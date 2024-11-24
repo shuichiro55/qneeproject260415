@@ -1,0 +1,89 @@
+{% load static %}
+{% block navbar %}
+
+<!-- START NAVBAR -->
+<nav id="navbar" class="navbar navbar-expand-lg fixed-top sticky">
+  <div class="container">
+    <a class="navbar-brand" href="/"><img src="{% static 'images/logo-qnee-yoko6.png' %}" alt="" height="23"></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <!-- area-expanded="false"は、関連する要素（下記のnavbar）が閉じていることを意味する？-->
+      <i class="mdi mdi-menu text-muted"></i>
+    </button>
+
+    <!-- 「navbar-expand-lg」によりlg以上の場合は、初めから表示される-->
+    <!-- これが表示されるとボタンは表示されない-->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0" id="navbar-navlist">
+        <li class="nav-item">
+          <a class="nav-link active" href="#home">Home</a>
+        </li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link" href="#" id="navbarDropdown" role="button"
+            data-bs-toggle="dropdown" aria-expanded="false">
+            私たちのサービス <i class="mdi mdi-chevron-down"></i>
+          </a>
+    
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <li><a class="nav-link" href="#features">主な特徴</a></li>
+            <li><a class="nav-link" href="#process">ご利用開始まで</a></li>
+            <li><a class="nav-link" href="#price">ご利用料金</a></li>
+            <li><a class="nav-link" href="#client">お客様の声</a></li>
+          </ul>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'corporate_info' %}">会社概要</a>
+        </li>
+
+        <!-- <li class="nav-item dropdown">
+          <a class="nav-link" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
+            aria-expanded="false">
+            会社概要 <i class="mdi mdi-chevron-down"></i>
+          </a>
+
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <li><a class="nav-link" href="/?#vision">ビジョン</a></li>
+            <li><a class="nav-link" href="/?#top-message">トップ・メッセージ</a></li>
+            <li><a class="nav-link" href="/?#corporate-info">会社情報</a></li>
+          </ul>
+        </li> -->
+
+        <li class="nav-item">
+          <a class="nav-link" href="#faq">FAQ</a>
+        </li>
+
+        <!-- <li class="nav-item dropdown">
+          <a class="nav-link" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
+            aria-expanded="false">
+            Blog <i class="mdi mdi-chevron-down"></i>
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <li><a class="nav-link" href="#blog">Blog</a></li>
+            <li><a class="nav-link" href="{% url 'blog-list' %}">Blog List</a></li>
+            <li><a class="nav-link" href="{% url 'blog-details' %}">Blog Details</a></li>
+          </ul>
+        </li> -->
+
+        <li class="nav-item">
+          <a class="nav-link" href="#contact">お問い合わせ</a>
+        </li>
+      </ul> <!--end ul navbar-nav-->
+
+      <!-- <ul class="list-inline mb-0 ps-lg-4 ms-2">
+        <li class="list-inline-item">
+          <a href="#" class="primary-link"><i class="mdi mdi-facebook"></i></a>
+        </li>
+        <li class="list-inline-item">
+          <a href="#" class="primary-link"><i class="mdi mdi-twitter"></i></a>
+        </li>
+        <li class="list-inline-item">
+          <a href="#" class="primary-link"><i class="mdi mdi-instagram"></i></a>
+        </li>
+      </ul> -->
+
+    </div> <!--end collapse-->
+  </div> <!--end container-->
+</nav> <!-- END NAVBAR -->
+{% endblock %}

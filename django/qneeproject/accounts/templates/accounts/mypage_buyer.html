@@ -1,0 +1,85 @@
+{%extends "partials/base_qconnect.html" %}
+
+{% load bootstrap_icons %}
+
+{% block content %}
+
+<!-- Icons Grid-->
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+
+<div class="alert alert-primary" role="alert">
+  来月初のQneeへのお支払いは●円です（支払が発生しているときに表示する）
+</div>
+
+<hr>
+
+<div class="row row-cols-1 row-cols-md-3 mb-3 text-center">
+  
+  <div class="col">
+    <div class="card mb-4 rounded-3 shadow-sm">
+      <div class="card-header py-3">
+        <h4 class="my-0 fw-normal">承認待ちボックス</h4>
+      </div>
+
+      <div class="card-body">
+        <p></p>
+        {% bs_icon 'inbox' color='cornflowerblue' size='2.5em' %}
+        <p></p>
+        <p class="lead mb-0">前払い申請の承認処理をします</p>
+
+        <form method="GET" action="{% url 'qpay:txlist_buyer_approve' %}">
+          {% csrf_token %}
+          <button type="submit" class="w-100 shadow btn btn-lg btn btn-outline-primary" name="next" value="approve_qpay">手続きへ</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col">
+    <div class="card mb-4 rounded-3 shadow-sm">
+      <div class="card-header py-3">
+        <h4 class="my-0 fw-normal">契約・取引履歴</h4>
+      </div>
+      <div class="card-body">
+        <p></p>
+        {% bs_icon 'receipt-cutoff' color='cornflowerblue' size='2.5em' %}
+        <p></p>
+
+        <p class="lead mb-0">契約状況や取引履歴を確認できます</p>
+
+        <form method="GET" action="{% url 'qpay:txlist_buyer_history' %}">
+          {% csrf_token %}
+          <button type="submit" class="w-100 shadow btn btn-lg btn btn-outline-primary" name="next" value="issue">手続きへ</button>
+          <!-- <button type="button" class="w-100 btn btn-lg btn-primary">手続きへ</button> -->
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col">
+    <div class="card mb-4 rounded-3 shadow-sm">
+    <!-- <div class="card mb-4 rounded-3 shadow-sm border-primary"> -->
+      <div class="card-header py-3"> 
+      <!-- <div class="card-header py-3 text-bg-primary border-primary"> -->
+        <h4 class="my-0 fw-normal">登録情報変更</h4>
+      </div>
+      <div class="card-body">
+        <p></p>
+        {% bs_icon 'pencil-square' color='cornflowerblue' size='2.5em' %}
+        <p></p>
+
+        <p class="lead mb-0">登録情報を変更します</p>
+
+        <form method="POST">
+          <button type="submit" class="w-100 shadow btn btn-lg btn btn-outline-primary" name="next" value="myinfo">編集へ</button>
+          <!-- <button type="button" class="w-100 btn btn-lg btn-primary">手続きへ</button> -->
+        </form>
+        </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,42 @@
+version: '3'       # docker-compose.ymlのファイル形式のバージョン
+services:          # dbサービスとdjango、2つのコンテナ起動
+
+  mysql:
+    image: mysql:8    # Docker Hubのmysql:8のイメージ利用
+
+    command:
+      --collation-server=utf8mb4_0900_bin
+      --transaction-isolation=READ-COMMITTED
+      # mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci
+      # コンテナ起動時に実行されるコマンドです. 文字コード変更（latin1⇒utf8）
+
+    restart:  always
+    environment:
+      MYSQL_DATABASE: qnee_db
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_USER: shuichiro
+      MYSQL_PASSWORD: password
+
+      TZ: 'Asia/Tokyo'
+
+    ports:
+      - 53306:3306
+        
+#  django:
+#    build: .
+#    # Dockerfileをもとイメージをビルド. .はDockerfileがある場所
+#
+#    command: python3 manage.py runserver 0.0.0.0:8000
+#    # ポート指定でDjangoの軽量サーバー起動
+#    # コンテナ起動時に実行（引数にコマンドを指定しないとき）
+#
+#    volumes:                 
+#      - .:/code  # カレントディレクトリを/codeにバインドマウント
+#
+#    ports:
+#      - 8000:8000
+#    # 左は公開用、右は転送先コンテナのポート
+#    # 右のポートは、上記のrunserverで指定したもの
+#
+#    # depends_on: # 先にdbサービスを起動
+#    #  - mysql

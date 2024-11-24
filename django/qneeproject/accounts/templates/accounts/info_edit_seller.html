@@ -1,0 +1,46 @@
+{%extends "partials/base_qconnect.html" %}
+
+{% load bootstrap_icons %}
+
+{% block content %}
+
+<!-- Icons Grid-->
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+
+
+<div class="header" style="display: flex; justify-content: space-between; align-items: center;">
+  <h5>{% bs_icon 'bank' size='1.1em' %} 各種登録情報の変更</h5>
+  <a href="{% url 'accounts:mypage_seller' %}" class="btn btn-outline-secondary" >メイン・メニューへ</a>
+</div>
+
+<hr>
+
+<div class="row row-cols-1 row-cols-md-3 mb-3 text-center">
+  <div class="col">
+    <form method="GET" action="{% url 'accounts:bankaccount_create' entity.id %}">
+      {% csrf_token %}
+      <button type="submit" class="w-100 shadow btn btn-lg btn btn-outline-primary" name="next" value="apply_qpay">受取口座設定</button>
+    </form>
+  </div>
+
+  <div class="col">
+    <form method="GET" action="{% url 'accounts:bankaccount_create' entity.id %}">
+      {% csrf_token %}
+      <button type="submit" class="w-100 shadow btn btn-lg btn btn-outline-primary" name="next" value="history">その他登録情報変更</button>
+      <!-- <button type="button" class="w-100 btn btn-lg btn-primary">手続きへ</button> -->
+    </form>
+  </div>
+
+  <div class="col">
+    <form method="GET" action="{% url 'accounts:bankaccount_create' entity.id %}">
+      {% csrf_token %}
+      <button type="submit" class="w-100 shadow btn btn-lg btn btn-outline-primary" name="next" value="history">パスワード変更</button>
+      <!-- <button type="button" class="w-100 btn btn-lg btn-primary">手続きへ</button> -->
+    </form>
+  </div>
+</div>
+
+{% endblock %}

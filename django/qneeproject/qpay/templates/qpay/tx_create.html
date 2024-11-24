@@ -1,0 +1,64 @@
+{% extends "partials/base_qconnect.html" %}
+{% load humanize %} 
+
+{% block content %}
+{% csrf_token %}
+<p></p>
+<div class="header" style="display: flex; justify-content: space-between; align-items: center;">
+  <h5>申請内容のご入力</h5>
+  <a href="{% url 'accounts:mypage_seller' %}" class="btn btn-outline-secondary" >メイン・メニューへ</a>
+</div>
+<hr>
+
+<form method="POST" class="p-4 m-4 bg-light border border-success rounded form-group" enctype="multipart/form-data">
+  {% csrf_token %}
+
+  {{ form.non_field_errors }}
+
+  {% if form.buyer_entity_choice.errors %}
+  <div style="color:red;">{{ form.buyer_entity.errors.as_text }}<br></div>
+  {% endif %}
+  <!-- {{ form.buyer_entity_choice.label_tag }} -->
+  ご報酬お支払い企業（リストから選択）： {{ form.buyer_entity_choice }}
+  <hr>
+
+  {% if form.buyer_entity_choice.errors %}
+  <div style="color:red;">{{ form.seller_entityname.errors.as_text }}<br></div>
+  {% endif %}
+  <!-- {{ form.seller_entityname.label_tag }} -->
+  ご報酬を受ける方：{{ form.seller_entityname }}
+  <hr>
+
+  {% if form.requested_amount.errors %}
+  <div style="color:red;">{{ form.rquested_amount.errors.as_text }}<br></div>
+  {% endif %}
+  <!-- {{ form.requested_amount.label_tag }} -->
+  前払いのご申請額（円）：{{ form.requested_amount}}
+  <hr>
+  
+  {% if form.original_payment_date.errors %}
+  <div style="color:red;">{{ form.original_payment_date.errors.as_text }}<br></div>
+  {% endif %}
+  <!-- {{ form.requested_amount.label_tag }} -->
+  報酬日：{{ form.original_payment_date }}
+  <hr>
+
+  {% if form.evidence.errors %}
+  <div style="color:red;">{{ form.evidence.errors.as_text }}<br></div>
+  {% endif %}
+  
+  {{ form.evidence.label_tag }}
+  {{ form.evidence }}
+  <hr>
+
+  {{ form.seller_email.as_hidden}}
+  {{ form.seller_personname.as_hidden}}
+  {{ form.buyer_entityname.as_hidden}}
+
+  <button type="submit" class="btn btn-outline-primary" name="next" value="confirm">申請する</button>
+  <!--<button type="submit" class="btn btn-outline-secondary" name="next" value="back">一覧に戻る</button> -->
+  <!-- <input type="hidden" name="next" value="{{ next }}" /> -->
+
+  </form>
+
+{% endblock %}

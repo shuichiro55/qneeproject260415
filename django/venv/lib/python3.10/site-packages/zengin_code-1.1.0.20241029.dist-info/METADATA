@@ -1,0 +1,72 @@
+Metadata-Version: 2.1
+Name: zengin-code
+Version: 1.1.0.20241029
+Summary: bank codes and branch codes for Japanese.
+Home-page: https://github.com/zengin-code/zengin-py
+Author: Zengin Code
+Author-email: zengin-code@zeny.io
+License: MIT
+Keywords: zengin,bank,japanese
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.4
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Programming Language :: Python :: Implementation :: PyPy
+Classifier: Topic :: Internet :: WWW/HTTP
+Classifier: Topic :: Software Development :: Libraries
+License-File: LICENSE.txt
+Requires-Dist: six
+
+==============================
+ZenginCode
+==============================
+
+|circle| |version|
+
+The python implementation of ZenginCode.
+
+ZenginCode is datasets of bank codes and branch codes for japanese.
+
+Installation
+==============
+
+.. code-block:: bash
+
+ pip install zengin_code
+
+Usage
+==============
+
+.. code-block:: python
+
+ from zengin_code import Bank
+
+ Bank.all # => OrderedDict([(u'0001', <zengin_code.bank.Bank object at 0x1044173d0>), ...
+
+Contributing
+===============
+
+Bug reports and pull requests are welcome on GitHub at https://github.com/zengin-code/zengin-py
+
+License
+===============
+
+The package is available as open source under the terms of the `MIT License <http://opensource.org/licenses/MIT>`_ .
+
+
+.. |circle| image:: https://img.shields.io/circleci/project/zengin-code/zengin-py.svg
+    :target: https://circleci.com/gh/zengin-code/zengin-py
+
+.. |version| image:: https://img.shields.io/pypi/v/zengin_code.svg
+    :target: http://pypi.python.org/pypi/zengin_code/
+    :alt: latest version
+
+

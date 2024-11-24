@@ -1,0 +1,45 @@
+{% extends "partials/base_qconnect.html" %}
+{% load humanize %}
+
+{% block content %}
+
+<p></p>
+
+<div class="header" style="display: flex; justify-content: space-between; align-items: center;">
+  <h5>承認画面</h5>
+  <a href="{% url 'qpay:txlist_buyer_approve' %}" class="btn btn-outline-secondary" >承認待ちボックスへ</a>
+</div>
+
+<hr>
+
+<div class="container">
+  <table class="table table-striped table-bordered">
+    <tbody>
+      <tr><td width="25%">受注者</td><td>{{ tx.seller_entityname }}</td></tr>
+      <tr><td>申請者</td><td>{{ tx.seller_personname }}</td></tr>
+      <tr><td>申請額</td><td>{{ tx.requested_amount|intcomma }}</td></tr>
+      <tr><td>エビデンス</td><td>{{ tx.evidence }}</td></tr>
+      <tr><td>処理状況</td><td>{{ tx.tx_status_char }}</td></tr>
+    </tbody>
+  </table>
+
+  <table class="table table-striped table-bordered">
+    <tbody>
+      <tr><td width="25%">＋Qnee前払額</td><td>{{ tx.advance_amount|intcomma }}</td></tr>
+      <tr><td>－前払替手数料</td><td>{{ tx.advance_fee|intcomma }}</td></tr>
+      <tr><td>－振込手数料</td><td>{{ tx.transfer_fee|intcomma }}</td></tr>
+      <tr><td>お取引先への振込額</td><td>{{ tx.to_seller_amount|intcomma }}</td></tr>
+      <tr><td>紹介報酬（Qnee⇒加盟店）</td><td>{{ tx.referral_fee|intcomma }}</td></tr>
+    </tbody>
+  </table>
+
+  <form method="POST" action="{% url 'qpay:txdetail_buyer_approve' tx.pk %}">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-outline-primary" name="next" value="approve">承認する</button>
+    <button type="submit" class="btn btn-outline-primary" name="next" value="reject1">否認する</button>
+    <button type="submit" class="btn btn-outline-primary" name="next" value="reject2">否認する（コメント付き）</button>
+  </form>
+
+</div>
+
+{% endblock %}
