@@ -1,0 +1,55 @@
+{% extends "index/base_qconnect_seller.html" %}
+{% load humanize %}
+
+{% block content %}
+{% csrf_token %}
+
+<p></p><div class="authentication-bg min-vh-100 min-vw-100" style="background-color: #d8eefa;">
+
+  <div class="container">
+
+    <nav aria-label="breadcrumb" role="navigation">
+      <ol class="breadcrumb text-dark rounded-2">
+        <li class="breadcrumb-item text-primary"><a href="{% url 'accounts:mypage_seller' %}">マイページ・ホーム</a></li>
+        <li class="breadcrumb-item text-primary"><a href="{% url 'accounts:info_edit_seller' %}">設定メニュー</a></li>
+        <li class="breadcrumb-item active" aria-current="page">前払い申請</li>
+      </ol>
+    </nav>
+
+
+    <div class="d-flex justify-content-center mt-4">
+      <h5>申請内容のご確認</h5>
+    </div>
+
+    <form method="POST" action="{% url 'qpay:tx_create' user_id tx.id %}" class="p-4 m-4 bg-light border border-success rounded form-group" enctype="multipart/form-data">
+      {% csrf_token %}
+      <table class="table table-striped table-bordered table-responsive">
+        <tbody< class="text-center">
+          <tr><td width="40%">お取引先</td><td style="text-align:center;">{{ buyer_entityname }}様</td></tr>
+          <tr><td>お申込者</td><td style="text-align:center;">{{ form.seller_personname.value }}様／{{ form.seller_email.value }}</td></tr>
+          <tr><td>ご報酬を受ける方</td><td style="text-align:center;">{{ form.seller_entityname.value }}様</td></tr>
+          <tr><td>ご申込金額</td><td style="text-align:center;">{{ form.requested_amount.value|intcomma }}</td></tr>
+        </tbody>
+      </table>
+
+      <table class="table table-striped table-bordered">
+        <tbody>
+          <tr><td width="40%">＋前払額</td><td style="text-align: right;">{{ tx.advance_amount|intcomma }}</td></tr>
+          <tr><td>－前払手数料</td><td style="text-align: right;">{{ tx.advance_fee|intcomma }}</td></tr>
+          <tr><td>－振込手数料</td><td style="text-align: right;">{{ tx.transfer_fee|intcomma }}</td></tr>
+          <tr><td>受取り金額</td><td style="text-align: right;">{{ tx.to_seller_amount|intcomma }}</td></tr>
+        </tbody>
+      </table>
+
+      {% for field in form %}
+        {{ field.as_hidden }}
+      {% endfor %}
+
+      <button id="next1" type="submit" class="btn btn-outline-primary" name="next" value="backToInput">戻る</button>
+      <button id="next2" type="submit" class="btn btn-primary" name="next" value="ToEvidence">証明書アップロードへ</button>
+
+    </form>
+  </div>
+</div>
+
+{% endblock %}

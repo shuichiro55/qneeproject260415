@@ -43,6 +43,7 @@ INSTALLED_APPS = [
   'django_bootstrap_icons',
   'django.contrib.humanize',
   'contact',
+
   #'django.contrib.sites',
   #'allauth',
   #'allauth.account',

@@ -1,0 +1,26 @@
+<div class="container-fluid">
+  <nav aria-label="Page navigation example">
+      <ul class="pagination justify-content-center">
+          {% if page_obj.has_previous %}
+              <li><a class="page-link text-primary d-inline-block" href="?page={{ page_obj.previous_page_number }}"><<</a></li>
+          {% endif %}
+
+          {% for link_page in page_obj.paginator.page_range %}
+              {% if link_page %}
+                  {% if link_page == page_obj.number %}
+                      <li class="disabled"><div class="page-link text-secondary d-inline-block disabled" href="#">{{ link_page }}</div></li>
+                  {% else %}
+                      <li><a class="page-link text-primary d-inline-block" href="?page={{ link_page }}">{{ link_page }}</a></li>
+                  {% endif %}
+              {% else %}
+                  <li class="disabled"><a class="page-link text-secondary d-inline-block text-muted" href="#">・・・</a></li>
+              {% endif %}
+          {% endfor %}
+          
+
+          {% if page_obj.has_next %}
+              <li><a class="page-link text-primary d-inline-block" href="?page={{ page_obj.next_page_number }}">>></a></li>
+          {% endif %}
+      </ul>
+  </nav>
+</div>

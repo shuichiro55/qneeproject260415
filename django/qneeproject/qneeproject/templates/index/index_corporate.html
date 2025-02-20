@@ -1,4 +1,4 @@
-{% extends 'partials/base_corporate.html' %}
+{% extends 'index/base_corporate.html' %}
 
 {% load static %}
 
@@ -8,6 +8,7 @@
 <section class="home-slider" id="home">
   <div class="swiper-container homeslider">
     <div class="swiper-wrapper">
+
       <div class="swiper-slide" style="background-image: url('static/images/home/bg-home3-1.jpg');background-size: cover;background-position: center;">
         <div class="bg-overlay">
         </div>
@@ -32,7 +33,7 @@
       </div> <!--end swiper-slide-->
   
       <div class="swiper-slide"
-        style="background-image: url('static/images/home/bg-home3-2.jpg');background-size: cover;background-position: bottom;">
+        style="background-image: url('static/images/home/bg-home3-2.jpg');background-size: cover;background-position: center;"> # bottom
         <div class="bg-overlay">
         </div>
       
@@ -48,7 +49,6 @@
                     data-bs-toggle="tooltip" data-bs-placement="bottom" title="受注者向けWebアプリ準備中">仕事を受注する方</a>
                   <a href="#" class="btn btn-primary" role="button"
                     data-bs-toggle="tooltip" data-bs-placement="bottom" title="発注者向けWebアプリ準備中">仕事を発注する方</a>
-
                 </div>
               </div>
             </div> <!--end col-->
@@ -57,7 +57,7 @@
       </div> <!--end swiper-slide-->
 
       <div class="swiper-slide"
-        style="background-image: url('static/images/home/bg-home3-3.jpg');background-size: cover;background-position: top;">
+        style="background-image: url('static/images/home/bg-home3-3.jpg');background-size: cover;background-position: center;"> # top
         <div class="bg-overlay">
         </div>
 
@@ -69,11 +69,10 @@
                 <h1>新しい価値創造へ</h1>
                 <p class="home-desc pt-3">オペレーション簡略化、行動や結果のデータ化による信用創造・マッチングなどの未来型のサービスを目指します。</p>
                 <div class="d-grid gap-5 d-md-flex justify-content-md-center mt-4 pt-3">
-                  <a href="#" class="btn btn-primary" role="button" 
+                  <a href="{% url 'index_qconnect_seller' %}" class="btn btn-primary" role="button" 
                     data-bs-toggle="tooltip" data-bs-placement="bottom" title="受注者向けWebアプリ準備中">仕事を受注する方</a>
-                  <a href="#" class="btn btn-primary" role="button"
+                  <a href="{% url 'index_qconnect_buyer' %}" class="btn btn-primary" role="button"
                     data-bs-toggle="tooltip" data-bs-placement="bottom" title="発注者向けWebアプリ準備中">仕事を発注する方</a>
-
                 </div>
               </div>
             </div> <!--end col-->

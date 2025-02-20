@@ -1,64 +1,220 @@
-{% extends "partials/base_qconnect.html" %}
+{% extends "index/base_qconnect_seller.html" %}
 {% load humanize %} 
 
 {% block content %}
 {% csrf_token %}
-<p></p>
-<div class="header" style="display: flex; justify-content: space-between; align-items: center;">
-  <h5>申請内容のご入力</h5>
-  <a href="{% url 'accounts:mypage_seller' %}" class="btn btn-outline-secondary" >メイン・メニューへ</a>
+
+<div class="authentication-bg min-vh-100 min-vw-100 align-items-start" style="background-color: #edf9ff;">
+
+  <div class="container mt-2">
+
+    <nav aria-label="breadcrumb" role="navigation">
+      <ol class="breadcrumb text-dark rounded-2">
+        <li class="breadcrumb-item text-primary"><a href="{% url 'accounts:mypage_seller' %}">マイページ・ホーム</a></li>
+        <li class="breadcrumb-item text-primary"><a href="{% url 'accounts:info_edit_seller' %}">設定メニュー</a></li>
+        <li class="breadcrumb-item active" aria-current="page">前払い申請</li>
+      </ol>
+    </nav>
+
+    <div class ="row justify-content-center">
+      <div class="col-10">
+        <div class="progress mt-3 mb-5" style="height: 12px" >
+          <div class="progress-bar bg-danger progress-bar-striped progress-bar-animated" role="progressbar"
+            style="width: 35%"
+            aria-valuenow="35" aria-valuemin="0" aria-valuemax="100">
+            申請内容のご登録
+          </div>
+
+          <div class="progress-bar bg-secondary" role="progressbar"
+            style="width: 35%"
+            aria-valuenow="70" aria-valuemin="0" aria-valuemax="100">
+            承認待ち
+          </div>
+
+          <div class="progress-bar bg-secondary" role="progressbar"
+            style="width: 30%"
+            aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+            口座設定
+        </div>
+
+      </div>
+    </div>
+
+
+    {% if flag_step == 1 %}
+
+      <div class="d-flex justify-content-center mt-2">
+        <h5>申請内容の入力</h5>
+      </div>
+
+      <!--
+      <select class="form-select"
+        name="{{form.buyer_entityname.name}}"
+        value="{{form.buyer_entityname.value}}">
+        <option value="富張" selected>富張</option>
+      </select>
+      -->
+
+      <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-9 col-xxl-8">
+          <form method="POST"
+            class="form-group bg-light border border-success rounded p-4 m-4 "
+            enctype="multipart/form-data">
+
+            {% csrf_token %}
+
+            {{ form.non_field_errors }}
+
+            <div class="form-group row justify-content-center pt-3">
+              <label class="col-11 col-md-3 col-form-label" id="{{form.buyer_entiyname.id_for_label}}">
+                報酬を払う方</label>
+
+                <div class="col-md-8 col-xl-7">
+                <select class="form-select"
+                  name="{{form.buyer_entityname.name}}"
+                  value="{{form.buyer_entityname.value}}"
+                  id="{{form.buyer_entiyname.id_for_label}}">
+
+                  {% if temporal_buyer_entityname == "" %}
+                    <option value="" selected></option>
+                    {% for key, value in buyerEntityname_dict.items %}
+                      <option value="{{ value }}">{{ value }}</option>
+                    {% endfor %}
+
+                  {% else %}
+
+                    {% for key, value in buyerEntityname_dict.items %}
+                      {% if value == temporal_buyer_entityname %}
+                        <option value="{{value}}" selected>{{value}}</option>
+                      {% else %}
+                        <option value="{{ value }}">{{ value }}</option>
+                      {% endif %}
+                    {% endfor %}
+
+                  {% endif %}
+                  
+                </select>
+              </div>
+            </div>
+
+            {% if form.buyer_entity_choice.errors %}
+              <div style="color:red;">{{ form.seller_entityname.errors.as_text }}<br></div>
+            {% endif %}
+            <div class="form-group row justify-content-center pt-3">
+              <label class="col-11 col-md-3 col-form-label" for="{{form.seller_entityname.id_for_label}}" >
+                報酬を貰う方</label>
+              <div class="col-md-8 col-xl-7">
+                <input type="{{form.seller_entityname.widget.input_type}}" class="form-control"
+                  name="{{form.seller_entityname.name}}"
+                  value="{{form.seller_entityname.value|default:''}}"
+                  readonly
+                  placeholder=""
+                  id="{{form.seller_entityname.id_for_label}}" >
+              </div>
+            </div>
+
+            {% if form.requested_amount.errors %}
+              <div style="color:red;">{{ form.rquested_amount.errors.as_text }}<br></div>
+            {% endif %}
+            <div class="form-group row justify-content-center pt-3">
+              <label class="col-11 col-md-3 col-form-label" for='{{form.requested_amount.id_for_label}}' >
+                申請金額</label>
+              <div class="col-md-8 col-xl-7">
+                <input type='form.requested_amount.widget.input_type' class='form-control'
+                  name="{{form.requested_amount.name}}"
+                  value="{{form.requested_amount.value|default:''}}"
+                  placeholder=""
+                  id="{{form.requested_amount.id_for_label}}" >
+              </div>
+            </div>
+
+
+            {% if form.original_payment_date.errors %}
+              <div style="color:red;">{{ form.original_payment_date.errors.as_text }}<br></div>
+            {% endif %}
+
+            <div class="form-group row justify-content-center pt-3">
+              <label class="col-11 col-md-3 col-form-label" for='{{form.original_payment_date.id_for_label}}' >
+                当初報酬日</label>
+              <div class="col-md-8 col-xl-7">
+                <input type="date" class='form-control'
+                  name="{{form.original_payment_date.name}}"
+                  value="{{form.original_payment_date.value|default:''}}"
+                  placeholder=""
+                  id="{{form.original_payment_date.id_for_label}}" >
+              </div>
+            </div>
+
+            <hr>
+          
+            <div class="d-flex justify-content-center pt-3">         
+              <button type="submit" class="btn btn-primary" name="next" value="ToConfirm">入力内容確認へ</button>
+            </div>
+            <!--<button type="submit" class="btn btn-outline-secondary" name="next" value="back">一覧に戻る</button> -->
+            <!-- <input type="hidden" name="next" value="{{ next }}" /> -->
+
+            {{ form.seller_email.as_hidden}}
+            {{ form.seller_personname.as_hidden}}
+            <!-- {{ form.buyer_entityname.as_hidden}} -->
+
+          </form>
+        </div>
+      </div>
+
+    {% endif %}
+
+
+    {% if flag_step == 2 %}
+
+      <div class="d-flex justify-content-center mt-2">
+        <h5>申請内容のご確認</h5>
+      </div>
+
+      <div class="row justify-content-center">
+        <div class="col-11 col-md-9 col-lg-6">
+
+          <form method="POST"
+            action="{% url 'qpay:tx_create' user_id tx.id %}"
+            class="p-4 m-4 bg-light border border-success rounded form-group"
+            enctype="multipart/form-data">
+
+            {% csrf_token %}
+            <table class="table table-striped table-bordered table-responsive">
+              <tbody< class="text-center">
+                <tr><td width="45%">パートナー</td><td style="text-align: right;">{{ form.buyer_entityname.value }}　様</td></tr>
+                <tr><td width="45%">お申込者</td><td style="text-align: right;">{{ form.seller_personname.value }}　様</td></tr>
+                <tr><td width="45%">報酬を貰う方</td><td style="text-align: right;">{{ form.seller_entityname.value }}　様</td></tr>
+                <tr><td width="45%">ご申込金額</td><td style="text-align: right;">{{ form.requested_amount.value|intcomma }}</td></tr>
+              </tbody>
+            </table>
+
+            <table class="table table-striped table-bordered">
+              <tbody>
+                <tr class="table-info"><td width="45%">受取り金額</td><td style="text-align: right;">{{ tx.to_seller_amount|intcomma }}</td></tr>
+                <tr><td width="45%">＋前払額</td><td style="text-align: right;">{{ tx.advance_amount|intcomma }}</td></tr>
+                <tr><td width="45%">－前払手数料</td><td style="text-align: right;">{{ tx.advance_fee|intcomma }}</td></tr>
+                <tr><td width="45%">－振込手数料</td><td style="text-align: right;">{{ tx.transfer_fee|intcomma }}</td></tr>
+              </tbody>
+            </table>
+
+            <hr>
+
+            <div class="d-flex justify-content-center">
+              <button id="next1" type="submit" class="btn btn-outline-primary me-2" name="next" value="BackToInput">戻る</button>
+              <button id="next2" type="submit" class="btn btn-primary" name="next" value="ToEvidence">証明書アップロードへ</button>
+            </div>
+
+            {% for field in form %}
+              {{ field.as_hidden }}
+            {% endfor %}
+
+          </form>
+        </div>
+      </div>
+
+    {% endif %}
+
+  </div>
 </div>
-<hr>
-
-<form method="POST" class="p-4 m-4 bg-light border border-success rounded form-group" enctype="multipart/form-data">
-  {% csrf_token %}
-
-  {{ form.non_field_errors }}
-
-  {% if form.buyer_entity_choice.errors %}
-  <div style="color:red;">{{ form.buyer_entity.errors.as_text }}<br></div>
-  {% endif %}
-  <!-- {{ form.buyer_entity_choice.label_tag }} -->
-  ご報酬お支払い企業（リストから選択）： {{ form.buyer_entity_choice }}
-  <hr>
-
-  {% if form.buyer_entity_choice.errors %}
-  <div style="color:red;">{{ form.seller_entityname.errors.as_text }}<br></div>
-  {% endif %}
-  <!-- {{ form.seller_entityname.label_tag }} -->
-  ご報酬を受ける方：{{ form.seller_entityname }}
-  <hr>
-
-  {% if form.requested_amount.errors %}
-  <div style="color:red;">{{ form.rquested_amount.errors.as_text }}<br></div>
-  {% endif %}
-  <!-- {{ form.requested_amount.label_tag }} -->
-  前払いのご申請額（円）：{{ form.requested_amount}}
-  <hr>
-  
-  {% if form.original_payment_date.errors %}
-  <div style="color:red;">{{ form.original_payment_date.errors.as_text }}<br></div>
-  {% endif %}
-  <!-- {{ form.requested_amount.label_tag }} -->
-  報酬日：{{ form.original_payment_date }}
-  <hr>
-
-  {% if form.evidence.errors %}
-  <div style="color:red;">{{ form.evidence.errors.as_text }}<br></div>
-  {% endif %}
-  
-  {{ form.evidence.label_tag }}
-  {{ form.evidence }}
-  <hr>
-
-  {{ form.seller_email.as_hidden}}
-  {{ form.seller_personname.as_hidden}}
-  {{ form.buyer_entityname.as_hidden}}
-
-  <button type="submit" class="btn btn-outline-primary" name="next" value="confirm">申請する</button>
-  <!--<button type="submit" class="btn btn-outline-secondary" name="next" value="back">一覧に戻る</button> -->
-  <!-- <input type="hidden" name="next" value="{{ next }}" /> -->
-
-  </form>
 
 {% endblock %}

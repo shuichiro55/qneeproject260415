@@ -7,6 +7,7 @@ from django.utils.translation import gettext_lazy as _
 
 from django.contrib.auth.forms import AuthenticationForm
 from .models import LegalEntity
+
 import unicodedata, re
 
 UserModel = get_user_model()
@@ -41,76 +42,14 @@ class UserCreateForm(UserCreationForm):
     UserModel.objects.filter(email=email, is_active=False).delete()
     return email
 
-## 24/03/31 個人か法人かを確認し、それぞれのFormにつなげる
-#class UserCreate2Form(forms.ModelForm):
-#
-#    def __init__(self, *args, **kwargs):
-#        super().__init__(*args, **kwargs)
-#        for field in self.fields.values():
-#            field.widget.attrs['class'] = 'form-control'
-#            field.widget.attrs['placeholder'] = field.label
-#
-#    def clean_type2(self):
-#        return self.cleaned_date['type2']
-#
-#    class Meta:
-#        model = UserModel
-#        fields = ('type2',)
 
-
-class MyPageForm_seller(forms.ModelForm):
+class MyPageForm_buyer(forms.ModelForm):
 
   class Meta:
     model = LegalEntity
     fields = ('personname', 'tel', 'entityname', 'department', 'title', 'postal_code')
 
-#class ConsentForm(forms.ModelForm):
-
-#class EmailAuthenticationForm(forms.Form): #実践Djangoの「認証バックエンドによるログイン処理のカスタマイズ」P217
-#    email = forms.EmailField(max_length=254, widget=forms.TextInput(attrs={'autofocus':True}))
-#    password = forms.CharField(label=_("Password"), strip=False, widget=forms.PasswordInput)
-#
-#    error_messages = {
-#        'invalid_login': "Eメールアドレスまたはパスワードに誤りがあります。", 'inactive':_("This account is inactive"),
-#    }
-#
-#    def __init__(self, request=None, *args, **kwargs):
-#        self.request = request
-#        self.user_cashe = None
-#        super().__init__(*args, **kwargs)
-#        
-#       #Set the label for the "email" field.
-#        self.email_field = UserModel._meta.get_field("email")
-#        if self.fields['email'].label is None:
-#            self.fields['email'].label = capfirst(self.email_field.verbose_name) #capfirst 先頭の文字を大文字に
-#    
-#    def clean(self):
-#        email = self.cleaned_data.get('email')
-#        password = self.cleaned_data.get('password')
-#
-#        if email is not None and password:
-#            self.user_cache = authenticate(self.request, email=email, password=password)
-#            if self.user_cache is None:
-#                raise forms.ValidationError(
-#                    self.error_messages['invalid_login'],
-#                    code = 'invalid_login',  #推奨コードにcodeの記載はあるがメリットは
-#                    params = {'email': self.email_field.verbose_name})  #paramsはエラーメッセージに変数を使うときだが使われていない
-#            else:
-#                self.confirm_login_allowed(self.user_cache)
-#        return self.cleaned_data
-#
-#    def confirm_login_allowed(self, user):
-#        if not user.is_active:
-#            raise forms.ValidationError(self.error_messages['inactive'], code='inactive')
-#    
-#    def get_user_id(self):
-#        if self.user_cache:
-#            return self.user_cache.id
-#    
-#    def get_user(self):
-#        return self.user_cache
-
-class MyPageForm_buyer(forms.ModelForm):
+class MyPageForm_seller(forms.ModelForm):
 
   class Meta:
     model = LegalEntity
@@ -130,7 +69,28 @@ class MyLoginForm(AuthenticationForm):
         field.widget.attrs['class'] = 'form-control'
         field.widget.attrs['placeholder'] = field.label
 
-class UserCreateForm(UserCreationForm):
+
+class UserCreateForm_buyer(UserCreationForm):
+
+    class Meta:
+      model = UserModel
+      fields = ('email',)
+
+    def __init__(self, *args, **kwargs):
+      super().__init__(*args, **kwargs)
+      for field in self.fields.values():
+        field.widget.attrs['class'] = 'form-control'
+        field.widget.attrs['placeholder'] = field.label
+    
+    def clean_email(self):
+      email = self.cleaned_data['email']
+      UserModel.objects.filter(email=email, is_active=False).delete()
+      # ★★ 25/0101 これ、既に登録されているユーザーを削除してしまうではないか、、、
+      return email
+
+tran_zen_han = str.maketrans('―－‐ー₋—⁻０１２３４５６７８９', '-------0123456789')
+
+class UserCreateForm_seller(UserCreationForm):
 
     class Meta:
       model = UserModel
@@ -145,39 +105,52 @@ class UserCreateForm(UserCreationForm):
     def clean_email(self):
       email = self.cleaned_data['email']
       UserModel.objects.filter(email=email, is_active=False).delete()
+      # ★★ 25/0101 これ、既に登録されているユーザーを削除してしまうではないか、、、
       return email
 
 
-tran_zen_han = str.maketrans('―－‐ー₋—⁻０１２３４５６７８９', '-------0123456789')
-
-class EntityCreateForm(forms.ModelForm):
+class EntityCreateForm_buyer(forms.ModelForm):
 
     class Meta:
       model = LegalEntity
-      fields = ('personname', 'tel', 'entityname', 'department', 'title', 'postal_code')
+      fields = ('personname', 'tel', 'entityname', 'postal_code', 'department', 'title')
+      labels = {
+        "personname": "お名前（個人名）",
+        "tel": "電話番号",
+        "entityname": "企業名",
+        "postal_code": "郵便番号",
+        "department": "部署名",
+        "title": "役職",
+    }
 
     def __init__(self, *args, **kwargs):
       super().__init__(*args, **kwargs)
+      
       for field in self.fields.values():
         field.widget.attrs['class'] = 'form-control'
-        #    field.widget.attrs['placeholder'] = field.label
+
+      self.fields['personname'].widget.attrs['placeholder'] = '記入例：山田 太郎'
+      self.fields['tel'].widget.attrs['placeholder'] = '数字のみ、ご記載ください'
+      self.fields['postal_code'].widget.attrs['placeholder'] = '数字のみ、ご記載ください'
 
     def clean_personname(self):
       print(self.cleaned_data['personname'])
       personname =self.cleaned_data.get('personname')
-      print(f'self.cleaned_data[personname]={personname} (in EntityCreateForm)')
+      personname 
+      print(f'self.cleaned_data[personname]={personname} (in EntityCreateForm_buyer)')
+
       return unicodedata.normalize('NFKC', self.cleaned_data['personname'])
         
     def clean_entityname(self):
       entityname = self.cleaned_data.get('entityname')
-      print(f'self.cleaned_data[entityname]={entityname} (in EntityCreateForm)')
+      print(f'self.cleaned_data[entityname]={entityname} (in EntityCreateForm_buyer)')
       if entityname is not None :
         return unicodedata.normalize('NFKC', entityname)   
       return entityname
 
     def clean_department(self):
       department = self.cleaned_data['department']
-      print(f'self.cleaned_data[department]={department} (clean_department in EntityCreateForm)')
+      print(f'self.cleaned_data[department]={department} (clean_department in EntityCreateForm_buyer)')
       if department is not None:
          return unicodedata.normalize('NFKC', department)
       return department
@@ -191,7 +164,7 @@ class EntityCreateForm(forms.ModelForm):
     def clean_tel(self):
       tel1 = self.cleaned_data['tel'].translate(tran_zen_han)
       tel2 = unicodedata.normalize('NFKC', ''.join(re.findall('[0-9０-９]+', tel1)))
-      print(f'tel2:{tel2}（clean_te. in class EntityCreateform）')
+      print(f'tel2:{tel2}（clean_tel. in class EntityCreateform_buyer）')
       return tel2
     
     def clean_postal_code(self):
@@ -199,73 +172,106 @@ class EntityCreateForm(forms.ModelForm):
       postal_code2 = unicodedata.normalize('NFKC', ''.join(re.findall('[0-9０-９]+', postal_code1)))
       return postal_code2
 
+class EntityCreateForm_seller(forms.ModelForm):
 
-class EntityConfirmForm(forms.Form):
+  class Meta:
+    model = LegalEntity
+    fields = ('personname', 'tel', 'entityname',  'postal_code', 'department', 'title')
+    labels = {
+      "personname": "お名前（個人名）",
+      "tel": "電話番号",
+      "entityname": "企業名",
+      "postal_code": "郵便番号",
+      "department": "部署名",
+      "title": "役職",
+  }
 
-    #is_consent = forms.BooleanField(label='同意する', required=True, widget=forms.CheckboxInput(attrs={'class': 'check'}),)
 
-    class Meta:
-      model = LegalEntity
-      fields = ('is_consent')
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+      
+    for field in self.fields.values():
+      field.widget.attrs['class'] = 'form-control'
+      field.widget.attrs['placeholder'] = field.label
+
+    self.fields['personname'].widget.attrs['placeholder'] = '記入例：山田 太郎'
+    self.fields['tel'].widget.attrs['placeholder'] = '数字のみ、ご記載ください'
+    self.fields['postal_code'].widget.attrs['placeholder'] = '数字のみ、ご記載ください'
+
+  def clean_personname(self):
+    print(self.cleaned_data['personname'])
+    personname =self.cleaned_data.get('personname')
+    print(f'self.cleaned_data[personname]={personname} (in EntityCreateForm_seller)')
+    return unicodedata.normalize('NFKC', self.cleaned_data['personname'])
+        
+  def clean_entityname(self):
+    entityname = self.cleaned_data.get('entityname')
+    print(f'self.cleaned_data[entityname]={entityname} (in EntityCreateForm_seller)')
+    if entityname is not None :
+      return unicodedata.normalize('NFKC', entityname)   
+    return entityname
+
+  def clean_department(self):
+    department = self.cleaned_data['department']
+    print(f'self.cleaned_data[department]={department} (clean_department in EntityCreateForm_seller)')
+    if department is not None:
+      return unicodedata.normalize('NFKC', department)
+    return department
+
+  def clean_title(self):
+    title = self.cleaned_data['title']
+    if title is not None:
+      return unicodedata.normalize('NFKC', title)
+    return title
+
+  def clean_tel(self):
+    tel1 = self.cleaned_data['tel'].translate(tran_zen_han)
+    tel2 = unicodedata.normalize('NFKC', ''.join(re.findall('[0-9０-９]+', tel1)))
+    print(f'tel2:{tel2}（clean_te. in class EntityCreateform_seller）')
+    return tel2
+    
+  def clean_postal_code(self):
+    postal_code1 = self.cleaned_data['postal_code'].translate(tran_zen_han)
+    postal_code2 = unicodedata.normalize('NFKC', ''.join(re.findall('[0-9０-９]+', postal_code1)))
+    return postal_code2
 
 
-class MyPageForm_seller(forms.ModelForm):
+class EntityConfirmForm_buyer(forms.Form):
 
-    class Meta:
-      model = LegalEntity
-      fields = ('personname', 'tel', 'entityname', 'department', 'title', 'postal_code')
+  class Meta:
+    model = LegalEntity
 
-#class ConsentForm(forms.ModelForm):
+class EntityConfirmForm_seller(forms.Form):
 
-#class EmailAuthenticationForm(forms.Form): #実践Djangoの「認証バックエンドによるログイン処理のカスタマイズ」P217
-#    email = forms.EmailField(max_length=254, widget=forms.TextInput(attrs={'autofocus':True}))
-#    password = forms.CharField(label=_("Password"), strip=False, widget=forms.PasswordInput)
-#
-#    error_messages = {
-#        'invalid_login': "Eメールアドレスまたはパスワードに誤りがあります。", 'inactive':_("This account is inactive"),
-#    }
-#
-#    def __init__(self, request=None, *args, **kwargs):
-#        self.request = request
-#        self.user_cashe = None
-#        super().__init__(*args, **kwargs)
-#        
-#       #Set the label for the "email" field.
-#        self.email_field = UserModel._meta.get_field("email")
-#        if self.fields['email'].label is None:
-#            self.fields['email'].label = capfirst(self.email_field.verbose_name) #capfirst 先頭の文字を大文字に
-#    
-#    def clean(self):
-#        email = self.cleaned_data.get('email')
-#        password = self.cleaned_data.get('password')
-#
-#        if email is not None and password:
-#            self.user_cache = authenticate(self.request, email=email, password=password)
-#            if self.user_cache is None:
-#                raise forms.ValidationError(
-#                    self.error_messages['invalid_login'],
-#                    code = 'invalid_login',  #推奨コードにcodeの記載はあるがメリットは
-#                    params = {'email': self.email_field.verbose_name})  #paramsはエラーメッセージに変数を使うときだが使われていない
-#            else:
-#                self.confirm_login_allowed(self.user_cache)
-#        return self.cleaned_data
-#
-#    def confirm_login_allowed(self, user):
-#        if not user.is_active:
-#            raise forms.ValidationError(self.error_messages['inactive'], code='inactive')
-#    
-#    def get_user_id(self):
-#        if self.user_cache:
-#            return self.user_cache.id
-#    
-#    def get_user(self):
-#        return self.user_cache
+  class Meta:
+    model = LegalEntity
+
+
+class AgreementConfirmForm_buyer(forms.Form):
+
+  class Meta:
+    model = LegalEntity
+    fields = ('is_consent_membership')
+
+class AgreementConfirmForm_seller(forms.Form):
+
+  class Meta:
+    model = LegalEntity
+    fields = ('is_consent_membership')
+
 
 class MyPageForm_buyer(forms.ModelForm):
 
   class Meta:
     model = LegalEntity
     fields = ('personname', 'tel', 'entityname', 'department', 'title', 'postal_code')
+
+class MyPageForm_seller(forms.ModelForm):
+
+  class Meta:
+    model = LegalEntity
+    fields = ('personname', 'tel', 'entityname', 'department', 'title', 'postal_code')
+
 
 # 24/06/30作成
 class ContactForm(forms.Form):
@@ -295,20 +301,40 @@ class BankAccountForm(forms.ModelForm):
   class Meta:
     model = BankAccount
     fields = (
+      'temporal_tx_id', # 取引と紐づいて受取口座を設定する際に利用 25/02/01
       'entity_id',
       'bank_code',
       'bank_name',
       'branch_code',
       'branch_name',
-      'account_number',
-    #  'holdername'
+      'holdername',
+      'accountNumber',
     ) 
-    
+
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
 
     for field in self.fields.values():
       field.widget.attrs['class'] = 'form-control'
+
+#  def clean_holdername(self):
+#    holdername = self.cleaned_data.get('holdername')
+#    print(f'pass1 self.cleaned_data[accountNumber]={holdername} (blank in BankAccountForm)')
+#    if holdername is None or "None" or "" :
+#      print(f'pass2 self.cleaned_data[accountNumber]={holdername} (hodername is None or blank in BankAccountForm)')
+#      raise forms.ValidationError('口座名義を入力してください')
+#
+#    return unicodedata.normalize('NFKC', holdername)
+
+#  def clean_accountNumber(self):
+#    accountNumber = self.cleaned_data.get('accountNumber')
+#    print(f'pass3 self.cleaned_data[accountNumber]={accountNumber} (in BankAccountForm)')
+#    if accountNumber is None or "None" or "" :
+#      print(f'pass4 self.cleaned_data[accountNumber]={accountNumber} (in BankAccountForm)')
+#      raise forms.ValidationError('口座番号を入力してください')
+#
+#    return accountNumber
+
 
 class InfoEditForm_seller(forms.ModelForm):
 

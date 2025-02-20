@@ -16,7 +16,9 @@ def user_directory_path(instance, filename):
   time_stamp = date_time.strftime('%H-%M-%S')  # 時-分-秒のフォーマットを作成
   new_filename = time_stamp + filename  # 実際のファイル名と結合
   user_directory = os.path.join(date_dir, new_filename)  # 階層構造にする
-  return "upload/user_{0}/{1}".format(instance.id, user_directory)
+  #le = LegalEntity.objects.get(pk=instance.seller_entity_id)
+  print(f'instance.seller_entity_id={instance.seller_entity_id} in qpay, models.py, user_directory_path')
+  return "upload/entity{0}_tx{1}/{2}".format(instance.seller_entity_id, instance.id, user_directory)
 
 class TxStatus(models.IntegerChoices):
   """ 状態 """
@@ -29,36 +31,37 @@ class TxStatus(models.IntegerChoices):
 class QpayTx(models.Model):
 
   # seller_personnameは、ユーザー名は表示する機会が多い中、seller_userからデータを取り出さなくてすむよう設定
-  seller_user = models.ForeignKey(CustomUser, verbose_name='受注者ユーザー', null=True, related_name='seller_tx', on_delete=models.CASCADE)
+  seller_user = models.ForeignKey(CustomUser, verbose_name='受注者ユーザー', null=True, related_name='tx_sellerUser', on_delete=models.CASCADE)
   seller_email = models.EmailField('受注者メールアドレス', unique=False, blank=False, null=True)
   seller_personname =models.CharField('受注者ユーザー名', max_length=150, unique=False, null=True,)
-  seller_entity = models.ForeignKey(LegalEntity, verbose_name='受注者エンティティ', null=True, related_name='seller_tx', on_delete=models.CASCADE)
+  seller_entity = models.ForeignKey(LegalEntity, verbose_name='受注者エンティティ', null=True, related_name='tx_sellerEntity', on_delete=models.CASCADE)
   seller_entityname = models.CharField('受注者エンティティ名', max_length=150, unique=False, null=True, blank=True)
  
   # TxCreateFormで選択された後に入力される 
-  buyer_user = models.ForeignKey(CustomUser, verbose_name='発注者ユーザー', null=True, related_name='buyer_tx', on_delete=models.CASCADE)
+  buyer_user = models.ForeignKey(CustomUser, verbose_name='発注者ユーザー', null=True, related_name='tx_buyerUser', on_delete=models.CASCADE)
 
   ## 24/07/16
   ## 発注者のemail,personnameを固定しないように要修正か
   ## 処理しているユーザー及びそのアドレスを取得するためのメソッドを追加した方が
-  buyer_email = models.EmailField('発注者メールアドレス', unique=False, blank=False, null=True)
-  buyer_personname =models.CharField('発注者ユーザー名', max_length=150, unique=False, null=True,)
+  buyer_email = models.EmailField('パートナー・email', unique=False, blank=False, null=True)
+  buyer_personname =models.CharField('パートナー・ユーザー名', max_length=150, unique=False, null=True,)
 
-  buyer_entity = models.ForeignKey(LegalEntity, verbose_name='発注者エンティティ', null=True, related_name='buyer_tx', on_delete=models.CASCADE)
-  buyer_entityname = models.CharField('発注者エンティティ名', max_length=150, unique=False, null=True, blank=True)
-  #buyer_entity_choice = models.IntegerField(_('発注者エンティティ（選択リスト）'), choices=[(idx, f) for idx, f in enumerate(LegalEntity.objects.filter(type1=1).values_list('entityname', flat=True), 1)], default=1)
+  buyer_entity = models.ForeignKey(LegalEntity, verbose_name='パートナー・エンティティ', default="", null=True, related_name='buyer_tx', on_delete=models.CASCADE)
+  # !! 初期値は「""」とし、値がセットされているかを判定できるようにする.
+  buyer_entityname = models.CharField('パートナー・エンティティ名', max_length=150, unique=False, default="", null=True, blank=True)
+  #buyer_entity_choice = models.IntegerField(_('パートナー・エンティティ（選択リスト）'), choices=[(idx, f) for idx, f in enumerate(LegalEntity.objects.filter(type1=1).values_list('entityname', flat=True), 1)], default=1)
   buyer_entity_choice = models.IntegerField(_('お支払者'), default=1)
 
   requested_at = models.DateTimeField(_('ご申請時点'), default=None, null=True)
   requested_amount = models.IntegerField(_('ご申請金額（円）'), default=None, null=True)
   approved_amount = models.IntegerField(_('承認金額（円）'), default=None, null=True)
-  original_payment_date = models.DateTimeField(_('報酬日'), default=None, null=True)
-  advanced_payment_date = models.DateTimeField(_('前払日'), default=None, null=True)
+  original_payment_date = models.DateField(_('報酬日'), default=None, null=True)
+  advanced_payment_date = models.DateField(_('前払日'), default=None, null=True)
 
   evidence = models.FileField(
     _('ご報酬の証明（請求書など）'),
     upload_to = user_directory_path , 
-    validators=[FileExtensionValidator(['jpg', 'png', 'jpeg', 'pdf', ])], null=True) 
+    validators=[FileExtensionValidator(['jpg', 'png', 'jpeg', 'pdf', ])], default=None, null=True) 
 
   tx_status_int = models.IntegerField(choices=TxStatus.choices, default=1, verbose_name='処理状況 No')
   tx_status_char = models.CharField(max_length=20, null=False, blank=False, default="承認待ち", verbose_name='処理状況')
@@ -89,7 +92,7 @@ class QpayTx(models.Model):
       uploaded_file = self.evidence # アップロードされたファイルを変数に代入しておく
       self.evidence = None          # 一旦fileフィールドがNullの状態で保存(→インスタンスIDが割り当てられる)
       super().save(*args, **kwargs)
-      print(f'ここ通る？self.evidence={self.evidence} save in class QpayTx')
+      print(f'ここ通る？self.evidence={self.evidence} in models.py, class QpayTx, save()')
 
       self.evidence = uploaded_file # fileフィールドに値をセット
 

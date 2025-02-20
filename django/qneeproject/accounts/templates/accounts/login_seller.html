@@ -1,23 +1,48 @@
-{% extends "partials/base_qconnect.html" %}
+{% extends "index/base_qconnect_seller.html" %}
 
 {% block content %}
-<p></p>
-<div class="basicFont">
-    <p></p>
-    <h5>ログイン</h5>
-    <a href="{% url 'accounts:user_create_seller' %}">初めてのご利用の方はこちら</a>
 
-    <form method="POST">
-        {{ form.non_field_errors }}
-        {% for field in form %}
-            {{ field }}
-            {{ field.errors }}
-            <hr>
-        {% endfor %}
+<div class="authentication-bg min-vh-100 min-vw-100 align-items-center" style="background-color: #edf9ff;">
 
-        <button type="submit" class="btn btn-outline-primary" >ログインする</button>
-        <input type="hidden" name="next" value="{{ next }}" />
-        {% csrf_token %}
-    </form>
+  <div class="container">
+    <div class="d-flex flex-column">
+      <div class="row justify-content-center my-auto">
+        <div class="col-11 col-md-8 col-lg-6 col-xl-5">
+
+          <div class="d-flex justify-content-center">
+            <h3 class="text-black">Welcome back to Qnee !</h3>
+          </div>
+          <div class="d-flex justify-content-center mb-4 pb-2">
+            <div class="text-black-50 mb-0">ゲストはこちらからご利用いただけます。</div>
+          </div>
+          
+          <p></p>
+          <h5>ログイン</h5>
+
+          <div class="row">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}" role="alert" style="background-color: #fcf7fa;">
+              <span>{{ message }}</span>
+            </div>
+            {% endfor %}
+          </div>
+
+          <a href="{% url 'accounts:user_create_seller' %}" class="text-decoration-underline">初めてのご利用の方はこちら</a>
+           <form method="POST">
+            {{ form.non_field_errors }}
+            {% for field in form %}
+              {{ field }}
+              {{ field.errors }}
+              <hr>
+            {% endfor %}
+
+            <button type="submit" class="btn btn-primary w-100 shadow" >ログインする</button>
+            <input type="hidden" name="next" value="{{ next }}" />
+            {% csrf_token %}
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

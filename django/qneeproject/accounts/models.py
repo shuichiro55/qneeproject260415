@@ -17,9 +17,11 @@ class BankAccount(models.Model):
     '口座名義',
     max_length=150,
     unique=False,
+    default="",
     null=True,
   )
-  entity_id =  models.IntegerField('エンティティID', default=0, null=True, blank=True)
+
+  entity_id = models.IntegerField('エンティティID', default=0, null=True, blank=True)
 
   bank_code =  models.CharField('金融機関コード', max_length=4, null=True, blank=True)
   bank_name =  models.CharField('金融機関名', max_length=25, default=0, null=True, blank=True)
@@ -27,7 +29,11 @@ class BankAccount(models.Model):
   branch_code = models.CharField('支店コード', max_length=3, null=True, blank=True)
   branch_name = models.CharField('支店名', max_length=25, default=0, null=True, blank=True)
 
-  account_number = models.CharField('口座番号', max_length=10, default=0, null=True, blank=True)
+  accountNumber_regex = RegexValidator(regex=r'^[0-9]+$', message = _("口座番号は数字でご入力ください。ex '1234567'"))
+  accountNumber = models.CharField('口座番号', max_length=10, default=None, null=True, validators=[accountNumber_regex])
+
+  temporal_tx_id = models.IntegerField(_('取引ID'), default=0, null=True, blank=True)
+  # 取引口座を設定していない取引がある場合に使う一時的な要素（ユーザーには見せない）
 
 class LegalEntity(models.Model):
 
@@ -42,35 +48,37 @@ class LegalEntity(models.Model):
   ################################
   personname_validator = UnicodeUsernameValidator()
   personname = models.CharField(
-    'ユーザー名',
+    '個人名', # 25/01/04 FirstNameとLastNameに分けるかは課題
     max_length=150,
     unique=False,
+    default="",
     null=True,
     validators=[personname_validator],
     error_messages={'unique': _("A user with that username already exists")},
   )
   email = models.EmailField('メールアドレス', unique=True, blank=False, null=True)
   
-  tel_regex = RegexValidator(regex=r'^[0-9０-９ー―－‐₋⁻-]+$', message = ("Tel Number must be entered in the format: '09012345678'. Up to 15 digits allowed."))
-  tel = models.CharField(_('電話番号'), max_length=30, null=False, validators=[tel_regex])
+  tel_regex = RegexValidator(regex=r'^[0-9０-９ー―－‐₋⁻-]+$', message = ("ハイフン「-」なしで数字のみご入力下さい（最大15桁）　例：09012345678."))
+  tel = models.CharField(_('電話番号'), max_length=30, default="", null=False, validators=[tel_regex])
   #「 \d → 任意の数字	[0-9]」 「 ^ → 文字列の先頭」、「 $ → 文字列の末尾」
 
   #取引主体が個人の場合に住所を入れるか検討（選択肢は①入力しない、②郵便番号まで、③全部入力）
-  #postal_code_regex = RegexValidator(regex=r'^[0-9]+$', message = ("Postal Code must be entered in the format: '1234567'. Up to 7 digits allowed."))
-  #postal_code = models.CharField(_('郵便番号'), validators=[postal_code_regex], max_length=7)  
+  postal_code_regex = RegexValidator(regex=r'^[0-9]+$', message = ("Postal Code must be entered in the format: '1234567'. Up to 7 digits allowed."))
+  postal_code = models.CharField(_('郵便番号'), validators=[postal_code_regex], max_length=7)  
 
   #######################################
   ##  取引主体が法人の場合に入力する項目 **
   #######################################
-  department = models.CharField(_('部署名'), max_length=150, blank=True, null=True)  # CustomUserが企業の担当のとき
-  title = models.CharField(_('役職'), max_length=150, blank=True, null=True)            # CustomUserが企業の担当のとき
+  department = models.CharField(_('部署名'), max_length=150, default="", blank=True, null=True)  # CustomUserが企業の担当のとき
+  title = models.CharField(_('役職名'), max_length=150, default="", blank=True, null=True)            # CustomUserが企業の担当のとき
 
   #企業の場合の入力値、個人の場合はpersonnameが入る
   entityname_validator = UnicodeUsernameValidator()
   entityname = models.CharField(
-    'エンティティ名',
+    '取引主体名',
     max_length=150,
     unique=False,
+    default="",
     null=True,
     blank=True,
     validators=[entityname_validator],)
@@ -78,18 +86,27 @@ class LegalEntity(models.Model):
 
   #企業の場合、住所は全部入力する
   postal_code_regex = RegexValidator(regex=r'^[0-9]+$', message = _("Postal Code must be entered in the format: '1234567'. Up to 7 digits allowed."))
-  postal_code = models.CharField(_('郵便番号'), max_length=7, null=False, blank=True, validators=[postal_code_regex])
+  postal_code = models.CharField(_('郵便番号'), max_length=7, default="", null=False, blank=True, validators=[postal_code_regex])
 
   # 手数料は加盟企業（発注者）ごとに設定できるようにする
   advance_fee_rate = models.DecimalField(max_digits=11, decimal_places=10, default=0.06) # 立替手数料（Seller⇒Qnee）
   referral_fee_rate = models.DecimalField(max_digits=11, decimal_places=10, default=0.015) # 紹介手数料（Qnee⇒Buyer）
 
   # 前払い申請者の受領口座
-  bank_account = models.ForeignKey(BankAccount, verbose_name='銀行口座', blank=True, null=True, on_delete=models.CASCADE)
+  bank_account = models.OneToOneField(BankAccount, verbose_name='振込口座', null=True, related_name='BankAccount_tx', on_delete=models.PROTECT)
+  bank_account_flag = models.IntegerField(_('口座設定フラグ'), null=True, blank=True, default=0)
+  # 0：設定なし、1：設定済み
 
-  is_consent = models.BooleanField(_('同意状況'),default=False)
+  # パートナー規約、ゲスト規約の同意状況、同意日時
+  is_consent_membership = models.BooleanField(_('規約同意'),default=False)  
+  date_consent_membership = models.DateTimeField(_('規約同意の日時'), null=True, blank=True,)
 
-  date_joined = models.DateTimeField(_('登録日'), default=timezone.now,)
+  # 業務委託契約の同意状況、同意日時
+  is_consent_outsource = models.BooleanField(_('契約合意'),default=False)  
+  date_consent_outsource = models.DateTimeField(_('契約合意の日時'), null=True, blank=True,)
+
+  # 会員登録した日時
+  date_joined = models.DateTimeField(_('登録日'), null=True, blank=True, )
 
   def __str__(self):
     return f'{self.entityname}'
@@ -127,12 +144,29 @@ class CustomUserManager(UserManager):
 
     return self._create_user(email, password, **extra_fields)
 
-#
+
 class CustomUser(AbstractBaseUser, PermissionsMixin):
 
   email = models.EmailField('メールアドレス', unique=True, blank=False, null=False)
+
+  firstname = models.CharField(
+    '名（First Name）',
+    blank=False,
+    max_length=150,
+    unique=False,
+    null=True,
+  )
+  lastname = models.CharField(
+    '姓（Last Name）',
+    blank=False,
+    max_length=150,
+    unique=False,
+    null=True,
+  )
+
   personname = models.CharField(
-    'ユーザー名',
+    'お名前（個人）',
+    blank=False,
     max_length=150,
     unique=False,
     null=True,
@@ -145,7 +179,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
   type2 = models.IntegerField(null=True, blank=True, choices=choice2)
 
   entity = models.ForeignKey(LegalEntity, verbose_name='取引主体', null=True, related_name='user_entity', on_delete=models.CASCADE)
-  # related_nameは、特定のentityに属するユーザーを抽出する際に使う
+  # related_nameは、参照しているentity（親モデル）を参照するuser（子モデル）を抽出する場合に使う
+
   entityname = models.CharField(
     '取引主体',
     max_length=150,

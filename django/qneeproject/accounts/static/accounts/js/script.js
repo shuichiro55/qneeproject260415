@@ -1,11 +1,13 @@
-const isAgreed = document.querySelector('#check');
-const btn = document.querySelector('#next2');
 
-isAgreed.addEventListener('change', () => {
-  if(isAgreed.checked){
-    btn.disabled = false;
-  } else {
-    btn.disabled = true;
-  }
-    
-});
+//const isAgreed = document.querySelector('#checkbox');
+//const btn = document.querySelector('#next2');
+//
+//isAgreed.addEventListener('change', () => {
+//  console.log('チェックボックスをクリックしたのは認識しているようです。')
+//  if(isAgreed.checked){
+//    btn.disabled = false;
+//  } else {
+//    btn.disabled = true;
+//  }
+//    
+//});

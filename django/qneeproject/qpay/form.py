@@ -1,4 +1,5 @@
 from django import forms
+import datetime
 #from django.db import models
 #from accounts.models import CustomUser, LegalEntity
 
@@ -16,40 +17,68 @@ class TxCreateForm(forms.ModelForm):
     model = QpayTx
     fields = (
       'id',
-      'buyer_entity_choice',
       'buyer_entityname',
       'requested_amount',
       'original_payment_date',
-      'evidence',
-      #'seller_user',
       'seller_email',
       'seller_personname',
-      #'seller_entity',
       'seller_entityname'
+    )
+#    widgets = {
+#      'original_payment_date': forms.SelectDateWidget
+#    }
+#    widgets= {'seller_personname':forms.HiddenInput(), 'seller_entityname':forms.HiddenInput()}
+    
+  def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
+            field.widget.attrs['placeholder'] = field.label        
+
+
+  def clean_requested_amount(self):
+      requested_amount = self.cleaned_data.get('requested_amount')
+      print(f'self.cleaned_data[entityname]={requested_amount} (in TxCreateForm)')
+      if requested_amount is None or "" :
+        raise forms.ValidationError("申請金額をご入力ください.")
+      return requested_amount
+  
+  def clean_original_payment_date(self):
+      original_payment_date = self.cleaned_data.get('original_payment_date')
+      print(f'self.cleaned_data[original_payment_date]={original_payment_date} (in TxCreateForm)')
+      print(f'datetime.date.today()={datetime.date.today()}')
+      
+      if original_payment_date is None or "" :
+        raise forms.ValidationError('「当初報酬日」にもともとの報酬の支払日を入力してください.')
+      if original_payment_date <= datetime.date.today():
+        raise forms.ValidationError("入力された「当初報酬日」が本日以前になっています.")
+      return original_payment_date
+
+
+class TxEvidenceForm(forms.ModelForm):
+
+  class Meta:
+    model = QpayTx
+    fields = (
+      'id',
+      'evidence',
     )
     #widgets= {'seller_personname':forms.HiddenInput(), 'seller_entityname':forms.HiddenInput()}
 
+  # ★全部のフィールドに'form-control'をセットするべきか？ 2025/02/14
   def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
             field.widget.attrs['class'] = 'form-control'
             # field.widget.attrs['placeholder'] = field.label
 
-#class TxCreateForm(forms.ModelForm):
-#
-#
-#  class Meta:
-#    model = QpayTx
-#    fields = ('buyer_entity_choice', 'requested_amount', 'evidence')
-#
-#  def __init__(self, *args, **kwargs):
-#    #print(f'ここまで来てる4 buyer_entity_chices={buyer_entity_choices} (in __init__ of TxCreateForm)')
-#    #print(f'ここまで来てる5 {self.base_fields['buyer_entity']} (in __init__ of TxCreateForm)')
-#    #self.base_fields['buyer_entity'].choices = buyer_entity_choices
-#        super().__init__(*args, **kwargs)
-#        for field in self.fields.values():
-#            field.widget.attrs['class'] = 'form-control'
-#            # field.widget.attrs['placeholder'] = field.label
+  def clean_evidence(self):
+      evidence = self.cleaned_data.get('evidence')
+      print(f'self.cleaned_data[entityname]={evidence} (in TxEvidenceForm)')
+      if evidence is None or "" :
+        raise forms.ValidationError('証明書ファイルを選択してください')   
+      return evidence
+
 
 class TxCreateConfirmForm(forms.ModelForm):
 

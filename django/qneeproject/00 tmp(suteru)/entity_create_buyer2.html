@@ -1,0 +1,161 @@
+{% extends "index/base_qconnect.html" %}
+
+{% block content %}
+
+<div class="authentication-bg min-vh-100 min-vw-100">
+
+  <div class="container">
+
+    <nav aria-label="breadcrumb" role="nabigation">
+      <ol class="breadcrumb text-dark rounded-2">
+        <li class="breadcrumb-item  text-primary"><a href="{% url 'accounts:mypage_buyer' %}">マイページ・ホーム</a></li>
+        <li class="breadcrumb-item active" aria-current="page">本登録（入力）</li>
+      </ol>
+    </nav>
+
+    <div class ="row justify-content-center">
+      <div class="col-10">
+        <div class="progress mt-1 mb-1" style="height: 12px" >
+          <div class="progress-bar bg-secondary" role="progressbar"
+            style="width: 25%"
+            aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
+            仮登録
+          </div>
+
+          <div class="progress-bar bg-secondary" role="progressbar"
+            style="width: 25%"
+            aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">
+            メール受領
+          </div>
+
+          <div class="progress-bar bg-danger progress-bar-striped progress-bar-animated" role="progressbar"
+            style="width: 25%"
+            aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
+            本登録
+          </div>
+
+          <div class="progress-bar bg-secondary progress-bar-striped progress-bar-animated" role="progressbar"
+          style="width: 25%"
+          aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+          利用規約確認
+        </div>
+
+      </div>
+    </div>
+
+    {% if user.type2 == 2 %}
+
+      <div class="row justify-content-center mt-4">
+        <h5 class="text-black text-center">本登録（法人）</h5>
+      </div>
+      
+      <form method="POST">
+        {% csrf_token %}
+
+        {{ form.non_field_errors }}
+
+        <div class="row justify-content-center mt-3">
+          {% if form.personname.errors %}
+            <div class="col-12 col-sm-11 col-md-9 col-lg-7 col-xl-5" style="color:red;">{{ form.personname.errors.as_text }}</div>
+          {% endif %}
+        </div>
+
+        <div class="row justify-content-center">
+          <div class="col-12 col-sm-11 col-md-9 col-lg-7 col-xl-5">
+            お名前（個人名）：{{ form.personname }}
+          </div>
+        </div>
+
+        <div class="row justify-content-center mt-3">
+          {% if form.tel.errors %}
+            <div class="col-12 col-sm-11 col-md-9 col-lg-7 col-xl-5" style="color:red;">{{ form.tel.errors.as_text }}</div>
+          {% endif %}
+        </div>
+
+        <div class="row justify-content-center">
+          <div class="col-12 col-sm-11 col-md-9 col-lg-7 col-xl-5" >
+            電話番号：{{ form.tel }}
+          </div>
+        </div>
+
+<!--
+        <div class="form-group row justify-content-center pb-3">
+          <label class="col-sm-2 col-form-label" for="{{form.tel.id_for_label}}" >電話番号</label>
+          <div class="col-sm-9 col-md-7">
+            <input type="text" class="form-control"
+              name="{{form.tel.name}}"
+              id="{{form.tel.id_for_label}}" >
+          </div>
+        </div>
+-->
+        <div class="row justify-content-center mt-3">
+          {% if form.entityname.errors %}
+            <div class="col-12 col-sm-11 col-md-9 col-lg-7 col-xl-5" style="color:red;">{{ form.entityname.errors.as_text }}</div>
+          {% endif %}
+        </div>
+
+        <div class="row justify-content-center">
+          <div class="col-12 col-sm-11 col-md-9 col-lg-7 col-xl-5">
+            企業名：{{ form.entityname }}
+          </div>
+        </div>
+
+        <div class="row justify-content-center mt-3">
+          {% if form.postal_code.errors %}
+            <div class="col-12 col-sm-11 col-md-9 col-lg-7 col-xl-5" style="color:red;">{{ form.postal_code.errors.as_text }}</div>
+          {% endif %}
+        </div>
+          
+        <div class="row justify-content-center">
+          <div class="col-12 col-sm-11 col-md-9 col-lg-7 col-xl-5">
+            郵便番号： {{ form.postal_code }}  
+          </div>
+        </div>
+
+        <div class="row justify-content-center mt-3">
+          {% if form.department.errors %}
+            <div class="col-12 col-sm-11 col-md-9 col-lg-7 col-xl-5" style="color:red;">{{ form.department.errors.as_text }}</div>
+          {% endif %}
+        </div>
+
+        <div class="row justify-content-center">
+          <div class="col-12 col-sm-11 col-md-9 col-lg-7 col-xl-5">
+            所属部署： {{ form.department }}  
+          </div>  
+        </div>
+
+        <div class="row justify-content-center mt-3">
+          {% if form.title.errors %}
+            <div class="col-12 col-sm-11 col-md-9 col-lg-7 col-xl-5" style="color:red;">{{ form.title.errors.as_text }}</div>
+          {% endif %}
+        </div>
+
+        <div class="row justify-content-center">
+          <div class="col-12 col-sm-11 col-md-9 col-lg-7 col-xl-5">
+            役職： {{ form.title }}  
+          </div>  
+        </div>
+          
+        <div class= "d-flex justify-content-center mt-4">
+          <button type="submit" class="btn btn-primary" name="next" value="ToConfirm">ご入力内容の確認画面に進む</button>
+        </div>
+      </form>
+
+<!-- ラベルと入力欄が横に並べる単に作ったもの（但し、モデルフォームでの対応が難しくその他の面でのデメリットが大きい
+        <div class="form-group row justify-content-center pb-3">
+          <label class="col-sm-2 col-form-label" for="{{form.tel.id_for_label}}" >電話番号</label>
+          <div class="col-sm-9 col-md-7">
+            <input type="text" class="form-control"
+              name="{{form.tel.name}}"
+              id="{{form.tel.id_for_label}}" >
+          </div>
+        </div>
+-->
+
+      </div> <!-- end row -->
+  </div> <!-- end container -->
+</div>
+
+{% endif %}
+
+{% endblock %}

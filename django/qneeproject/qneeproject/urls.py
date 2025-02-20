@@ -25,6 +25,7 @@ from . import views
 urlpatterns = [
 
     #path('', views.top_corporate, name='top'),
+    
     path('admin/', admin.site.urls),
 
     path('', TemplateView.as_view(template_name="index/index_corporate.html"),name="index_corporate"), 
@@ -33,6 +34,8 @@ urlpatterns = [
     path('',include('contact.urls')),
 
     path('corporate_info', TemplateView.as_view(template_name="index/corporate_info.html"),name="corporate_info"),
+    path('index_qconnect_seller', TemplateView.as_view(template_name="index/index_qconnect_seller.html"),name="index_qconnect_seller"),
+    path('index_qconnect_buyer', TemplateView.as_view(template_name="index/index_qconnect_buyer.html"),name="index_qconnect_buyer"),
 
     path('blog-list', TemplateView.as_view(template_name="index/blog-list.html"),name="blog-list"),
     path('blog-details', TemplateView.as_view(template_name="index/blog-details.html"),name="blog-details"),

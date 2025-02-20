@@ -1,4 +1,63 @@
-  
+
+<!-- 書籍「Django4」に従って作ったコンタクトフォーム-->
+{% extends "index/base_qconnect_seller.html" %}
+
+{% load static %}   
+{% block title %}●{% endblock %}
+{% block content %}
+ 
+<main class="mb-4">
+
+  <div class="authentication-bg min-vh-100 min-vw-100 sticky-top" style="background-color: #eaf6fd;">
+
+    <h5>お問い合わせ</h5>
+    <hr>
+
+    <div class="col-md-8 col-lg-6 col-xl-5">
+      <div class="container px-4 px-lg-5">
+        <div class="row gx-4 gx-lg-5 justify-content-center">
+
+          ご希望の方は、以下を記入してメッセージをご送信下さい。。
+
+          {% if messages %}
+          <ul class="list-unstyled" style="list-style: none;">
+            {% for message in messages %}
+              <li {% if message.tags %} class="{{ message.tags }}" {% endif %}>
+                {{ message }}
+              </li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+
+          <div class="my-5">
+            <form method="POST">
+              {% csrf_token %}
+            
+              {% for field in form %}
+                <div class="form-floating">
+                  <div class="form-group floating-label-form-group controls">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    <p class="help-block text-danger"></p>
+                  </div>
+                </div>
+              {% endfor %}
+
+              <br>
+              <button type="submit" class="btn btn-outline-primary" id="snedMessageButton">Send</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr>
+  </div>
+
+</main>
+
+{% endblock %}
+
+
 <table border="0" cellpadding="0" cellspacing="0" width="710" class="table01">
   <tbody>
     <tr>
