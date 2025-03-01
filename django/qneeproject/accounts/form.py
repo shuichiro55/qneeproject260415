@@ -30,6 +30,7 @@ class UserCreateForm(UserCreationForm):
   class Meta:
     model = UserModel
     fields = ('email', 'type2')
+    fields = ('email',)
 
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)

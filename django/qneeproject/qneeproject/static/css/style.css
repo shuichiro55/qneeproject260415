@@ -1559,6 +1559,20 @@ ul.pattern .color6 {
   border-color: #3f8efc;
 }
 
+.login-bg {
+  background-image: url("../images/bg-auth.png");
+  background-color: rgb(251, 199, 178);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
 .authentication-bg {
   background-image: url("../images/bg-auth.png");
   background-color: rgba(63, 142, 252, 0.12);

@@ -22,7 +22,7 @@ DATABASES = {
     'USER': 'shuichiro',
     'PASSWORD': '921Story552@',
     'HOST': 'localhost',  # 'mysql',
-    'PORT': '53306',
+    'PORT': '3306',  #'53306',
     'ATOMIC_REQUESTS': True, # 最後まで問題なければcommit、例外あればトランザクションはロールバック
   }
 }

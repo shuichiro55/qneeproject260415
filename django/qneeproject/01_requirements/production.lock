@@ -17,3 +17,5 @@ sqlparse==0.5.2
 typing_extensions==4.12.2
 urllib3==2.2.3
 zengin-code==1.1.0.20241029
+mysqlclient
+pymysql

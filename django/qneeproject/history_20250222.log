@@ -1,0 +1,1000 @@
+  994  sudo systemctl status nginx
+  995  sudo ls -la /var/www/
+  996  sudo ls -la /var/www/qneeproject
+  997  sudo ls -la /var/www/qneeproject/static
+  998  sudo systemctl status nginx
+  999  sudo systemctl status qneeproject.socket
+ 1000  sudo systemctl status qneeproject
+ 1001  sudo systemctl enable qneeproject.service
+ 1002  sudo systemctl start qneeproject
+ 1003  sudo systemctl status qneeproject
+ 1004  gunicorn --workers 3 --bind=0.0.0.0:8000 qneeproject.wsgi:application
+ 1005  ps au
+ 1006  sudo systemctl status qneeproject
+ 1007  cd ..
+ 1008  sudo systemctl status qneeproject
+ 1009  sudo systemctl start qneeproject
+ 1010  sudo systemctl status
+ 1011  sudo systemctl enable qneeproject.service
+ 1012  sudo systemctl enable qneeproject.socket
+ 1013  sudo systemctl start qneeproject
+ 1014  sudo systemctl status qneeproject
+ 1015  sudo vi /etc/nginx/sites-available/qneeproject
+ 1016  sudo systemctl enable qneeproject.socket
+ 1017  sudo systemctl enable qneeproject.service
+ 1018  sudo systemctl start qneeproject
+ 1019  sudo systemctl status qneeproject
+ 1020  sudo vi /etc/nginx/sites-available/qneeproject
+ 1021  sudo systemctl reload nginx
+ 1022  sudo ls -la /var/www/project/static/
+ 1023  sudo ls -la /var/www/qneeproject/static/
+ 1024  sudo ls -la /var/www/qneeproject/static/css
+ 1025  sudo ls -la /var/www/qneeproject/static/
+ 1026  sudo systemctl enable qneeproject.service
+ 1027  sudo systemctl start qneeproject
+ 1028  sudo systemctl status qneeproject
+ 1029  sudo systemctl reload nginx
+ 1030  sudo systemctl restart nginx
+ 1031  sudo ls -la /etc/nginx/sites-enabled/
+ 1032  sudo systemctl status nginx
+ 1033  sudo vi /etc/nginx/sites-available/qneeproject
+ 1034  sudo ufw allow 8000
+ 1035  pwd
+ 1036  cd ../../..
+ 1037  ls
+ 1038  cd shuichiro
+ 1039  ls -la
+ 1040  sudo ls -la .ssh
+ 1041  cd /
+ 1042  ls
+ 1043  sudo cat /home/shuiciro/.ssh/known_hosts
+ 1044  sudo cat /home/shuichiro/.ssh/known_hosts
+ 1045  sudo ls -la .ssh
+ 1046  sudo ls -la /home/shuichiro/.ssh
+ 1047  ls
+ 1048  cd app3
+ 1049  ls -la
+ 1050  sudo ls -la .ssh
+ 1051  sudo chown -R .ssh/aws_ubuntu
+ 1052  sudo chown -R shuichiro .ssh/aws_ubuntu
+ 1053  sudo chown -R shuichiro .ssh/aws_ubuntu.pub
+ 1054  sudo chown -R shuichiro .ssh/app3
+ 1055  sudo chown -R shuichiro .ssh/app3.pub
+ 1056  pws
+ 1057  pwd
+ 1058  ls -lsa
+ 1059  ls -la
+ 1060  sudo 700 ~/.ssh
+ 1061  sudo chmod 700 ~/.ssh
+ 1062  ls -la
+ 1063  sudo ls -la .ssh/aws-ubuntu
+ 1064  sudo chmod 400 ~/.ssh/aws-ubuntu
+ 1065  sudo ls -la .ssh/aws-ubuntu
+ 1066  ls
+ 1067  ls -la
+ 1068  cd ..
+ 1069  ls
+ 1070  cd ..
+ 1071  l
+ 1072  ls
+ 1073  cd shuichiro
+ 1074  ls
+ 1075  cd ls -la
+ 1076  cd ..
+ 1077  ls -la
+ 1078  cd ..
+ 1079  ls -^la
+ 1080  ls -la
+ 1081  pwd
+ 1082  cd home
+ 1083  ls
+ 1084  cd shuichiro
+ 1085  ls
+ 1086  ls -la
+ 1087  cd django
+ 1088  ls cd app3
+ 1089  pwd
+ 1090  cd app3
+ 1091  ls -la
+ 1092  find / -name git
+ 1093  cd ../../
+ 1094  ls
+ 1095  cd ..
+ 1096  ls
+ 1097  find /usr -name git
+ 1098  pwd
+ 1099  cd /home
+ 1100  ls
+ 1101  cd shuichiro
+ 1102  ls
+ 1103  cd app3
+ 1104  ls -la
+ 1105  cd ..
+ 1106  ls
+ 1107  cd app3
+ 1108  cd django
+ 1109  ls -;a
+ 1110  ls -la
+ 1111  cd qneeproject
+ 1112  ls -la
+ 1113  cd django
+ 1114  python3 -m venv venv
+ 1115  source venv/bin/activat
+ 1116  cd qneeproject
+ 1117  python manage.py collectstatic
+ 1118  which python
+ 1119  python manage.py collectstatic --settings qneeproject/settings/local.py
+ 1120  python manage.py collectstatic --settings qneeproject.settings.local
+ 1121  python]
+ 1122  python
+ 1123  which python3
+ 1124  which python
+ 1125  curl http://52.199.54.189:8000
+ 1126  sudo vi /etc/systemd/system/qneeproject.service
+ 1127  sudo vi /etc/systemd/system/qneeproject.sock
+ 1128  sudo vi /etc/systemd/system/qneeproject.socket
+ 1129  sudo vi /etc/nginx/sites-available/qneeproject
+ 1130  python3 manage.py runserver
+ 1131  p
+ 1132  python3 manage.py runserver  --settings qneeproject.settings.local
+ 1133  python3 manage.py runserver
+ 1134  python3 manage.py runserver 0.0.0.0 --settings qneeproject.settings.local
+ 1135  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1136  ls
+ 1137  ls -la
+ 1138  ps au
+ 1139  ls
+ 1140  deactivate
+ 1141  ls -la
+ 1142  ps au
+ 1143  cd ..
+ 1144  python3 -m venv venv
+ 1145  source vnev/bin/activate
+ 1146  source venv/bin/activate
+ 1147  ls
+ 1148  cd qneeproject
+ 1149  ls
+ 1150  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1151  sudo systemctl status nginx
+ 1152  sudo systemctl stop nginx
+ 1153  sudo systemctl status nginx
+ 1154  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1155  sudo systemctl status nginx
+ 1156  sudo ufw allow 8000
+ 1157  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1158  cd django
+ 1159  python3 -m venv venv
+ 1160  source venv/bin/activate
+ 1161  cd django
+ 1162  cd qneeproject
+ 1163  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1164  cd django
+ 1165  python3 -m venv venv
+ 1166  source venv/bin/activate
+ 1167  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1168  cd qneeproject
+ 1169  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1170  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.production
+ 1171  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1172  python3 manage.py runserver 0.--settings qneeproject.settings.local
+ 1173  python3 manage.py runserver --settings qneeproject.settings.local
+ 1174  sudo systemctl stop qneeproject
+ 1175  python3 manage.py runserver --settings qneeproject.settings.local
+ 1176  sudo systemctl stop qneeproject
+ 1177  sudo systemctl disable qneeproject
+ 1178  python3 manage.py runserver --settings qneeproject.settings.local
+ 1179  sudo systemctl stop qneeproject
+ 1180  sudo systemctl disable qneeproject
+ 1181  python3 manage.py runserver --settings qneeproject.settings.local
+ 1182  sudo systemctl disable qneeproject.socket
+ 1183  python3 manage.py runserver --settings qneeproject.settings.local
+ 1184  sudo systemctl status qneeproject.socket
+ 1185  sudo systemctl stop qneeproject.socket
+ 1186  sudo systemctl status qneeproject.socket
+ 1187  sudo systemctl status qneeproject
+ 1188  python3 manage.py runserver --settings qneeproject.settings.local
+ 1189  sudo systemctl status qneeproject
+ 1190  sudo systemctl status qneeproject.socket
+ 1191  sudo systemctl status nginx
+ 1192  sudo systemctl stop nginx
+ 1193  sudo systemctl status nginx
+ 1194  python3 manage.py runserver --settings qneeproject.settings.local
+ 1195  sudo systemctl status nginx
+ 1196  sudo systemctl status qneeproject.socket
+ 1197  sudo systemctl status qneeproject
+ 1198  python3 manage.py migrate
+ 1199  python3 manage.py makemigrations
+ 1200  python3 manage.py runserver --settings qneeproject.settings.local
+ 1201  python3 manage.py runserver 127.0.0.1:8000 --settings qneeproject.settings.local
+ 1202  sudo systemctl status nginx
+ 1203  sudo systemctl status qneeproject.socket
+ 1204  sudo systemctl status qneeproject
+ 1205  ps au
+ 1206  ls -la
+ 1207  python3 manage.py runserver 127.0.0.1:8000 --settings qneeproject.settings.local
+ 1208  pkill gunicorn
+ 1209  python3 manage.py runserver 127.0.0.1:8000 --settings qneeproject.settings.local
+ 1210  python3 manage.py runserver 120.0.0.0:8000 --settings qneeproject.settings.local
+ 1211  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1212  cd django
+ 1213  python3 -m venv ven
+ 1214  python3 -m venv venv
+ 1215  source venv/bin/activate
+ 1216  cd qneeproject
+ 1217  ls
+ 1218  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1219  sudo vi /var/www/qneeproject/static/css/style.css
+ 1220  sudo cp /var/www/qneeproject/static/css/style.css ./qneeproject/static/css/style.css
+ 1221  sudo cp /var/www/qneeproject/static/css/main.css ./qneeproject/static/css/main.css
+ 1222  sudo cp /var/www/qneeproject/static/css/style.min.css ./qneeproject/static/css/style.min.css
+ 1223  sudo cp /var/www/qneeproject/static/css/bootstrap.min.css ./qneeproject/static/css/bootstrap.min.cssCCCCCCCCCCCCCCCCCCC
+ 1224  cd django
+ 1225  python3 -m venv venv
+ 1226  source venv/bin/activate
+ 1227  cd qneeproject
+ 1228  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1229  dpkg -l | grep -i mysql
+ 1230  wget https://dev.mysql.com/get/mysql-apt-config_0.8.33-1_all.deb
+ 1231  sudo wget https://dev.mysql.com/get/mysql-apt-config_0.8.33-1_all.deb
+ 1232  sudo dpkg -i mysql-apt-config_0.8.33-1_all.deb
+ 1233  sudo wget https://dev.mysql.com/get/mysql-apt-config_0.8.15-1_all.deb
+ 1234  sudo dpkg -i mysql-apt-config_0.8.15-1_all.deb
+ 1235  mysql --version
+ 1236  sudo apt update
+ 1237  sudo apt install mysql-server-8.0 -f
+ 1238  sudo apt-get remove --purge mysql-server mysql-client mysql-common && sudo apt-get autoremove && sudo apt-get autoclean && sudo deluser mysql && sudo rm -rf /var/lib/mysql && sudo apt-get purge mysql-server-core-5.7 && sudo apt-get purge mysql-client-core-5.7 && sudo rm -rf /var/log/mysql && sudo rm -rf /etc/mysql
+ 1239  docker search mysql
+ 1240  docker pull mysql/mysql-server
+ 1241  docker images
+ 1242  docker ps
+ 1243  docker ps -a
+ 1244  docker rm bfb640b0412d
+ 1245  docker rm ef566bdf5765
+ 1246  docker stop bfb640b0412d
+ 1247  docker rm bfb640b0412d
+ 1248  docker ps
+ 1249  docker ps -a
+ 1250  docker images
+ 1251  docker rmi 8e703cc58170
+ 1252  docker images
+ 1253  docker rmi 866933b8b57a
+ 1254  docker images
+ 1255  docker rmi 8e291756241d
+ 1256  docker images
+ 1257  docker rmi 10db11fef9ce
+ 1258  docker images
+ 1259  docker rmi 40a0a481c0d5
+ 1260  docker rmi b7aff0191ea5
+ 1261  docker rmi 40a0a481c0d5
+ 1262  docker images
+ 1263  docker rmi 40a0a481c0d5e3ea3917feb1
+ 1264  docker rmi e3ea3917feb1
+ 1265  docker images
+ 1266  docker rmi a9e2e4834cd4
+ 1267  docker images
+ 1268  docker rmi a4cb00e84832
+ 1269  docker images
+ 1270  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1271  docker images
+ 1272  docker ps -a
+ 1273  docker ps -a -q
+ 1274  docker ps
+ 1275  docer ps
+ 1276  docker ps
+ 1277  docer run --name=mysql1 -d mysql/mysql-server
+ 1278  docker run --name=mysql1 -d mysql/mysql-server
+ 1279  docker -s
+ 1280  docker ps
+ 1281  docker logs mysql
+ 1282  docker logs mysql1
+ 1283  docker ps
+ 1284  docker images
+ 1285  docker logs mysql1 2>&1 | grep GENERATED
+ 1286  whoami
+ 1287  docker exec -it mysql1 mysql -r root -p
+ 1288  docker exec -it mysql1 mysql -u root -p
+ 1289  docker ps
+ 1290  ls -la /code
+ 1291  sudo apt install mysql-server
+ 1292  mysql --version
+ 1293  sudo apt install -y default-libmysqlclient-dev
+ 1294  pip freeze > 01_requirements/production.lock 
+ 1295  docker ps
+ 1296  mysql --version
+ 1297  pip freeze > 01_requirements/production.lock 
+ 1298  docker stop fef7a31cf3b6
+ 1299  docker rm fef7a31cf3b6
+ 1300  docker ps
+ 1301  sudo mysql_secure_installation
+ 1302  dpkg -l | grep -i mysql
+ 1303  docker ps
+ 1304  dpkg -l | grep -i mysql
+ 1305  sudo apt remove --purge mysql-server* mysql-common
+ 1306  dpkg -l | grep -i mysql
+ 1307  sudo apt install -y mysql-server
+ 1308  sudo apt install -y default-libmysqlclient-dev
+ 1309  dpkg -l | grep -i mysql
+ 1310  sudo mysql_secure_installation
+ 1311  logs
+ 1312  mysql -u root -p
+ 1313  less mysqld.log | grep “temporary password”
+ 1314  less mysqld.log
+ 1315  sudo /etc/init.d/mysql start
+ 1316  sudo mysql_secure_installation
+ 1317  service mysqld stop
+ 1318  sudo service mysqld stop
+ 1319  sudo mysqld_safe --skip-grant-tables &
+ 1320  mysql -u root
+ 1321  sudo mysqld_safe --skip-grant-tables &
+ 1322  mysql -u root
+ 1323  sudo service mysqld stop
+ 1324  su
+ 1325  service mysqld stop
+ 1326  MySQLをセ
+ 1327  sudo service mysql stop
+ 1328  sudo mkdir -p /var/run/mysqld
+ 1329  sudo chown mysql:mysql /var/run/mysqld
+ 1330  sudo /usr/sbin/mysqld --skip-grant-tables --user=root --skip-networking &
+ 1331  mysql -u root
+ 1332  sudo pkill mysqld
+ 1333  sudo chown -R mysql:mysql /var/lib/mysql/
+ 1334  sudo service mysql start
+ 1335  mysql -u root
+ 1336  sudo mysql -u root
+ 1337  sudo mysql_secure_installation
+ 1338  sudo systemctl status mysql
+ 1339  sudo vi /etc/mysql/mysql.conf.d/mysql.cnf
+ 1340  sudo systemctl status mysql
+ 1341  sudo vi /etc/mysql/mysql.conf.d/mysql.cnf
+ 1342  sudo ls -la /etc/mysql/mysql.conf.d/
+ 1343  sudo ls -la /etc/mysql/mysql.conf.d/mysqld.cnf
+ 1344  sudo vi /etc/mysql/mysql.conf.d/mysqld.cnf
+ 1345  sudo systemctl restart mysql
+ 1346  mysql -r root -p
+ 1347  mysql -u root -p
+ 1348  su
+ 1349  sudo vi /etc/mysql/mysql.conf.d/mysqld.cnf
+ 1350  sudo systemctl restart mysql
+ 1351  mysql -u root -p
+ 1352  su
+ 1353  sudo vi /etc/mysql/mysql.conf.d/mysqld.cnf
+ 1354  sudo ls -la /var/log
+ 1355  pythpn3 manage.py migrate
+ 1356  python3 manage.py migrate
+ 1357  sudo apt install -y sqlclient
+ 1358  sudo apt install -y mysqlclient
+ 1359  sudo apt install -y mysql-client
+ 1360  python3 manage.py migrate
+ 1361  sudo pip install -y mysqlclient
+ 1362  sudo pip uninstall -y mysql-client
+ 1363  sudo apt uninstall -y mysql-client
+ 1364  sudo apt-get install default-libmysqlclient-dev build-essential
+ 1365  sudo pip install -y mysqlclient
+ 1366  sudo pip install mysqlclient
+ 1367  sudo pip install -y mysqlclientC
+ 1368  python3 manage.py migrate
+ 1369  sudo pip install mysqlclient
+ 1370  python3 manage.py migrate
+ 1371  sudo ls -la /home/shuichiro/app3/django/venv/lib/python3.10/site-packages/django/db/backends/mysql/base.py
+ 1372  pip install pymysql
+ 1373  python3 manage.py migrate
+ 1374  pip install cryptography
+ 1375  python3 manage.py migrate
+ 1376  python3 manage.py makemigrations
+ 1377  python3 manage.py migrate
+ 1378  python3 manage.py makemigrations
+ 1379  python3 manage.py migrate
+ 1380  sudo mysql -u root -p
+ 1381  python3 manage.py migrate
+ 1382  sudo mysql -u root -p
+ 1383  python3 manage.py migrate
+ 1384  sudo mysql -u root -p
+ 1385  python3 manage.py migrate
+ 1386  python3 manage.py makemigrations
+ 1387  python3 manage.py migrate
+ 1388  sudo mysql -u root -p
+ 1389  python3 manage.py migrate
+ 1390  python3 manage.py showmigrations
+ 1391  python3 manage.py migrate
+ 1392  python3 manage.py migrate accounts
+ 1393  sudo mysql -u root -p
+ 1394  python3 manage.py migrate accounts
+ 1395  python3 manage.py migrate
+ 1396  python3 manage.py migrate accounts
+ 1397  python3 manage.py mkemigrations accounts
+ 1398  python3 manage.py mkmigrations accounts
+ 1399  python3 manage.py makemigrations accounts
+ 1400  python3 manage.py migrate accounts
+ 1401  python3 manage.py migrate
+ 1402  sudo mysql -u root -p
+ 1403  python3 manage.py migrate
+ 1404  python3 manage.py showmigrations
+ 1405  python3 manage.py createsuperuser
+ 1406  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1407  python manage.py collectstatic
+ 1408  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1409  pythonon3 manage.py collectstatic
+ 1410  python3 manage.py collectstatic
+ 1411  sudo ls -la /var/www/qneeproject/templates
+ 1412  sudo ls -la /var/www/qneeproject/
+ 1413  sudo ls -la /var/www/qneeproject/static
+ 1414  sudo ls -la /var/www/
+ 1415  sudo ls -la /var/www/html
+ 1416  cd django
+ 1417  python3 -m venv venv
+ 1418  source venv/bin/activate
+ 1419  ls
+ 1420  cd qneeprojcet
+ 1421  ls
+ 1422  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1423  pwd
+ 1424  ls -la
+ 1425  cd app3
+ 1426  ls
+ 1427  sudo vi /etc/mysql/mysql.conf.d/mysqld.cnf
+ 1428  cd django
+ 1429  ls
+ 1430  vi memo
+ 1431  cd ..
+ 1432  ls
+ 1433  vi ReadMe
+ 1434  ls
+ 1435  cd django
+ 1436  python3 -m venv venv
+ 1437  source venv/bin/activate
+ 1438  cd qneeproject
+ 1439  ls
+ 1440  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1441  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+ 1442  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1443  pwd
+ 1444  cd app3
+ 1445  cd django
+ 1446  ls
+ 1447  python3 -m venv venv
+ 1448  source venv/bin/activate
+ 1449  cd qneeproject
+ 1450  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1451  cd app3/django
+ 1452  python3 -m venv venv
+ 1453  source venv/bin/activate
+ 1454  cd qneeproject
+ 1455  ls
+ 1456  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1457  python3 manage.py makemigrations
+ 1458  python3 manage.py showmigrations
+ 1459  python3 manage.py migrate
+ 1460  python3 manage.py makemigrations qpay
+ 1461  python3 manage.py migrate
+ 1462  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1463  pwd
+ 1464  cd app3/django
+ 1465  python3 -m venv venv
+ 1466  source venv/bin/activate
+ 1467  cd qneeproject
+ 1468  ls
+ 1469  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1470  python3 manage.py createsuperuser
+ 1471  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1472  python3 manage.py makemigrations qpay
+ 1473  python3 manage.py makemigrations
+ 1474  python3 manage.py migrate
+ 1475  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1476  python3 manage.py makemigrations
+ 1477  python3 manage.py migrate
+ 1478  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1479  python3 manage.py makemigrations
+ 1480  python3 manage.py migrate
+ 1481  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1482  cd app3/djnago
+ 1483  ls
+ 1484  cd app3/
+ 1485  cd django
+ 1486  ls
+ 1487  python3 -m venv venv
+ 1488  python3 manage.py makem
+ 1489  python3 manage.py migrate
+ 1490  source venv/bin/activate
+ 1491  cd qneeproject
+ 1492  ls
+ 1493  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1494  python3 manage.py makemigrations
+ 1495  python3 manage.py migrate
+ 1496  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local{% extends "index/base_qconnect.html" %}
+ 1497  {% load static %}
+ 1498      
+ 1499  {% block title %}登録内容のご確認{% endblock %}
+ 1500  {% block content %}
+ 1501  <div class="authentication-bg min-vh-100 min-vw-100">
+ 1502    
+ 1503    <div class="container">
+ 1504      <nav aria-label="breadcrumb" role="nabigation">
+ 1505        <ol class="breadcrumb text-dark rounded-2">
+ 1506          <li class="breadcrumb-item  text-primary"><a href="{% url 'accounts:mypage_buyer' %}">マイページ・ホーム</a></li>
+ 1507          <li class="breadcrumb-item active" aria-current="page">利用規約確認</li>
+ 1508        </ol>
+ 1509      </nav>
+ 1510      <div class ="row justify-content-center">
+ 1511        <div class="col-10">
+ 1512          <div class="progress mt-1 mb-1" style="height: 12px" >
+ 1513            <div class="progress-bar bg-secondary" role="progressbar"
+ 1514              style="width: 25%"
+ 1515              aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
+ 1516              仮登録
+ 1517            </div>
+ 1518    
+ 1519            <div class="progress-bar bg-secondary" role="progressbar"
+ 1520              style="width: 25%"
+ 1521              aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">
+ 1522              メール受領
+ 1523            </div>
+ 1524    
+ 1525            <div class="progress-bar bg-secondary" role="progressbar"
+ 1526              style="width: 25%"
+ 1527              aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
+ 1528              本登録
+ 1529            </div>
+ 1530    
+ 1531            <div class="progress-bar bg-danger progress-bar-striped progress-bar-animated" role="progressbar"
+ 1532              style="width: 25%"
+ 1533              aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+ 1534              利用規約確認
+ 1535            </div>
+ 1536          </div>
+ 1537        </div>
+ 1538      </div>
+ 1539    
+ 1540      <div class ="row justify-content-center">
+ 1541        <div class="col-12 col-sm-11 col-md-9">
+ 1542          <div class="row justify-content-center mt-4 mb-1">
+ 1543            <h4 class="text-black text-center">＜利用規約ご確認＞</h4>
+ 1544          </div>
+ 1545          {% for message in messages %}
+ 1546            <div class="alert alert-{{ message.tags }}" role="alert" style="background-color: #fae6ef;">
+ 1547              <span>{{ message }}</span>
+ 1548            </div>
+ 1549          {% endfor %}
+ 1550          <!-- メッセージはerror/warning/success/infoのmessage.tagsが付けられて保存される。 -->
+ 1551          <!-- message.tagsはsettings.pyのMESSAGE_TAGSで定義できる  25/01/10 -->
+ 1552          <!-- extra_tagはsettings.pyのMESSAGE_TAGSで定義できる  25/01/10 -->
+ 1553          <div class="iframe-wrapper d-flex justify-content-center">
+ 1554            <iframe src= "{% static 'accounts/利用規約（サンプル）.pdf' %}"></iframe>
+ 1555          </div>
+ 1556        </div> <!-- end col -->
+ 1557      </div> <!-- end row -->
+ 1558      <div class="row justify-content-center">
+ 1559        <div class="col-12 col-xs-10">
+ 1560          <br>
+ 1561          <div class="btn-group btn-group-vertical d-flex justify-content-center" data-toggle="buttons">
+ 1562            <label class="btn active">
+ 1563              <input id="check" type="checkbox" name='check'>
+ 1564              <span> 利用規約に同意する </span>
+ 1565            </label>
+ 1566          </div>
+ 1567          <form method="POST" action="{% url 'accounts:agreement_confirm_buyer' user.id entity.id %}">
+ 1568            {% csrf_token %}
+ 1569            {% for field in form %}
+ 1570            {{field.as_hidden}}
+ 1571            {% endfor %}
+ 1572            <div class="d-flex justify-content-center mt-4">
+ 1573              <button id="next1" type="submit" class="btn btn-primary me-2" name="next" value="disagree"
+ 1574                data-bs-toggle="tooltip"
+ 1575                data-bs-placement="bottom"
+ 1576                title="">同意しない
+ 1577              </button>
+ 1578              
+ 1579              <button id="next2" type="submit" class="btn btn-primary ms-2" name="next" value="agree"
+ 1580                data-bs-toggle="tooltip"
+ 1581                data-bs-placement="bottom"
+ 1582                title="上記「利用規約に同意します」にチェックしたうえクリック">同意します
+ 1583              </button>
+ 1584            </div>
+ 1585          </form>
+ 1586        </div>
+ 1587      </div>
+ 1588    </div>
+ 1589  </div>
+ 1590  <script src="{% static 'accounts/js/script.js' %}" defer></script>
+ 1591  {% endblock %}
+ 1592  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1593  pwd
+ 1594  cd app3
+ 1595  pwd
+ 1596  ls -la
+ 1597  cd django
+ 1598  python3 -m venv venv
+ 1599  source venv/bin/activate
+ 1600  cd qneeproject
+ 1601  ls
+ 1602  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1603  python3 manage.py makemigrations
+ 1604  python3 manage.py migrate
+ 1605  python3 manage.py makemigrations
+ 1606  python3 manage.py migrate
+ 1607  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1608  cd app3/django
+ 1609  python3 -m venv venv
+ 1610  source venv/bin/activate
+ 1611  cd qneeproject
+ 1612  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1613  pwd
+ 1614  cd app3/django
+ 1615  python3 -m venv venv
+ 1616  source venv/bin/activate
+ 1617  cd qneeproject
+ 1618  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1619  cd app3/django
+ 1620  python3 -m venv venv
+ 1621  source venv/bin/activate
+ 1622  cd qneeproject
+ 1623  cd ..
+ 1624  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1625  python3 manage.py makemigrations
+ 1626  python3 manage.py migrate
+ 1627  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1628  python3 manage.py makemigrations
+ 1629  python3 manage.py migrate
+ 1630  python3 manage.py makemigrations
+ 1631  python3 manage.py migrate
+ 1632  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1633  python3 manage.py migrate
+ 1634  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1635  python3 manage.py makemigrations
+ 1636  python3 manage.py migrate
+ 1637  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1638  python3 manage.py makemigrations
+ 1639  python3 manage.py migrate
+ 1640  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1641  python3 manage.py makemigrations
+ 1642  python3 manage.py migrate
+ 1643  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1644  python3 manage.py makemigrations
+ 1645  python3 manage.py migrate
+ 1646  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1647  python3 manage.py makemigrations
+ 1648  python3 manage.py migrate
+ 1649  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1650  pwd
+ 1651  ls
+ 1652  cd app3/django
+ 1653  python3 -m venv venv
+ 1654  source venv/bin/activate
+ 1655  cd qneeproject
+ 1656  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1657  python3 manage.py makemigrations
+ 1658  python3 manage.py migrate
+ 1659  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1660  python3 manage.py makemigrations
+ 1661  python3 manage.py migrate
+ 1662  python3 manage.py makemigrations
+ 1663  python3 manage.py migrate
+ 1664  python3 manage.py makemigrations
+ 1665  python3 manage.py migrate
+ 1666  python3 manage.py makemigrations
+ 1667  python3 manage.py migrate
+ 1668  python3 manage.py makemigrations
+ 1669  python3 manage.py migrate
+ 1670  python3 manage.py makemigrations
+ 1671  python3 manage.py migrate
+ 1672  python3 manage.py makemigrations
+ 1673  python3 manage.py migrate
+ 1674  python3 manage.py makemigrations
+ 1675  python3 manage.py migrate
+ 1676  python3 manage.py makemigrations
+ 1677  python3 manage.py migrate
+ 1678  python3 manage.py makemigrations
+ 1679  python3 manage.py migrate
+ 1680  python3 manage.py makemigrations
+ 1681  python3 manage.py migrate
+ 1682  python3 manage.py makemigrations
+ 1683  python3 manage.py migrate
+ 1684  python3 manage.py makemigrations
+ 1685  python3 manage.py migrate
+ 1686  python3 manage.py makemigrations
+ 1687  python3 manage.py migrate
+ 1688  python3 manage.py makemigrations
+ 1689  python3 manage.py migrate
+ 1690  python3 manage.py makemigrations
+ 1691  python3 manage.py migrate
+ 1692  python3 manage.py makemigrations
+ 1693  python3 manage.py migrate
+ 1694  python3 manage.py makemigrations
+ 1695  python3 manage.py migrate
+ 1696  python3 manage.py makemigrations
+ 1697  python3 manage.py migrate
+ 1698  python3 manage.py makemigrations
+ 1699  python3 manage.py migrate
+ 1700  python3 manage.py makemigrations
+ 1701  python3 manage.py migrate
+ 1702  python3 manage.py makemigrations
+ 1703  python3 manage.py migrate
+ 1704  python3 manage.py makemigrations
+ 1705  python3 manage.py migrate
+ 1706  cd app3/django
+ 1707  python3 -m venv venv
+ 1708  source venv/bin/activate
+ 1709  cd qneeproject
+ 1710  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1711  python3 manage.py makemigrations
+ 1712  python3 manage.py migrate
+ 1713  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1714  python3 manage.py makemigrations
+ 1715  python3 manage.py migrate
+ 1716  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1717  python3 manage.py makemigrations
+ 1718  python3 manage.py migrate
+ 1719  python3 manage.py makemigrations
+ 1720  python3 manage.py migrate
+ 1721  python manage.py migrate api 0005_remove_legalentity_is_consent_and_more
+ 1722  python3 manage.py makemigrations
+ 1723  python3 manage.py migrate
+ 1724  python3 manage.py makemigrations
+ 1725  python3 manage.py migrate
+ 1726  python3 manage.py makemigrations
+ 1727  python3 manage.py migrate
+ 1728  python3 manage.py makemigrations
+ 1729  python3 manage.py migrate
+ 1730  python3 manage.py makemigrations
+ 1731  python3 manage.py migrate
+ 1732  python3 manage.py makemigrations
+ 1733  python3 manage.py migrate
+ 1734  python3 manage.py makemigrations
+ 1735  python3 manage.py migrate
+ 1736  python3 manage.py makemigrations
+ 1737  python3 manage.py migrate
+ 1738  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1739  python3 manage.py makemigrations
+ 1740  python3 manage.py migrate
+ 1741  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1742  python manage.py shell
+ 1743  python3 manage.py makemigrations
+ 1744  python3 manage.py migrate
+ 1745  python3 manage.py makemigrations
+ 1746  python3 manage.py migrate
+ 1747  python3 manage.py makemigrations
+ 1748  python3 manage.py migrate
+ 1749  python3 manage.py makemigrations
+ 1750  python3 manage.py migrate
+ 1751  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1752  python manage.py shell
+ 1753  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1754  python3 manage.py makemigrations
+ 1755  python3 manage.py migrate
+ 1756  python manage.py dbshell
+ 1757  python3 manage.py makemigrations
+ 1758  python3 manage.py migrate
+ 1759  python3 manage.py makemigrations
+ 1760  python3 manage.py migrate
+ 1761  python3 manage.py makemigrations
+ 1762  python3 manage.py migrate
+ 1763  python3 manage.py makemigrations
+ 1764  python3 manage.py migrate
+ 1765  python manage.py dbshell
+ 1766  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1767  python3 manage.py makemigrations
+ 1768  python3 manage.py migrate
+ 1769  python3 manage.py makemigrations
+ 1770  python3 manage.py migrate
+ 1771  python3 manage.py makemigrations
+ 1772  python3 manage.py migrate
+ 1773  python3 manage.py sqlmigrate
+ 1774  python3 manage.py migrate
+ 1775  python manage.py dbshell
+ 1776  python3 manage.py makemigrations
+ 1777  python3 manage.py migrate
+ 1778  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1779  python manage.py dbshell
+ 1780  python3 manage.py makemigrations
+ 1781  python3 manage.py migrate
+ 1782  python manage.py sqlmigrate
+ 1783  python manage.py sqlmigrate historical_data 0001
+ 1784  python manage.py showmigrations
+ 1785  python3 manage.py makemigrations
+ 1786  python3 manage.py migrate
+ 1787  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1788  python3 manage.py makemigrations
+ 1789  python3 manage.py migrate
+ 1790  python3 manage.py makemigrations
+ 1791  python3 manage.py migrate
+ 1792  python3 manage.py makemigrations
+ 1793  python3 manage.py migrate
+ 1794  python3 manage.py makemigrations
+ 1795  python3 manage.py migrate
+ 1796  python3 manage.py makemigrations
+ 1797  python3 manage.py migrate
+ 1798  python3 manage.py makemigrations
+ 1799  python3 manage.py migrate
+ 1800  python3 manage.py makemigrations
+ 1801  python3 manage.py migrate
+ 1802  python3 manage.py makemigrations
+ 1803  python3 manage.py migrate
+ 1804  python3 manage.py makemigrations
+ 1805  python3 manage.py migrate
+ 1806  python3 manage.py makemigrations
+ 1807  python3 manage.py migrate
+ 1808  python3 manage.py makemigrations
+ 1809  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1810  python3 manage.py makemigrations
+ 1811  python3 manage.py migrate
+ 1812  python3 manage.py makemigrations
+ 1813  python3 manage.py migrate
+ 1814  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1815  python3 manage.py makemigrations
+ 1816  python3 manage.py migrate
+ 1817  python3 manage.py makemigrations
+ 1818  python3 manage.py migrate
+ 1819  python3 manage.py makemigrations
+ 1820  python3 manage.py migrate
+ 1821  python3 manage.py makemigrations
+ 1822  python3 manage.py migrate
+ 1823  python3 manage.py makemigrations
+ 1824  python3 manage.py migrate
+ 1825  python manage.py dbshell
+ 1826  python3 manage.py makemigrations
+ 1827  python3 manage.py migrate
+ 1828  python3 manage.py makemigrations
+ 1829  python3 manage.py migrate
+ 1830  python manage.py dbshell
+ 1831  cd app3/django
+ 1832  python3 -m -m venv
+ 1833  python -m -m venv
+ 1834  python3 -m venv venv
+ 1835  source ven/bin/activate
+ 1836  source venv/bin/activate
+ 1837  cd qneeproject
+ 1838  ls
+ 1839  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1840  python3 manage.py makemigrations
+ 1841  python3 manage.py migrate
+ 1842  python manage.py dbshell
+ 1843  python3 manage.py makemigrations
+ 1844  python3 manage.py migrate
+ 1845  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1846  python manage.py dbshell
+ 1847  python3 manage.py makemigrations
+ 1848  python3 manage.py migrate
+ 1849  python manage.py dbshell
+ 1850  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1851  python3 manage.py createsuperuser
+ 1852  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1853  python3 manage.py makemigrations
+ 1854  python3 manage.py migrate
+ 1855  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1856  python3 manage.py makemigrations
+ 1857  python3 manage.py migrate
+ 1858  python3 manage.py makemigrations
+ 1859  python3 manage.py migrate
+ 1860  python3 manage.py makemigrations
+ 1861  python3 manage.py migrate
+ 1862  python3 manage.py makemigrations
+ 1863  python3 manage.py migrate
+ 1864  python3 manage.py makemigrations
+ 1865  python3 manage.py migrate
+ 1866  python3 manage.py makemigrations
+ 1867  python3 manage.py migrate
+ 1868  python3 manage.py makemigrations
+ 1869  python3 manage.py migrate
+ 1870  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1871  python3 manage.py makemigrations
+ 1872  python3 manage.py migrate
+ 1873  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1874  python3 manage.py makemigrations
+ 1875  python3 manage.py migrate
+ 1876  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1877  python3 manage.py makemigrations
+ 1878  python manage.py dbshell
+ 1879  python3 manage.py makemigrations
+ 1880  python manage.py dbshell
+ 1881  python3 manage.py makemigrations
+ 1882  python manage.py dbshell
+ 1883  pip install mysqlclient
+ 1884  python manage.py dbshell
+ 1885  python3 manage.py makemigrations
+ 1886  mysql -u root -p
+ 1887  mysql -u shuichiro -p
+ 1888  $ sudo mysql -u root -p
+ 1889  sudo mysql -u root -p
+ 1890  python3 manage.py makemigrations
+ 1891  sudo mysql -u root -p
+ 1892  python3 manage.py makemigrations
+ 1893  python3 manage.py showmigrations
+ 1894  python3 manage.py makemigrations --merge
+ 1895  sudo mysql -u root -p
+ 1896  python3 manage.py showmigrations
+ 1897  python3 manage.py makemigrations
+ 1898  python3 manage.py showmigrations
+ 1899  python3 manage.py makemigrations
+ 1900  python3 manage.py showmigrations
+ 1901  python3 manage.py makemigrations
+ 1902  python3 manage.py showmigrations
+ 1903  python3 manage.py makemigrations
+ 1904  python3 manage.py showmigrations
+ 1905  python3 manage.py makemigrations
+ 1906  python3 manage.py migrate
+ 1907  python3 manage.py makemigrations
+ 1908  python3 manage.py migrate
+ 1909  python3 manage.py showmigrations
+ 1910  python3 manage.py makemigrations
+ 1911  python3 manage.py migrate
+ 1912  python3 manage.py makemigrations
+ 1913  python3 manage.py migrate
+ 1914  python3 manage.py showmigrations
+ 1915  python3 manage.py makemigrations
+ 1916  python3 manage.py migrate
+ 1917  python3 manage.py showmigrations
+ 1918  python3 manage.py makemigrations
+ 1919  sudo mysql -u root -p
+ 1920  python3 manage.py makemigrations
+ 1921  python3 manage.py showmigrations
+ 1922  python3 manage.py makemigrations
+ 1923  python3 manage.py migrate
+ 1924  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1925  python3 manage.py migrate
+ 1926  sudo mysql -u root -p
+ 1927  python3 manage.py migrate 
+ 1928  python3 manage.py showmigrations
+ 1929  python3 manage.py makemigrations
+ 1930  python3 manage.py showmigrations
+ 1931  sudo mysql -u root -p
+ 1932  python3 manage.py showmigrations
+ 1933  python3 manage.py makemigrations
+ 1934  sudo mysql -u root -p
+ 1935  python3 manage.py showmigrations
+ 1936  python3 manage.py migrate 
+ 1937  python3 manage.py showmigrations
+ 1938  python3 manage.py migrate 
+ 1939  python3 manage.py showmigrations
+ 1940  python3 manage.py makemigrations
+ 1941  python3 manage.py migrate 
+ 1942  python3 manage.py createsuperuser 
+ 1943  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1944  sudo mysql -u root -p
+ 1945  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1946  service mysql status
+ 1947  sudo mysql -u root -p
+ 1948  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1949  sudo mysql -u root -p
+ 1950  python3 manage.py makemigrations
+ 1951  python3 manage.py migrate 
+ 1952  python3 manage.py makemigrations
+ 1953  sudo mysql -u root -p
+ 1954  python3 manage.py makemigrations
+ 1955  sudo mysql -u root -p
+ 1956  python3 manage.py makemigrations
+ 1957  python3 manage.py showmigrations
+ 1958  sudo mysql -u root -p
+ 1959  python3 manage.py showmigrations
+ 1960  sudo mysql -u root -p
+ 1961  python3 manage.py makemigrations
+ 1962  sudo mysql -u root -p
+ 1963  python3 manage.py makemigrations
+ 1964  sudo mysql -u shuichiro -p
+ 1965  sudo mysql -u root -p
+ 1966  python3 manage.py makemigrations
+ 1967  sudo mysql -u root -p
+ 1968  sudo mysql -u shuichiro -p
+ 1969  sudo mysql -u root -p
+ 1970  python3 manage.py makemigrations
+ 1971  sudo mysql -u root -p
+ 1972  sudo mysql -u root -p -e "CREATE DATABASE qnee_db CHARACTER SET utf8;"
+ 1973  sudo mysql -u root -p
+ 1974  python3 manage.py makemigrations
+ 1975  python3 manage.py migrate 
+ 1976  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1977  cd app3/django
+ 1978  python3 -m venv venv
+ 1979  source venv/bin/activate
+ 1980  cd qneeproject
+ 1981  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1982  cd app3_for_git
+ 1983  cd django
+ 1984  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1985  cd qneeproject
+ 1986  python3 manage.py runserver 0.0.0.0:8000 --settings qneeproject.settings.local
+ 1987  history
+ 1988  history -a
+ 1989  history -p
+ 1990  history 
+ 1991  git status
+ 1992  git log
+ 1993  history >> history_20250222.log
