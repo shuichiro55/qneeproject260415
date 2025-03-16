@@ -1,0 +1,9 @@
+{{ tx.seller_personname }} 様 ご利用ありがとうございます。
+
+{{ tx.buyer_entityname }} 様が {{ tx.seller_entityname }} 様の申請を承認されました。
+下記に移った先から銀行口座をご登録お願いいたします。
+
+銀行口座登録用URL
+{{ protocol}}://{{ domain }}{% url 'accounts:login_seller' token %}
+
+株式会社Qnee（キユーニー）

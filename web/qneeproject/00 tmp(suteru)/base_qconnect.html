@@ -1,0 +1,116 @@
+{% load static %}
+{% load bootstrap_icons %}
+
+<html>
+<head>
+  <meta charset="utf-8">
+
+  <title>Qnee | Qnee Connect</title> <!-- SEO対策として書き換える-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="制作会社やフリーランスの方に「より便利な環境を」。
+    負担の少ない報酬先払い、契約書締結の代行、本当に大事なもの以外は手間や費用を
+    かけないような環境構築を目指します。" />
+  <meta name="keywords" content="フリーランス新法, プロダクション, 制作会社, ファクタリング, freelance, " />
+  <meta name="author" content="富張周一郎" />
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+  <link rel="stylesheet" type="text/css" href="{% static 'qpay/css/style.css' %}">
+
+  <script src="{% static 'accounts/js/script.js' %}" defer></script>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <title>{% block title %}{% endblock title %}</title>
+    
+  {% block extraheader %}{% endblock %}
+</head>
+
+<body class="basicFont" style="background-color:#f8f6f4">
+
+<nav class="navbar navbar-dark bg-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">Qnee Connect</a>
+  
+    <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasDarkNavbar" aria-controls="offcanvasDarkNavbar" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div
+    data-bs-spy="scroll"
+    data-bs-target="#navbar-example2"
+    data-bs-offset="0"
+    class="scrollspy-example"
+    tabindex="0"
+  >
+    <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="offcanvasDarkNavbar" aria-labelledby="offcanvasDarkNavbarLabel">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasDarkNavbarLabel">フロントデスク</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      </div>
+
+      <div class="offcanvas-body">
+        <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#">Home</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'accounts:login_seller' %}">お客様ログイン</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'accounts:login_buyer' %}">加盟店様ログイン</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'accounts:logout' %}">ログアウト</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'accounts:contact' %}">お問い合わせ</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              メニュー
+            </a>
+              <ul class="dropdown-menu dropdown-menu-dark">
+                <li><a class="dropdown-item" href="#">Action</a></li>
+                <li><a class="dropdown-item" href="#">Another action</a></li>
+                <li>
+                  <hr class="dropdown-divider">
+                </li>
+                <li><a class="dropdown-item" href="#">Something else here</a></li>
+            </ul>
+          </li>
+        </ul>
+        <form class="d-flex mt-3" role="search">
+          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+          <button class="btn btn-success" type="submit">Search</button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</nav>
+  
+
+
+<main>
+  <div class="container">
+    {% block content %}{% endblock %}
+    {% block extrajs %}{% endblock %}
+  </div>
+</main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+</body>
+</html>

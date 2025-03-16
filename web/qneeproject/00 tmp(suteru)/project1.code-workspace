@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "../../../.."
+		},
+		{
+			"path": "../../../../../GitTraining"
+		},
+		{
+			"path": "../../../../../project5"
+		}
+	],
+	"settings": {
+		"git.ignoreLimitWarning": true
+	}
+}

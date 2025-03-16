@@ -1,0 +1,83 @@
+{% extends "index/base_qconnect_seller.html" %}
+
+{% load bootstrap_icons %}
+
+{% block content %}
+
+<div class="authentication-bg min-vh-100 min-vw-100 align-items-start" style="background-color: #edf9ff;">
+
+  <div class="container mt-2">
+
+    <nav aria-label="breadcrumb" role="navigation">
+      <ol class="breadcrumb text-dark rounded-2">
+        <li class="breadcrumb-item text-primary"><a href="{% url 'accounts:mypage_seller' %}">マイページ・ホーム</a></li>
+        <li class="breadcrumb-item text-primary"><a href="{% url 'accounts:info_edit_seller' %}">設定メニュー</a></li>
+        <li class="breadcrumb-item active" aria-current="page">受取口座設定</li>
+      </ol>
+    </nav>
+
+    <div class="d-flex justify-content-center mt-4">
+      <h5>{% bs_icon 'bank' size='1.4em' %} 　登録されている口座</h5>
+      <!-- <a href="{% url 'accounts:mypage_seller' %}" class="btn btn-outline-secondary" >メイン・メニューへ</a> -->
+    </div>
+
+    <div class="row">
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}" role="alert" style="background-color: #fcf7fa;">
+        <span>{{ message }}</span>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="row justify-content-center">
+      <form method="POST"
+        class="form-group col-11 col-md-9 col-lg-7 bg-light border border-success rounded p-4 m-2">
+        {% csrf_token %}
+
+        <table class="table table-striped table-bordered table table-responsive bg-light">
+          <tbody class="text-center">
+            <tr>
+              <td width="30%">金融機関</td>
+              <td >{{ form.bank_name.value|default:"" }}（{{ form.bank_code.value|default:"" }}）</td>
+            </tr>
+            <tr>
+              <td width="30%">支店</td>
+              <td>{{ form.branch_name.value|default:"" }}（{{ form.branch_code.value|default:"" }}）</td>
+            </tr>
+          </tr>
+          <tr>
+            <td width="30%">口座名義</td>
+            <td>{{ form.holdername.value|default:"" }}</td>
+          </tr>
+          <tr>
+            <td width="30%">口座番号</td>
+            <td>{{ form.accountNumber.value|default:"" }}</td>
+          </tr>
+        </table>
+      </tbody>
+    </table>
+
+    <hr>
+  
+    <div class="d-flex justify-content-center pt-3">
+      <button type="submit" class="btn btn-primary shadow me-2" name="WhichAccount" value="ThisAccount">　この口座を使う　</button>
+      <button type="submit" class="btn btn-primary shadow ms-2" name="WhichAccount" value="NewAccount">別の口座を登録する</button>
+    </div>
+
+    {{ form.temporal_tx_id.as_hidden }}
+    {{ form.entity_id.as_hidden }}
+
+      </form>
+
+    </div> <!-- end row -->  
+  </div> <!-- end container -->
+</div>
+
+{% endblock %}
+
+{% block extrajs %}
+
+  <script>
+  </script>
+
+{% endblock %}

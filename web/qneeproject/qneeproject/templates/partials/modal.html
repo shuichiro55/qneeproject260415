@@ -1,0 +1,22 @@
+{% load static %}
+
+{% block modal %}
+<!-- Modal -->
+<div class="modal fade" id="presentationVideo" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content  bg-transparent border-0">
+      <div class="modal-body p-0">
+        <div class="text-end">
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+              aria-label="Close"></button>
+        </div>
+        <div class="ratio ratio-16x9">
+          <video id="VisaChipCardVideo" class="video-box" controls>
+            <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+          </video>
+        </div>
+      </div> <!--end modal-body-->
+    </div> <!--end modal-content-->
+  </div> <!--end modal-dialog-->
+</div> <!--end modal-->
+{% endblock %}

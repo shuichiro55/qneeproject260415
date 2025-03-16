@@ -1,0 +1,187 @@
+{% extends "index/base_qconnect_seller.html" %}
+
+{% load bootstrap_icons %}
+
+{% block content %}
+
+<div class="authentication-bg min-vh-100 min-vw-100 align-items-start" style="background-color: #edf9ff;">
+
+  <div class="container mt-2">
+
+    <nav aria-label="breadcrumb" role="navigation">
+      <ol class="breadcrumb text-dark rounded-2">
+        <li class="breadcrumb-item text-primary"><a href="{% url 'accounts:mypage_seller' %}">マイページ・ホーム</a></li>
+        <li class="breadcrumb-item text-primary"><a href="{% url 'accounts:info_edit_seller' %}">設定メニュー</a></li>
+        <li class="breadcrumb-item active" aria-current="page">受取口座設定</li>
+      </ol>
+    </nav>
+
+    <div class="d-flex justify-content-center mt-4">
+      <h5>{% bs_icon 'bank' size='1.4em' %} 　銀行口座の登録</h5>
+      <!-- <a href="{% url 'accounts:mypage_seller' %}" class="btn btn-outline-secondary" >メイン・メニューへ</a> -->
+    </div>
+
+    <div class="row">
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}" role="alert" style="background-color: #fcf7fa;">
+        <span>{{ message }}</span>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="row justify-content-center">
+      <form method="POST"
+        class="form-group col-11 col-md-9 col-lg-7 bg-light border border-success rounded p-4 m-2">
+        {% csrf_token %}
+
+        <h6>■金融機関の選択</h6>
+        <div class="input-group">
+          <input type="text" class="form-control" name="keyword_bank" placeholder="キーワード入力 （ex. 0001 or みずほ or ミズホ）">
+          <button type="submit" class="btn btn-primary shadow" name="search" value="search_bank">検索</button>
+          <!-- <button type="submit" class="btn btn-outline-primary" name="select" value="select_bank">選択</button> -->
+        </div>
+
+        <!-- 「multiple」はリストのスタイルを変える -->
+        <select class="form-select"
+          id="id_bank"
+          name="select_bank"
+          value="{{form.bank_code.value}}　　　{{form.bank_name.value}}"
+          multiple  
+          aria-label="multiple select example">
+
+          {% if match_bank_dict.items %}
+
+            {% if bank_code %}
+              <option>コード　　金融機関名</option>
+              {% for code, name in  match_bank_dict.items %}
+          
+                {% if code == bank_code %}
+                  <option value='{{code}}' selected>{{code}}　　　{{name}}</option>
+                {% else %}
+                  <option value='{{code}}'>{{code}}　　　{{name}}</option>
+                {% endif %}
+              {% endfor %}
+
+            {% else %}
+              <option selected>コード　　金融機関名</option>
+              {% for code, name in  match_bank_dict.items %}
+                <option value='{{code}}'>{{code}}　　　{{name}}</option>
+              {% endfor %}
+            {% endif %}
+          {% endif %}
+        </select>
+
+        <hr>
+
+        <h6>■支店の選択</h6>
+        <div class="input-group">
+          <input type="text" class="form-control" name="keyword_branch" placeholder="キーワード入力 （ex. 001 or ぎんざ or ginza or ぎんざ）">
+          <button type="submit" class="btn btn-primary shadow" name="search" value="search_branch">検索</button>
+          <!-- <button type="submit" class="btn btn-outline-primary" name="select" value="select_branch">選択</button> -->
+        </div>
+
+        <select class="form-select"
+          id="id_branch"
+          name="select_branch"
+          multiple
+          aria-label="multiple select example">
+
+          {% if match_branch_dict.items %}
+            <option selected>支店コード　　支店名</option>    
+        
+            {% for code, name in match_branch_dict.items %}
+            <option value='{{code}}'>{{code}}　　　{{name}}</option>
+            {% endfor %}
+          {% endif %}
+        </select>
+
+        <hr>
+  
+        <div class="d-flex justify-content-center pt-3">
+          <button type="submit" class="btn btn-primary shadow" name="next" value="ToInput">　口座名義、口座番号の登録へ　</button>
+        </div>
+
+        {{ form.temporal_tx_id.as_hidden }}
+        {{ form.entity_id.as_hidden }}
+
+      </form>
+    </div> <!-- end row -->   
+  </div> <!-- end container -->
+</div>
+
+{% endblock %}
+
+{% block extrajs %}
+
+  <script>
+
+    const BankElement = document.querySelector('#id_bank');
+    const BranchElement = document.querySelector('#id_branch');
+
+    //const BankElement = document.getElementById('#id_bank');
+    //const BranchElement = document.getElementById('#id_branch');
+
+    
+//    BankElement.addEventListener('change', () => {
+//  
+//      alert('ひとまず<script>のイベントチェンジに反応しています。 alert2');
+//      console.log('コンソール1-1');
+//      console.log('{{ bank_branches_dict|safe }}')
+//      let branches_obj = JSON.parse('{{ bank_branches_dict|safe }}' || "null");
+//      
+//      console.log('コンソール1-2');
+//
+//      let bank_code = BankElement.value;
+//      console.log(branches_obj[bank_code]);
+//      BranchElement.remove();
+//      
+//      Object.keys(branches_obj[bank_code]).forEach((key) => {
+//        const option = document.createElement('option');
+//        option.value = key;
+//        option.innerHTML = branches_obj[bank_code][key];
+//        console.log(key, branches_obj[bank_code][key])
+//        BranchElement.append(option);
+//      });
+//
+//      //let branches = branches_obj.bank_code;
+//  
+//      alert('ひとまず<script>に入ってます alert5');
+//
+//    });
+
+
+    function loadFinished(){
+      //alert('Load');
+       
+      BankElement.addEventListener('change', () => {
+
+        console.log('コンソール2-1');
+
+        for (let i=BranchElement.length-1 ; i >= 0 ; i--) {
+          BranchElement.remove( i );
+        }
+
+        let branches_obj = JSON.parse('{{ bank_branches_dict|safe }}' || "null");
+        let bank_code = BankElement.value;
+        console.log(branches_obj[bank_code]);      
+        // ここが機能しない。<select>にoption要素が加えられない！
+
+        Object.keys(branches_obj[bank_code]).forEach((key) => {
+          let option = document.createElement('option');
+          option.value = key;
+          option.innerHTML = key + '　　　' + branches_obj[bank_code][key];
+          console.log(key, branches_obj[bank_code][key]);
+          BranchElement.appendChild(option);
+        });
+
+        alert('alert2　ひとまず<script> in window.addEventListener(load, function()) ');
+        console.log('コンソール2-2');
+
+      });
+    }
+
+    window.addEventListener('load', loadFinished);
+
+</script>
+
+{% endblock %}

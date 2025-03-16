@@ -1,0 +1,68 @@
+{% extends "index/base_qconnect_seller.html" %}
+{% load humanize %}
+
+{% block content %}
+
+<div class="authentication-bg min-vh-100 min-vw-100 align-items-start" style="background-color:#edf9ff;">
+
+  <div class="container mt-2">
+
+    <nav aria-label="breadcrumb" role="navigation">
+      <ol class="breadcrumb text-dark rounded-2">
+        <li class="breadcrumb-item text-primary"><a href="{% url 'accounts:mypage_seller' %}">マイページ・ホーム</a></li>
+        <li class="breadcrumb-item active" aria-current="page">取引履歴・書類発行</li>
+      </ol>
+    </nav>
+
+    <div class="d-flex justify-content-center mt-3">
+      <div class="header">
+        <h5>詳細情報</h5>
+      </div>
+    </div>
+
+    <div class="row justify-content-center">
+      <div class="col-11 col-md-9 col-lg-6">
+
+        <form method="GET"
+          action="{% url 'qpay:txlist_seller' tx.id page_num %}"
+          class="form-group bg-light border border-success rounded p-4 m-1">
+      
+          {% csrf_token %}
+
+          <table class="table table-striped table-bordered">
+            <tbody>
+              <tr class="table-info">
+                <td width="45%">処理状況</td><td style="text-align:center;">{{ tx.tx_status_char }}</td></tr>
+              <tr><td width="45%">ゲスト</td><td style="text-align:right;">{{ tx.seller_entityname }}</td></tr>
+              <tr><td width="45%">申請者</td><td style="text-align:right;">{{ tx.seller_personname }}</td></tr>
+              <tr><td width="45%">申請額</td><td style="text-align:right;">{{ tx.requested_amount|intcomma }}</td></tr>
+              <tr>
+                <td width="45%">エビデンス</td>
+                <td style="text-align:center">
+                  <img src="{{ tx.evidence.url }}" class="img-thumbnail" style="width:50;height:auto"/>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <table class="table table-striped table-bordered">
+            <tbody>
+              <tr class="table-info">
+                <td width="45%">受取り金額</td><td>{{ tx.to_seller_amount|intcomma }}</td></tr>
+              <tr><td width="45%">＋前払額</td><td>{{ tx.advance_amount|intcomma }}</td></tr>
+              <tr><td width="45%">－前払手数料</td><td>{{ tx.advance_fee|intcomma }}</td></tr>
+              <tr><td width="45%">－振込手数料</td><td>{{ tx.transfer_fee|intcomma }}</td></tr>
+            </tbody>
+          </table>
+
+          <div class="d-flex justify-content-center pt-3">  
+            <button type="submit" class="btn btn-outline-primary" name="next" value="back">一覧に戻る</button>
+          </div>
+        </form>
+
+      </div> <!-- endo row -->
+    </div> <!-- end col -->
+  </div> <!-- end container -->
+</div>
+
+{% endblock %}

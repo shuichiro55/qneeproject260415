@@ -1,0 +1,47 @@
+/* Global Colors - The following color variables are used throughout the website. Updating them here will change the color scheme of the entire website */
+:root { 
+  --background-color: #ffffff; /* Background color for the entire website, including individual sections */
+  --default-color: #313030; /* Default color used for the majority of the text content across the entire website */
+  --heading-color: #473d3a; /* Color for headings, subheadings and title throughout the website */
+  --accent-color: #ff5821; /* Accent color that represents your brand on the website. It's used for buttons, links, and other elements that need to stand out */
+  --surface-color: #ffffff; /* The surface color is used as a background of boxed elements within sections, such as cards, icon boxes, or other elements that require a visual separation from the global background. */
+  --contrast-color: #ffffff; /* Contrast color for text, ensuring readability against backgrounds of accent, heading, or default colors. */
+}
+
+/* トップメッセージ*/
+.about .content ul li {
+  display: flex;
+  align-items: flex-start;
+  margin-top: 40px;
+}
+
+.about .content ul i {
+  flex-shrink: 0;
+  font-size: 48px;
+  color: var(--accent-color);
+  margin-right: 20px;
+  line-height: 0;
+}
+
+.overview {
+  width: 100%;
+  }
+  
+  .overview th,
+  .overview td {
+  border: 1px solid #d2d2d2;
+  padding: 20px;
+  }
+  
+  .overview th {
+  font-weight: bold;
+  background-color: #fed6d6; 
+  }
+  
+  @media screen and (max-width: 767px) {
+  .overview,
+  .overview tr,
+  .overview td,
+  .overview th {display:block;}
+  .overview th {width:auto;}
+  }

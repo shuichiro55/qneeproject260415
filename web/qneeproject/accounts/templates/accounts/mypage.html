@@ -1,0 +1,40 @@
+{%extends "partials/base_qconnect.html" %}
+
+{% load bootstrap_icons %}
+
+{% block main %}
+
+<!-- Icons Grid-->
+<section class="features-icons bg-light text-center">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <p></p>
+                {% bs_icon 'send' color='cornflowerblue' size='2.5em' %}
+                <p></p>
+                <a href="{% url 'qpay:qpay_create' user.id entity.id %}"><h3>報酬の前払い申請</h3></a>
+                <p class="lead mb-0">前払いを申請し、発注会社に確認をとります</p>
+            </div>
+
+            <div class="col-md-4">
+                <p></p>
+                {% bs_icon 'receipt-cutoff' color='cornflowerblue' size='2.5em' %}
+                <p></p>
+                <h3>取引履歴・書類発行</h3>
+                <p class="lead mb-0">取引個別や取引を取りまとめて書類を発行します</p>
+            </div>
+
+            <div class="col-md-4">
+                <p></p>
+                {% bs_icon 'pencil-square' color='cornflowerblue' size='2.5em' %}
+                <p></p>
+                <h3>登録情報変更</h3>
+                <p class="lead mb-0">本サービスをご利用される、ご本人様または法人様の登録情報を変更します</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+{% endblock %}

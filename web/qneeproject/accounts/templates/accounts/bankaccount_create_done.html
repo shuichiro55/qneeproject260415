@@ -1,0 +1,64 @@
+{% extends "index/base_qconnect_seller.html" %}
+
+{% load bootstrap_icons %}
+<!-- {% load humanize %} -->
+
+{% block content %}
+
+<div class="authentication-bg min-vh-100 min-vw-100 align-items-start" style="background-color: #edf9ff;">
+
+  <div class="container mt-2">
+
+    <nav aria-label="breadcrumb" role="navigation">
+      <ol class="breadcrumb text-dark rounded-2">
+        <li class="breadcrumb-item text-primary"><a href="{% url 'accounts:mypage_seller' %}">マイページ・ホーム</a></li>
+        <li class="breadcrumb-item text-primary"><a href="{% url 'accounts:info_edit_seller' %}">設定メニュー</a></li>
+        <li class="breadcrumb-item active" aria-current="page">受取口座設定</li>
+      </ol>
+    </nav>
+
+    <div class="d-flex justify-content-center mt-4">
+      <h5>{% bs_icon 'bank' size='1.4em' %} 　登録内容のご確認</h5>
+      <!-- <a href="{% url 'accounts:mypage_seller' %}" class="btn btn-outline-secondary" >メイン・メニューへ</a> -->
+    </div>
+
+    <div class="row">
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}" role="alert" style="background-color: #fcf7fa;">
+        <span>{{ message }}</span>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="row justify-content-center">
+      <form method="POST" class="form-group col-11 col-md-9 col-lg-7 bg-light border border-success rounded p-4 m-4">
+
+        {% csrf_token %}
+
+        <table  width="200px" class="table table-striped table table-bordered table table-responsive">
+          <tbody class="text-center">
+            <tr><td width="35%">金融機関コード</td><td>{{ form.bank_code.value }}</td></tr>
+            <tr><td >金融機関名</td><td>{{ form.bank_name.value }}</td></tr>
+            <tr><td>支店コード</td><td>{{ form.branch_code.value }}</td></tr>
+            <tr><td>支店名</td><td>{{ form.branch_name.value }}</td></tr>
+            <tr><td>口座番号</td><td>{{ form.accountNumber.value }}</td></tr>
+          </tbody>
+        </table>
+
+        <hr>
+
+        <div class="d-flex justify-content-center pt-3">
+          <button id="next1" type="submit" class="btn btn-primary shadow me-3" name="next" value="back">戻る</button>
+          <button id="next2" type="submit" class="btn btn-primary shadow ms-3" name="next" value="register">登録</button>
+        </div>
+
+        {% for field in form %}
+          {{ field.as_hidden }}
+        {% endfor %}
+
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

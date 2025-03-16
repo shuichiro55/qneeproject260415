@@ -1,0 +1,13 @@
+.authentication-bg {
+  /* background-image: url("../images/bg-auth.png"); */
+  background-color: #eaf6fd;
+  background-size: cover;   /* 元画像の縦横比は保持し、ちょうど良く覆う */
+  background-repeat: no-repeat;
+  background-position: center;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
