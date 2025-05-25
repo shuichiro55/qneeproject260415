@@ -1,5 +1,6 @@
 from django.contrib.auth import logout, get_user_model
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import \
+  LoginView, PasswordChangeView, PasswordChangeDoneView
 from .models import CustomUser, BankAccount
 from .models import LegalEntity
 
@@ -11,11 +12,12 @@ from django.conf import settings
 
 from django.views import generic
 from .form import \
-  MyLoginForm, UserCreateForm_seller, UserCreateForm_buyer,\
+  MyLoginForm, UserCreateForm, \
   EntityCreateForm_buyer, EntityCreateForm_seller, \
   MyPageForm_buyer, MyPageForm_seller, \
   ContactForm, BankAccountForm, InfoEditForm_seller, \
-  AgreementConfirmForm_buyer, AgreementConfirmForm_seller
+  AgreementConfirmForm_buyer, AgreementConfirmForm_seller, \
+  MyPasswordChangeForm
 
 from qpay.models import QpayTx
 from qpay.form import TxCreateForm, TxListForm_buyer_approve
@@ -63,167 +65,456 @@ def MyLoginRedirect(request):
   return HttpResponseRedirect(reverse('accounts:mypage_seller'))
   #return HttpResponseRedirect(reverse('accounts:login_seller'))
 
-#class MyLoginRedirect(generic.View):
-#  #http_method_names = ['get']
-#
-#  def get(self, request, *args, **kwargs):
-#    print(f'ここ通る？ def get in MyLoginRedirect')
-#    return HttpResponseRedirect(reverse('accounts:mypage', kwargs={'user_id': request.user.id}))
 
 class MyLoginView_buyer(LoginView):
+
   #redirect_authenticated_user=True,  "Trueの場合、ログイン済みユーザーはトップページ等にリダイレクト
   model = CustomUser
   form_class = MyLoginForm
   template_name='accounts/login_buyer.html'
 
+  def get_context_data(self, **kwargs):
+    context = super().get_context_data(**kwargs)
+    return context
+
   def get_success_url(self):
+
     print(f'通過1 get_success_url in MyLoginView_buyer')
+
     try:
-      ## tx_idをtokenに変えた方がよいか 24/07/20
       token =self.kwargs['token']
       return reverse_lazy('qpay:txdetail_buyer_approve_before', kwargs={'token': token})
 
     except:
-      print(f'通過2 get_success_url in MyLoginView_buyer')
+      self.object = usermodel.objects.get(email=self.request.user)
+
+      if self.object.type1 != 1:
+        if self.object.type1 == 1: type1_name = "パートナー"
+        if self.object.type1 == 2: type1_name = "ゲスト"
+        if self.object.type1 == 3: type1_name = "スタッフ"
+
+        message = type1_name + "での登録です。" + type1_name + "でログインしてください。"
+        messages.add_message(self.request, messages.INFO, message) 
+        logout(self.request)
+        print(f'self.object.type1={self.object.type1} in get_success_url in MyLoginView_buyer')
+
+        if self.object.type1 == 1: reverse_lazy('accounts:login_buyer')
+        if self.object.type1 == 2: reverse_lazy('accounts:login_seller')
+        if self.object.type1 == 3: reverse_lazy('accounts:login_admin')
+
       return reverse_lazy('accounts:mypage_buyer')
 
 
 class MyLoginView_seller(LoginView):
 
+  #redirect_authenticated_user=True,  "Trueの場合、ログイン済みユーザーはトップページ等にリダイレクト
   model = CustomUser
   form_class = MyLoginForm
-  template_name = 'accounts/login_seller.html'
-  #http_method_names = ['get']
+  template_name='accounts/login_seller.html'
 
-  #def get_object(self, queryset=None):
-  #  obj = super().get_object(queryset)
-  #  return obj
+  def get_context_data(self, **kwargs):
+    context = super().get_context_data(**kwargs)
+    return context
 
   def get_success_url(self):
 
     print(f'通過1 get_success_url in MyLoginView_seller')
-    try:
-      ## tx_idをtokenに変えた方がよいか 24/07/20
-      token =self.kwargs['token']
-      return reverse_lazy('accounts:bankaccount_create_before', kwargs={'token': token})
-    except:
-      print(f'通過2 get_success_url in MyLoginView_seller')
-      return reverse_lazy('accounts:mypage_seller')
+
+    self.object = usermodel.objects.get(email=self.request.user)
+
+    if self.object.type1 != 2:
+      if self.object.type1 == 1: type1_name = "パートナー"
+      if self.object.type1 == 2: type1_name = "ゲスト"
+      if self.object.type1 == 3: type1_name = "スタッフ"
+
+      message = type1_name + "での登録です。" + type1_name + "でログインしてください。"
+      messages.add_message(self.request, messages.INFO, message) 
+      logout(self.request)
+      print(f'self.object.type1={self.object.type1} in get_success_url in MyLoginView_seller')
+
+      if self.object.type1 == 1: reverse_lazy('accounts:login_buyer')
+      if self.object.type1 == 2: reverse_lazy('accounts:login_seller')
+      if self.object.type1 == 3: reverse_lazy('accounts:login_admin')
+
+    return reverse_lazy('accounts:mypage_seller')
+
+
+class MyLoginView_admin(LoginView):
+
+  #redirect_authenticated_user=True,  "Trueの場合、ログイン済みユーザーはトップページ等にリダイレクト
+  model = CustomUser
+  form_class = MyLoginForm
+  template_name='accounts/login_admin.html'
+
+  def get_context_data(self, **kwargs):
+    context = super().get_context_data(**kwargs)
+    return context
+
+  def get_success_url(self):
+
+    print(f'通過1 get_success_url in MyLoginView_admin')
+
+    self.object = usermodel.objects.get(email=self.request.user)
+
+    if self.object.type1 != 3:
+      if self.object.type1 == 1: type1_name = "パートナー"
+      if self.object.type1 == 2: type1_name = "ゲスト"
+      if self.object.type1 == 3: type1_name = "スタッフ"
+
+      message = type1_name + "での登録です。" + type1_name + "でログインしてください。"
+      messages.add_message(self.request, messages.INFO, message) 
+      logout(self.request)
+      print(f'self.object.type1={self.object.type1} in get_success_url in MyLoginView_admin')
+
+      if self.object.type1 == 1: reverse_lazy('accounts:login_buyer')
+      if self.object.type1 == 2: reverse_lazy('accounts:login_seller')
+      if self.object.type1 == 3: reverse_lazy('accounts:login_admin')
+
+    return reverse_lazy('accounts:mypage_admin')
+
+
+def MyLogoutView_buyer(request, **kwargs):
+  logout(request)
+  return redirect('index_qconnect_buyer')
+
+def MyLogoutView_seller(request, **kwargs):
+  logout(request)
+  return redirect('index_qconnect_seller')
+
+def MyLogoutView_admin(request, **kwargs):
+  logout(request)
+  return redirect('index_qconnect_admin')
+
+
+# 25/05/17に追加
+class MyPasswordChangeView_buyer(PasswordChangeView):
+
+  """パスワード変更ビュー"""
+  form_class = MyPasswordChangeForm
+  success_url = reverse_lazy('accounts:password_change2_buyer')
+  template_name = 'accounts/password_change_buyer.html'
+
+  def get_context_data(self, **kwargs):
+    context = super().get_context_data(**kwargs)
+    context['user_id'] = self.kwargs['user_id']
+    user_id = context['user_id'] 
+    print(f'user_id = {user_id} get_context_data in MyPasswordChange_buyer')
+    return context
+
+
+  def get_success_url(self):
+
+    print(f'通過1 get_success_url in MyPasswordChange_buyer')
+    
+    self.object = usermodel.objects.get(email=self.request.user)
+
+    if self.object.type1 != 1:
+      if self.object.type1 == 1: type1_name = "パートナー"
+      if self.object.type1 == 2: type1_name = "ゲスト"
+      if self.object.type1 == 3: type1_name = "スタッフ"
+
+      message = type1_name + "での登録です。" + type1_name + "でログインしてください。"
+      messages.add_message(self.request, messages.INFO, message) 
+      logout(self.request)
+      print(f'self.object.type1={self.object.type1} in get_success_url in MyPasswordChangeView_buyer')
+
+      return reverse_lazy('accounts:MyPasswordChange_buyer')
+
+    return reverse_lazy('accounts:mypage_buyer')
   
+
+class MyPasswordChangeView_seller(PasswordChangeView):
+
+  """パスワード変更ビュー"""
+  form_class = MyPasswordChangeForm
+  success_url = reverse_lazy('accounts:password_change2_seller')
+  template_name = 'accounts/password_change_seller.html'
+
+  def get_context_data(self, **kwargs):
+    context = super().get_context_data(**kwargs)
+    context['user_id'] = self.kwargs['user_id']
+    user_id = context['user_id'] 
+    print(f'user_id = {user_id} get_context_data in MyPasswordChange_seller')
+    return context
+
+
+  def get_success_url(self):
+
+    print(f'通過1 get_success_url in MyPasswordChange_seller')
+    
+    self.object = usermodel.objects.get(email=self.request.user)
+
+    if self.object.type1 != 2:
+      if self.object.type1 == 1: type1_name = "パートナー"
+      if self.object.type1 == 2: type1_name = "ゲスト"
+      if self.object.type1 == 3: type1_name = "スタッフ"
+
+      message = type1_name + "での登録です。" + type1_name + "でログインしてください。"
+      messages.add_message(self.request, messages.INFO, message) 
+      logout(self.request)
+      print(f'self.object.type1={self.object.type1} in get_success_url in MyPasswordChangeView_seller')
+
+      return reverse_lazy('accounts:MyPasswordChange_seller')
+
+    return reverse_lazy('accounts:mypage_seller')
+
+
+class MyPasswordChangeView_admin(PasswordChangeView):
+
+  """パスワード変更ビュー"""
+  form_class = MyPasswordChangeForm
+  success_url = reverse_lazy('accounts:password_change2_admin')
+  template_name = 'accounts/password_change_admin.html'
+
+  def get_context_data(self, **kwargs):
+    context = super().get_context_data(**kwargs)
+    context['user_id'] = self.kwargs['user_id']
+    user_id = context['user_id'] 
+    print(f'user_id = {user_id} get_context_data in MyPasswordChange_admin')
+    return context
+
+
+  def get_success_url(self):
+
+    print(f'通過1 get_success_url in MyPasswordChange_admin')
+    
+    self.object = usermodel.objects.get(email=self.request.user)
+
+    if self.object.type1 != 3:
+      if self.object.type1 == 1: type1_name = "パートナー"
+      if self.object.type1 == 2: type1_name = "ゲスト"
+      if self.object.type1 == 3: type1_name = "スタッフ"
+
+      message = type1_name + "での登録です。" + type1_name + "でログインしてください。"
+      messages.add_message(self.request, messages.INFO, message) 
+      logout(self.request)
+      print(f'self.object.type1={self.object.type1} in get_success_url in MyPasswordChangeView_admin')
+
+      return reverse_lazy('accounts:MyPasswordChange_admin')
+
+    return reverse_lazy('accounts:mypage_admin')
   
-def MyLogoutView_buyer(request):
-    logout(request)
-    return redirect('index_qconnect_buyer')
 
-def MyLogoutView_seller(request):
-    logout(request)
-    return redirect('index_qconnect_seller')
-
-# class MyLogoutView(LogoutView):
-#    """ログアウトページ"""
-#    template_name = 'index_corporate.html'
+# 25/05/17に追加
+class MyPasswordChange2View_buyer(PasswordChangeDoneView):
+    """パスワードを変更したことを表示"""
+    template_name = 'accounts/password_change2_buyer.html'
 
 
-# ユーザーを作成し、メールアドレス・パスワードを登録（発注者側）
+class MyPasswordChange2View_seller(PasswordChangeDoneView):
+    """パスワードを変更したことを表示"""
+    template_name = 'accounts/password_change2_seller.html'
+
+
+class MyPasswordChange2View_admin(PasswordChangeDoneView):
+    """パスワードを変更したことを表示"""
+    template_name = 'accounts/password_change2_admin.html'
+
+
 class UserCreateView_buyer(generic.CreateView):
+
   model = CustomUser
   template_name = 'accounts/user_create_buyer.html'
-  form_class = UserCreateForm_buyer
+  form_class = UserCreateForm
+
+
+  def get(self, request, **kwargs):  #selfはメソッドを呼んだインスタンス自体
+
+    context = {
+      'form' : self.form_class,
+    }
+    return TemplateResponse(request, 'accounts/user_create_buyer.html', context)  #ここでgetとするのは、おそらく親クラスでtemplate_nameを表示するように規定されている
+
 
   # CreateView（親クラス）で自動バリデーションが通ったときに実行される
-  # 発注者のフラグ立て、ユーザーインスタンス組成、本登録用メールの発行を行う
-  def form_valid(self, form):
+  # ユーザーインスタンス生成・保存、type1,type2の登録、本登録用メールの発行を行う
 
-    user = form.save(commit=False)
-    user.is_active = False  # 本登録時にTrueに（退会後はFalse）
-    user.type1 = 1          # 発注者として登録 24/04/27
-    user.type2 = 2          # 法人として登録  25/01/01
-    #user.email = self.request.user
-    user.save()
-    
-    print(f'ここまで来てる1 email={user.email} user.pk={user.pk}（form_valid in class UserCreateView_buyer）')
+  def post(self, request, **kwargs):  #selfはメソッドを呼んだインスタンス自体
 
-    #アクティベーションURLの送付
-    ### あとでsend_mailに切り替える？
-    current_site = get_current_site(self.request)
-    domain = current_site.domain
-    context = {
-      'protocol': self.request.scheme,
-      'domain': domain,
-      'token': dumps(user.pk),
-      'user': user,
-    }
+    form = self.form_class(request.POST)
 
-    subject = render_to_string('accounts/mail/subject_buyer.txt', context)
-    message = render_to_string('accounts/mail/message_buyer.txt', context)
+    if form.is_valid():
 
-    print(f'メールアドレス：{user.email}')
-    user.email_user(subject, message)
-        
-    return redirect('accounts:user_create_done_buyer')
+      user = form.save(commit=False)
+      user.is_active = False
 
-  def form_invalid(self, form):
+      user.type1 = 1  # パートナー：1、ゲスト：2、Qnee：3で登録 25/04/27
 
-    print(f'ここ来てる2（form_invalid in class UserCreateVier_buyer）')
-    print(form.errors)
-    form.instance.user = self.request.user
-    return super().form_invalid(form)
+      user.save()
+      print(f'ここまで来てる1 email={user.email} type2={user.type2} user.pk={user.pk} usr.passsword= {user.password}（def post if form.is_valid in class UserCreateView_buyer）')
+
+      ### あとでsend_mailに切り替えるか検討 2025/04/27
+      current_site = get_current_site(self.request)
+      domain = current_site.domain
+      context = {
+        'protocol': self.request.scheme,
+        'domain': domain,
+        'token': dumps(user.pk),
+        'user': user,
+      }
+
+      subject = render_to_string('accounts/mail/subject_buyer.txt', context)
+      message = render_to_string('accounts/mail/message_buyer.txt', context)
+
+      print(context)
+      print(f'メールアドレス：{user.email}')
+      user.email_user(subject, message)
+     
+      return redirect('accounts:user_create2_buyer')
+
+    else:
+  
+      print(f'ここ来てる2（def post if form.is_valid=FALSE in class UserCreateView_buyer）')
+      print(form.errors)
+
+      context = {
+        'form' : form,
+      }
+      return render(request, 'accounts/user_create_buyer', context)  #ここでgetとするのは、おそらく親クラスでtemplate_nameを表示するように規定されている
 
 
-# ユーザーを作成し、メールアドレス・パスワードを登録（受注者側）
 class UserCreateView_seller(generic.CreateView):
 
   model = CustomUser
   template_name = 'accounts/user_create_seller.html'
-  form_class = UserCreateForm_seller
+  form_class = UserCreateForm
+
+
+  def get(self, request, **kwargs):  #selfはメソッドを呼んだインスタンス自体
+  
+    context = {
+      'form' : self.form_class,
+    }
+    return TemplateResponse(request, 'accounts/user_create_seller.html', context)  #ここでgetとするのは、おそらく親クラスでtemplate_nameを表示するように規定されている
+
 
   # CreateView（親クラス）で自動バリデーションが通ったときに実行される
-  # 発注者のフラグ立て、ユーザーインスタンス組成、本登録用メールの発行を行う
-  def form_valid(self, form):
+  # ユーザーインスタンス生成・保存、type1,type2の登録、本登録用メールの発行を行う
 
-    user = form.save(commit=False)
-    user.is_active = False
-    user.type1 = 2          #受注者として登録 24/04/27
-    user.type2 = self.request.POST['type2']
-    # user.email = self.request.user
+  def post(self, request, **kwargs):  #selfはメソッドを呼んだインスタンス自体
 
-    user.save()
-    print(f'ここまで来てる1 email={user.email} type2={user.type2}（form_valid in class UserCreateView_seller）')
+    form = self.form_class(request.POST)
 
-    #アクティベーションURLの送付
-    ### あとでsend_mailに切り替える？
-    current_site = get_current_site(self.request)
-    domain = current_site.domain
-    context = {
-      'protocol': self.request.scheme,
-      'domain': domain,
-      'token': dumps(user.pk),
-      'user': user,
-    }
+    if form.is_valid():
 
-    subject = render_to_string('accounts/mail/subject_seller.txt', context)
-    message = render_to_string('accounts/mail/message_seller.txt', context)
+      user = form.save(commit=False)
+      user.is_active = False
 
-    print(f'メールアドレス：{user.email}')
-    user.email_user(subject, message)
+      user.type1 = 2  # パートナー：1、ゲスト：2、Qnee：3で登録 25/04/27
+
+      user.save()
+      print(f'ここまで来てる1 email={user.email} type2={user.type2} user.pk={user.pk} usr.passsword= {user.password}（def post if form.is_valid in class UserCreateView_seller）')
+
+      ### あとでsend_mailに切り替えるか検討 2025/04/27
+      current_site = get_current_site(self.request)
+      domain = current_site.domain
+      context = {
+        'protocol': self.request.scheme,
+        'domain': domain,
+        'token': dumps(user.pk),
+        'user': user,
+      }
+
+      subject = render_to_string('accounts/mail/subject_seller.txt', context)
+      message = render_to_string('accounts/mail/message_seller.txt', context)
+
+      print(context)
+      print(f'メールアドレス：{user.email}')
+      user.email_user(subject, message)
      
-    return redirect('accounts:user_create_done_seller')
+      return redirect('accounts:user_create2_seller')
 
-  def form_invalid(self, form):
+    else:
+  
+      print(f'ここ来てる2（def post if form.is_valid=FALSE in class UserCreateView_seller）')
+      print(form.errors)
 
-    print(f'ここ来てる2（form_invalid in class UserCreateView_seller）')
-    print(form.errors)
-    #form.instance.user = self.request.user
-    return super().form_invalid(form)
+      context = {
+        'form' : form,
+      }
+      return render(request, 'accounts/user_create_seller.html', context)  #ここでgetとするのは、おそらく親クラスでtemplate_nameを表示するように規定されている
+
+
+class UserCreateView_admin(generic.CreateView):
+
+  model = CustomUser
+  template_name = 'accounts/user_create_admin.html'
+  form_class = UserCreateForm
+
+  def get(self, request, **kwargs):  #selfはメソッドを呼んだインスタンス自体
+
+    context = {
+      'form' : self.form_class,
+    }
+    return TemplateResponse(request, 'accounts/user_create_admin.html', context)  #ここでgetとするのは、おそらく親クラスでtemplate_nameを表示するように規定されている
+
+
+  # CreateView（親クラス）で自動バリデーションが通ったときに実行される
+  # ユーザーインスタンス生成・保存、type1,type2の登録、本登録用メールの発行を行う
+
+  def post(self, request, **kwargs):  #selfはメソッドを呼んだインスタンス自体
+
+    form = self.form_class(request.POST)
+
+    if form.is_valid():
+
+      user = form.save(commit=False)
+      user.is_active = False
+
+      user.type1 = 3  # パートナー：1、ゲスト：2、Qnee：3で登録 25/04/27
+      user.type2 = 1  # 個人として登録
+      user.is_active = True
+
+      user.save()
+      print(f'ここまで来てる1 email={user.email} type2={user.type2} user.pk={user.pk} usr.passsword= {user.password}（def post if form.is_valid in class UserCreateView_admin）')
+
+      ### あとでsend_mailに切り替えるか検討 2025/04/27
+      current_site = get_current_site(self.request)
+      domain = current_site.domain
+      context = {
+        'protocol': self.request.scheme,
+        'domain': domain,
+        'token': dumps(user.pk),
+        'user': user,
+      }
+
+      subject = render_to_string('accounts/mail/subject_admin.txt', context)
+      message = render_to_string('accounts/mail/message_admin.txt', context)
+
+      print(context)
+      print(f'メールアドレス：{user.email}')
+      user.email_user(subject, message)
+     
+      return redirect('accounts:user_create2_admin')
+
+    else:
+  
+      print(f'ここ来てる2（def post if form.is_valid=FALSE in class UserCreateView_admin）')
+      print(form.errors)
+
+      context = {
+        'form' : form,
+      }
+      return render(request, 'accounts/user_create_admin.html', context)  #ここでgetとするのは、おそらく親クラスでtemplate_nameを表示するように規定されている
 
 
 """ユーザー仮登録が完了し、メール送付したと伝えるテンプレート"""
-class UserCreateDone_buyer(generic.TemplateView):
-  template_name = 'accounts/user_create_done_buyer.html'
+class UserCreateView2_buyer(generic.TemplateView):
+  template_name = 'accounts/user_create2_buyer.html'
 
-"""ユーザー仮登録が完了し、メール送付したと伝えるテンプレート"""
-class UserCreateDone_seller(generic.TemplateView):
-  template_name = 'accounts/user_create_done_seller.html'
+class UserCreateView2_seller(generic.TemplateView):
+  template_name = 'accounts/user_create2_seller.html'
+
+class UserCreateView2_admin(generic.TemplateView):
+  template_name = 'accounts/user_create2_admin.html'
+
+#"""ユーザー仮登録が完了し、メール送付したと伝えるテンプレート"""
+#class UserCreateDone_buyer(generic.TemplateView):
+#  template_name = 'accounts/user_create_done_buyer.html'
+
+#"""ユーザー仮登録が完了し、メール送付したと伝えるテンプレート"""
+#class UserCreateDone_seller(generic.TemplateView):
+#  template_name = 'accounts/user_create_done_seller.html'
 
 
 """25/01/01 メールで受領したURLがクリックされると本登録画面を表示"""
@@ -586,7 +877,7 @@ class AgreementConfirmView_buyer(generic.CreateView):
         entity.date_joined = timezone.now()
         entity.save()
 
-        return redirect('accounts:login_buyer')
+        return redirect('accounts:login', 1)
       
       else:
         messages.error(request, "「利用規約に同意します。」のチェックボックスにチェックがありません。", extra_tags='no check')
@@ -658,7 +949,7 @@ class AgreementConfirmView_seller(generic.UpdateView):
 
         entity.save()
         print(f'pass after if next==agree')
-        return redirect('accounts:login_seller')
+        return redirect('accounts:login', 2)
 
       else:
         messages.error(request, "「利用規約に同意します。」のチェックボックスにチェックがありません。", extra_tags='no check')
@@ -679,6 +970,78 @@ class AgreementConfirmView_seller(generic.UpdateView):
 
     return HttpResponseBadRequest()  # 基本的にはここには来ない
 
+"""ログインした後に呼ばれるビュー"""
+class MyPageView_admin(generic.DetailView):
+
+  model = CustomUser
+  template_name = "accounts/mypage_admin.html"
+
+  
+  def get(self, request, *args, **kwargs):
+    if request.method != "GET":
+      return HttpResponseNotAllowed("GET")
+
+  
+    # 「URLパラメーターがある場合」と「ない場合（ログインから）」に分ける   
+    try:
+      self.object = usermodel.objects.get(pk=self.kwargs['user_id'])
+    except:
+      print(f'request.user={request.user} def get in MyPageView_admin')
+      self.object = usermodel.objects.get(email=self.request.user) 
+  
+    if self.object.type1 != 3:
+
+      if self.object.type1 == 1:
+        message = "パートナーで登録されています。パートナーでログインして下さい。"
+        messages.add_message(request, messages.INFO, message) 
+        logout(request)
+        return HttpResponseRedirect(reverse('accounts:login', 1))
+
+      if self.object.type1 == 2:
+        message = "ゲストで登録されています。ゲストでログインして下さい。"
+        messages.add_message(request, messages.INFO, message) 
+        logout(request)
+        return HttpResponseRedirect(reverse('accounts:login', 2))
+
+    print(f'self.object.entityname={self.object.entityname} def get in MyPageView_admin')
+
+    return TemplateResponse(
+      request, "accounts/mypage_admin.html",
+      { 
+        "user": self.object,
+      }
+    ) 
+
+
+  def post(self, request, *args, **kwargs):
+
+    # 「URLパラメーターがある場合」と「ない場合（ログインから）」に分ける   
+    try:
+      self.object = usermodel.objects.get(pk=self.kwargs['user_id'])
+    except:
+      self.object = usermodel.objects.get(email=self.request.user) 
+      print(f'request.user={request.user} def get in MyPageView_buyer')
+    
+    next = self.request.POST.get('next', '')
+    if next == 'approve_qpay':
+      form = TxListForm_buyer_approve()
+
+      # Buyerにメールを送信するようにする
+
+      return super().form_valid(form)      
+
+    # 以下、各プログラムを加えていく
+    #if next == '':
+    #  form = TxCreateForm(request.POST)
+    #  return super().form_valid(form)    
+    
+    #if next == '':
+    #  form = TxCreateForm(request.POST)
+    #  return super().form_valid(form)
+
+  def get_success_url(self):
+    return reverse('qpay:txlist_buyer_approve', kwargs={'user_id': self.object.id})
+
 
 """ログインした後に呼ばれるビュー"""
 class MyPageView_buyer(generic.DetailView):
@@ -698,11 +1061,19 @@ class MyPageView_buyer(generic.DetailView):
       self.object = usermodel.objects.get(email=self.request.user) 
       print(f'request.user={request.user} def get in MyPageView_buyer')
 
-    if self.object.type1 == 2:
+    if self.object.type1 != 1:
 
-      messages.add_message(request, messages.INFO, 'パートナー企業としてログインして下さい') 
-      # 次に出るテンプレートで表示するように、メッセージフレームワークを使う
-      return HttpResponseRedirect(reverse('accounts:logout_buyer'))
+      if self.object.type1 == 2:
+        message = "ゲストで登録されています。ゲストでログインして下さい。"
+        messages.add_message(request, messages.INFO, message) 
+        logout(request)
+        return TemplateResponse(request, "accounts/login.html", {"type1":2})
+
+      if self.object.type1 == 3:
+        message = "スタッフで登録されています。スタッフでログインして下さい。"
+        messages.add_message(request, messages.INFO, message) 
+        logout(request)
+        return TemplateResponse(request, "accounts/login.html", {"type1":3})
 
     print(f'self.object.entityname={self.object.entityname} def get in MyPageView_buyer')
 
@@ -751,8 +1122,8 @@ class MyPageView_buyer(generic.DetailView):
       form = TxListForm_buyer_approve()
 
       # Buyerにメールを送信するようにする
-
-      return super().form_valid(form)      
+      return reverse('qpay:txlist_buyer_approve', kwargs={'user_id': self.object.id})
+      
 
     # 以下、各プログラムを加えていく
     #if next == '':
@@ -763,6 +1134,7 @@ class MyPageView_buyer(generic.DetailView):
     #  form = TxCreateForm(request.POST)
     #  return super().form_valid(form)
 
+  # form_validを使わなくなった時点で不要ではないか
   def get_success_url(self):
     return reverse('qpay:txlist_buyer_approve', kwargs={'user_id': self.object.id})
 
@@ -789,12 +1161,20 @@ class MyPageView_seller(generic.DetailView):
       self.object = usermodel.objects.get(email=self.request.user) 
       print(f'request.user={request.user} def get in MyPageView_seller')
 
-    if self.object.type1 == 1:  # 発注者の場合
+    if self.object.type1 != 2:
 
-      # 次のメッセージは確認できなかったので、要調整（トップページで出るようにする？）
-      # テンプレートに表示されるようにする
-      messages.add_message(request, messages.INFO, "発注者としてログインして下さい") 
-      return HttpResponseRedirect(reverse('accounts:logout'))
+      if self.object.type1 == 1:
+        message = "パートナーで登録されています。パートナーでログインして下さい。"
+        messages.add_message(request, messages.INFO, message) 
+        logout(request)
+        return TemplateResponse(request, "accounts/login.html", {"type1":1})
+
+      if self.object.type1 == 3:
+        message = "スタッフで登録されています。スタッフでログインして下さい。"
+        messages.add_message(request, messages.INFO, message) 
+        logout(request)
+        return TemplateResponse(request, "accounts/login.html", {"type1":3})
+
 
     # ★error 個人で登録している人にエンティティが登録されていない 25/01/14
     # ★task ①複数のパートナーと仕事をするとき、②個人で仮登録しか終わってないとき 25/01/14
@@ -969,11 +1349,8 @@ class BankAccountCreateView(generic.CreateView):
       # 受取口座が設定済み場合（le.bank_account_flag == 1）
       # 既に口座設定がなされている場合は、表示できるように初期値に入力
 
-      cnt = self.model.objects.filter(entity_id=entity_id).count()
-      if cnt == 0:
-        print('pass4 既存の口座設定なし')
+      try:
 
-      if cnt == 1:
         ba = self.model.objects.get(entity_id=entity_id)
         print(f'ba.bank_name={ba.bank_name}')
         print(f'ba.branch_name={ba.branch_name}')
@@ -984,11 +1361,9 @@ class BankAccountCreateView(generic.CreateView):
         init_dict.update(holdername=ba.holdername)
         init_dict.update(accountNumber=ba.accountNumber)
 
-      if cnt >= 2:
-        print('口座が複数設定されている！')
-        messages.add_message(request, messages.INFO, "エラー！口座が複数設定されています。お手数ですが、Qneeお問い合わせ下さい") 
-        print(self.model.objects.all())
-        return HttpResponseRedirect(reverse('accounts:mypage_seller'))
+      except:
+        print('pass4 既存の口座設定なし（想定外）')
+        messages.add_message(request, messages.INFO, "口座設定済みフラグありで口座情報取得できない") 
 
       form = self.form_class(initial=init_dict)
       context = { "form" : form, }
@@ -1121,16 +1496,10 @@ class BankAccountCreateView(generic.CreateView):
           ba_tmp = form.save(commit=False)
           ba_tmp.temporal_tx_id = 0
 
-          cnt = self.model.objects.filter(entity_id=ba_tmp.entity_id).count()
-          if cnt == 0:
-            ba_tmp.save()
-            le = LegalEntity.objects.get(pk=ba_tmp.entity_id)
-            le.bank_account_flag = 1
-            le.bank_account = ba_tmp
-            le.save()
+          try:
 
-          if cnt == 1:
-            ba = self.model.objects.filter(entity_id=ba_tmp.entity_id) 
+            # 既存口座データがある場合の処理
+            ba = self.model.objects.get(entity_id=ba_tmp.entity_id)
             ba.entity_id = ba_tmp.entity_id
             ba.bank_code = ba_tmp.bank_code
             ba.bank_name = ba_tmp.bank_name
@@ -1150,10 +1519,27 @@ class BankAccountCreateView(generic.CreateView):
             print(f'ba.entity_id={ba.entity_id} BankAccountCreateV, post, next==register')
             print(f'ba.bank_code={ba.bank_code} BankAccountCreateV, post, next==register')
 
-          if cnt >= 2:
-            messages.add_message(request, messages.INFO, "エラー。口座が複数設定されています") 
+          except:
 
-        return super().form_valid(form)    
+            # 既存口座データがない場合の処理
+            # ＝（ba = self.model.objects.get(entity_id=ba_tmp.entity_id)がデータ取得できない場合）
+            ba_tmp.save()
+            le = LegalEntity.objects.get(pk=ba_tmp.entity_id)
+            le.bank_account_flag = 1
+            le.bank_account = ba_tmp
+            le.save()
+
+            messages.add_message(request, messages.INFO, "受け取り口座は設定されました。") 
+
+            print(f'ba.entity_id={ba.entity_id} BankAccountCreateV, post, next==register')
+            print(f'ba.bank_code={ba.bank_code} BankAccountCreateV, post, next==register')
+
+          return TemplateResponse(reverse_lazy('mypage_seller'))
+
+        else:
+          messages.add_message(request, messages.INFO, "口座情報の入力にエラーがあります。") 
+          return render(self.request, 'accounts/bankaccount_create1.html', {'form':form})
+
 
       if next == 'back':
         print(f'ここまで来てる（def post if next==back after form.is_valid in class BankAccountCreateView）')

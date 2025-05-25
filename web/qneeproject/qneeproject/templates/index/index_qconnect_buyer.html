@@ -4,30 +4,26 @@
 
 {% block content %}
 
-{% block copy_buyer1 %}
-  {% include 'partials_qconnect/copy_buyer1.html' %}
-{% endblock %}
+<div class="authentication-bg min-vh-100 min-vw-100">
 
-{% block copy_buyer2 %}
-  {% include 'partials_qconnect/copy_buyer2.html' %}
-{% endblock %}
+  <div class="container">
 
-{% block copy_buyer3 %}
-  {% include 'partials_qconnect/copy_buyer3.html' %}
-{% endblock %}
-
-
-<!--
-  <div class="d-grid gap-5 d-md-flex justify-content-md-center mt-4 pt-3">
+    <div class="d-grid gap-5 d-md-flex justify-content-md-center mt-4 pt-3">
       <a href="#" class="btn btn-primary" role="button" 
         data-bs-toggle="tooltip" data-bs-placement="bottom" title="">商品説明へ</a>
       <a href="{% url 'accounts:login_buyer' %}" class="btn btn-primary" role="button"
         data-bs-toggle="tooltip" data-bs-placement="bottom" title="">Qnee Connectへ</a>
     </div>
-
   </div>
--->
+</div>
+
+<!--START HOME-->
+<section class="home-slider" id="home">
+
+</section> <!--end home-->
+
 <script>
+
   let tooltipTriggerList = [].slice.call(document.querySelectorAll('{data-bs-toggle="tooltip"}'));
   let tooltipList = tooltipTriggerList.map(function (tooltipTriggerElem){
     return new bootstrap.Tooltip(tooltipTriggerElem)
@@ -36,3 +32,4 @@
 </script>  
 
 {% endblock %}
+

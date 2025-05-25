@@ -1,11 +1,11 @@
 from django import forms
 from django.db import models
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import \
+  AuthenticationForm, UserCreationForm, PasswordChangeForm
 from .models import CustomUser, BankAccount 
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
-from django.contrib.auth.forms import AuthenticationForm
 from .models import LegalEntity
 
 import unicodedata, re
@@ -25,12 +25,12 @@ class MyLoginForm(AuthenticationForm):
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['placeholder'] = field.label
 
+
 class UserCreateForm(UserCreationForm):
 
   class Meta:
     model = UserModel
-    fields = ('email', 'type2')
-    fields = ('email',)
+    fields = ('email', 'type2',)
 
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
@@ -41,7 +41,17 @@ class UserCreateForm(UserCreationForm):
   def clean_email(self):
     email = self.cleaned_data['email']
     UserModel.objects.filter(email=email, is_active=False).delete()
+    # ★★★ 25/01/01、25/04/11
+    # おそらく仮登録だけされて、ゴースト化したインスタンスを消すためのもの
+    # 問題なさそうだが、本当に問題ないか確認が必要ではないか
     return email
+
+
+class MyPageForm_admin(forms.ModelForm):
+
+  class Meta:
+    model = LegalEntity
+    fields = ('personname', 'tel' )
 
 
 class MyPageForm_buyer(forms.ModelForm):
@@ -71,43 +81,13 @@ class MyLoginForm(AuthenticationForm):
         field.widget.attrs['placeholder'] = field.label
 
 
-class UserCreateForm_buyer(UserCreationForm):
-
-    class Meta:
-      model = UserModel
-      fields = ('email',)
+class MyPasswordChangeForm(PasswordChangeForm):
+    """パスワード変更フォーム"""
 
     def __init__(self, *args, **kwargs):
-      super().__init__(*args, **kwargs)
-      for field in self.fields.values():
-        field.widget.attrs['class'] = 'form-control'
-        field.widget.attrs['placeholder'] = field.label
-    
-    def clean_email(self):
-      email = self.cleaned_data['email']
-      UserModel.objects.filter(email=email, is_active=False).delete()
-      # ★★ 25/0101 これ、既に登録されているユーザーを削除してしまうではないか、、、
-      return email
-
-tran_zen_han = str.maketrans('―－‐ー₋—⁻０１２３４５６７８９', '-------0123456789')
-
-class UserCreateForm_seller(UserCreationForm):
-
-    class Meta:
-      model = UserModel
-      fields = ('email', 'type2')
-
-    def __init__(self, *args, **kwargs):
-      super().__init__(*args, **kwargs)
-      for field in self.fields.values():
-        field.widget.attrs['class'] = 'form-control'
-        field.widget.attrs['placeholder'] = field.label
-    
-    def clean_email(self):
-      email = self.cleaned_data['email']
-      UserModel.objects.filter(email=email, is_active=False).delete()
-      # ★★ 25/0101 これ、既に登録されているユーザーを削除してしまうではないか、、、
-      return email
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
 
 
 class EntityCreateForm_buyer(forms.ModelForm):
@@ -172,6 +152,8 @@ class EntityCreateForm_buyer(forms.ModelForm):
       postal_code1 = self.cleaned_data['postal_code'].translate(tran_zen_han)
       postal_code2 = unicodedata.normalize('NFKC', ''.join(re.findall('[0-9０-９]+', postal_code1)))
       return postal_code2
+
+tran_zen_han = str.maketrans('―－‐ー₋—⁻０１２３４５６７８９', '-------0123456789')
 
 class EntityCreateForm_seller(forms.ModelForm):
 
@@ -342,3 +324,16 @@ class InfoEditForm_seller(forms.ModelForm):
   class Meta:
     model = LegalEntity
     fields = ('personname', 'tel', 'entityname', 'department', 'title', 'postal_code')  
+
+
+# 25/05/17 パスワード変更用意追加
+class MyPasswordChangeForm(PasswordChangeForm):
+    """パスワード変更フォーム"""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            print(f'field.label={field.label}')
+
+
+            field.widget.attrs['class'] = 'form-control'

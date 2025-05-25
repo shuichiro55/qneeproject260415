@@ -4,7 +4,7 @@
 
 {% block content %}
 
-<div class="authentication-bg min-vh-100 min-vw-100 align-items-start" style="background-color:#edf9ff;">
+<div class="authentication-bg min-vh-100 min-vw-100 align-items-start" style="background-color:#def5f9;">
 
   <div class="container">
 
@@ -38,7 +38,7 @@
         </div>
 
         <div class="row justify-content-center">       
-          <form method="GET" action="{% url 'accounts:bankaccount_create' entity.id %}">
+          <form method="GET" action="{% url 'accounts:password_change_seller' user.id %}">
             {% csrf_token %}
             <button type="submit" class="btn btn-primary w-100 shadow" name="next" value="history">パスワード変更</button>
           </form>

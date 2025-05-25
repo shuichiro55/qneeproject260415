@@ -2,8 +2,7 @@
 
 {% block content %}
 
-<!-- <div class="authentication-bg min-vh-100 min-vw-100" style="background-color: #eaf6fd;"> -->
-<div class="authentication-bg min-vh-100 min-vw-100 align-items-start" style="background-color: #edf9ff;">
+<div class="authentication-bg min-vh-100 min-vw-100 align-items-start" style="background-color:#def5f9;">
 
   <div class="container">
 
@@ -30,17 +29,9 @@
         </div>
       </div>
     </div>
-  
-    <div class="row justify-content-center my-auto">
-      <div class="col-12 col-md-8 col-lg-6 col-xl-5">
-  
-        <div class="d-flex justify-content-center">
-          <h3 class="text-black">仮登録</h3>
-        </div>
 
-        <div class="d-flex justify-content-center mb-4 pb-2">
-          <div class="text-black-50 mb-0">あなたのメールアドレスに本登録のご案内いたします。</div>
-        </div>
+    <div class="row justify-content-center my-auto">
+      <div class="col-11 col-md-8 col-lg-6 col-xl-5">
 
         <div class="row">
           {% for message in messages %}
@@ -49,24 +40,70 @@
           </div>
           {% endfor %}
         </div>
-  
+
+        <div class="d-flex justify-content-center">
+          <h3 class="text-black">仮登録</h3>
+        </div>
+
+        <div class="d-flex justify-content-center mb-4 pb-2">
+          <div class="text-black-50 mb-0">あなたのメールアドレスに本登録のご案内いたします。</div>
+        </div>
+
         <form method="POST">
+        
           {{ form.non_field_errors }}
 
-          {% for field in form %}
-            {{ field }}
-            {{ field.errors }}
-            <hr>
-          {% endfor %}
+          {% if form.email.errors %}
+            <div style="color:red;">{{ form.email.errors.as_text }}<br></div>        
+          {% endif %}
+          {{ form.email }} <hr>
 
+          ✓ 個人か法人かお選びください
+          {% if form.type2.errors %}
+            <div style="color:red;">{{ form.type2.errors.as_text }}<br></div>        
+          {% endif %}
+          {{ form.type2 }} <hr>
+
+          {% if form.password1.errors %}
+            <div style="color:red;">{{ form.password1.errors.as_text }}<br></div>        
+          {% endif %}
+          {{ form.password1 }} <hr>
+
+          {% if form.password2.errors %}
+            <div style="color:red;">{{ form.password2.errors.as_text }}<br></div>        
+          {% endif %}
+          {{ form.password2 }} <hr> 
+<!--          
+          {% for field in form %}
+
+            {% if field.label != form.type2.label %}
+
+              {% if field.errors %}
+                <div style="color:red;">{{ field.errors.as_text }}<br></div>
+              {% endif %}
+              {{ field }}
+              {{ field.errors }}
+              <hr>
+            {% else %}
+              {% if type1 == 1 or type1 == 2 %}
+                ✓ 個人か法人かお選びください
+                {{ field }}
+                {{ field.errors }}
+                <hr>
+              {% endif %}
+            {% endif %}
+
+          {% endfor %}
+-->
           <button type="submit" class="btn btn-primary w-100 shadow" >本登録URLを送付</button>
           <input type="hidden" name="next" value="{{ next }}" />
-          {% csrf_token %}
-        </form>
 
-      </div> <!-- end col -->
-    </div> <!-- end row -->
-  </div> <!-- end container -->
+          {% csrf_token %}
+
+        </form>
+      </div>
+    </div>
+  </div>
 </div>  
 
 {% endblock %}

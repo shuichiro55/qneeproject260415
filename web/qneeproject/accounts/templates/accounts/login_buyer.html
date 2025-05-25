@@ -1,26 +1,15 @@
 {% extends "index/base_qconnect_buyer.html" %}
 
-{% load static %}
+{% load bootstrap_icons %}
 
 {% block content %}
 
-<div class="login-bg min-vh-100 min-vw-100 align-items-center" style="background-color:#edf9ff;">
+<div class="login-bg min-vh-100 min-vw-100 align-items-center" style="background-color:#def5f9;">
 
   <div class="container">
     <div class="d-flex flex-column">
       <div class="row justify-content-center my-auto">
         <div class="col-11 col-md-8 col-lg-6 col-xl-5">
-  
-          <div class="d-flex justify-content-center">
-            <h3 class="text-black">Welcome back to Qnee !</h3>
-          </div>
-          <div class="d-flex justify-content-center mb-4 pb-2">
-            <div class="text-black-50 mb-0">パートナー企業はこちらからご利用ください。</div>
-          </div>
-  
-          <p></p>
-          <h5>ログイン</h5>
-          <a href="{% url 'accounts:user_create_buyer' %}" class="text-decoration-underline">初めてのご利用の方はこちら</a>
 
           <div class="row">
             {% for message in messages %}
@@ -30,21 +19,43 @@
             {% endfor %}
           </div>
 
-          <form method="POST">
+          <div class="d-flex justify-content-center pb-3">
+            <h3 class="text-black">{% bs_icon 'clouds' color='cornflowerblue' size='1.5em' %} Welcome to Qnee Connect !</h3>
+          </div>
+
+          <p></p>
+          <h5>パートナー・ログイン</h5>
+
+          <form method="POST"
+            action="{% url 'accounts:login_buyer' %}"
+            class="form-group bg-light border border-success rounded p-4 mb-4 ">
+
             {{ form.non_field_errors }}
             {% for field in form %}
-                {{ field }}
-                {{ field.errors }}
-            <hr>
+              {{ field }}
+              {{ field.errors }}
+              <hr>
             {% endfor %}
 
             <button type="submit" class="btn btn-primary w-100 shadow" >ログインする</button>
             <input type="hidden" name="next" value="{{ next }}" />
             {% csrf_token %}
+          </form>     
+
+          <h5>パートナー登録</h5>
+
+          <form method="GET"
+            action="{% url 'accounts:user_create_buyer' %}"
+            class="form-group bg-light border border-success rounded p-4 mb-3 ">
+
+            <button type="submit" class="btn btn-primary w-100 shadow" >登録する</button>
+            <input type="hidden" name="next" value="{{ next }}" />
+            {% csrf_token %}
           </form>
-        </div> <!-- col -->
-      </div> <!-- row -->
-    </div> <!-- d-flex -->
-  </div> <!-- end container -->
+
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

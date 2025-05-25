@@ -20,8 +20,8 @@ class TxCreateForm(forms.ModelForm):
       'buyer_entityname',
       'requested_amount',
       'original_payment_date',
-      'seller_email',
-      'seller_personname',
+      'seller_user_email',
+      'seller_user_personname',
       'seller_entityname'
     )
 #    widgets = {

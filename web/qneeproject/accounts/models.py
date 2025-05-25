@@ -37,7 +37,7 @@ class BankAccount(models.Model):
 
 class LegalEntity(models.Model):
 
-  choices1 = ((1, '発注者'), (2, '受注者'))
+  choices1 = ((1, 'パートナー'), (2, 'ゲスト'))
   type1 = models.IntegerField(default=1, null=False, blank=False, choices=choices1) #ユーザーが入力しない想定
 
   choices2 = ((1, '個人（法人組織でない）'), (2, '法人'))
@@ -172,11 +172,11 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     null=True,
   )
 
-  choice1 = ((1, '発注者'), (2, '受注者'), (3, 'その他')) #内部管理用
-  type1 = models.IntegerField(default=1, null=True, blank=True, choices=choice1)
+  choice1 = ((1, 'パートナー'), (2, 'ゲスト'), (3, 'Qnee')) #内部管理用
+  type1 = models.IntegerField('属性1', default=1, null=True, blank=True, choices=choice1)
 
   choice2 = ((1, '個人（法人組織でない）'), (2, '法人'))
-  type2 = models.IntegerField(null=True, blank=True, choices=choice2)
+  type2 = models.IntegerField('属性2', null=True, blank=True, choices=choice2)
 
   entity = models.ForeignKey(LegalEntity, verbose_name='取引主体', null=True, related_name='user_entity', on_delete=models.CASCADE)
   # related_nameは、参照しているentity（親モデル）を参照するuser（子モデル）を抽出する場合に使う

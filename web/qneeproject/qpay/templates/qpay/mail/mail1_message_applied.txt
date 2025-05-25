@@ -1,4 +1,4 @@
-{{ tx.buyer_personname }} 様 
+{{ tx.buyer_user_personname }} 様 
 
 {{ tx.buyer_entityname }} 様宛に、{{ tx.seller_entityname }} 様から前払いの申請が届いております。
 

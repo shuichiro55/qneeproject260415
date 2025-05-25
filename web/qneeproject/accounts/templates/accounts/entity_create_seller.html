@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<div class="authentication-bg min-vh-100 min-vw-100 align-items-start" style="background-color: #edf9ff;">
+<div class="authentication-bg min-vh-100 min-vw-100 align-items-start" style="background-color: #def5f9;">
 
   <div class="container mt-2">
 
@@ -222,6 +222,23 @@
               value="{{form.department.value}}"
               placeholder=""
               id="{{form.department.id_for_label}}" >
+          </div>
+        </div>
+
+        <div class="row justify-content-center my-auto">
+          {% if form.title.errors %}
+            <div class="col-11 col-md-11" style="color:red;">{{ form.title.errors.as_text }}</div>
+          {% endif %}
+        </div>
+  
+        <div class="form-group row justify-content-center pt-3">
+          <label class="col-11 col-md-3 col-lg-2 col-form-label" for='{{form.title.id_for_label}}' >役職</label>
+          <div class="col-md-8 col-lg-6">
+            <input type='form.title.widget.input_type' class='form-control'
+              name="{{form.title.name}}"
+              value="{{form.title.value}}"
+              placeholder=""
+              id="{{form.title.id_for_label}}" >
           </div>
         </div>
 

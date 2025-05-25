@@ -158,10 +158,11 @@ AUTHENTICATION_BACKENDS = [
 
 AUTH_USER_MODEL = 'accounts.CustomUser' 
 
-# 24/03/20追加  Lovinview.view_asの内の「redirect_authenticated_user=True」に対応
-LOGIN_REDIRECT_URL = 'top'
+# 24/03/20追加  LovinView.view_asの内の「redirect_authenticated_user=True」に対応
 LOGIN_REDIRECT_URL = 'accounts:login_redirect'
-#LOGOUT_REDIRECT_URL = '/'
+# LOGIN_URL = '' # '/'
+# 未ログイン時に遷移するURL
+# 本来ログイン後で確認できるページに無断でアクセスされない為にも設定しておく必要があります。  
 
 # 24/03/23追加
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' #デフォルト値のため省略可

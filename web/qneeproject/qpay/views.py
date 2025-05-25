@@ -46,12 +46,13 @@ class TxCreateView(generic.CreateView):
     seller_user = usermodel.objects.get(pk=self.kwargs['user_id'])
 
     buyerEntityname_dict =dict((str(idx), f) for idx, f in enumerate(LegalEntity.objects.filter(type1=1).values_list('entityname', flat=True), 1))
-    print(f'buyerEntityname_dict={buyerEntityname_dict}')
+    print(f'buyerEntityname_dict={buyerEntityname_dict} def get in TxCreateView')
+    print(f'seller_user.personname={seller_user.personname} def get in TxCreateView')
 
     init_dict = {
       'buyer_entityname': "",
-      'seller_email': seller_user.email,
-      'seller_personname': seller_user.personname,
+      'seller_user_email': seller_user.email,
+      'seller_user_personname': seller_user.personname,
       'seller_entityname': seller_user.entityname,
     }
     form = self.form_class(initial=init_dict)
@@ -87,14 +88,16 @@ class TxCreateView(generic.CreateView):
         buyer_entityname = self.request.POST['buyer_entityname']
         tx.buyer_entityname = buyer_entityname
         print(f'tx.buyer_entityname={tx.buyer_entityname} TxCreateViewV, post, next==ToConfirm')
+        print(f'tx.seller_user_personname={tx.seller_user_personname} TxCreateViewV, post, next==ToConfirm')
 
         buyer_entity = LegalEntity.objects.get(entityname=buyer_entityname)
         tx.buyer_entity = buyer_entity
         tx.buyer_email = buyer_entity.email
 
-        tx.buyer_personname = buyer_entity.personname
+        tx.buyer_user_personname = buyer_entity.personname
 
-        tx.seller_user = usermodel.objects.get(personname = request.POST['seller_personname'], entityname = request.POST['seller_entityname'])
+        tx.seller_user = usermodel.objects.get(personname = request.POST['seller_user_personname'], entityname = request.POST['seller_entityname'])
+        #tx.seller_user_personname = request.POST['seller_user_personname']
         tx.seller_entity = LegalEntity.objects.get(entityname = request.POST['seller_entityname'])
         
         # 各種金額を計算
@@ -475,6 +478,7 @@ class TxDetailView_buyer_approve(generic.UpdateView):
       context1 = {
         'protocol': self.request.scheme,
         'domain': domain,
+        'type1': 2,  # 承認された後、sellerがログインする場合の種別
         'token': dumps(tx.pk),
         'tx': tx,
       }
@@ -483,7 +487,7 @@ class TxDetailView_buyer_approve(generic.UpdateView):
       message = render_to_string('qpay/mail/mail2_message_approved.txt', context1)
 
       from_email = 'shuichiro.tomihari.201604@gmail.com'
-      recipient_list =[tx.seller_email]
+      recipient_list =[tx.seller_user_email]
       #bcc =  ["toritoritorina@gmail.com"]  # BCCリスト
       email = EmailMessage(subject, message, from_email, recipient_list)
       email.send()

@@ -4,7 +4,8 @@
 
 {% block content %}
 
-<div class="authentication-bg min-vh-100 min-vw-100 align-items-start" style="background-color:#edf9ff;">
+<div class="authentication-bg min-vh-100 min-vw-100 align-items-start" style="background-color:#def5f9;">
+
   <div class="container">
 
     <div class="row">
@@ -15,85 +16,85 @@
       {% endfor %}
     </div>
 
+          <!-- row-cols-md-3が前の項を上書きを行っている -->
     <div class="row justify-content-center">
-    <div class="col-11 col-md-10 mt-3">
+      <div class="col-11 col-md-10 mt-3">
 
-      <!-- row-cols-md-3が前の項を上書きを行っている -->
-      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 mb-3 text-center" >
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 mb-3 text-center" >
 
 
-        <div class="col mt-3">
-          <div class="card mb-4 rounded-3 shadow-sm">
-            <div class="card-header py-3">
-              <h5 class="my-0 fw-normal">報酬の前払い申請</h5>
-            </div>
+          <div class="col mt-3">
+            <div class="card mb-4 rounded-3 shadow-sm">
+              <div class="card-header py-3">
+                <h5 class="my-0 fw-normal">報酬の前払い申請</h5>
+              </div>
 
-            <div class="card-body">
-              <p></p>
-              {% bs_icon 'send' color='cornflowerblue' size='2.5em' %}
-              <p></p>
+              <div class="card-body">
+                <p></p>
+                {% bs_icon 'send' color='cornflowerblue' size='2.5em' %}
+                <p></p>
 
-              <p class="mb-4">パートナーに報酬前払い申請します</p>
-              <!-- <p class="lead mb-4">発注者に前払いの申請を行います</p> 「lead」は目立たせるときに入れる -->
+                <p class="mb-4">パートナーに報酬前払い申請します</p>
+                <!-- <p class="lead mb-4">発注者に前払いの申請を行います</p> 「lead」は目立たせるときに入れる -->
           
-              <form method="GET" action="{% url 'qpay:tx_create' user.id %}">
-                {% csrf_token %}
-                <button type="submit" class="w-100 shadow btn btn-lg btn-outline-primary" name="next" value="apply_qpay">
-                申請ページへ
-                </button>
-              </form>
-            </div> <!-- card-body -->
-          </div> <!-- end card -->
-        </div> <!-- end col -->
+                <form method="GET" action="{% url 'qpay:tx_create' user.id %}">
+                  {% csrf_token %}
+                  <button type="submit" class="w-100 shadow btn btn-lg btn-outline-primary" name="next" value="apply_qpay">
+                    申請ページへ
+                  </button>
+                </form>
+              </div> <!-- card-body -->
+            </div> <!-- end card -->
+          </div> <!-- end col -->
 
-        <div class="col mt-3">
-          <div class="card mb-4 rounded-3 shadow-sm">
-            <div class="card-header py-3">
-              <h5 class="my-0 fw-normal">取引履歴・書類発行</h5>
-            </div>
+          <div class="col mt-3">
+            <div class="card mb-4 rounded-3 shadow-sm">
+              <div class="card-header py-3">
+                <h5 class="my-0 fw-normal">取引履歴・書類発行</h5>
+              </div>
 
-            <div class="card-body">
-              <p></p>
-              {% bs_icon 'receipt-cutoff' color='cornflowerblue' size='2.5em' %}
-              <p></p>
+              <div class="card-body">
+                <p></p>
+                {% bs_icon 'receipt-cutoff' color='cornflowerblue' size='2.5em' %}
+                <p></p>
 
-              <p class="mb-4">取引の確認と書類の発行ができます</p>
+                <p class="mb-4">取引の確認と書類の発行ができます</p>
 
-              <form method="GET" action="{% url 'qpay:txlist_seller' %}">
-                {% csrf_token %}
-                <button type="submit" class="w-100 shadow btn btn-lg btn-outline-primary" name="next" value="history">取引一覧へ</button>
-                <!-- <button type="button" class="w-100 btn btn-lg btn-primary">手続きへ</button> -->
-              </form>
-            </div> <!-- card-body -->
-          </div> <!-- end card -->
-        </div> <!-- end col -->
+                <form method="GET" action="{% url 'qpay:txlist_seller' %}">
+                  {% csrf_token %}
+                  <button type="submit" class="w-100 shadow btn btn-lg btn-outline-primary" name="next" value="history">取引一覧へ</button>
+                  <!-- <button type="button" class="w-100 btn btn-lg btn-primary">手続きへ</button> -->
+                </form>
+              </div> <!-- card-body -->
+            </div> <!-- end card -->
+          </div> <!-- end col -->
 
-        <div class="col mt-3">
-          <div class="card mb-4 rounded-3 shadow-sm">
-          <!-- <div class="card mb-4 rounded-3 shadow-sm border-primary"> -->
-            <div class="card-header py-3"> 
-            <!-- <div class="card-header py-3 text-bg-primary border-primary"> -->
-              <h5 class="my-0 fw-normal">登録情報変更</h5>
-            </div>
+          <div class="col mt-3">
+            <div class="card mb-4 rounded-3 shadow-sm">
+            <!-- <div class="card mb-4 rounded-3 shadow-sm border-primary"> -->
+              <div class="card-header py-3"> 
+              <!-- <div class="card-header py-3 text-bg-primary border-primary"> -->
+                <h5 class="my-0 fw-normal">登録情報変更</h5>
+              </div>
 
-            <div class="card-body">
-              <p></p>
-              {% bs_icon 'pencil-square' color='cornflowerblue' size='2.5em' %}
-              <p></p>
+              <div class="card-body">
+                <p></p>
+                {% bs_icon 'pencil-square' color='cornflowerblue' size='2.5em' %}
+                <p></p>
 
-              <p class="mb-4">受取口座など登録情報を変更します</p>
+                <p class="mb-4">受取口座など登録情報を変更します</p>
         
-              <form method="GET" action="{% url 'accounts:info_edit_seller' user.id entity.id %}">
-                {% csrf_token %}
-                <button type="submit" class="w-100 shadow btn btn-lg btn-outline-primary" name="next" value="history">編集メニューへ</button>
-                <!-- <button type="button" class="w-100 btn btn-lg btn-primary">手続きへ</button> -->
-              </form>
-            </div> <!-- card-body -->
-          </div> <!-- end card -->
-        </div> <!-- end col -->
+                <form method="GET" action="{% url 'accounts:info_edit_seller' user.id entity.id %}">
+                  {% csrf_token %}
+                  <button type="submit" class="w-100 shadow btn btn-lg btn-outline-primary" name="next" value="history">編集メニューへ</button>
+                  <!-- <button type="button" class="w-100 btn btn-lg btn-primary">手続きへ</button> -->
+                </form>
+              </div> <!-- card-body -->
+            </div> <!-- end card -->
+          </div> <!-- end col -->
 
-      </div> <!-- end row -->
-    </div>
+        </div> <!-- end row -->
+      </div>
     </div>
   </div> <!-- end container -->
 </div>

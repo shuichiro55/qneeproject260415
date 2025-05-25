@@ -195,6 +195,15 @@ html {
   bottom: 0;
 }
 
+.bg-overlay2 {
+  position: absolute;
+  background-color: rgba(48, 58, 69, 0.4);
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+
 #back-to-top {
   width: 30px;
   height: 30px;
@@ -1577,7 +1586,7 @@ ul.pattern .color6 {
 
 .authentication-bg {
   background-image: url("../images/bg-auth.png");
-  background-color: rgba(63, 142, 252, 0.12);
+  background-color: rgb(211, 226, 246);
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
@@ -1641,10 +1650,14 @@ ul.pattern .color6 {
   align-items: center;
 }
 
+.copy {
+  justify-content: center;
+}
+
 .copy-head {
   color: #fff;
   /* font-size: 30px; */
-  font-size: calc(13px + 1.3vw);
+  font-size: clamp(1.2rem, 0.8rem + 1.2vw, 1.5rem);
   text-shadow: 1px 1px 20px #000;
   font-weight: bold;
 
@@ -1653,17 +1666,17 @@ ul.pattern .color6 {
   letter-spacing: .2em;
 }
  
-.copy-body1 {
+.copy-body-m {
   color: #fff;
   /* font-size: 20px; */
-  font-size: calc(12px + 0.7vw);
+  font-size: clamp(0.9rem, 0.7rem + 1vw, 1.2rem);
   text-shadow: 1px 1px 20px #000;
   text-align: center;
 }
-.copy-body2{
+.copy-body-l{
   color: #fff;
   /* font-size: 20px; */
-  font-size: calc(13px + 0.70vw);
+  font-size: clamp(0.94rem, 0.74rem + 1vw, 1.25rem);
   text-shadow: 2px 2px 20px #000;
   text-align: center;
 }
@@ -1688,7 +1701,7 @@ ul.pattern .color6 {
     position: absolute;
 
     width: 100%;
-    height: 34%;
+    height: 33.3333333334%;
 
     top: 50%;
     left: 50%;
@@ -1702,7 +1715,7 @@ ul.pattern .color6 {
 @media (min-width: 1200px) {
   .ParaVideo {
 	  width: 100vw;
-    height: 100%;
+    height: 56.25vw;
     /*padding: 15px 15px;*/
   }
 
@@ -1712,19 +1725,18 @@ ul.pattern .color6 {
     width: 100vw;
     height: 100%;
 
-    top: 50%;
+    top: 49.6666666667%;
     left: 50%;
     /*object-fit: cover;*/
     transform: translate(-50%, -50%);
   }
 }
 
-
+/*
 @media (max-width: 900px) {
   .ParaVideo2 {
 	  width: 100vw;
     height: 100%;
-  	/* padding: 15px 0px; */
   }
   
   .ParaVideo2 > video {
@@ -1748,7 +1760,6 @@ ul.pattern .color6 {
   .ParaVideo2 {
 	  width: 100vw;
 	  height: 100%;
-    /* padding: 15px 0px; */
   }
 
   .ParaVideo2 > video {
@@ -1759,7 +1770,6 @@ ul.pattern .color6 {
 
     top: 50%;
     left: 50%;
-    /* object-fit: cover; */
     transform: translate(-50%, -50%);
     position: fixed;
     z-index: -999;
@@ -1767,6 +1777,7 @@ ul.pattern .color6 {
     display: block;
   }
 }
+*/
 /*
 .ParaVideo > video::after{
   position: absolute;
@@ -1777,16 +1788,14 @@ ul.pattern .color6 {
   z-index: -999;
 }
 */
-
+/*
 .ParaContent h1, .ParaContent h2, .ParaContent h3, .ParaContent p {
-	/* font-family: Orbitron; */
 	color: #fff;
 	text-shadow: 0 5px 10px #000;
 	text-align: center;
 }
 
 .ParaVideo h1, .ParaVideo h2, .ParaVideo h3 {
-	/*font-family: Orbitron; */
 	color-interpolation-filters: #fff;
 	text-shadow: 0 5px 10px #000;
 	text-align: center;
@@ -1802,20 +1811,55 @@ ul.pattern .color6 {
 }
 
 .ParaVideo .p, .ParaContent .p {
-	/* font-family: Arial; */
 	color: #fff;
 	text-align: center;
 	font-size: 18px;
 }
+*/
 
-.ParaImage {
+@media (min-width: 1200px) {
+  .ParaImage-left {
+	  width: 100vw;
+	  height: 100%;
+    /* background-color: #000; */
+	  background-attachment: fixed;
+	  background-size: auto 100%;
+    background-size: cover;
+    background-position: left;
+    background-repeat: no-repeat;
+    background-color: #2399CB;
+
+    position: relative;
+
+	  /*padding: 100% 0px;*/
+  }
+}
+@media (max-width: 1200px) {
+  .ParaImage-left {
+	  width: 100%;
+	  height: 100vh;
+    /* background-color: #000; */
+	  background-attachment: fixed;
+	  background-size: 100% 100%;
+    background-size: cover;
+    background-position: left;
+    background-repeat: no-repeat;
+    background-color: #2399CB;
+
+    position: relative;
+
+	  /*padding: 100% 0px;*/
+  }
+}
+
+.ParaImage-center {
 	width: 100vw;
-	height: 100%;
+	height: 100vh;
   /* background-color: #000; */
 	background-attachment: fixed;
 	/*background-size: auto 100%;*/
   background-size: cover;
-  background-position: left;
+  background-position: center;
   background-repeat: no-repeat;
   background-color: #2399CB;
 
@@ -1824,12 +1868,13 @@ ul.pattern .color6 {
 
 	/*padding: 100% 0px;*/
 }
+
 .bg1 {
 	background-image: url('../images/qconnect/bg-productLP-buyer1_6.jpg');
 }
 
 .bg2 {
-	background-image: url('../images/qconnect/bg-productLP-buyer2.jpg');
+	background-image: url('../images/qconnect/bg-productLP-buyer2_6.jpg');
 }
 
 .ParaImage h1, .ParaImage h2, .ParaImage h3 {
@@ -1842,68 +1887,3 @@ ul.pattern .color6 {
 	/* text-shadow: 0 5px 10px #000; */
 	text-align: center;
 }
-
-
-
-/*
-.video {
-  position: absolute;
-  margin: 0;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  overflow: hidden;
-  z-index: -1;
-
-  background: url('static/css/images/qconnect/bg-productLP-buyer1.jpg') no-repeat center/cover; 
-}
-*/
-/*
-.video::after{
-  content: '';
-  width: 100%;
-  height: 100%;
-  background-color: rgba(184, 169, 252, 0.2);
-  display: block;
-  position: absolute;
-  left: 0;
-  top: 0;
-}
-*/
-/*
-.movie {
-  position: relative;
-  height: 100vh;
-}
-.parallax-bg {
-  position: fixed;
-  z-index: -1;
-  top: 0;
-  right: 0;
-  left: 0;
-  bottom: 0;
-  overflow: hidden;
-}
-.parallax-bg > video {
-  position: absolute;
-  z-index: -1;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 177.77777778vh;
-  height: 56.25vw;
-  min-height: 100%;
-  min-width: 100%;
-}
-
-.parallax-bg > video::after{
-  content: '';
-  width: 100%;
-  height: 100%;
-  background-color: rgba(184, 169, 252, 0.2);
-  display: block;
-  position: absolute;
-  left: 0;
-  top: 0;
-}
-*/
