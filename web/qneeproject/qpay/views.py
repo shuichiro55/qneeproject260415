@@ -43,23 +43,23 @@ class TxCreateView(generic.CreateView):
 
   def get(self, request, *args, **kwargs):
 
-    seller_user = usermodel.objects.get(pk=self.kwargs['user_id'])
+    sellerUser = usermodel.objects.get(pk=self.kwargs['user_id'])
 
     buyerEntityname_dict =dict((str(idx), f) for idx, f in enumerate(LegalEntity.objects.filter(type1=1).values_list('entityname', flat=True), 1))
     print(f'buyerEntityname_dict={buyerEntityname_dict} def get in TxCreateView')
-    print(f'seller_user.personname={seller_user.personname} def get in TxCreateView')
+    print(f'sellerUser.personname={sellerUser.personname} def get in TxCreateView')
 
     init_dict = {
-      'buyer_entityname': "",
-      'seller_user_email': seller_user.email,
-      'seller_user_personname': seller_user.personname,
-      'seller_entityname': seller_user.entityname,
+      'buyerEntity_entityname': "",
+      'sellerUser_email': sellerUser.email,
+      'sellerUser_personname': sellerUser.personname,
+      'sellerEntity_entityname': sellerUser.entityname,
     }
     form = self.form_class(initial=init_dict)
     context = {
       'form': form,
       'flag_step': 1,
-      'temporal_buyer_entityname': "",
+      'temporal_buyerEntityname': "",
       'buyerEntityname_dict': buyerEntityname_dict,
     }
 
@@ -85,35 +85,35 @@ class TxCreateView(generic.CreateView):
  
         tx = form.save(commit=False)
 
-        buyer_entityname = self.request.POST['buyer_entityname']
-        tx.buyer_entityname = buyer_entityname
-        print(f'tx.buyer_entityname={tx.buyer_entityname} TxCreateViewV, post, next==ToConfirm')
-        print(f'tx.seller_user_personname={tx.seller_user_personname} TxCreateViewV, post, next==ToConfirm')
+        buyerEntity_entityname = self.request.POST['buyerEntity_entityname']
+        tx.buyerEntity_entityname = buyerEntity_entityname
+        print(f'tx.buyerEntity_entityname={tx.buyerEntity_entityname} TxCreateViewV, post, next==ToConfirm')
+        print(f'tx.sellerUser_personname={tx.sellerUser_personname} TxCreateViewV, post, next==ToConfirm')
 
-        buyer_entity = LegalEntity.objects.get(entityname=buyer_entityname)
-        tx.buyer_entity = buyer_entity
-        tx.buyer_email = buyer_entity.email
+        buyerEntity = LegalEntity.objects.get(entityname=buyerEntity_entityname)
+        tx.buyerEntity = buyerEntity
+        tx.buyerUser_email = buyerEntity.email  #★★★　buyerのuserを複数にしたときに修正　25/05/31
 
-        tx.buyer_user_personname = buyer_entity.personname
+        tx.buyerUser_personname = buyerEntity.personname
 
-        tx.seller_user = usermodel.objects.get(personname = request.POST['seller_user_personname'], entityname = request.POST['seller_entityname'])
-        #tx.seller_user_personname = request.POST['seller_user_personname']
-        tx.seller_entity = LegalEntity.objects.get(entityname = request.POST['seller_entityname'])
+        tx.sellerUser = usermodel.objects.get(personname = request.POST['sellerUser_personname'], entityname = request.POST['sellerEntity_entityname'])
+        #tx.sellerUser_personname = request.POST['sellerUser_personname']
+        tx.sellerEntity = LegalEntity.objects.get(entityname = request.POST['sellerEntity_entityname'])
         
         # 各種金額を計算
         tx.advance_amount = tx.requested_amount
-        tx.advance_fee = (tx.requested_amount * buyer_entity.advance_fee_rate) //1
-        tx.referral_fee = (tx.requested_amount * buyer_entity.referral_fee_rate) //1
+        tx.advance_fee = (tx.requested_amount * buyerEntity.advance_fee_rate) //1
+        tx.referral_fee = (tx.requested_amount * buyerEntity.referral_fee_rate) //1
         tx.transfer_fee = 110
         tx.to_seller_amount = tx.advance_amount - tx.advance_fee - tx.transfer_fee
 
         tx.save()
-        print(f'メールアドレス：{tx.buyer_email} next==confirm in TxCreateView')
+        print(f'メールアドレス：{tx.buyerUser_email} next==confirm in TxCreateView')
 
         context = {
           'form':form,
           'flag_step': 2,
-          #'buyer_entityname': buyer_entityname,
+          #'buyerEntityname': buyerEntityname,
           'user_id': self.kwargs['user_id'],
           'tx': tx,
         }
@@ -126,7 +126,7 @@ class TxCreateView(generic.CreateView):
         context = {
           'form':form,
           'flag_step': 1,
-          'temporal_buyer_entityname': self.request.POST['buyer_entityname'],
+          'temporal_buyerEntityname': self.request.POST['buyerEntity_entityname'],
           'buyerEntityname_dict': buyerEntityname_dict,
         }
         return render(self.request, 'qpay/tx_create.html', context)
@@ -141,14 +141,14 @@ class TxCreateView(generic.CreateView):
         dict((str(idx), f) for idx, f in enumerate(LegalEntity.objects.filter(type1=1).values_list('entityname', flat=True), 1))
       print(f'buyerEntityname_dict={buyerEntityname_dict}')
 
-      temporal_buyer_entityname = self.request.POST['buyer_entityname']
-      print(f'pass4 temporal_buyer_entityname={temporal_buyer_entityname} in TxCreateV, post, next==BackToInput')
+      temporal_buyerEntityname = self.request.POST['buyerEntity_entityname']
+      print(f'pass4 temporal_buyerEntityname={temporal_buyerEntityname} in TxCreateV, post, next==BackToInput')
 
       context = {
         'form': form,
         'flag_step': 1,
         'buyerEntityname_dict': buyerEntityname_dict,
-        'temporal_buyer_entityname': temporal_buyer_entityname,
+        'temporal_buyerEntityname': temporal_buyerEntityname,
       }
       return render(self.request, 'qpay/tx_create.html', context)
 
@@ -185,7 +185,7 @@ class TxCreateView(generic.CreateView):
 
       tx_id = self.kwargs['tx_id']
       print(f'pass5 self.kwarts[tx_id]={tx_id} in TxCreateV, post, next==ToEvidenceConfirm')
-      print(f'pass5 tx.buyer_email={tx.buyer_email} in TxCreateV, post, next==ToEvidenceConfirm')
+      print(f'pass5 tx.buyerUer_email={tx.buyerUser_email} in TxCreateV, post, next==ToEvidenceConfirm')
 
       context = {
         'flag_step': 2,
@@ -220,15 +220,15 @@ class TxCreateView(generic.CreateView):
       message = render_to_string('qpay/mail/mail1_message_applied.txt', context)
 
       from_email = 'shuichiro.tomihari.201604@gmail.com'
-      recipient_list = [tx.buyer_email]
+      recipient_list = [tx.buyerUser_email]
       #bcc =  ["toritoritorina@gmail.com"]  # BCCリスト
       email = EmailMessage(subject, message, from_email, recipient_list)
       email.send()
   
       messages.add_message(request, messages.SUCCESS, 'パートナー企業に前払いの申請を行いました.')
-      print(f'pass6 tx.buyer_email={tx.buyer_email}（TxCreateV, post, next==TxSave)')
+      print(f'pass6 tx.buyer_email={tx.buyerUser_email}（TxCreateV, post, next==TxSave)')
     
-      return TemplateResponse(request, "accounts/mypage_seller.html", {'entity': tx.seller_entity},)
+      return TemplateResponse(request, "accounts/mypage_seller.html", {'entity': tx.sellerEntity},)
       #return reverse_lazy('accounts:bankaccount_create', kwargs={'tx_id': tx_id})
   
     # self.request.POST.get('next', '')が何にも該当しない場合
@@ -262,7 +262,7 @@ class TxListView_buyer_approve(generic.UpdateView):
     user =usermodel.objects.get(email=self.request.user)
 
     # 承認待ちの取引を抽出する
-    object_list = QpayTx.objects.filter(buyer_entity = user.entity, tx_status_int=1).order_by('-requested_at')
+    object_list = QpayTx.objects.filter(buyerEntity = user.entity, tx_status_int=1).order_by('-requested_at')
     print(f'request.user={request.user} def get in TxListView_buyer_approve')
 
     # ログイン後にすぐに呼ばれることはなくなった中、必要か検討 24/07/02
@@ -306,7 +306,7 @@ class TxListView_buyer_history(LoginRequiredMixin, generic.UpdateView):
   def get(self, request, *args, **kwargs):
 
     user =usermodel.objects.get(email=self.request.user)
-    object_list = QpayTx.objects.filter(buyer_entity = user.entity).order_by('-created_at')
+    object_list = QpayTx.objects.filter(buyerEntity = user.entity).order_by('-created_at')
     print(f'request.user={request.user} def get in TxListView_buyer_history')
 
     # ログイン後にすぐに呼ばれることはなくなった中、必要か検討 24/07/02
@@ -350,7 +350,7 @@ class TxListView_seller(LoginRequiredMixin, generic.UpdateView):
   def get(self, request, *args, **kwargs):
 
     user =usermodel.objects.get(email=self.request.user)
-    object_list = QpayTx.objects.filter(seller_entity = user.entity).order_by('-requested_at')
+    object_list = QpayTx.objects.filter(sellerEntity = user.entity).order_by('-requested_at')
     print(f'request.user={request.user} def get in TxListView_seller')
 
     if user.type1 == 1:
@@ -432,7 +432,7 @@ class TxDetailView_buyer_approve(generic.UpdateView):
   def get(self, request, *args, **kwargs):
 
     tx = QpayTx.objects.get(pk=self.kwargs['tx_id'])   
-    #le = LegalEntity.objects.get(entityname=tx.buyer_entityname)
+    #le = LegalEntity.objects.get(entityname=tx.buyerEntity_entityname)
 
     # ページネーションから受け取る「page」をセット
     page_num = self.request.GET.get('page', 0)
@@ -487,7 +487,7 @@ class TxDetailView_buyer_approve(generic.UpdateView):
       message = render_to_string('qpay/mail/mail2_message_approved.txt', context1)
 
       from_email = 'shuichiro.tomihari.201604@gmail.com'
-      recipient_list =[tx.seller_user_email]
+      recipient_list =[tx.sellerUser_email]
       #bcc =  ["toritoritorina@gmail.com"]  # BCCリスト
       email = EmailMessage(subject, message, from_email, recipient_list)
       email.send()
@@ -545,7 +545,7 @@ class TxDetailView_buyer_history(generic.UpdateView):
   def get(self, request, *args, **kwargs):
 
     tx = QpayTx.objects.get(pk=self.kwargs['tx_id'])
-    #vle = LegalEntity.objects.get(entityname=tx.buyer_entityname)
+    #vle = LegalEntity.objects.get(entityname=tx.buyerEntity_entityname)
 
     try:
       page_num = int(self.kwargs['page_num'])
@@ -569,7 +569,7 @@ class TxDetailView_seller(generic.UpdateView):
   def get(self, request, *args, **kwargs):
 
     tx = QpayTx.objects.get(pk=self.kwargs['tx_id'])
-    le = LegalEntity.objects.get(entityname=tx.buyer_entityname)
+    le = LegalEntity.objects.get(entityname=tx.buyerEntity_entityname)
 
     try:
       page_num = int(self.kwargs['page_num'])

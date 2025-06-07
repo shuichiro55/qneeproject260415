@@ -13,7 +13,7 @@ from django.conf import settings
 from django.views import generic
 from .form import \
   MyLoginForm, UserCreateForm, \
-  EntityCreateForm_buyer, EntityCreateForm_seller, \
+  EntitySelectForm_buyer, EntityCreateForm_buyer, EntityCreateForm_seller, \
   MyPageForm_buyer, MyPageForm_seller, \
   ContactForm, BankAccountForm, InfoEditForm_seller, \
   AgreementConfirmForm_buyer, AgreementConfirmForm_seller, \
@@ -508,13 +508,163 @@ class UserCreateView2_seller(generic.TemplateView):
 class UserCreateView2_admin(generic.TemplateView):
   template_name = 'accounts/user_create2_admin.html'
 
-#"""ユーザー仮登録が完了し、メール送付したと伝えるテンプレート"""
-#class UserCreateDone_buyer(generic.TemplateView):
-#  template_name = 'accounts/user_create_done_buyer.html'
 
-#"""ユーザー仮登録が完了し、メール送付したと伝えるテンプレート"""
-#class UserCreateDone_seller(generic.TemplateView):
-#  template_name = 'accounts/user_create_done_seller.html'
+
+""" 25/06/02（コーディング開始） ①パートナー登録するか、②既存パートナーにユーザー追加を選択 """
+""" 上記①の場合はEntityCreateViewへ、上②の場合は既存パートナーのスーパーユーザーに登録申請 """
+
+class EntitySetView_buyer(generic.TemplateView):
+
+  # model = LegalEntity
+  # form_class = EntitySelectForm_buyer
+  template_name = 'accounts/entity_set_buyer.html'
+
+  timeout_seconds = getattr(settings,  'ACTIVATION_TIMEOUT_SECONDS', 60*60*24)
+
+  """（ビューにおいて）GETリクエストを受け取ったときに呼び出される（実践Django P121）"""
+  """ 処理：ゲストに送られたメールのURLをクリックされた時点で呼ばれる """
+  def get(self, request, **kwargs):  #selfはメソッドを呼んだインスタンス自体
+  
+    ### 開発時だけのコード（時間制限なくレイアウトを整えられるように）24/01/02
+    try:
+      user = usermodel.objects.get(pk=self.kwargs['user_id'])
+    except:
+
+      try:
+        # URLから<token>（暗号化されたuser_id）を取り出す（kwargsはdict型）
+        token = kwargs.get('token')
+        user_pk = loads(token, max_age=self.timeout_seconds)
+        user = usermodel.objects.get(pk=user_pk)
+        print(f'token = {token}, user_pk = {user_pk} in def get of EntitySetView_buyer')
+
+      except usermodel.DoesNotExist:
+        return HttpResponseBadRequest()
+
+      # 期限切れ
+      except SignatureExpired:
+        # この段階でCustomUserインスタンスが生成されている。
+        # 同じメールアドレスで登録できるように、オブジェクトを削除する。
+        return HttpResponseBadRequest()
+
+      # tokenが間違っている
+      except BadSignature:
+        return HttpResponseBadRequest()
+            
+    if not user.is_active:
+      user.is_active = True
+      user.save()
+
+    context = {
+      'user': user,
+      'form': self.form_class,
+    }
+
+    print(f'ここ来てる1 request.user={request.user} email={user.email} type2={user.type2}（get in class EntitySetView_buyer）')
+        
+    return TemplateResponse(request, 'accounts/entity_set_buyer.html', context)  #ここでgetとするのは、おそらく親クラスでtemplate_nameを表示するように規定されている
+
+
+  def post(self, request, *args, **kwargs):
+     
+    form = self.form_class(request.POST)
+    next = self.request.POST.get('next', '') 
+
+    if next == 'ToConfirm':  
+    
+      try:
+        user = usermodel.objects.get(pk=self.kwargs['user_id'])
+      except:
+
+        try:
+          timeout_seconds = getattr(settings,  'ACTIVATION_TIMEOUT_SECONDS', 60*60*24)
+          token = kwargs.get('token')  #kwargsはdict型
+
+          user_pk = loads(token, max_age=timeout_seconds)
+          user = usermodel.objects.get(pk=user_pk)
+
+          print(f'token = {token} in def post of EntitySetView_buyer')
+          print(f'user_pk = {user_pk} in def post of EntitySetView_buyer')
+    
+        # 期限切れ
+        except SignatureExpired:
+          # この段階でCustomUserインスタンスが生成されている。
+          # 同じメールアドレスで登録できるように、オブジェクトを削除する。
+          return HttpResponseBadRequest()
+
+        # tokenが間違っている
+        except BadSignature:
+          return HttpResponseBadRequest()
+
+        except usermodel.DoesNotExist:
+          return HttpResponseBadRequest()
+
+
+      if form.is_valid():
+      # 「.is_valid()」の後、フォームでのclean、clean_<field>が実行され、
+      # form.cleaned_data[]にデータが入る
+
+        context = {
+          'form': form,
+          'user': user,
+        }
+        return render(self.request, 'accounts/entity_confirm_buyer.html', context)
+
+      else: #バリデーションエラーの時に通る
+        print(f'ここ来てる3（def post after if not form.is_valid in class EntityCreateView_buyer）')
+        return TemplateResponse(self.request, 'accounts/entity_create_buyer.html', {'form':form, 'user_id':user.id, 'user':user},)
+    
+    else: # next == "ToComfirm"ではない場合
+
+      user = usermodel.objects.get(pk=self.kwargs['user_id'])
+      form = self.form_class(request.POST)
+
+      if next == 'back':
+        print(f'ここ来てる4（def post after 「try-except:」 in class EntityCreateView_buyer）')
+        return render(self.request, 'accounts/entity_create_buyer.html', {'form':form, 'user':user})
+        
+      if next == 'create': # 確認した内容をデータベースに登録
+
+        entity = form.save(commit=False)
+        entity.type1 = user.type1  # CustomUserとLegalEntityでいずれもtype1（発注者 or 受注者）、type2（個人 or 法人）を管理
+        entity.type2 = user.type2  # CustomUserとLegalEntityでいずれもtype1（発注者 or 受注者）、type2（個人 or 法人）を管理
+        entity.email = user.email
+
+        count = LegalEntity.objects.filter(email=user.email).count()
+        if count >= 1:
+          messages.add_message(request, messages.INFO, '既に同じメールアドレスでの登録があります。')
+
+        print(f'entity.id = {entity.id}（post ==create after form.is_valid in class EntityCreateView_buyer）')
+        
+        # 個人（type2==1）の場合、entitynameに直接入力しない為、personnameを代入
+        if user.type2 == 1: entity.entityname = entity.personname
+
+        entity.save()
+
+        user.personname = entity.personname
+        user.entityname = entity.entityname
+        user.entity = entity
+
+        user.save()
+
+        
+        print(f'self.request.POST.get={next}')
+        print(f'user.entityname={user.entityname}')
+        print(f'request.user.get_username={request.user.get_username} type2={user.type2}（def post ==confirm after form.is_valid in class EntityCreateView_buyer）')
+
+        return render(self.request, 'accounts/agreement_confirm_buyer.html', {'user':user, 'entity':entity})
+        # return HttpResponseRedirect(reverse('accounts:login_buyer'))
+        
+      print(form.errors)
+      print(f'ここまで来てる6 例外（post in class EntityCreateView_buyer）')
+
+  def form_valid(self, form):
+    return super().form_valid(form)
+  
+  def form_invalid(self, form):
+    print(f'ここまで来てる4（form_invalid in class EntityCreateView_buyer）')
+    print(form.errors)
+    #form.instance.user = self.request.user
+    return super().form_invalid(form)
 
 
 """25/01/01 メールで受領したURLがクリックされると本登録画面を表示"""
@@ -622,12 +772,11 @@ class EntityCreateView_buyer(generic.CreateView):
         }
         return render(self.request, 'accounts/entity_confirm_buyer.html', context)
 
-      else:
+      else: #バリデーションエラーの時に通る
         print(f'ここ来てる3（def post after if not form.is_valid in class EntityCreateView_buyer）')
         return TemplateResponse(self.request, 'accounts/entity_create_buyer.html', {'form':form, 'user_id':user.id, 'user':user},)
-        #contextを見直しが必要（基本的にはあまり通らないところだが）
     
-    else:
+    else: # next == "ToComfirm"ではない場合
 
       user = usermodel.objects.get(pk=self.kwargs['user_id'])
       form = self.form_class(request.POST)
@@ -657,6 +806,7 @@ class EntityCreateView_buyer(generic.CreateView):
         user.personname = entity.personname
         user.entityname = entity.entityname
         user.entity = entity
+
         user.save()
 
         
@@ -1087,7 +1237,7 @@ class MyPageView_buyer(generic.DetailView):
     first_of_month_after_next = first_of_month + relativedelta(months=+2)
 
     queryset = QpayTx.objects.filter(
-      buyer_entity=entity,
+      buyerEntity=entity,
       tx_status_int = 2,
       original_payment_date__gte = first_of_next_month,
       original_payment_date__lt = first_of_month_after_next)
@@ -1295,7 +1445,7 @@ class BankAccountCreateView_before(generic.TemplateView):
       tx_id = loads(token, max_age=self.timeout_seconds)
       tx = QpayTx.objects.get(pk=tx_id)
       ### ここは修正を要する
-      le = LegalEntity.objects.get(email=tx.seller_email)
+      le = LegalEntity.objects.get(email=tx.sellerUser_email)
       print(f'tx_id={tx_id}, entity_id={le.id} def get in class BankAccountCreateView_before')
 
     except SignatureExpired:

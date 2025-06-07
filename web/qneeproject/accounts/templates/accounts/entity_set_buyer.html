@@ -1,0 +1,167 @@
+{% extends "index/base_qconnect_buyer.html" %}
+
+{% block content %}
+
+<div class="authentication-bg min-vh-100 min-vw-100 align-items-start" style="background-color: #def5f9;">
+
+  <div class="container mt-2">
+
+    <nav aria-label="breadcrumb" role="navigation">
+      <ol class="breadcrumb text-dark rounded-2">
+        <li class="breadcrumb-item  text-primary"><a href="{% url 'accounts:mypage_buyer' user.id %}">マイページ・ホーム</a></li>
+        <li class="breadcrumb-item active" aria-current="page">本登録（入力）</li>
+      </ol>
+    </nav>
+
+    <div class ="row justify-content-center">
+      <div class="col-10">
+        <div class="progress mt-1 mb-1" style="height: 12px" >
+          <div class="progress-bar bg-secondary" role="progressbar"
+            style="width: 25%"
+            aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
+            仮登録
+          </div>
+
+          <div class="progress-bar bg-secondary" role="progressbar"
+            style="width: 25%"
+            aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">
+            メール受領
+          </div>
+
+          <div class="progress-bar bg-danger progress-bar-striped progress-bar-animated" role="progressbar"
+            style="width: 25%"
+            aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
+            本登録
+          </div>
+
+          <div class="progress-bar bg-secondary progress-bar-striped progress-bar-animated" role="progressbar"
+          style="width: 25%"
+          aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+          利用規約確認
+        </div>
+      </div>
+    </div>
+
+    <!-- パートナーの場合は法人のみ -->
+    {% if user.type2 == 2 %}
+
+      <div class="row justify-content-center mt-4">
+        <h5 class="text-black text-center">本登録（法人）</h5>
+      </div>
+
+      <div class="row">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" role="alert" style="background-color: #fcf7fa;">
+          <span>{{ message }}</span>
+        </div>
+        {% endfor %}
+      </div>
+
+      <form method="POST">
+        {% csrf_token %}
+
+        <div class="btn-group btn-group-toggle" data-toggle="buttons">
+  
+          <div class="col-sm-2">
+            登録方法
+          </div>
+          <div class="col-sm-10">
+            <label class="btn btn-secondary active" style="width:50%">
+              <input class="radio_NewOrNot" type="radio" name="options" id="option1" onclick="formSwitch()" autocomplete="off">
+              新たにパートナーを登録
+            </label>
+            <!-- autocompleteは過去の入力情報を自動的に補完する機能-->
+          
+            <label class="btn btn-secondary" style="width:50%">
+              <input class="radio_NewOrNot" type="radio" name="options" id="option2" onclick="formSwitch()" autocomplete="off">
+              登録済パートナーに参加
+            </label>
+          </div> 
+        </div>
+        
+        <span id="addition1">
+
+          <div class="row justify-content-center my-auto">
+            {% if form.personname.errors %}
+              <div class="col-11 col-md-11" style="color:red;">{{ form.personname.errors.as_text }}</div>
+            {% endif %}
+          </div>
+  
+          <div class="form-group row justify-content-center pt-3">
+            <label class="col-11 col-md-3 col-lg-2 col-form-label" for='{{form.personname.id_for_label}}' >お名前（個人名）</label>
+            <div class="col-md-8 col-lg-6">
+              <input type='form.personname.widget.input_type' class='form-control'
+                name='{{form.personname.name}}'
+                value='{{form.personname.value}}'
+                id='{{form.personname.id_for_label}}' >
+            </div>
+          </div>
+
+          <!-- ★★★ この部分にパートナーを追加する -->
+          <div class="selecter">
+            <select id="buyerSelect" name="hoge" onchange="selectChange();">
+              <option value="select1">ジャンルを選んでください</option>
+              <option value="select2">ロック</option>
+              <option value="select3">ジャズ</option>
+              <option value="select4">ポップス</option>
+              <option value="select5">クラシック</option>
+              <option value="select6">ラテン</option>
+            </select>
+          </div>
+        </span>       
+
+        <span id="addition2">
+          <div class= "d-flex justify-content-center mt-5">
+            <button type="submit" class="btn btn-primary shadow" name="next" value="ToNext">次へ進む</button>
+          </div>
+        </span>
+
+      </form>
+
+    </div> <!-- end row -->
+  </div> <!-- end container -->
+</div>
+
+<script>
+
+  var addition1 = document.getElementById('addition1');
+  var addition2 = document.getElementById('addition2');
+
+  var selecter = document.getElementById('buyerSelect');
+
+  addition1.style.display = "none";
+  addition2.style.display = "none";
+
+  function formSwitch() {
+
+    radios = document.getElementsByClassName('radio_NewOrNot')
+
+    if (radios[0].checked) {
+        addition1.style.display = "none";     /* 非表示 */
+        addition2.style.display = "block";    /* 表示 */
+        selecter.selectedIndex = 0;  /* ★★★　どう使うか要確認 25/06/08 */
+
+    } else if (radios[1].checked) {
+        addition1.style.display = "block";
+        addition2.style.display = "block";
+    } else {
+        addition1.style.display = "none";
+        addition2.style.display = "none";
+    }
+  }
+  
+  window.addEventListener('load', formSwitch());
+
+  /* これはパートナーを選択後に何かしら処理が発生する場合に利用 */
+  function selectChange(){
+
+    if(document.getElementById('buyerSelect')){
+      id = document.getElementById('buyerSelect').value;
+    }
+  }
+
+</script>
+
+{% endif %}
+
+{% endblock %}

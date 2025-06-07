@@ -35,13 +35,11 @@ urlpatterns = [
   path('user_create_admin/', views.UserCreateView_admin.as_view(), name='user_create_admin'),
   path('user_create2_admin', views.UserCreateView2_admin.as_view(), name='user_create2_admin'),
 
-  path('entity_set_buyer/<token>/', views.EntitySetView_buyer.as_view(), name='entity_set_buyer'),
-
-  path('entity_create_buyer/<token>/', views.EntityCreateView_buyer.as_view(), name='entity_create_buyer'),
   path('entity_create_seller/<token>/', views.EntityCreateView_seller.as_view(), name='entity_create_seller'),   
+  path('entity_create_buyer/<token>/', views.EntityCreateView_buyer.as_view(), name='entity_create_buyer'),
 
-  path('<int:user_id>/entity_create_buyer/', views.EntityCreateView_buyer.as_view(), name='entity_create_buyer'),
   path('<int:user_id>/entity_create_seller/', views.EntityCreateView_seller.as_view(), name='entity_create_seller'),
+  path('<int:user_id>/entity_create_buyer/', views.EntityCreateView_buyer.as_view(), name='entity_create_buyer'),
 
   #開発用
   path('<int:user_id>/<int:entity_id>/agreement_confirm_buyer/', views.AgreementConfirmView_buyer.as_view(), name='agreement_confirm_buyer'),

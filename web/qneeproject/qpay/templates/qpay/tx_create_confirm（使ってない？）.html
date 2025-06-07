@@ -16,8 +16,8 @@
     <table  width="200px" class="table table-striped table table-bordered table table-responsive">
       <tbody class="text-center">
         <tr><td width="25%">お取引先</td><td>{{ buyer_entityname }}様</td></tr>
-        <tr><td>お申込者</td><td>{{ form.seller_personname.value }}様／{{ form.seller_email.value }}</td></tr>
-        <tr><td>ご報酬を受ける方</td><td>{{ form.seller_entityname.value }}様</td></tr>
+        <tr><td>お申込者</td><td>{{ form.sellerUser_personname.value }}様／{{ form.sellerUser_email.value }}</td></tr>
+        <tr><td>ご報酬を受ける方</td><td>{{ form.sellerEntity_entityname.value }}様</td></tr>
         <tr><td>ご申込金額</td><td>{{ form.requested_amount.value|intcomma }}</td></tr>
         <tr><td>ご報酬の証明（請求書など）</td><td>{{ tx.evidence }}</td></tr>
       </tbody>

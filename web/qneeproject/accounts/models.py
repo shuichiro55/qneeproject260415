@@ -57,6 +57,7 @@ class LegalEntity(models.Model):
     error_messages={'unique': _("A user with that username already exists")},
   )
   email = models.EmailField('メールアドレス', unique=True, blank=False, null=True)
+  #★★★ 25/05/31 ユーザーを複数にした場合は変更が必要
   
   tel_regex = RegexValidator(regex=r'^[0-9０-９ー―－‐₋⁻-]+$', message = ("ハイフン「-」なしで数字のみご入力下さい（最大15桁）　例：09012345678."))
   tel = models.CharField(_('電話番号'), max_length=30, default="", null=False, validators=[tel_regex])
@@ -93,7 +94,7 @@ class LegalEntity(models.Model):
   referral_fee_rate = models.DecimalField(max_digits=11, decimal_places=10, default=0.015) # 紹介手数料（Qnee⇒Buyer）
 
   # 前払い申請者の受領口座
-  bank_account = models.OneToOneField(BankAccount, verbose_name='振込口座', null=True, related_name='BankAccount_tx', on_delete=models.PROTECT)
+  bank_account = models.OneToOneField(BankAccount, verbose_name='振込口座', null=True, related_name='account_holder', on_delete=models.PROTECT)
   bank_account_flag = models.IntegerField(_('口座設定フラグ'), null=True, blank=True, default=0)
   # 0：設定なし、1：設定済み
 
@@ -178,7 +179,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
   choice2 = ((1, '個人（法人組織でない）'), (2, '法人'))
   type2 = models.IntegerField('属性2', null=True, blank=True, choices=choice2)
 
-  entity = models.ForeignKey(LegalEntity, verbose_name='取引主体', null=True, related_name='user_entity', on_delete=models.CASCADE)
+  entity = models.ForeignKey(LegalEntity, verbose_name='取引主体', null=True, related_name='entity_users', on_delete=models.CASCADE)
   # related_nameは、参照しているentity（親モデル）を参照するuser（子モデル）を抽出する場合に使う
 
   entityname = models.CharField(
@@ -194,9 +195,18 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
   # なぜなら特定の受注者は、複数の発注先を持つ可能性がある。
 
   is_active = models.BooleanField(_('active'), default=False)
-  is_staff = models.BooleanField(_('staff status'), default=False)
-  is_admin = models.BooleanField(default=False)
-  is_company = models.BooleanField(_('company'), default=False)
+  #is_staff = models.BooleanField(_('staff status'), default=False)
+  #is_admin = models.BooleanField(default=False)
+  #is_company = models.BooleanField(_('company'), default=False)
+
+  #
+  is_buyerUser_ApproveAll = models.BooleanField(_('active'), default=False)
+  is_buyerUser_ApproveJoinning = models.BooleanField(_('active'), default=False)
+  is_buyerUser_ApproveQpay = models.BooleanField(_('active'), default=False)
+
+  is_sellerUser_ApproveAll = models.BooleanField(_('active'), default=False)
+  is_sellerUser_ApproveJoinning = models.BooleanField(_('active'), default=False)
+  is_sellerUser_ApproveQpay = models.BooleanField(_('active'), default=False)
 
   date_joined = models.DateTimeField(_('登録日'), default=timezone.now,)
 

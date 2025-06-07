@@ -90,6 +90,72 @@ class MyPasswordChangeForm(PasswordChangeForm):
             field.widget.attrs['class'] = 'form-control'
 
 
+class EntitySelectForm_buyer(forms.Form):
+
+    class Meta:
+      model = LegalEntity
+      fields = ('personname', 'tel', 'entityname', 'postal_code', 'department', 'title')
+      labels = {
+        "personname": "お名前（個人名）",
+        "tel": "電話番号",
+        "entityname": "企業名",
+        "postal_code": "郵便番号",
+        "department": "部署名",
+        "title": "役職",
+    }
+
+    def __init__(self, *args, **kwargs):
+      super().__init__(*args, **kwargs)
+      
+      for field in self.fields.values():
+        field.widget.attrs['class'] = 'form-control'
+
+      self.fields['personname'].widget.attrs['placeholder'] = '記入例：山田 太郎'
+      self.fields['tel'].widget.attrs['placeholder'] = '数字のみ、ご記載ください'
+      self.fields['postal_code'].widget.attrs['placeholder'] = '数字のみ、ご記載ください'
+
+    def clean_personname(self):
+      print(self.cleaned_data['personname'])
+      personname =self.cleaned_data.get('personname')
+      personname 
+      print(f'self.cleaned_data[personname]={personname} (in EntityCreateForm_buyer)')
+
+      return unicodedata.normalize('NFKC', self.cleaned_data['personname'])
+        
+    def clean_entityname(self):
+      entityname = self.cleaned_data.get('entityname')
+      print(f'self.cleaned_data[entityname]={entityname} (in EntityCreateForm_buyer)')
+      if entityname is not None :
+        return unicodedata.normalize('NFKC', entityname)   
+      return entityname
+
+    def clean_department(self):
+      department = self.cleaned_data['department']
+      print(f'self.cleaned_data[department]={department} (clean_department in EntityCreateForm_buyer)')
+      if department is not None:
+         return unicodedata.normalize('NFKC', department)
+      return department
+
+    def clean_title(self):
+      title = self.cleaned_data['title']
+      if title is not None:
+        return unicodedata.normalize('NFKC', title)
+      return title
+
+    def clean_tel(self):
+      tel1 = self.cleaned_data['tel'].translate(tran_zen_han)
+      tel2 = unicodedata.normalize('NFKC', ''.join(re.findall('[0-9０-９]+', tel1)))
+      print(f'tel2:{tel2}（clean_tel. in class EntityCreateform_buyer）')
+      return tel2
+    
+    def clean_postal_code(self):
+      postal_code1 = self.cleaned_data['postal_code'].translate(tran_zen_han)
+      postal_code2 = unicodedata.normalize('NFKC', ''.join(re.findall('[0-9０-９]+', postal_code1)))
+      return postal_code2
+
+tran_zen_han = str.maketrans('―－‐ー₋—⁻０１２３４５６７８９', '-------0123456789')
+
+
 class EntityCreateForm_buyer(forms.ModelForm):
 
     class Meta:
@@ -219,17 +285,20 @@ class EntityCreateForm_seller(forms.ModelForm):
     return postal_code2
 
 
+# 使っていないから削除予定
 class EntityConfirmForm_buyer(forms.Form):
 
   class Meta:
     model = LegalEntity
 
+# 使っていないから削除予定
 class EntityConfirmForm_seller(forms.Form):
 
   class Meta:
     model = LegalEntity
 
 
+## Metaを使う時には、forms.ModelFormを継承するべき 25/06/02
 class AgreementConfirmForm_buyer(forms.Form):
 
   class Meta:

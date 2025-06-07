@@ -22,7 +22,29 @@
       <div class="col-11 col-md-10">
 
       <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 mb-3 text-center" >
-  
+
+        <!-- 25/05/31追加 ゲストへの案内 -->
+        <div class="col mt-3">
+          <div class="card mb-4 rounded-3 shadow">
+            <div class="card-header py-3">
+              <h5 class="my-0 fw-normal">ゲストへの案内</h5>
+            </div>
+
+            <div class="card-body shadow">
+              <p></p>
+              {% bs_icon 'send' color='cornflowerblue' size='2.5em' %}
+              <p></p>
+
+              <h6>ゲストへの各種案内をします</h6>
+
+              <form method="GET" action="{% url 'qpay:txlist_buyer_send' %}">
+                {% csrf_token %}
+                <button type="submit" class="w-100 shadow btn btn-lg btn-outline-primary" name="next" value="approve_qpay">手続きへ</button>
+              </form>
+            </div>
+          </div>
+        </div>
+
         <div class="col mt-3">
           <div class="card mb-4 rounded-3 shadow">
             <div class="card-header py-3">

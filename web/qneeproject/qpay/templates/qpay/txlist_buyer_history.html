@@ -46,8 +46,8 @@
 
                 <tr>
                   <td scope="row" style="text-align:center;">{{ forloop.counter }}</td>
-                  <td>{{ item.seller_entityname }}</td>
-                  <td>{{ item.seller_personname }}</td>
+                  <td>{{ item.sellerEntity_entityname }}</td>
+                  <td>{{ item.sellerUser_personname }}</td>
                   <td>{{ item.requested_amount|intcomma }}</td>
                   <td style="text-align:center"><img src="{{ item.evidence.url }}" class="img-evidence" style="width:50;height:auto"/></td>
                   <td style="text-align:center">{{ item.tx_status_char|linebreaksbr }}</td>

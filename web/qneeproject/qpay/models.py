@@ -16,9 +16,9 @@ def user_directory_path(instance, filename):
   time_stamp = date_time.strftime('%H-%M-%S')  # 時-分-秒のフォーマットを作成
   new_filename = time_stamp + filename  # 実際のファイル名と結合
   user_directory = os.path.join(date_dir, new_filename)  # 階層構造にする
-  #le = LegalEntity.objects.get(pk=instance.seller_entity_id)
-  print(f'instance.seller_entity_id={instance.seller_entity_id} in qpay, models.py, user_directory_path')
-  return "upload/entity{0}_tx{1}/{2}".format(instance.seller_entity_id, instance.id, user_directory)
+  #le = LegalEntity.objects.get(pk=instance.sellerEntity_id)
+  print(f'instance.sellerEntity_id={instance.sellerEntity_id} in qpay, models.py, user_directory_path')
+  return "upload/entity{0}_tx{1}/{2}".format(instance.sellerEntity_id, instance.id, user_directory)
 
 class TxStatus(models.IntegerChoices):
   """ 状態 """
@@ -30,30 +30,30 @@ class TxStatus(models.IntegerChoices):
   
 class QpayTx(models.Model):
 
-  # seller_personnameは、ユーザー名は表示する機会が多い中、seller_userからデータを取り出さなくてすむよう設定
-  seller_user = models.ForeignKey(CustomUser, verbose_name='ゲスト・ユーザー', null=True, related_name='tx_sellerUser', on_delete=models.CASCADE)
-  # seller_user_id = models.IntegerField('ゲストID', null=False, blank=False, )
-  seller_user_email = models.EmailField('ゲスト・メールアドレス', unique=False, null=True, blank=False,)
-  seller_user_personname =models.CharField('ゲスト・ユーザー名', max_length=150, unique=False, null=True,)
+  # sellerUser_personnameは、ユーザー名は表示する機会が多い中、sellerUserからデータを取り出さなくてすむよう設定
+  sellerUser = models.ForeignKey(CustomUser, verbose_name='ゲスト・ユーザー', null=True, related_name='sellerUser_txs', on_delete=models.CASCADE)
+  # sellerUser_id = models.IntegerField('ゲストID', null=False, blank=False, )
+  sellerUser_email = models.EmailField('ゲスト・メールアドレス', unique=False, null=True, blank=False,)
+  sellerUser_personname =models.CharField('ゲスト・ユーザー名', max_length=150, unique=False, null=True,)
 
-  seller_entity = models.ForeignKey(LegalEntity, verbose_name='ゲスト・エンティティ', null=True, related_name='tx_sellerEntity', on_delete=models.CASCADE)
-  # seller_entity_id = models.IntegerField('ゲスト・エンティティID', null=False, blank=False, )
-  seller_entityname = models.CharField('ゲスト・エンティティ名', max_length=150, unique=False, null=True, blank=True)
+  sellerEntity = models.ForeignKey(LegalEntity, verbose_name='ゲスト・エンティティ', null=True, related_name='sellerEntity_txs', on_delete=models.CASCADE)
+  # sellerEntity_id = models.IntegerField('ゲスト・エンティティID', null=False, blank=False, )
+  sellerEntity_entityname = models.CharField('ゲスト・エンティティ名', max_length=150, unique=False, null=True, blank=True)
  
   # TxCreateFormで選択された後に入力される 
-  buyer_user = models.ForeignKey(CustomUser, verbose_name='パートナー・ユーザー', null=True, related_name='tx_buyerUser', on_delete=models.CASCADE)
+  buyerUser = models.ForeignKey(CustomUser, verbose_name='パートナー・ユーザー', null=True, related_name='buyerUser_txs', on_delete=models.CASCADE)
 
   ## 24/07/16
   ## 発注者のemail,personnameを固定しないように要修正か
   ## 処理しているユーザー及びそのアドレスを取得するためのメソッドを追加した方が
-  buyer_email = models.EmailField('パートナー・メールアドレス', unique=False, blank=False, null=True)
-  buyer_personname =models.CharField('パートナー・ユーザー名', max_length=150, unique=False, null=True,)
+  buyerUser_email = models.EmailField('パートナー・メールアドレス', unique=False, blank=False, null=True)
+  buyerUser_personname =models.CharField('パートナー・ユーザー名', max_length=150, unique=False, null=True,)
 
-  buyer_entity = models.ForeignKey(LegalEntity, verbose_name='パートナー・エンティティ', default="", null=True, related_name='buyer_tx', on_delete=models.CASCADE)
+  buyerEntity = models.ForeignKey(LegalEntity, verbose_name='パートナー・エンティティ', default="", null=True, related_name='buyerEntity_txs', on_delete=models.CASCADE)
   # !! 初期値は「""」とし、値がセットされているかを判定できるようにする.
-  buyer_entityname = models.CharField('パートナー・エンティティ名', max_length=150, unique=False, default="", null=True, blank=True)
+  buyerEntity_entityname = models.CharField('パートナー・エンティティ名', max_length=150, unique=False, default="", null=True, blank=True)
   #buyer_entity_choice = models.IntegerField(_('パートナー・エンティティ（選択リスト）'), choices=[(idx, f) for idx, f in enumerate(LegalEntity.objects.filter(type1=1).values_list('entityname', flat=True), 1)], default=1)
-  buyer_entity_choice = models.IntegerField(_('お支払者'), default=1)
+  buyerEntity_choice = models.IntegerField(_('お支払者'), default=1)
 
   requested_at = models.DateTimeField(_('ご申請時点'), default=None, null=True)
   requested_amount = models.IntegerField(_('ご申請金額（円）'), default=None, null=True)
@@ -106,4 +106,4 @@ class QpayTx(models.Model):
     # この段階ではインスタンスIDが存在するので、user_directory_path関数でinstance.idが使える
 
   def __str__(self):
-    return f'{self.buyer_entity}-{self.seller_entity}'
+    return f'{self.buyer_entity}-{self.sellerEntity}'
