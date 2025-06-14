@@ -60,6 +60,7 @@ class TxCreateView(generic.CreateView):
       'form': form,
       'flag_step': 1,
       'temporal_buyerEntityname': "",
+      # コメント(25/06/08)：Selectボックスで未選択であることを示す。選択後はページ移動でデータ保持するために使う
       'buyerEntityname_dict': buyerEntityname_dict,
     }
 

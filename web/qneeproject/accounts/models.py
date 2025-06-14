@@ -35,6 +35,7 @@ class BankAccount(models.Model):
   temporal_tx_id = models.IntegerField(_('取引ID'), default=0, null=True, blank=True)
   # 取引口座を設定していない取引がある場合に使う一時的な要素（ユーザーには見せない）
 
+
 class LegalEntity(models.Model):
 
   choices1 = ((1, 'パートナー'), (2, 'ゲスト'))
@@ -43,38 +44,43 @@ class LegalEntity(models.Model):
   choices2 = ((1, '個人（法人組織でない）'), (2, '法人'))
   type2 = models.IntegerField(default=1, null=True, blank=True, choices=choices2)
 
-  ################################
-  ##  個人も企業も入力必要な項目  ##
-  ################################
-  personname_validator = UnicodeUsernameValidator()
-  personname = models.CharField(
-    '個人名', # 25/01/04 FirstNameとLastNameに分けるかは課題
+  name_validator = UnicodeUsernameValidator()
+  representitive = models.CharField(
+    '代表者名',
     max_length=150,
     unique=False,
     default="",
     null=True,
-    validators=[personname_validator],
-    error_messages={'unique': _("A user with that username already exists")},
+    validators=[name_validator],
+    # error_messages={'unique': _("ご記載の名前は既に使われています")},
   )
-  email = models.EmailField('メールアドレス', unique=True, blank=False, null=True)
-  #★★★ 25/05/31 ユーザーを複数にした場合は変更が必要
-  
-  tel_regex = RegexValidator(regex=r'^[0-9０-９ー―－‐₋⁻-]+$', message = ("ハイフン「-」なしで数字のみご入力下さい（最大15桁）　例：09012345678."))
-  tel = models.CharField(_('電話番号'), max_length=30, default="", null=False, validators=[tel_regex])
-  #「 \d → 任意の数字	[0-9]」 「 ^ → 文字列の先頭」、「 $ → 文字列の末尾」
 
-  #取引主体が個人の場合に住所を入れるか検討（選択肢は①入力しない、②郵便番号まで、③全部入力）
+  ################################
+  ##  個人も企業も入力必要な項目  ##
+  ################################
+
+  ## ★★★ 影響の範囲を確認して削除する 25/06/11
+  #personname = models.CharField(
+  #  '個人名', # 25/01/04 FirstNameとLastNameに分けるかは課題
+  #  max_length=150,
+  #  unique=False,
+  #  default="",
+  #  null=True,
+  #  validators=[name_validator],
+  #  # error_messages={'unique': _("ご記載の名前は既に存在します。")},
+  #)
+
+  tel_regex = RegexValidator(regex=r'^[0-9０-９ー―－‐₋⁻-]+$', message = ("ハイフン「-」なしで数字のみご入力下さい（最大15桁）　例：09012345678."))
+  tel_main = models.CharField(_('電話番号'), max_length=30, default="", null=False, validators=[tel_regex])
+
   postal_code_regex = RegexValidator(regex=r'^[0-9]+$', message = ("Postal Code must be entered in the format: '1234567'. Up to 7 digits allowed."))
+  #「 \d → 任意の数字	[0-9]」 「 ^ → 文字列の先頭」、「 $ → 文字列の末尾」
+  #取引主体が個人の場合に住所を入れるか検討（選択肢は①入力しない、②郵便番号まで、③全部入力）
+
   postal_code = models.CharField(_('郵便番号'), validators=[postal_code_regex], max_length=7)  
 
-  #######################################
-  ##  取引主体が法人の場合に入力する項目 **
-  #######################################
-  department = models.CharField(_('部署名'), max_length=150, default="", blank=True, null=True)  # CustomUserが企業の担当のとき
-  title = models.CharField(_('役職名'), max_length=150, default="", blank=True, null=True)            # CustomUserが企業の担当のとき
 
   #企業の場合の入力値、個人の場合はpersonnameが入る
-  entityname_validator = UnicodeUsernameValidator()
   entityname = models.CharField(
     '取引主体名',
     max_length=150,
@@ -82,8 +88,8 @@ class LegalEntity(models.Model):
     default="",
     null=True,
     blank=True,
-    validators=[entityname_validator],)
-    #error_messages={'unique':_("ご入力の取引者は既に存在します。次のリストからお選び下さい。")},)
+    validators=[name_validator],)
+    #error_messages={'unique':_("ご入力の名前は既に存在します。次のリストからお選び下さい。")},)
 
   #企業の場合、住所は全部入力する
   postal_code_regex = RegexValidator(regex=r'^[0-9]+$', message = _("Postal Code must be entered in the format: '1234567'. Up to 7 digits allowed."))
@@ -179,9 +185,15 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
   choice2 = ((1, '個人（法人組織でない）'), (2, '法人'))
   type2 = models.IntegerField('属性2', null=True, blank=True, choices=choice2)
 
-  entity = models.ForeignKey(LegalEntity, verbose_name='取引主体', null=True, related_name='entity_users', on_delete=models.CASCADE)
-  # related_nameは、参照しているentity（親モデル）を参照するuser（子モデル）を抽出する場合に使う
+  entities = models.ManyToManyField(
+    LegalEntity,
+    verbose_name='取引主体',
+    through="UserEntityRelation",
+    null=True)
+  # LegalEntityからは、CustomUser_setで参照（又はrelated_nameで定義）
+  # user.entities.add(x(,y))で追加,user.entities.remove(x)で削除、user.entityes.all()で全部取得
 
+  # ★★★  CustomUserが複数のEntityと関係を持つのにあたり削除
   entityname = models.CharField(
     '取引主体',
     max_length=150,
@@ -189,24 +201,21 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     null=True,
     blank=True,
   )
-  # buyer_entity = models.ForeignKey(LegalEntity, verbose_name='発注者', null=True, related_name='user_buyerentity', on_delete=models.CASCADE)
-  #（CustomUserが受注者の場合に）発注者を保存。受注者への案内時に発注者の情報を持たせるようにする
-  # 発注者の情報は、①QRコードに発注者の情報を持たせる、②前払い申請の時に選択するようにした方がよいか、
-  # なぜなら特定の受注者は、複数の発注先を持つ可能性がある。
 
-  is_active = models.BooleanField(_('active'), default=False)
+  is_active = models.BooleanField(_('アクティブ'), default=False)   # 仮登録し、受領メール内のリンクでアクセス後
+  is_active2 = models.BooleanField(_('アクティブ'), default=False)  # Entity登録後
+
   #is_staff = models.BooleanField(_('staff status'), default=False)
   #is_admin = models.BooleanField(default=False)
-  #is_company = models.BooleanField(_('company'), default=False)
 
-  #
-  is_buyerUser_ApproveAll = models.BooleanField(_('active'), default=False)
-  is_buyerUser_ApproveJoinning = models.BooleanField(_('active'), default=False)
-  is_buyerUser_ApproveQpay = models.BooleanField(_('active'), default=False)
 
-  is_sellerUser_ApproveAll = models.BooleanField(_('active'), default=False)
-  is_sellerUser_ApproveJoinning = models.BooleanField(_('active'), default=False)
-  is_sellerUser_ApproveQpay = models.BooleanField(_('active'), default=False)
+  is_buyerUser_ApproveAll = models.BooleanField(_('承認（全部）'), default=False)
+  is_buyerUser_ApproveJoinning = models.BooleanField(_('承認（参加）'), default=False)
+  is_buyerUser_ApproveQpay = models.BooleanField(_('承認（Qpay）'), default=False)
+
+  is_sellerUser_ApproveAll = models.BooleanField(_('承認（全部）'), default=False)
+  is_sellerUser_ApproveJoinning = models.BooleanField(_('承認（参加）'), default=False)
+  is_sellerUser_ApproveQpay = models.BooleanField(_('承認（Qpay）'), default=False)
 
   date_joined = models.DateTimeField(_('登録日'), default=timezone.now,)
 
@@ -233,3 +242,43 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
   def __str__(self):
     return f'{self.email}'
+  
+
+""" CustomUserとLegalentityの中間テーブル 25/06/08に追加 """
+
+""" CustomUserのManyToManyFieldのthrough引数で指定することで、
+ORMで自動生成される中間テーブルの代わりに利用することができる。
+情報を追加することができる（email、tel）。 """
+
+class UserEntityRelation(models.Model):
+
+  user = models.ForeignKey("CustonUser", on_delete=models.CASCADE)  
+  personname = models.CharField(
+    'お名前（個人）',
+    blank=False,
+    max_length=150,
+    unique=False,
+    null=True,
+  )
+
+  entity = models.ForeignKey("LegalEntity", on_delete=models.CASCADE)
+  #entityname = models.CharField(
+  #  '取引主体名',
+  #  max_length=150,
+  #  unique=False,
+  #  default="",
+  #  null=True,
+  #  blank=True,
+  #)
+
+  email = models.EmailField('メールアドレス', unique=True, blank=False, null=True)
+  
+  tel_regex = RegexValidator(regex=r'^[0-9０-９ー―－‐₋⁻-]+$', message = ("ハイフン「-」なしで数字のみご入力下さい（最大15桁）　例：09012345678."))
+  tel_direct = models.CharField(_('電話番号'), max_length=30, default="", null=False, validators=[tel_regex])
+  #「 \d → 任意の数字	[0-9]」 「 ^ → 文字列の先頭」、「 $ → 文字列の末尾」
+
+  #######################################
+  ##  取引主体が法人の場合に入力する項目 **
+  #######################################
+  department = models.CharField(_('部署名'), max_length=150, default="", blank=True, null=True)   # Entityが法人の場合
+  title = models.CharField(_('役職名'), max_length=150, default="", blank=True, null=True)        # Entityが法人の場合

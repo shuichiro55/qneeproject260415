@@ -36,6 +36,7 @@ urlpatterns = [
   path('user_create2_admin', views.UserCreateView2_admin.as_view(), name='user_create2_admin'),
 
   path('entity_set_buyer/<token>/', views.EntitySetView_buyer.as_view(), name='entity_set_buyer'),
+  path('<int:user_id>/entity_set_buyer/', views.EntitySetView_buyer.as_view(), name='entity_set_buyer'),
 
   path('entity_create_buyer/<token>/', views.EntityCreateView_buyer.as_view(), name='entity_create_buyer'),
   path('entity_create_seller/<token>/', views.EntityCreateView_seller.as_view(), name='entity_create_seller'),   

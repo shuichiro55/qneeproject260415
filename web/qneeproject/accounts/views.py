@@ -13,7 +13,7 @@ from django.conf import settings
 from django.views import generic
 from .form import \
   MyLoginForm, UserCreateForm, \
-  EntitySelectForm_buyer, EntityCreateForm_buyer, EntityCreateForm_seller, \
+  EntitySetForm_buyer, EntityCreateForm_buyer, EntityCreateForm_seller, \
   MyPageForm_buyer, MyPageForm_seller, \
   ContactForm, BankAccountForm, InfoEditForm_seller, \
   AgreementConfirmForm_buyer, AgreementConfirmForm_seller, \
@@ -515,18 +515,17 @@ class UserCreateView2_admin(generic.TemplateView):
 
 class EntitySetView_buyer(generic.TemplateView):
 
-  # model = LegalEntity
-  # form_class = EntitySelectForm_buyer
+  model = UserEntityRelation
+  form_class = EntitySetForm_buyer
   template_name = 'accounts/entity_set_buyer.html'
-
   timeout_seconds = getattr(settings,  'ACTIVATION_TIMEOUT_SECONDS', 60*60*24)
 
   """（ビューにおいて）GETリクエストを受け取ったときに呼び出される（実践Django P121）"""
   """ 処理：ゲストに送られたメールのURLをクリックされた時点で呼ばれる """
   def get(self, request, **kwargs):  #selfはメソッドを呼んだインスタンス自体
   
-    ### 開発時だけのコード（時間制限なくレイアウトを整えられるように）24/01/02
     try:
+      ### 開発時だけのコード（時間制限なくレイアウトを整えられるように）25/06/08
       user = usermodel.objects.get(pk=self.kwargs['user_id'])
     except:
 
@@ -554,108 +553,113 @@ class EntitySetView_buyer(generic.TemplateView):
       user.is_active = True
       user.save()
 
+    ###  ここからしたが工事中（25/06/08） ###
+
+    buyerEntityname_dict =dict((str(idx), f) for idx, f in enumerate(LegalEntity.objects.filter(type1=1).values_list('entityname', flat=True), 1))
+    print(f'buyerEntityname_dict={buyerEntityname_dict} def get in EntitySetView_buyer')
+
+    init_dict = {
+      'personname': "",
+      'email': user.email,
+      'tel': "",
+    }
+
+    form = self.form_class(initial=init_dict)
     context = {
-      'user': user,
-      'form': self.form_class,
+      'form': form,
+      'temporal_buyerEntityname': "",
+      # コメント(25/06/08)：Selectボックスで未選択であることを示す。選択後はページ移動でデータ保持するために使う
+      'buyerEntityname_dict': buyerEntityname_dict,
     }
 
     print(f'ここ来てる1 request.user={request.user} email={user.email} type2={user.type2}（get in class EntitySetView_buyer）')
         
-    return TemplateResponse(request, 'accounts/entity_set_buyer.html', context)  #ここでgetとするのは、おそらく親クラスでtemplate_nameを表示するように規定されている
+    return TemplateResponse(request, 'accounts/entity_set_buyer.html', context)
 
 
   def post(self, request, *args, **kwargs):
-     
+
+    user = usermodel.objects.get(email=self.request.user) 
+
     form = self.form_class(request.POST)
-    next = self.request.POST.get('next', '') 
+    next = self.request.POST.get('next', '')
 
-    if next == 'ToConfirm':  
-    
-      try:
-        user = usermodel.objects.get(pk=self.kwargs['user_id'])
-      except:
+    if form.is_valid():
+    # 「.is_valid()」の後、フォームでのclean、clean_<field>が実行され、
+    # form.cleaned_data[]にデータが入る
 
-        try:
-          timeout_seconds = getattr(settings,  'ACTIVATION_TIMEOUT_SECONDS', 60*60*24)
-          token = kwargs.get('token')  #kwargsはdict型
+      if next == 'ToEntityCreate': # 新規のパートナー登録へ
 
-          user_pk = loads(token, max_age=timeout_seconds)
-          user = usermodel.objects.get(pk=user_pk)
-
-          print(f'token = {token} in def post of EntitySetView_buyer')
-          print(f'user_pk = {user_pk} in def post of EntitySetView_buyer')
-    
-        # 期限切れ
-        except SignatureExpired:
-          # この段階でCustomUserインスタンスが生成されている。
-          # 同じメールアドレスで登録できるように、オブジェクトを削除する。
-          return HttpResponseBadRequest()
-
-        # tokenが間違っている
-        except BadSignature:
-          return HttpResponseBadRequest()
-
-        except usermodel.DoesNotExist:
-          return HttpResponseBadRequest()
-
-
-      if form.is_valid():
-      # 「.is_valid()」の後、フォームでのclean、clean_<field>が実行され、
-      # form.cleaned_data[]にデータが入る
+        # ★★★ Entityでは郵便番号、住所、代表者を登録するようにする 25/06/08 23:46
+        # ★★★ ここで
 
         context = {
-          'form': form,
           'user': user,
+          'form': EntityCreateForm_buyer,
+        }
+        return render(self.request, 'accounts/entity_create_buyer.html', context)
+
+      if next == 'ToConfirm':  # 登録済みパートナーにユーザー追加
+
+        tmp_entityname = self.request.POST.get('buyerSelect', "")
+        entity = LegalEntity.objects.get(entityname=tmp_entityname)
+        print(f'tmp_entityname={tmp_entityname} (def post of EntitySetView_buyer)')
+        user.personname = form.personname
+        user.save()
+
+        UserEntityRelation = form.save(commit=False)
+        UserEntityRelation.user = user
+        UserEntityRelation.entity = entity 
+        UserEntityRelation.save()
+
+        if not user.is_active:
+          user.is_active = True
+          user.save()
+
+        context = {
+          'user': user,
+          'entity': entity,
         }
         return render(self.request, 'accounts/entity_confirm_buyer.html', context)
 
-      else: #バリデーションエラーの時に通る
-        print(f'ここ来てる3（def post after if not form.is_valid in class EntityCreateView_buyer）')
-        return TemplateResponse(self.request, 'accounts/entity_create_buyer.html', {'form':form, 'user_id':user.id, 'user':user},)
-    
-    else: # next == "ToComfirm"ではない場合
 
-      user = usermodel.objects.get(pk=self.kwargs['user_id'])
-      form = self.form_class(request.POST)
-
-      if next == 'back':
-        print(f'ここ来てる4（def post after 「try-except:」 in class EntityCreateView_buyer）')
-        return render(self.request, 'accounts/entity_create_buyer.html', {'form':form, 'user':user})
+    if next == 'back':
+      print(f'ここ来てる4（def post after 「try-except:」 in class EntityCreateView_buyer）')
+      return render(self.request, 'accounts/entity_create_buyer.html', {'form':form, 'user':user})
         
-      if next == 'create': # 確認した内容をデータベースに登録
+    if next == 'create': # 確認した内容をデータベースに登録
 
-        entity = form.save(commit=False)
-        entity.type1 = user.type1  # CustomUserとLegalEntityでいずれもtype1（発注者 or 受注者）、type2（個人 or 法人）を管理
-        entity.type2 = user.type2  # CustomUserとLegalEntityでいずれもtype1（発注者 or 受注者）、type2（個人 or 法人）を管理
-        entity.email = user.email
+      entity = form.save(commit=False)
+      entity.type1 = user.type1  # CustomUserとLegalEntityでいずれもtype1（発注者 or 受注者）、type2（個人 or 法人）を管理
+      entity.type2 = user.type2  # CustomUserとLegalEntityでいずれもtype1（発注者 or 受注者）、type2（個人 or 法人）を管理
+      entity.email = user.email
 
-        count = LegalEntity.objects.filter(email=user.email).count()
-        if count >= 1:
-          messages.add_message(request, messages.INFO, '既に同じメールアドレスでの登録があります。')
+      count = LegalEntity.objects.filter(email=user.email).count()
+      if count >= 1:
+        messages.add_message(request, messages.INFO, '既に同じメールアドレスでの登録があります。')
 
-        print(f'entity.id = {entity.id}（post ==create after form.is_valid in class EntityCreateView_buyer）')
+      print(f'entity.id = {entity.id}（post ==create after form.is_valid in class EntityCreateView_buyer）')
         
-        # 個人（type2==1）の場合、entitynameに直接入力しない為、personnameを代入
-        if user.type2 == 1: entity.entityname = entity.personname
+      # 個人（type2==1）の場合、entitynameに直接入力しない為、personnameを代入
+      if user.type2 == 1: entity.entityname = entity.personname
 
-        entity.save()
+      entity.save()
 
-        user.personname = entity.personname
-        user.entityname = entity.entityname
-        user.entity = entity
+      user.personname = entity.personname
+      user.entityname = entity.entityname
+      user.entity = entity
 
-        user.save()
-
+      user.save()
         
-        print(f'self.request.POST.get={next}')
-        print(f'user.entityname={user.entityname}')
-        print(f'request.user.get_username={request.user.get_username} type2={user.type2}（def post ==confirm after form.is_valid in class EntityCreateView_buyer）')
+      print(f'self.request.POST.get={next}')
+      print(f'user.entityname={user.entityname}')
+      print(f'request.user.get_username={request.user.get_username} type2={user.type2}（def post ==confirm after form.is_valid in class EntityCreateView_buyer）')
 
-        return render(self.request, 'accounts/agreement_confirm_buyer.html', {'user':user, 'entity':entity})
-        # return HttpResponseRedirect(reverse('accounts:login_buyer'))
+      return render(self.request, 'accounts/agreement_confirm_buyer.html', {'user':user, 'entity':entity})
+      # return HttpResponseRedirect(reverse('accounts:login_buyer'))
         
-      print(form.errors)
-      print(f'ここまで来てる6 例外（post in class EntityCreateView_buyer）')
+    print(form.errors)
+    print(f'ここまで来てる6 例外（post in class EntityCreateView_buyer）')
 
   def form_valid(self, form):
     return super().form_valid(form)
@@ -676,22 +680,24 @@ class EntityCreateView_buyer(generic.CreateView):
 
   timeout_seconds = getattr(settings,  'ACTIVATION_TIMEOUT_SECONDS', 60*60*24)
 
-  #（ビューにおいて）GETリクエストを受け取ったときに呼び出される（実践Django P121）
-  # 具体的には、受注者に送られたメールのURLをクリックされた時点で呼ばれる
+
+  """（ビューにおいて）GETリクエストを受け取ったときに呼び出される（実践Django P121）"""
+  """ 処理：ゲストに送られたメールのURLをクリックされた時点で呼ばれる """
+
   def get(self, request, **kwargs):  #selfはメソッドを呼んだインスタンス自体
   
-    ### 開発時だけのコード（時間制限なくレイアウトを整えられるように）24/01/02
     try:
+      ### 開発時だけのコード（時間制限なくレイアウトを整えられるように）25/06/08
       user = usermodel.objects.get(pk=self.kwargs['user_id'])
     except:
 
       try:
+
         # URLから<token>（暗号化されたuser_id）を取り出す（kwargsはdict型）
         token = kwargs.get('token')
         user_pk = loads(token, max_age=self.timeout_seconds)
         user = usermodel.objects.get(pk=user_pk)
-        print(f'token = {token} in def get of EntityCreateView_buyer')
-        print(f'user_pk = {user_pk} in def get of EntityCreateView_buyer')
+        print(f'token = {token}, user_pk = {user_pk} in def get of EntitySetView_buyer')
 
       except usermodel.DoesNotExist:
         return HttpResponseBadRequest()
@@ -705,63 +711,111 @@ class EntityCreateView_buyer(generic.CreateView):
       # tokenが間違っている
       except BadSignature:
         return HttpResponseBadRequest()
-            
+    
+    # メールを受領し、リンクからアクセスできたタイミングでアクティブ化
     if not user.is_active:
       user.is_active = True
       user.save()
 
-    context = {
-      'user': user,
-      'form': self.form_class,
+    ### ここからしたが工事中（25/06/08） ###
+    ### buyerEntityname_dictのデータをselectに格納するようにする 
+
+    buyerEntityname_dict = dict((str(idx), f) for idx, f in enumerate(LegalEntity.objects.filter(type1=1).values_list('entityname', flat=True), 1))
+    print(f'buyerEntityname_dict={buyerEntityname_dict} def get in EntitySetView_buyer')
+
+    init_dict = {
+      'personname': "",
+      'email': user.email,
+      'tel': "",
     }
 
-    print(f'ここ来てる1 email={user.email} type2={user.type2}（get in class EntityCreateView_buyer）')
+    context = {
+      'flag_step': 1,
+      'form': EntitySetForm_buyer(initial=init_dict),
+      'temporal_buyerEntityname': "",
+      # コメント(25/06/08)：Selectボックスで未選択であることを示す。選択後はページ移動でデータ保持するために使う
+      'buyerEntityname_dict': buyerEntityname_dict,
+    }
 
-    # この下の２行はいらないでしょ 24/06/01
-    # context = super().get_context_data(**kwargs)
-    # context['user'] = user
-
-    print(f'ここ来てる2 email={user.email} type2={user.type2}（get in class EntityCreateView_buyer）')
-    print(f'ここ来てる2 request.user={request.user} type2={user.type2}（get in class EntityCreateView_buyer）')
+    print(f'ここ来てる1 request.user={request.user} email={user.email} type2={user.type2}（get in class EntitySetView_buyer）')
         
-    return TemplateResponse(request, 'accounts/entity_create_buyer.html', context)  #ここでgetとするのは、おそらく親クラスでtemplate_nameを表示するように規定されている
+    return TemplateResponse(request, 'accounts/entity_set_buyer.html', context)
 
 
   def post(self, request, *args, **kwargs):
-     
-    form = self.form_class(request.POST)
-    next = self.request.POST.get('next', '') 
 
-    if next == 'ToConfirm':  
+    user = usermodel.objects.get(email=self.request.user) 
+    next = self.request.POST.get('next', '')
+
+    if next == 'ToEntityCreate': # 新規のパートナー登録へ
+
+      # ★★★ Entityでは郵便番号、住所、代表者を登録するようにする 25/06/08 23:46
+
+      context = {
+        'user': user,
+        'form': EntityCreateForm_buyer,
+        }
+      return render(self.request, 'accounts/entity_create_buyer.html', context)
+
+
+    if next == 'ToConfirm1':  # 登録済みパートナーにユーザー追加
+
+      form = EntitySetForm_buyer(request.POST)
+
+      temporal_buyerEntityname = self.request.POST.get('buyerSelect', "")
+      entity = LegalEntity.objects.get(entityname=temporal_buyerEntityname)
+ 
+      print(f'temporal_buyerEntityname={temporal_buyerEntityname} form.personname={form.personname} (def post of EntityCreateView_buyer)')
+
+      context = {
+        'flag_step': 2,
+        'form': form,     # personname, email, telの値が入っている
+        'entity': entity,
+        'temporal_buyerEntityname': temporal_buyerEntityname,
+      }
+      return render(self.request, 'accounts/entity_create_buyer.html', context)
+
+
+    if next == 'save1':
+
+      form = EntitySetForm_buyer(request.POST)
+      temporal_buyerEntityname = self.request.POST.get('temporal_buyerEntityname', "")
+
+      user.personname = form.personname
+      user.save()
+
+      UserEntityRelation = form.save(commit=False)
+      UserEntityRelation.user = user
+      UserEntityRelation.entity = entity
+      UserEntityRelation.entityname = temporal_buyerEntityname
+      UserEntityRelation.save()
+
+      # 確認が終わった後にフラグを変える（場所を移す）
+      if not user.is_active2:
+        user.is_active2 = True
+        user.save()
+
+      return render(self.request, 'accounts/mypage_buyer.html')
+
+
+    # データ確認画面から入力画面に戻る時の処理 2025/02/14
+    if next == 'BackToInput':
+
+      buyerEntityname_dict = dict((str(idx), f) for idx, f in enumerate(LegalEntity.objects.filter(type1=1).values_list('entityname', flat=True), 1))
+      print(f'buyerEntityname_dict={buyerEntityname_dict} def get in EntitySetView_buyer')
+
+      context = {
+        'flag_step': 1,
+        'form': self.form_class(request.POST),
+        'temporal_buyerEntityname': self.request.POST['temporal_buerEntityname'],
+        # コメント(25/06/08)：Selectボックスで未選択であることを示す。選択後はページ移動でデータ保持するために使う
+        'buyerEntityname_dict': buyerEntityname_dict,
+      }
+      return TemplateResponse(request, 'accounts/entity_set_buyer.html', context)
+
+
+    if next == 'ToConfirm2':  
     
-      try:
-        user = usermodel.objects.get(pk=self.kwargs['user_id'])
-      except:
-
-        try:
-          timeout_seconds = getattr(settings,  'ACTIVATION_TIMEOUT_SECONDS', 60*60*24)
-          token = kwargs.get('token')  #kwargsはdict型
-
-          user_pk = loads(token, max_age=timeout_seconds)
-          user = usermodel.objects.get(pk=user_pk)
-
-          print(f'token = {token} in def post of EntityCreateView_buyer')
-          print(f'user_pk = {user_pk} in def post of EntityCreateView_buyer')
-    
-        # 期限切れ
-        except SignatureExpired:
-          # この段階でCustomUserインスタンスが生成されている。
-          # 同じメールアドレスで登録できるように、オブジェクトを削除する。
-          return HttpResponseBadRequest()
-
-        # tokenが間違っている
-        except BadSignature:
-          return HttpResponseBadRequest()
-
-        except usermodel.DoesNotExist:
-          return HttpResponseBadRequest()
-
-
       if form.is_valid():
       # 「.is_valid()」の後、フォームでのclean、clean_<field>が実行され、
       # form.cleaned_data[]にデータが入る
@@ -776,16 +830,15 @@ class EntityCreateView_buyer(generic.CreateView):
         print(f'ここ来てる3（def post after if not form.is_valid in class EntityCreateView_buyer）')
         return TemplateResponse(self.request, 'accounts/entity_create_buyer.html', {'form':form, 'user_id':user.id, 'user':user},)
     
-    else: # next == "ToComfirm"ではない場合
+    else: # next != "ToConfirm"の場合（confirm画面からの処理を想定）
 
-      user = usermodel.objects.get(pk=self.kwargs['user_id'])
       form = self.form_class(request.POST)
 
       if next == 'back':
         print(f'ここ来てる4（def post after 「try-except:」 in class EntityCreateView_buyer）')
         return render(self.request, 'accounts/entity_create_buyer.html', {'form':form, 'user':user})
         
-      if next == 'create': # 確認した内容をデータベースに登録
+      if next == 'save': # 確認した内容をデータベースに登録
 
         entity = form.save(commit=False)
         entity.type1 = user.type1  # CustomUserとLegalEntityでいずれもtype1（発注者 or 受注者）、type2（個人 or 法人）を管理
