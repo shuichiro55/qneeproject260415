@@ -4,14 +4,17 @@ from .models import LegalEntity
 from .models import BankAccount
 
 class CustomerUserAdmin(admin.ModelAdmin):
-  list_display = ('username', 'type1', 'type2', 'personname', 'entityname')
+  list_display = ('personname', 'type1', 'type2',)
 
 
 class LegalEntityAdmin(admin.ModelAdmin):
-  list_display = ('entityname', 'type1', 'personname', 'tel', 'email')
+  list_display = ('type1', 'type2', 'entityname', 'representitive', )
+
+class UserEntityRelationAdmin(admin.ModelAdmin):
+  list_display = ('personname', 'entityname', 'email')
 
 class BankAccountAdmin(admin.ModelAdmin):
-  list_display = ('entity_id', 'holdername', 'bank_name', 'branch_name')
+  list_display = ('entity_id', 'holdername', 'BankName', 'BranchName')
 
 admin.site.register(CustomUser, CustomerUserAdmin)
 admin.site.register(LegalEntity, LegalEntityAdmin)

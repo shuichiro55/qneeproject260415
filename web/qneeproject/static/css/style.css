@@ -1560,7 +1560,7 @@ ul.pattern .color6 {
 }
 
 .authentication-bg {
-  background-image: url("../images/bg-auth.png");
+  /* background-image: url("../images/bg-auth.png"); */
   background-color: rgba(63, 142, 252, 0.12);
   background-size: cover;
   background-repeat: no-repeat;

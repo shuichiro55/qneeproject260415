@@ -11,11 +11,12 @@
     <nav aria-label="breadcrumb" role="navigation">
       <ol class="breadcrumb text-dark rounded-2">
         <li class="breadcrumb-item text-primary"><a href="{% url 'accounts:mypage_seller' %}">マイページ・ホーム</a></li>
-        <li class="breadcrumb-item text-primary"><a href="{% url 'accounts:info_edit_seller' %}">設定メニュー</a></li>
+        <li class="breadcrumb-item text-primary"><a href="{% url 'accounts:infoEdit_seller' %}">設定メニュー</a></li>
         <li class="breadcrumb-item active" aria-current="page">受取口座設定</li>
       </ol>
     </nav>
 
+    <!-- ★★★  250730 複数のエンティティと関連する場合は、複数エンティティの情報を表示するようにする -->
     <div class="d-flex justify-content-center mt-4">
       <h5>{% bs_icon 'bank' size='1.4em' %} 　登録されている口座</h5>
       <!-- <a href="{% url 'accounts:mypage_seller' %}" class="btn btn-outline-secondary" >メイン・メニューへ</a> -->
@@ -38,11 +39,11 @@
           <tbody class="text-center">
             <tr>
               <td width="30%">金融機関</td>
-              <td >{{ form.bank_name.value|default:"" }}（{{ form.bank_code.value|default:"" }}）</td>
+              <td >{{ form.BankName.value|default:"" }}（{{ form.BankCode.value|default:"" }}）</td>
             </tr>
             <tr>
               <td width="30%">支店</td>
-              <td>{{ form.branch_name.value|default:"" }}（{{ form.branch_code.value|default:"" }}）</td>
+              <td>{{ form.BranchName.value|default:"" }}（{{ form.BranchCode.value|default:"" }}）</td>
             </tr>
           </tr>
           <tr>
@@ -65,7 +66,7 @@
     </div>
 
     {{ form.temporal_tx_id.as_hidden }}
-    {{ form.entity_id.as_hidden }}
+    <!-- {{ form.entity_id.as_hidden }} -->
 
       </form>
 

@@ -17,17 +17,17 @@ class TxCreateForm(forms.ModelForm):
     model = QpayTx
     fields = (
       'id',
-      'buyerEntity_entityname',
+      'buyEntityname',
       'requested_amount',
       'original_payment_date',
-      'sellerUser_email',
-      'sellerUser_personname',
-      'sellerEntity_entityname'
+      'sellUser_email',
+      'sellUser_personname',
+      'sellEntityname'
     )
 #    widgets = {
 #      'original_payment_date': forms.SelectDateWidget
 #    }
-#    widgets= {'sellerUser_personname':forms.HiddenInput(), 'sellerEntity_entityname':forms.HiddenInput()}
+#    widgets= {'sellUser_personname':forms.HiddenInput(), 'sellEntityname':forms.HiddenInput()}
     
   def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -63,7 +63,7 @@ class TxEvidenceForm(forms.ModelForm):
       'id',
       'evidence',
     )
-    #widgets= {'sellerUser_personname':forms.HiddenInput(), 'sellerEntity_entityname':forms.HiddenInput()}
+    #widgets= {'sellUser_personname':forms.HiddenInput(), 'sellEntityname':forms.HiddenInput()}
 
   # ★全部のフィールドに'form-control'をセットするべきか？ 2025/02/14
   def __init__(self, *args, **kwargs):
@@ -84,15 +84,15 @@ class TxCreateConfirmForm(forms.ModelForm):
 
   class Meta:
     model = QpayTx
-    fields = ('buyerEntity_choice', 'requested_amount', 'evidence')
+    fields = ('requested_amount', 'evidence')
 
 # 24/7/9 発注者が承認するために表示する一覧表。表示項目は未精査
 class TxListForm_buyer_approve(forms.ModelForm):
 
   class Meta:
     model = QpayTx
-    fields = ('sellerEntity', 'sellerUser', 'requested_amount', 'evidence')
-    ##fields = ('sellerEntity',  'requested_amount', 'evidence')
+    fields = ('sellEntity', 'sellUser', 'requested_amount', 'evidence')
+    ##fields = ('sellEntity',  'requested_amount', 'evidence')
 
 
 # 24/7/9 発注者が書類を発行するために表示する取引履歴。表示項目は未精査
@@ -100,21 +100,21 @@ class TxListForm_buyer_history(forms.ModelForm):
 
   class Meta:
     model = QpayTx
-    fields = ('sellerEntity', 'sellerUser', 'requested_amount', 'evidence')
-    ##fields = ('sellerEntity', 'requested_amount', 'evidence')
+    fields = ('sellEntity', 'sellUser', 'requested_amount', 'evidence')
+    ##fields = ('sellEntity', 'requested_amount', 'evidence')
 
 class TxListForm_seller(forms.ModelForm):
 
   class Meta:
     model = QpayTx
-    fields = ('sellerEntity', 'sellerUser', 'requested_amount', 'evidence')
-    ##fields = ('sellerEntity', 'requested_amount', 'evidence')
+    fields = ('sellEntity', 'sellUser', 'requested_amount', 'evidence')
+    ##fields = ('sellEntity', 'requested_amount', 'evidence')
 
 #class TxDetailForm(forms.ModelForm):
 #
 #  class meta:
 #    model = QpayTx
-#    fields = ('sellerEntity', 'sellerUser', 'request_amount', 'evidennce')
+#    fields = ('sellEntity', 'sellUser', 'request_amount', 'evidennce')
 #
 #  def __init__(self, *args, **kwargs):
 #    super().__init__(*args, **kwargs)

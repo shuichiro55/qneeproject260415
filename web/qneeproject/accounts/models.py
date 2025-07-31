@@ -11,6 +11,10 @@ from django.core.mail import send_mail
 #from django.contrib.auth.models import AbstractUser
 #from django.contrib.auth.validators import ASCIIUsernameValidator
 
+name_validator = UnicodeUsernameValidator()
+tel_regex = RegexValidator(regex=r'^[0-9０-９ー―－‐₋⁻-]+$', message = ("ハイフン「-」なしで数字のみご入力下さい（最大15桁）　例：09012345678."))
+
+
 class BankAccount(models.Model):
 
   holdername =  models.CharField(
@@ -23,11 +27,11 @@ class BankAccount(models.Model):
 
   entity_id = models.IntegerField('エンティティID', default=0, null=True, blank=True)
 
-  bank_code =  models.CharField('金融機関コード', max_length=4, null=True, blank=True)
-  bank_name =  models.CharField('金融機関名', max_length=25, default=0, null=True, blank=True)
+  BankCode =  models.CharField('金融機関コード', max_length=4, null=True, blank=True)
+  BankName =  models.CharField('金融機関名', max_length=25, default=0, null=True, blank=True)
 
-  branch_code = models.CharField('支店コード', max_length=3, null=True, blank=True)
-  branch_name = models.CharField('支店名', max_length=25, default=0, null=True, blank=True)
+  BranchCode = models.CharField('支店コード', max_length=3, null=True, blank=True)
+  BranchName = models.CharField('支店名', max_length=25, default=0, null=True, blank=True)
 
   accountNumber_regex = RegexValidator(regex=r'^[0-9]+$', message = _("口座番号は数字でご入力ください。ex '1234567'"))
   accountNumber = models.CharField('口座番号', max_length=10, default=None, null=True, validators=[accountNumber_regex])
@@ -44,7 +48,17 @@ class LegalEntity(models.Model):
   choices2 = ((1, '個人（法人組織でない）'), (2, '法人'))
   type2 = models.IntegerField(default=1, null=True, blank=True, choices=choices2)
 
-  name_validator = UnicodeUsernameValidator()
+  #企業の場合の入力値、個人の場合はpersonnameが入る
+  entityname = models.CharField(
+    '取引主体名',
+    max_length=150,
+    unique=False,
+    default="",
+    null=True,
+    blank=True,
+    validators=[name_validator],)
+    #error_messages={'unique':_("ご入力の名前は既に存在します。次のリストからお選び下さい。")},)
+
   representitive = models.CharField(
     '代表者名',
     max_length=150,
@@ -79,18 +93,6 @@ class LegalEntity(models.Model):
 
   postal_code = models.CharField(_('郵便番号'), validators=[postal_code_regex], max_length=7)  
 
-
-  #企業の場合の入力値、個人の場合はpersonnameが入る
-  entityname = models.CharField(
-    '取引主体名',
-    max_length=150,
-    unique=False,
-    default="",
-    null=True,
-    blank=True,
-    validators=[name_validator],)
-    #error_messages={'unique':_("ご入力の名前は既に存在します。次のリストからお選び下さい。")},)
-
   #企業の場合、住所は全部入力する
   postal_code_regex = RegexValidator(regex=r'^[0-9]+$', message = _("Postal Code must be entered in the format: '1234567'. Up to 7 digits allowed."))
   postal_code = models.CharField(_('郵便番号'), max_length=7, default="", null=False, blank=True, validators=[postal_code_regex])
@@ -100,8 +102,8 @@ class LegalEntity(models.Model):
   referral_fee_rate = models.DecimalField(max_digits=11, decimal_places=10, default=0.015) # 紹介手数料（Qnee⇒Buyer）
 
   # 前払い申請者の受領口座
-  bank_account = models.OneToOneField(BankAccount, verbose_name='振込口座', null=True, related_name='account_holder', on_delete=models.PROTECT)
-  bank_account_flag = models.IntegerField(_('口座設定フラグ'), null=True, blank=True, default=0)
+  BankAccount = models.OneToOneField(BankAccount, verbose_name='振込口座', null=True, on_delete=models.PROTECT)
+  BankAccount_flag = models.IntegerField(_('口座設定フラグ'), null=True, blank=True, default=0)
   # 0：設定なし、1：設定済み
 
   # パートナー規約、ゲスト規約の同意状況、同意日時
@@ -189,33 +191,30 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     LegalEntity,
     verbose_name='取引主体',
     through="UserEntityRelation",
+    related_name='users',
     null=True)
+  
   # LegalEntityからは、CustomUser_setで参照（又はrelated_nameで定義）
   # user.entities.add(x(,y))で追加,user.entities.remove(x)で削除、user.entityes.all()で全部取得
 
-  # ★★★  CustomUserが複数のEntityと関係を持つのにあたり削除
-  entityname = models.CharField(
-    '取引主体',
-    max_length=150,
-    unique=False,
-    null=True,
-    blank=True,
-  )
-
   is_active = models.BooleanField(_('アクティブ'), default=False)   # 仮登録し、受領メール内のリンクでアクセス後
-  is_active2 = models.BooleanField(_('アクティブ'), default=False)  # Entity登録後
 
-  #is_staff = models.BooleanField(_('staff status'), default=False)
-  #is_admin = models.BooleanField(default=False)
+  # 登録の経過を確認するためのフラグ
+  is_active1 = models.BooleanField(_('アクティブ1'), default=False)  # 仮登録完了後、メールからのアクセスで本登録開始
+  is_active2 = models.BooleanField(_('アクティブ2'), default=False)  # Entity登録後
+  is_active3 = models.BooleanField(_('アクティブ3'), default=False)  # 利用規約を確認後
+
+  is_staff = models.BooleanField(_('staff status'), default=False)
+  is_admin = models.BooleanField(default=False)
 
 
-  is_buyerUser_ApproveAll = models.BooleanField(_('承認（全部）'), default=False)
-  is_buyerUser_ApproveJoinning = models.BooleanField(_('承認（参加）'), default=False)
-  is_buyerUser_ApproveQpay = models.BooleanField(_('承認（Qpay）'), default=False)
+  is_approver_buyer_all = models.BooleanField(_('パートナー側 承認（全部）'), default=False)
+  is_approver_buyer_add = models.BooleanField(_('パートナー側 承認（参加）'), default=False)
+  is_approver_buyer_qpay = models.BooleanField(_('パートナー側 承認（Qpay）'), default=False)
 
-  is_sellerUser_ApproveAll = models.BooleanField(_('承認（全部）'), default=False)
-  is_sellerUser_ApproveJoinning = models.BooleanField(_('承認（参加）'), default=False)
-  is_sellerUser_ApproveQpay = models.BooleanField(_('承認（Qpay）'), default=False)
+  is_approver_seller_all = models.BooleanField(_('ゲスト側 承認（全部）'), default=False)
+  is_approver_seller_add = models.BooleanField(_('ゲスト側 承認（参加）'), default=False)
+  is_approver_seller_qpay = models.BooleanField(_('ゲスト側 承認（Qpay）'), default=False)
 
   date_joined = models.DateTimeField(_('登録日'), default=timezone.now,)
 
@@ -252,28 +251,26 @@ ORMで自動生成される中間テーブルの代わりに利用すること�
 
 class UserEntityRelation(models.Model):
 
-  user = models.ForeignKey("CustonUser", on_delete=models.CASCADE)  
+  user = models.ForeignKey("CustomUser", on_delete=models.CASCADE)  
   personname = models.CharField(
     'お名前（個人）',
     blank=False,
     max_length=150,
     unique=False,
-    null=True,
-  )
+    null=True, )
 
   entity = models.ForeignKey("LegalEntity", on_delete=models.CASCADE)
-  #entityname = models.CharField(
-  #  '取引主体名',
-  #  max_length=150,
-  #  unique=False,
-  #  default="",
-  #  null=True,
-  #  blank=True,
-  #)
+  entityname = models.CharField(
+    '取引主体名',
+    max_length=150,
+    unique=False,
+    default="",
+    null=True,
+    blank=True,
+    validators=[name_validator],)
+    #error_messages={'unique':_("ご入力の名前は既に存在します。次のリストからお選び下さい。")},)
 
   email = models.EmailField('メールアドレス', unique=True, blank=False, null=True)
-  
-  tel_regex = RegexValidator(regex=r'^[0-9０-９ー―－‐₋⁻-]+$', message = ("ハイフン「-」なしで数字のみご入力下さい（最大15桁）　例：09012345678."))
   tel_direct = models.CharField(_('電話番号'), max_length=30, default="", null=False, validators=[tel_regex])
   #「 \d → 任意の数字	[0-9]」 「 ^ → 文字列の先頭」、「 $ → 文字列の末尾」
 

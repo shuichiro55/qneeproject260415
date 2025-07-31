@@ -37,7 +37,7 @@
                 <p class="mb-4">パートナーに報酬前払い申請します</p>
                 <!-- <p class="lead mb-4">発注者に前払いの申請を行います</p> 「lead」は目立たせるときに入れる -->
           
-                <form method="GET" action="{% url 'qpay:tx_create' user.id %}">
+                <form method="GET" action="{% url 'qpay:txCreate1' user.id %}">
                   {% csrf_token %}
                   <button type="submit" class="w-100 shadow btn btn-lg btn-outline-primary" name="next" value="apply_qpay">
                     申請ページへ
@@ -84,7 +84,7 @@
 
                 <p class="mb-4">受取口座など登録情報を変更します</p>
         
-                <form method="GET" action="{% url 'accounts:info_edit_seller' user.id entity.id %}">
+                <form method="GET" action="{% url 'accounts:info_edit_seller' user.id %}">
                   {% csrf_token %}
                   <button type="submit" class="w-100 shadow btn btn-lg btn-outline-primary" name="next" value="history">編集メニューへ</button>
                   <!-- <button type="button" class="w-100 btn btn-lg btn-primary">手続きへ</button> -->

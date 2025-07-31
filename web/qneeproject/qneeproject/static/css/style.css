@@ -1571,7 +1571,7 @@ ul.pattern .color6 {
 }
 
 .login-bg {
-  background-image: url("../images/bg-auth.png");
+  /* background-image: url("../images/bg-auth.png"); */
   background-color: rgb(251, 199, 178);
   background-size: cover;
   background-repeat: no-repeat;
@@ -1585,7 +1585,7 @@ ul.pattern .color6 {
 }
 
 .authentication-bg {
-  background-image: url("../images/bg-auth.png");
+  /* background-image: url("../images/bg-auth.png"); */
   background-color: rgb(211, 226, 246);
   background-size: cover;
   background-repeat: no-repeat;

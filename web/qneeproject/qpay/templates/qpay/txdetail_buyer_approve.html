@@ -33,7 +33,7 @@
             <table class="table table-striped table-bordered">
               <tbody>
                 <tr class="table-info"><td width="45%">処理状況</td><td style="text-align:center;">{{ tx.tx_status_char }}</td></tr>
-                <tr><td width="45%">受注者</td><td style="text-align:right;">{{ tx.sellerEntity_entityname }}</td></tr>
+                <tr><td width="45%">受注者</td><td style="text-align:right;">{{ tx.sellerEntityname }}</td></tr>
                 <tr><td width="45%">申請者</td><td style="text-align:right;">{{ tx.sellerUser_personname }}</td></tr>
                 <tr><td width="45%">申請額</td><td style="text-align:right;">{{ tx.requested_amount|intcomma }}</td></tr>
                 <tr>

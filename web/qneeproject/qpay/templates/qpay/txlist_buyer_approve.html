@@ -49,7 +49,7 @@
                 {% endif %}
 
                 <td  style="text-align:center">{{ forloop.counter }}</td>
-                <td>{{ item.sellerEntity_entityname }}</td>
+                <td>{{ item.sellerEntityname }}</td>
                 <td>{{ item.requested_amount|intcomma }}</td>
                 <td style="text-align:center">{{ item.requested_at|date:"y/n/j" }}<br>{{ item.requested_at|date:"H:i:s" }}</td>
                 <td style="text-align:center"><img src="{{ item.evidence.url }}" class="img-evidence" style="width:50;height:auto" /></td>

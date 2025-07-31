@@ -30,30 +30,25 @@ class TxStatus(models.IntegerChoices):
   
 class QpayTx(models.Model):
 
-  # sellerUser_personnameは、ユーザー名は表示する機会が多い中、sellerUserからデータを取り出さなくてすむよう設定
-  sellerUser = models.ForeignKey(CustomUser, verbose_name='ゲスト・ユーザー', null=True, related_name='sellerUser_txs', on_delete=models.CASCADE)
-  # sellerUser_id = models.IntegerField('ゲストID', null=False, blank=False, )
-  sellerUser_email = models.EmailField('ゲスト・メールアドレス', unique=False, null=True, blank=False,)
-  sellerUser_personname =models.CharField('ゲスト・ユーザー名', max_length=150, unique=False, null=True,)
-
-  sellerEntity = models.ForeignKey(LegalEntity, verbose_name='ゲスト・エンティティ', null=True, related_name='sellerEntity_txs', on_delete=models.CASCADE)
+  sellEntity = models.ForeignKey(LegalEntity, verbose_name='ゲスト・エンティティ', null=True, related_name='sellEntity_qpaytxs', on_delete=models.CASCADE)
   # sellerEntity_id = models.IntegerField('ゲスト・エンティティID', null=False, blank=False, )
-  sellerEntity_entityname = models.CharField('ゲスト・エンティティ名', max_length=150, unique=False, null=True, blank=True)
- 
-  # TxCreateFormで選択された後に入力される 
-  buyerUser = models.ForeignKey(CustomUser, verbose_name='パートナー・ユーザー', null=True, related_name='buyerUser_txs', on_delete=models.CASCADE)
+  sellEntityname = models.CharField('ゲスト・エンティティ名', max_length=150, unique=False, null=True, blank=True)
 
-  ## 24/07/16
-  ## 発注者のemail,personnameを固定しないように要修正か
-  ## 処理しているユーザー及びそのアドレスを取得するためのメソッドを追加した方が
-  buyerUser_email = models.EmailField('パートナー・メールアドレス', unique=False, blank=False, null=True)
-  buyerUser_personname =models.CharField('パートナー・ユーザー名', max_length=150, unique=False, null=True,)
+  sellUser = models.ForeignKey(CustomUser, verbose_name='ゲスト・ユーザー', null=True, related_name='sellUser_qpaytxs', on_delete=models.CASCADE)
+  # sellerUser_id = models.IntegerField('ゲストID', null=False, blank=False, )
+  sellUser_email = models.EmailField('ゲスト・メールアドレス', unique=False, null=True, blank=False,)
+  sellUser_personname =models.CharField('ゲスト・ユーザー名', max_length=150, unique=False, null=True,)
 
-  buyerEntity = models.ForeignKey(LegalEntity, verbose_name='パートナー・エンティティ', default="", null=True, related_name='buyerEntity_txs', on_delete=models.CASCADE)
+  buyEntity = models.ForeignKey(LegalEntity, verbose_name='パートナー・エンティティ', default="", null=True, related_name='buyEntity_qpaytxs', on_delete=models.CASCADE)
   # !! 初期値は「""」とし、値がセットされているかを判定できるようにする.
-  buyerEntity_entityname = models.CharField('パートナー・エンティティ名', max_length=150, unique=False, default="", null=True, blank=True)
+  buyEntityname = models.CharField('パートナー・エンティティ名', max_length=150, unique=False, default="", null=True, blank=True)
   #buyer_entity_choice = models.IntegerField(_('パートナー・エンティティ（選択リスト）'), choices=[(idx, f) for idx, f in enumerate(LegalEntity.objects.filter(type1=1).values_list('entityname', flat=True), 1)], default=1)
-  buyerEntity_choice = models.IntegerField(_('お支払者'), default=1)
+  #buyEntity_choice = models.IntegerField(_('お支払者'), default=1)
+
+  """ buyerUserは、承認した人を登録するようにする """
+  buyUser = models.ForeignKey(CustomUser, verbose_name='パートナー・ユーザー', null=True, related_name='buyUser_qpaytxs', on_delete=models.CASCADE)
+  buyUser_email = models.EmailField('パートナー・メールアドレス', unique=False, blank=False, null=True)
+  buyUser_personname =models.CharField('パートナー・ユーザー名', max_length=150, unique=False, null=True,)
 
   requested_at = models.DateTimeField(_('ご申請時点'), default=None, null=True)
   requested_amount = models.IntegerField(_('ご申請金額（円）'), default=None, null=True)

@@ -69,6 +69,7 @@ function setColor(theme) {
   console.log(theme)
   window.localStorage.removeItem('color');
   window.localStorage.setItem("color", theme);
+  //document.getElementById("color-opt").href = "../static/css/colors/" + theme + ".css";
   document.getElementById("color-opt").href = "../static/css/colors/" + theme + ".css";
   toggleSwitcher(false);
 }
@@ -81,16 +82,19 @@ function defaultColor(e) {
     }else{
         color = window.localStorage.getItem('color');
     }
-    document.getElementById('color-opt').href = '../static/css/colors/' + color + '.css';
+    //document.getElementById('color-opt').href = '../static/css/colors/' + color + '.css';
+    document.getElementById('color-opt').href = "../static/css/colors/" + color + ".css";
 };
 
 //
 /********************* Page Load js ************************/
 //
 
+/*
 window.onload = function loader() {
   setTimeout(() => {
     document.getElementById("preloader").style.visibility = "hidden";
     document.getElementById("preloader").style.opacity = "0";
   }, 350);
 };
+*/

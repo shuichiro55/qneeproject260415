@@ -4,6 +4,6 @@
 まだスタッフ登録手続きは完了しておりませんので、ご注意ください。
 
 本登録用URL
-{{ protocol}}://{{ domain }}{% url 'accounts:login' 3 %}
+{{ protocol}}://{{ domain }}{% url 'accounts:login_admin' %}
 
 株式会社Qnee（キユーニー）

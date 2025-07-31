@@ -4,6 +4,6 @@
 まだ会員登録手続きは完了しておりませんので、ご注意ください。
 
 本登録用URL
-{{ protocol}}://{{ domain }}{% url 'accounts:entity_set_buyer' token %}
+{{ protocol}}://{{ domain }}{% url 'accounts:entityCreate_seller' token %}
 
 株式会社Qnee（キユーニー）

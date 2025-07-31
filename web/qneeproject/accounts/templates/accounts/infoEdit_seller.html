@@ -31,23 +31,23 @@
       <div class="row row-cols-1 row-cols-md-3 justify-content-center" >
 
         <div class="row justify-content-center">
-          <form method="GET" action="{% url 'accounts:bankaccount_create' entity.id %}">
+          <form method="POST" action="{% url 'accounts:bankAccountCreate' %}">
             {% csrf_token %}
-            <button type="submit" class="btn btn-primary w-100 shadow" name="next" value="bankaccount">受取口座設定</button>
+            <button type="submit" class="btn btn-primary w-100 shadow" name="next" value="BankAccount">受取口座設定</button>
           </form>
         </div>
 
         <div class="row justify-content-center">       
           <form method="GET" action="{% url 'accounts:password_change_seller' user.id %}">
             {% csrf_token %}
-            <button type="submit" class="btn btn-primary w-100 shadow" name="next" value="history">パスワード変更</button>
+            <button type="submit" class="btn btn-primary w-100 shadow" name="next" value="History">パスワード変更</button>
           </form>
         </div>
 
         <div class="row justify-content-center">
-          <form method="GET" action="{% url 'accounts:bankaccount_create' entity.id %}">
+          <form method="GET" action="{% url 'accounts:bankaccount_create' %}">
             {% csrf_token %}
-            <button type="submit" class="btn btn-primary w-100 shadow" name="next" value="info_edit">その他情報変更</button>
+            <button type="submit" class="btn btn-primary w-100 shadow" name="next" value="InfoEdit">その他情報変更</button>
           </form> <!-- end col -->
         </div>
     

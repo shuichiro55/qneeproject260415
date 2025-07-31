@@ -1,0 +1,200 @@
+{% extends "index/base_qconnect_seller.html" %}
+
+{% load bootstrap_icons %}
+
+{% block content %}
+
+<div class="authentication-bg min-vh-100 min-vw-100 align-items-start" style="background-color: #edf9ff;">
+
+  <div class="container mt-2">
+
+    <nav aria-label="breadcrumb" role="navigation">
+      <ol class="breadcrumb text-dark rounded-2">
+        <li class="breadcrumb-item text-primary"><a href="{% url 'accounts:mypage_seller' %}">マイページ・ホーム</a></li>
+        <li class="breadcrumb-item text-primary"><a href="{% url 'accounts:infoEdit_seller' %}">設定メニュー</a></li>
+        <li class="breadcrumb-item active" aria-current="page">受取口座設定</li>
+      </ol>
+    </nav>
+
+    <div class="d-flex justify-content-center mt-4">
+      <h5>{% bs_icon 'bank' size='1.4em' %} 　銀行口座の登録</h5>
+      <!-- <a href="{% url 'accounts:mypage_seller' %}" class="btn btn-outline-secondary" >メイン・メニューへ</a> -->
+    </div>
+
+    <div class="row">
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}" role="alert" style="background-color: #fcf7fa;">
+        <span>{{ message }}</span>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="row justify-content-center">
+      <form method="POST"
+        class="form-group col-11 col-md-9 col-lg-7 bg-light border border-success rounded p-4 m-2">
+        {% csrf_token %}
+
+        <h6>■金融機関の選択</h6>
+        <div class="input-group">
+          <input id="id_BankSearchInput"
+            name="name_BankSearchInput" 
+            type="text" class="form-control"
+            placeholder="キーワード入力 （ex. 0001 or みずほ or ミズホ）">
+          <button type="submit" class="btn btn-primary shadow"
+            name="name_BankSearchBtn"
+            value="value_BankSearch">検索</button>
+          <!-- <button type="submit" class="btn btn-outline-primary" name="select" value="select_bank">選択</button> -->
+        </div>
+
+        <!-- 「multiple」はリストのスタイルを変える -->
+        <select class="form-select"
+          id="id_BankSelect"
+          name="name_BankSelect"
+          value="{{form.BankCode.value}}　　　{{form.BankName.value}}"
+          multiple  
+          aria-label="multiple select example">
+
+          {% if dict_MatchedBank.items %}
+
+            {% if BankCode %}
+              <option>コード　　金融機関名</option>
+              {% for code, name in dict_MatchedBank.items %}
+          
+                {% if code == BankCode %}
+                  <option value='{{code}}' selected>{{code}}　　　{{name}}</option>
+                {% else %}
+                  <option value='{{code}}'>{{code}}　　　{{name}}</option>
+                {% endif %}
+              {% endfor %}
+
+            {% else %}
+              <option selected>コード　　金融機関名</option>
+              {% for code, name in dict_MatchedBank.items %}
+                <option value='{{code}}'>{{code}}　　　{{name}}</option>
+              {% endfor %}
+            {% endif %}
+          {% endif %}
+        </select>
+
+        <hr>
+
+        <h6>■支店の選択</h6>
+        <div class="input-group">
+          <input id="id_BranchSearchInput"
+            name="name_BranchSearchInput"
+            type="text" class="form-control"
+            placeholder="キーワード入力 （ex. 001 or ぎんざ or ginza or ぎんざ）">
+          <button type="submit" class="btn btn-primary shadow"
+            name="name_BranchSearchBtn"
+            value="value_BranchSearch">検索</button>
+          <!-- <button type="submit" class="btn btn-outline-primary" name="select" value="select_branch">選択</button> -->
+        </div>
+
+        <select class="form-select"
+          id="id_BranchSelect"
+          name="name_BranchSelect"
+          multiple
+          aria-label="multiple select example">
+
+          {% if dict_MatchedBranch.items %}
+            <option selected>支店コード　　支店名</option>    
+        
+            {% for code, name in dict_MatchedBranch.items %}
+            <option value='{{code}}'>{{code}}　　　{{name}}</option>
+            {% endfor %}
+          {% endif %}
+        </select>
+
+        <hr>
+  
+        <div class="d-flex justify-content-center pt-3">
+          <button type="submit" class="btn btn-primary shadow" name="next" value="ToInput">　口座名義、口座番号の登録へ　</button>
+        </div>
+
+        {{ form.temporal_tx_id.as_hidden }}
+        <!-- {{ form.entity_id.as_hidden }} -->
+
+      </form>
+    </div> <!-- end row -->   
+  </div> <!-- end container -->
+</div>
+
+{% endblock %}
+
+{% block extrajs %}
+
+<script>
+
+  const BankSearchInput = document.getElementById('id_BankSearchInput');
+  const BankSelect = document.getElementById('id_BankSelect');
+    
+  const BranchSearchInput = document.getElementById('id_BranchSearchInput');
+  const BranchSelect = document.getElementById('id_BranchSelect');
+
+  //次の2行は25/07/20に追加（リアルタイム検索の準備）
+  const NormalizedInput = normalizeText(BranchSearchInput.value); // 入力されたクエリを正規化
+  const keywords = NormalizedInput.split(/[\s\u3000]+/).filter(keyword => keyword); // スペースで分割してキーワード配列を生成
+
+  function loadFinished(){
+    //alert('Load');
+    let flag_BankSelected = 0;
+    let obj_branches;
+ 
+    BrachSearchInput.addEventListener('input', () => {
+
+      console.log('BranchSearchInputのinputイベント通過');
+      const BranchOptions = BranchSelectBankSelect.options;
+      const NormalizedInput = normalizeText(BranchSearchInput.value); // 入力されたクエリを正規化
+      const keywords = NormalizedInput.split(/[\s\u3000]+/).filter(keyword => keyword); // スペースで分割してキーワード配列を生成
+
+      if (flag_BankSelected == 1){
+
+        for (let i=BranchOptions.length-1 ; i >= 0 ; i--) {
+          BranchOptions.remove( i );
+        }
+
+        //let obj_branches = JSON.parse('{{ json_Branches_Of_MatchedBank|safe }}' || "null");
+        //「safe」はエスケープを無効化する.Django側で''でなく{{ }}で認識させる
+        //https://se-memorandum.com/django-safe/
+
+        Object.keys(obj_branches).forEach((key) => {
+
+          matches = keywords.some(keyword => obj_branches[key].includes(keyword));
+          console.log(key, obj_branches[key]);
+
+          if(matches){
+           let option = document.createElement('option');
+            option.value = key;
+            option.text = key + '　　　' + obj_branches[key];
+            console.log(key, obj_branches[key]);
+            BranchOptions.add(option);
+          }
+        });       
+      }
+
+      alert('alert2　ひとまず<script> in window.addEventListener(load, function()) ');
+      console.log('コンソール2-2');
+    });
+
+    BankSearchInput.addEventListener('input', () => {
+    });
+
+    BankSelect.addEventListener('change', (event) => {
+      flag_BankSelected = 1;
+      obj_branches = JSON.parse('{{ json_Banks_Branches[event.target.value]|safe }}' || "null");
+    });
+
+    function normalizeText(text) {
+      console.log('inputイベント内でnormalizeTextが呼ばれました.');
+      return text
+        .normalize("NFKC") // 半角を全角文字に変換
+        .replace(/[\u30a1-\u30f6]/g, match => 
+        String.fromCharCode(match.charCodeAt(0) - 0x60)) // 全角カタカナをひらがなに変換
+        .toLowerCase(); // 英数字を小文字に変換
+    }
+  }
+  window.addEventListener('load', loadFinished);
+
+</script>
+
+{% endblock %}

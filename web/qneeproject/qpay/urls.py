@@ -11,8 +11,8 @@ app_name = 'qpay'
 
 urlpatterns = [
 
-  path('<int:user_id>/tx_create/', views.TxCreateView.as_view(), name='tx_create'),
-  path('<int:user_id>/<int:tx_id>/tx_create/', views.TxCreateView.as_view(), name='tx_create'),
+  path('<int:user_id>/txCreate1/', views.TxCreateView.as_view(), name='txCreate1'),
+  path('<int:user_id>/<int:tx_id>/txCreate1/', views.TxCreateView.as_view(), name='txCreate1'),
 
   #path('txlist_buyer_approve_before/<token>/', views.TxListView_buyer_approve_before.as_view(), name='txlist_buyer_approve_before'),
 

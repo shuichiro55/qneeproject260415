@@ -11,7 +11,7 @@
     <nav aria-label="breadcrumb" role="navigation">
       <ol class="breadcrumb text-dark rounded-2">
         <li class="breadcrumb-item text-primary"><a href="{% url 'accounts:mypage_seller' %}">マイページ・ホーム</a></li>
-        <li class="breadcrumb-item text-primary"><a href="{% url 'accounts:info_edit_seller' %}">設定メニュー</a></li>
+        <li class="breadcrumb-item text-primary"><a href="{% url 'accounts:infoEdit_seller' %}">設定メニュー</a></li>
         <li class="breadcrumb-item active" aria-current="page">受取口座設定</li>
       </ol>
     </nav>
@@ -39,13 +39,13 @@
           <tbody class="text-center bg-white">
             <tr>
               <td width="30%">金融機関</td>
-              <td width="40%">{{ form.bank_name.value }}</td>
-              <td width="30%">コード：{{ form.bank_code.value }}</td>
+              <td width="40%">{{ form.BankName.value }}</td>
+              <td width="30%">コード：{{ form.BankCode.value }}</td>
             </tr>
             <tr>
               <td width="30%">支店</td>
-              <td width="40%">{{ form.branch_name.value }}</td>
-              <td width="30%">コード：{{ form.branch_code.value }}</td>
+              <td width="40%">{{ form.BranchName.value }}</td>
+              <td width="30%">コード：{{ form.BranchCode.value }}</td>
             </tr>
           </tbody>
         </table>
@@ -90,10 +90,10 @@
 
         {{ form.temporal_tx_id.as_hidden }}
         {{ form.entity_id.as_hidden }}
-        {{ form.bank_code.as_hidden }}
-        {{ form.bank_name.as_hidden }}
-        {{ form.branch_code.as_hidden }}
-        {{ form.branch_name.as_hidden }}
+        {{ form.BankCode.as_hidden }}
+        {{ form.BankName.as_hidden }}
+        {{ form.BranchCode.as_hidden }}
+        {{ form.BranchName.as_hidden }}
 
       </form>
     </div> <!-- end row -->
