@@ -4,13 +4,22 @@
 
 {% block content %}
 
-<div class="authentication-bg min-vh-100 min-vw-100 align-items-start" style="background-color:#def5f9;">
+<div class="authentication-bg min-vh-100 min-vw-100 align-items-start">
+
   <div class="container">
 
-  
+    <!-- 本番環境ではmessagesは「DEBUG=False」として非表示とする -->
     <div class="row justify-content-center">
-      <div class="col-11 col-md-10 mt-3">
-        <div class="alert alert-primary" role="alert">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" role="alert">
+          <span>{{ message }}</span>
+        </div>
+      {% endfor %}
+    </div>
+    
+    <div class="row justify-content-center mt-2 mx-4">
+      <div class="col-md-10">
+        <div class="alert alert-warning" role="alert">
           来月初のQneeへのお支払いは●円です（支払が発生しているときに表示する）
         </div>
       </div>
@@ -18,91 +27,71 @@
     </div>
 
     <!-- row-cols-md-3が前の項を上書きを行っている -->
-    <div class="row justify-content-center">
-      <div class="col-11 col-md-10">
+    <div class="row justify-content-center mx-4">
+      <div class="col-md-10">
 
-      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 mb-3 text-center" >
+      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 text-center" >
 
         <!-- 25/05/31追加 ゲストへの案内 -->
-        <div class="col mt-3">
-          <div class="card mb-4 rounded-3 shadow">
-            <div class="card-header py-3">
-              <h5 class="my-0 fw-normal">ゲストへの案内</h5>
+
+        <div class="col mt-4">
+          <div class="card rounded-2 shadow">
+            <div class="card-header py-2">
+              <h5 class="my-0 fw-normal">
+                前払いの承認待ち
+              </h5>
             </div>
 
-            <div class="card-body shadow">
-              <p></p>
-              {% bs_icon 'send' color='cornflowerblue' size='2.5em' %}
-              <p></p>
+            <div class="card-body shadow pb-1">
 
-              <h6>ゲストへの各種案内をします</h6>
-
-              <form method="GET" action="{% url 'qpay:txlist_buyer_send' %}">
-                {% csrf_token %}
-                <button type="submit" class="w-100 shadow btn btn-lg btn-outline-primary" name="next" value="approve_qpay">手続きへ</button>
-              </form>
-            </div>
-          </div>
-        </div>
-
-        <div class="col mt-3">
-          <div class="card mb-4 rounded-3 shadow">
-            <div class="card-header py-3">
-              <h5 class="my-0 fw-normal">承認待ちボックス</h5>
-            </div>
-
-            <div class="card-body shadow">
-              <p></p>
               {% bs_icon 'inbox' color='cornflowerblue' size='2.5em' %}
-              <p></p>
 
-              <h6>前払い申請の承認をします</h6>
-
-              <form method="GET" action="{% url 'qpay:txlist_buyer_approve' %}">
+              <form method="GET" action="{% url 'qpay:txlist_buyer_approve' %}" class="mt-3">
                 {% csrf_token %}
-                <button type="submit" class="w-100 shadow btn btn-lg btn-outline-primary" name="next" value="approve_qpay">手続きへ</button>
+                <button type="submit"
+                  class="w-100 shadow btn btn-outline-primary btn-sm"
+                  name="next" value="approve_qpay">ご承認へ</button>
               </form>
             </div>
           </div>
         </div>
 
-        <div class="col mt-3">
-          <div class="card mb-4 rounded-3 shadow">
-            <div class="card-header py-3">
+        <div class="col mt-4">
+          <div class="card rounded-2 shadow">
+            <div class="card-header py-2">
               <h5 class="my-0 fw-normal">取引・契約状況</h5>
             </div>
-            <div class="card-body">
-              <p></p>
+            <div class="card-body shadow pb-1">
               {% bs_icon 'receipt-cutoff' color='cornflowerblue' size='2.5em' %}
-              <p></p>
 
-              <h6>取引・契約状況を確認します</h6>
-
-              <form method="GET" action="{% url 'qpay:txlist_buyer_history' %}">
+              <form method="GET" action="{% url 'qpay:txlist_buyer_history' %}" class="mt-3">
                 {% csrf_token %}
-                <button type="submit" class="w-100 shadow btn btn-lg btn-outline-primary" name="next" value="issue">手続きへ</button>
-                <!-- <button type="button" class="w-100 btn btn-lg btn-primary">手続きへ</button> -->
+                <button type="submit"
+                  class="w-100 shadow btn btn-outline-primary btn-lg"
+                  name="next" value="issue">ご確認へ</button>
+
+                  <!-- <button type="button" class="w-100 btn btn-lg btn-primary">手続きへ</button> -->
               </form>
             </div>
           </div>
         </div>
 
-        <div class="col mt-3">
-          <div class="card mb-4 rounded-3 shadow">
+        <div class="col mt-4">
+          <div class="card rounded-2 shadow">
           <!-- <div class="card mb-4 rounded-3 shadow-sm border-primary"> -->
-            <div class="card-header py-3"> 
+            <div class="card-header py-2"> 
             <!-- <div class="card-header py-3 text-bg-primary border-primary"> -->
               <h5 class="my-0 fw-normal">登録情報変更</h5>
             </div>
-            <div class="card-body">
-              <p></p>
+            <div class="card-body shadow pb-1">
               {% bs_icon 'pencil-square' color='cornflowerblue' size='2.5em' %}
-              <p></p>
 
-              <h6>登録情報を変更します</h6>
-
-              <form method="POST">
-                <button type="submit" class="w-100 shadow btn btn-lg btn-outline-primary" name="next" value="myinfo">編集へ</button>
+              <form method="GET" action="{% url 'accounts:infoEdit_buyer' %}" class="mt-3">
+                {% csrf_token %}
+                <button type="submit" class="w-100 shadow btn btn-outline-primary btn-lg"
+                  name="next"
+                  value="myinfo">
+                  ご編集へ</button>
                 <!-- <button type="button" class="w-100 btn btn-lg btn-primary">手続きへ</button> -->
               </form>
             </div>
@@ -113,4 +102,33 @@
     </div>
   </div>
 </div>
+
+
 {% endblock %}
+
+        <!--            
+
+        <div class="col mt-3">
+          <div class="card mb-4 rounded-3 shadow">
+            <div class="card-header py-3">
+              <h5 class="my-0 fw-normal">ゲストへの案内</h5>
+            </div>
+  
+            <div class="card-body shadow">
+              <p></p>
+              {% bs_icon 'send' color='cornflowerblue' size='2.5em' %}
+              <p></p>
+
+              <h6>ゲストへの各種案内をします</h6>
+
+              <form method="GET" action="{% url 'qpay:txlist_buyer_send' %}">
+                {% csrf_token %}
+                <button type="submit"
+                  class="w-100 shadow btn btn-lg btn-outline-primary"
+                  name="next" value="approve_qpay">
+                  手続きへ</button>
+              </form>
+            </div>
+          </div>
+        </div>
+        -->

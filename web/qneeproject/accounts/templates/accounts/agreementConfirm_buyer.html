@@ -1,0 +1,149 @@
+{% extends "index/base_qconnect_buyer.html" %}
+{% load static %}
+    
+{% block title %}登録内容のご確認{% endblock %}
+{% block content %}
+
+<div class="authentication-bg-with-flex-center min-vh-100 min-vw-100 align-items-start">
+  
+  <div class="container">
+
+    <!-- 本番環境ではmessagesは「DEBUG=False」として非表示とする -->
+    <div class="row justify-content-center my-auto">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" role="alert">
+          <span>{{ message }}</span>
+        </div>
+      {% endfor %}
+    </div>
+    <!-- メッセージはerror/warning/success/infoのmessage.tagsが付けられて保存される。 -->
+    <!-- message.tagsはsettings.pyのMESSAGE_TAGSで定義できる  25/01/10 -->
+    <!-- extra_tagはsettings.pyのMESSAGE_TAGSで定義できる  25/01/10 -->
+
+    <div class="row">
+      <nav aria-label="breadcrumb" role="navigation">
+        <ol class="breadcrumb text-dark mt-1">
+          <li class="breadcrumb-item text-dark"><a href="{% url 'accounts:mypage_buyer' %}">マイページ・ホーム</a></li>
+          <li class="breadcrumb-item text-dark active" aria-current="page">利用規約ご確認</li>
+        </ol>
+      </nav>  
+    </div>
+
+    <div class ="row justify-content-center">
+      <div class="col-11 col-sm-10 col-md-9">
+        <div class="progress mt-1 mb-1" style="height: 12px" >
+          <div class="progress-bar bg-secondary" role="progressbar"
+            style="width: 25%"
+            aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
+            仮登録
+          </div>
+  
+          <div class="progress-bar bg-secondary" role="progressbar"
+            style="width: 25%"
+            aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">
+            メール受領
+          </div>
+  
+          <div class="progress-bar bg-secondary" role="progressbar"
+            style="width: 25%"
+            aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
+            本登録
+          </div>
+  
+          <div class="progress-bar bg-danger progress-bar-striped progress-bar-animated" role="progressbar"
+            style="width: 25%"
+            aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+            利用規約確認
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% if flag_step == 1 %}
+    
+      <div class ="row justify-content-center mx-4">
+        <div class="col-sm-10 col-md-9">
+
+          <div class="row justify-content-center mt-3">
+            <h4 class="text-black text-center">＜利用規約ご確認＞</h4>
+          </div>
+
+          <div class="iframe-wrapper d-flex justify-content-center mt-3">
+            <iframe src= "{% static 'accounts/利用規約（サンプル）.pdf' %}"></iframe>
+          </div>
+        </div> <!-- end col -->
+      </div> <!-- end row -->
+
+      <div class="row justify-content-center mt-3">
+        <div class="col-11 col-sm-10 col-md-9">
+          <form method="POST" action="{% url 'accounts:agreementConfirm_buyer' %}">
+            {% csrf_token %}
+
+            <div class="btn-group btn-group-vertical d-flex justify-content-center" data-toggle="buttons">
+              <label class="btn active">
+                <input id="checkbox" type="checkbox"
+                  name="check_consent"
+                  value="agree">
+                <span> 利用規約に同意する </span>
+              </label>
+            </div>
+
+            <div class="d-flex justify-content-center mt-3">
+              <button id="next1" type="submit" class="btn btn-outline-primary me-2"
+                name="next" value="disagree_{{user.id}}_{{entity.id}}"
+                data-bs-toggle="tooltip"
+                data-bs-placement="bottom"
+                title="">同意しない
+              </button>
+            
+              <button id="next2" type="submit" class="btn btn-primary ms-2 shadow"
+                name="next" value="agree_{{user.id}}_{{entity.id}}"
+                data-bs-toggle="tooltip"
+                data-bs-placement="bottom"
+                title="上記「利用規約に同意します」にチェックしたうえクリック">同意します
+              </button> 
+            </div>
+
+            {% for field in form %}
+            {{field.as_hidden}}
+            {% endfor %}
+          </form>
+        </div> <!-- end col -->
+      </div> <!-- end row -->
+
+    {% endif %}
+
+    {% if flag_step == 2 %}
+
+      <!--<div class="authentication-bg min-vh-100 min-vw-100 d-flex align-items-center justify-content-center" style="background-color: #def5f9;"> -->
+      <div class="row justify-content-center mt-4">
+        申請手続きが終了し、パートナー企業に参加申請しました。<br>
+        パートナー企業の承認の結果をメールでご連絡いたします。
+      </div>
+
+      {% endif %}
+
+  </div> <!-- end container -->
+</div>
+
+{% endblock %}
+
+<!-- <script src="{% static 'accounts/js/script.js' %}" defer></script> -->
+
+{% block extrajs %}
+
+  <script>
+    const isAgreed = document.querySelector('#checkbox');
+    const btn = document.querySelector('#next2');
+
+    isAgreed.addEventListener('change', () => {
+      if(isAgreed.checked){
+        btn.disabled = false;
+      } else {
+        btn.disabled = true;
+      }
+    });
+
+</script>
+
+{% endblock %}

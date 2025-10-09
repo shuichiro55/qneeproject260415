@@ -1,35 +1,47 @@
 {% extends "index/base_qconnect_buyer.html" %}
+
+{% load bootstrap_icons %}
 {% load humanize %}
 
 {% block content %}
 {% csrf_token %}
 
 
-<div class="authentication-bg min-vh-100 min-vw-100 align-items-start" style="background-color:#def5f9;">
+<div class="authentication-bg min-vh-100 min-vw-100 align-items-start">
 
-  <div class="container mt-2">
+  <div class="container">
+
+    <!-- 本番環境ではmessagesは「DEBUG=False」として非表示とする -->
+    <div class="row justify-content-center my-auto">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" role="alert">
+          <span>{{ message }}</span>
+        </div>
+      {% endfor %}
+    </div>
 
     <nav aria-label="breadcrumb" role="navigation">
-      <ol class="breadcrumb text-dark rounded-2">
-        <li class="breadcrumb-item text-primary"><a href="{% url 'accounts:mypage_buyer' %}">マイページ・ホーム</a></li>
-        <li class="breadcrumb-item active" aria-current="page">取引一覧</li>
+      <ol class="breadcrumb text-dark mt-1">
+        <li class="breadcrumb-item text-dark"><a href="{% url 'accounts:mypage_buyer' %}">マイページ・ホーム</a></li>
+        <li class="breadcrumb-item text-dark active" aria-current="page">取引一覧</li>
       </ol>
     </nav>
 
     
     <div class="d-flex justify-content-center mt-3">
-      <h5>取引一覧</h5>
+      <h5>{% bs_icon 'receipt-cutoff' color='cornflowerblue' size='2.5em' %}　取引一覧</h5>
     </div>
 
-    <div class="row justify-content-center">
-      
-      <form method="POST">
-        {% csrf_token %}
+    {% if object_list.count >= 1 %}
+      <div class="row justify-content-center">
+ 
+        <form method="POST" class="bg-light rounded-1 mt-2 p-3">
+          {% csrf_token %}
 
-        <div class="table-responsive">
-          <table class="table table-striped table-bordered">
-            <thead>
-              <tr class="table-primary" style="text-align:center;">
+          <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+              <thead>
+                <tr class="table-primary" style="text-align:center;">
                 <th style="vertical-align:top">#</th>
                 <th style="vertical-align:top">ゲスト</th>
                 <th style="vertical-align:top">申請者</th>
@@ -46,20 +58,23 @@
 
                 <tr>
                   <td scope="row" style="text-align:center;">{{ forloop.counter }}</td>
-                  <td>{{ item.sellerEntityname }}</td>
-                  <td>{{ item.sellerUser_personname }}</td>
+                  <td>{{ item.sellerEntityName }}</td>
+                  <td>{{ item.sellerUser_userName }}</td>
                   <td>{{ item.requested_amount|intcomma }}</td>
                   <td style="text-align:center"><img src="{{ item.evidence.url }}" class="img-evidence" style="width:50;height:auto"/></td>
-                  <td style="text-align:center">{{ item.tx_status_char|linebreaksbr }}</td>
+                  <td style="text-align:center">{{ item.txStatus_char|linebreaksbr }}</td>
                   <td style="text-align:center">
                     <a href="{% url 'qpay:txdetail_buyer_history' item.id page_obj.number %}"
                       class="btn btn-outline-primary">表示</a>
                   </td>
                 </tr>
               {% empty %}
-                <p>データがありません。</p>
+
+                取引データはありません。
+              
               {% endfor %}
             </tbody>
+
           </table>
         </div> <!-- table-responsive -->
 
@@ -68,6 +83,15 @@
         <input type="hidden" name="next" value="{{ next }}" />       
       </form>
     </div> <!-- end row -->
+
+    {% else %}
+
+      <div class="row justify-content-center mt-5">
+        取引データはありません。
+      </div>
+
+    {% endif %}
+
   </div> <!-- end containaer -->
 </div>
 

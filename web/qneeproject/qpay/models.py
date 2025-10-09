@@ -11,14 +11,14 @@ import datetime
 usermodel = get_user_model()
   
 def user_directory_path(instance, filename):
-  date_time = datetime.datetime.now()  # 現在の時刻を取得
-  date_dir = date_time.strftime('%Y%m%d_%H-%M-%S')  # 年/月/日のフォーマットの作成
-  time_stamp = date_time.strftime('%H-%M-%S')  # 時-分-秒のフォーマットを作成
+  dateTime = datetime.datetime.now()  # 現在の時刻を取得
+  date_dir = dateTime.strftime('%Y%m%d_%H-%M-%S')  # 年/月/日のフォーマットの作成
+  time_stamp = dateTime.strftime('%H-%M-%S')  # 時-分-秒のフォーマットを作成
   new_filename = time_stamp + filename  # 実際のファイル名と結合
   user_directory = os.path.join(date_dir, new_filename)  # 階層構造にする
   #le = LegalEntity.objects.get(pk=instance.sellerEntity_id)
-  print(f'instance.sellerEntity_id={instance.sellerEntity_id} in qpay, models.py, user_directory_path')
-  return "upload/entity{0}_tx{1}/{2}".format(instance.sellerEntity_id, instance.id, user_directory)
+  print(f'instance.sellerEntity_id={instance.sellEntity_id} in qpay, models.py, user_directory_path')
+  return "upload/entity{0}_tx{1}/{2}".format(instance.sellEntity_id, instance.id, user_directory)
 
 class TxStatus(models.IntegerChoices):
   """ 状態 """
@@ -30,39 +30,52 @@ class TxStatus(models.IntegerChoices):
   
 class QpayTx(models.Model):
 
-  sellEntity = models.ForeignKey(LegalEntity, verbose_name='ゲスト・エンティティ', null=True, related_name='sellEntity_qpaytxs', on_delete=models.CASCADE)
+  sellEntity = models.ForeignKey(LegalEntity, verbose_name='ゲスト・エンティティ',
+    null=False, related_name='sellEntity_qpaytxs', on_delete=models.CASCADE)
+  sellEntityName = models.CharField('ゲスト・エンティティ名', max_length=150, unique=False, null=False, blank=True)
   # sellerEntity_id = models.IntegerField('ゲスト・エンティティID', null=False, blank=False, )
-  sellEntityname = models.CharField('ゲスト・エンティティ名', max_length=150, unique=False, null=True, blank=True)
 
-  sellUser = models.ForeignKey(CustomUser, verbose_name='ゲスト・ユーザー', null=True, related_name='sellUser_qpaytxs', on_delete=models.CASCADE)
+  sellUser = models.ForeignKey(CustomUser, verbose_name='ゲスト・ユーザー', null=False, related_name='sellUser_qpaytxs', on_delete=models.CASCADE)
+  sellUser_userName =models.CharField('ゲスト・ユーザー名', max_length=150, unique=False, null=False,)
   # sellerUser_id = models.IntegerField('ゲストID', null=False, blank=False, )
-  sellUser_email = models.EmailField('ゲスト・メールアドレス', unique=False, null=True, blank=False,)
-  sellUser_personname =models.CharField('ゲスト・ユーザー名', max_length=150, unique=False, null=True,)
+  # sellUser_email = models.EmailField('ゲスト・メールアドレス', unique=False, null=False, blank=False,)
 
-  buyEntity = models.ForeignKey(LegalEntity, verbose_name='パートナー・エンティティ', default="", null=True, related_name='buyEntity_qpaytxs', on_delete=models.CASCADE)
+  buyEntity = models.ForeignKey(LegalEntity, verbose_name='パートナー・エンティティ',
+    null=False, related_name='buyEntity_qpaytxs', on_delete=models.CASCADE)
   # !! 初期値は「""」とし、値がセットされているかを判定できるようにする.
-  buyEntityname = models.CharField('パートナー・エンティティ名', max_length=150, unique=False, default="", null=True, blank=True)
-  #buyer_entity_choice = models.IntegerField(_('パートナー・エンティティ（選択リスト）'), choices=[(idx, f) for idx, f in enumerate(LegalEntity.objects.filter(type1=1).values_list('entityname', flat=True), 1)], default=1)
+  buyEntityName = models.CharField('パートナー・エンティティ名', max_length=150,
+    unique=False,
+    null=False,
+    blank=True,
+    default="")
+  #buyer_entity_choice = models.IntegerField(_('パートナー・エンティティ（選択リスト）'), choices=[(idx, f) for idx, f in enumerate(LegalEntity.objects.filter(type1=1).values_list('entityName', flat=True), 1)], default=1)
   #buyEntity_choice = models.IntegerField(_('お支払者'), default=1)
 
-  """ buyerUserは、承認した人を登録するようにする """
-  buyUser = models.ForeignKey(CustomUser, verbose_name='パートナー・ユーザー', null=True, related_name='buyUser_qpaytxs', on_delete=models.CASCADE)
-  buyUser_email = models.EmailField('パートナー・メールアドレス', unique=False, blank=False, null=True)
-  buyUser_personname =models.CharField('パートナー・ユーザー名', max_length=150, unique=False, null=True,)
+  """ buyUserは、承認した人を登録するようにする """
+  buyUser = models.ForeignKey(CustomUser, verbose_name='パートナー・ユーザー',
+    null=True,
+    related_name='buyUser_qpaytxs',
+    on_delete=models.CASCADE)
+  #buyUser_email = models.EmailField('パートナー・メールアドレス',
+  #  unique=False,
+  #  null=True,
+  #  blank=False)
+  #buyUser_userName =models.CharField('パートナー・ユーザー名', max_length=150,
+  #  unique=False,
+  #  null=False,)
 
-  requested_at = models.DateTimeField(_('ご申請時点'), default=None, null=True)
-  requested_amount = models.IntegerField(_('ご申請金額（円）'), default=None, null=True)
-  approved_amount = models.IntegerField(_('承認金額（円）'), default=None, null=True)
-  original_payment_date = models.DateField(_('報酬日'), default=None, null=True)
-  advanced_payment_date = models.DateField(_('前払日'), default=None, null=True)
+  requested_at = models.DateTimeField(_('ご申請時点'), null=True)
+  requested_amount = models.IntegerField(_('ご申請金額（円）'), null=False)
+  exPayment_date = models.DateField(_('報酬日'), null=True)
+
 
   evidence = models.FileField(
     _('ご報酬の証明（請求書など）'),
     upload_to = user_directory_path , 
-    validators=[FileExtensionValidator(['jpg', 'png', 'jpeg', 'pdf', ])], default=None, null=True) 
+    validators=[FileExtensionValidator(['jpg', 'png', 'jpeg', 'pdf', ])], null=False, default=None) 
 
-  tx_status_int = models.IntegerField(choices=TxStatus.choices, default=1, verbose_name='処理状況 No')
-  tx_status_char = models.CharField(max_length=20, null=False, blank=False, default="承認待ち", verbose_name='処理状況')
+  txStatus_int = models.IntegerField(choices=TxStatus.choices, default=1, verbose_name='処理状況 No')
+  txStatus_char = models.CharField(max_length=20, null=False, blank=False, default="承認待ち", verbose_name='処理状況')
   
   # 1: UNPROCESSED 承認待ち
   # 2: APPROVED 承認済み（前払い未了）
@@ -70,18 +83,21 @@ class QpayTx(models.Model):
   # 4: QNEE_PAYED 前払い完了（Qnee⇒Seller）
   # 5: BUYER_PAYED Qnee受領（Buyer⇒Qnee）
 
-  created_at = models.DateTimeField(_('データ作成時点'), auto_now_add=True, blank=True, null=True)
-  approved_at = models.DateTimeField(_('承認時点'), default=None, blank=True, null=True)
-  rejected_at = models.DateTimeField(_('否認時点'), default=None, blank=True, null=True)
+  created_at = models.DateTimeField(_('データ作成時点'), auto_now_add=True)
+  approved_at = models.DateTimeField(_('承認時点'), null=True, blank=True)
+  approved_amount = models.IntegerField(_('承認金額（円）'), null=True)
+  advancePayment_date = models.DateField(_('前払日'), null=True)
+
+  rejected_at = models.DateTimeField(_('否認時点'), null=True, blank=True)
   updated_at = models.DateTimeField(_('更新時点'), auto_now=True)
 
-  advance_amount = models.IntegerField(_('立替金額'), default=0)
-  advance_fee =  models.IntegerField(_('立替手数料'), default=0)
-  referral_fee =  models.IntegerField(_('ご報酬（紹介料）'), default=0)
-  transfer_fee = models.IntegerField(_('振込手数料'), default=0)
-  total_fee = models.IntegerField(_('合計手数料'), default=0)
+  advance_amount = models.IntegerField(_('立替金額'), null=False, default=0)
+  advance_fee =  models.IntegerField(_('立替手数料'), null=False, default=0)
+  referral_fee =  models.IntegerField(_('ご報酬（紹介料）'), null=False, default=0)
+  transfer_fee = models.IntegerField(_('振込手数料'), null=False, default=0)
+  total_fee = models.IntegerField(_('合計手数料'), null=False, default=0)
 
-  to_seller_amount =  models.IntegerField(_('振込金額'), default=0)
+  to_seller_amount =  models.IntegerField(_('振込金額'), null=False, default=0)
 
 
   def save(self, *args, **kwargs):
@@ -101,4 +117,4 @@ class QpayTx(models.Model):
     # この段階ではインスタンスIDが存在するので、user_directory_path関数でinstance.idが使える
 
   def __str__(self):
-    return f'{self.buyer_entity}-{self.sellerEntity}'
+    return f'{self.buyEntity}-{self.sellEntity}'

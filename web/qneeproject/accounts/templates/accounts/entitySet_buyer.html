@@ -4,14 +4,23 @@
 
 {% block content %}
 
-<div class="authentication-bg min-vh-100 min-vw-100 align-items-start" style="background-color: #def5f9;">
+<div class="authentication-bg min-vh-100 min-vw-100 align-items-start">
 
-  <div class="container mt-2">
+  <div class="container">
 
+    <!-- 本番環境ではmessagesは「DEBUG=False」として非表示とする -->
+    <div class="row justify-content-center my-auto">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" role="alert">
+          <span>{{ message }}</span>
+        </div>
+      {% endfor %}
+    </div>
+  
     <nav aria-label="breadcrumb" role="navigation">
-      <ol class="breadcrumb text-dark rounded-2">
-        <li class="breadcrumb-item  text-primary"><a href="{% url 'accounts:mypage_buyer' %}">マイページ・ホーム</a></li>
-        <li class="breadcrumb-item active" aria-current="page">本登録（入力）</li>
+      <ol class="breadcrumb text-dark mt-1">
+        <li class="breadcrumb-item text-dark"><a href="{% url 'accounts:mypage_buyer' %}">マイページ・ホーム</a></li>
+        <li class="breadcrumb-item text-dark active" aria-current="page">本登録（入力）</li>
       </ol>
     </nav>
 
@@ -46,25 +55,19 @@
         </div>
       </div>
     </div>
-
-    <div class="row justify-content-center mt-4 mb-4">
-      <h5 class="text-black text-center">本登録</h5>
-    </div>
-
-    <div class="row justify-content-center my-auto">
-
-      {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}" role="alert" style="background-color: #fcf7fa;">
-          <span>{{ message }}</span>
-        </div>
-      {% endfor %}
-    </div>
   
     <!-- パートナー（buyer）の場合は法人のみ -->
     {% if user.type2 == 2 %}
+
+      <!-- flag_step == 1：入力画面の表示 -->
+      <!-- flag_step == 1：入力内容の確認 -->
       {% if flag_step == 1 %}
 
-        <div class="row justify-content-center">
+        <div class="row justify-content-center mt-4">
+          <h5 class="text-black text-center">パートナー登録</h5>
+        </div>
+
+        <div class="row justify-content-center mt-5">
           <div class="btn-group btn-group-toggle col-11 col-lg-8"  id="id_NewOrNot" data-toggle="buttons">
 
             <label class="btn btn-secondary" for="id_radio1">
@@ -79,29 +82,15 @@
               既存パートナーに参加
             </label>
           </div>   
-        </div>
+        </div> <!-- end row -->
         
-        <!--
-        <span id="id_hidden" style="display: none;">
-          <select class="form-select"
-            id="id_HiddenBuyerSelect"
-            name="name_HiddenBuyerSelect"
-            multiple>
-
-            {% for key, value in dict_buyEntityname.items %}
-              <option value='{{value}}'>{{value}}</option>
-            {% endfor %}
-          </select>
-        </span>
-        -->
-
         <!-- パートナーを新規登録する場合 -->
         <span id="id_addition1" style="display: none;">
           <hr>
           <form method="POST" action="{% url 'accounts:entityCreate_buyer' %}" >
             {% csrf_token %}
             <div class= "d-flex justify-content-center mt-5">
-              <button type="submit" class="btn btn-primary shadow" name="next1" value="ToEntityCreate">
+              <button type="submit" class="btn btn-primary shadow" name="next1" value="ToEntityCreate_{{user.id}}" >
                 パートナーの新規登録へ</button>
             </div>
           </form>
@@ -117,14 +106,18 @@
 
             <div class="row justify-content-center pt-4">
               <div class="col-11 col-lg-8">
-                <label class="form-label" for="id_SearchInput">パートナーの選択</label>
+                <label class="form-label" for="id_SearchInput">パートナー選択とユーザー登録</label>
                 <div class="input-group">
-                  <input type="text" class="form-control" id="id_SearchInput" name="name_SearchInput" placeholder="キーワード入力 （ex. IMAGICA or イマジ or いま）">
+                  <input type="text" class="form-control"
+                    id="id_SearchInput"
+                    name="name_SearchInput"
+                    value="{{form.entityName.value| default:''}}"
+                    placeholder="キーワード入力 （ex. IMAGICA or イマジ or いま）">
                   <button type="submit" class="btn btn-primary shadow" name="name_SearchInput" value="searchStart">検索</button>
                   <!-- <button type="submit" class="btn btn-outline-primary" name="select" value="select_bank">選択</button> -->
                 </div>
               </div>
-            </div>
+            </div> <!-- end row -->
 
             <div class="row justify-content-center">
 
@@ -133,18 +126,15 @@
                 <!-- 「multiple」はリストのスタイルを変える -->
                 <select class="form-select"
                   id="id_BuyerSelect"
-                  name="name_BuyerSelect"
-                  value="{{temporal_buyEntityname}}"
-                  multiple  
-                  aria-label="multiple select example">
+                  name="{{form.entityName.name}}">
 
-                  {% if dict_buyEntityname.items %}
+                  {% if dict_buyEntityName.items %}
 
-                    {% if temporal_buyEntityname != "" %}
+                    {% if temporal_buyEntityName != "" %}
                       <!-- <option>パートナー名（取引主体）</option> -->
-                      {% for key, value in dict_buyEntityname.items %}
+                      {% for key, value in dict_buyEntityName.items %}
           
-                        {% if value == temporal_buyEntityname %}
+                        {% if value == temporal_buyEntityName %}
                           <option value='{{value}}' selected>{{value}}</option>
                         {% else %}
                           <option value='{{value}}'>{{value}}</option>
@@ -154,124 +144,175 @@
                     {% else %}
   
                       <!-- <option selected>パートナー名（取引主体）</option> -->
-                      {% for key, value in dict_buyEntityname.items %}
+                      {% for key, value in dict_buyEntityName.items %}
                         <option value='{{value}}'>{{value}}</option>
                       {% endfor %}
                     {% endif %}
                   {% endif %}
                 </select>
-              </div>
-            </div>
+              </div> <!-- end col -->
+            </div> <!-- end row -->
 
             <hr>
-
-            <div class="row justify-content-center my-auto">
-              {% if form.personname.errors %}
-                <div class="col-11 col-lg-8" style="color:red;">{{ form.personname.errors.as_text }}</div>
-              {% endif %}
-            </div>
-          
-
+         
             <div class="form-group row justify-content-center pt-3">
-              <label class="col-11 col-md-3 col-lg-2 col-form-label" for='{{form.personname.id_for_label}}' >お名前（個人名）</label>
+              <label class="col-11 col-md-3 col-lg-2 col-form-label" for="{{form.userName.id_for_label}}" >
+                お名前（個人名）</label>
               <div class="col-11 col-md-8 col-lg-6">
-                <input type='form.personname.widget.input_type' class='form-control'
-                  name='{{form.personname.name}}'
-                  value='{{form.personname.value}}'
-                  id='{{form.personname.id_for_label}}' >
+                <input type="form.userName.widget.input_type" class="form-control"
+                  name="{{form.userName.name}}"
+                  value="{{form.userName.value| default:''}}"
+                  id="{{form.userName.id_for_label}}" >
               </div>
             </div>
-
             <div class="row justify-content-center my-auto">
-              {% if form.tel_direct.errors %}
-                <div class="col-11 col-lg-8" style="color:red;">{{ form.tel_direct.errors.as_text }}</div>
+              {% if form.userName.errors %}
+                <div class="col-11 col-lg-8" style="color:red;">{{ form.userName.errors.as_text }}</div>
               {% endif %}
             </div>
   
             <div class="form-group row justify-content-center pt-3">
-              <label class="col-11 col-md-3 col-lg-2 col-form-label" for='{{form.tel_direct.id_for_label}}' >お電話（直通）</label>
+              <label class="col-11 col-md-3 col-lg-2 col-form-label" for="{{form.tel_user.id_for_label}}" >
+                お電話（直通）</label>
               <div class="col-11 col-md-8 col-lg-6">
-                <input type='form.tel_direct.widget.input_type' class='form-control'
-                  name='{{form.tel_direct.name}}'
-                  value='{{form.tel_direct.value}}'
-                  id='{{form.tel_direct.id_for_label}}' >
+                <input type="form.tel_user.widget.input_type" class="form-control"
+                  name="{{form.tel_user.name}}"
+                  value="{{form.tel_user.value| default:''}}"
+                  id="{{form.tel_user.id_for_label}}" >
               </div>
             </div>
+            <div class="row justify-content-center my-auto">
+              {% if form.tel_user.errors %}
+                <div class="col-11 col-lg-8" style="color:red;">{{ form.tel_user.errors.as_text }}</div>
+              {% endif %}
+            </div>
 
-            <!-- ★★★ この部分にパートナーを追加する　ボタンを追加する必要がある -->
+  
+            <div class="form-group row justify-content-center pt-3">
+              <label class="col-11 col-md-3 col-lg-2 col-form-label" for="{{form.department.id_for_label}}" >
+                所属部署</label>
+              <div class="col-11 col-md-8 col-lg-6">
+                <input type="form.department.widget.input_type" class="form-control"
+                  name="{{form.department.name}}"
+                  value="{{form.department.value| default:''}}"
+                  id="{{form.department.id_for_label}}" >
+              </div>
+            </div>
+            <div class="row justify-content-center my-auto">
+              {% if form.department.errors %}
+                <div class="col-11 col-lg-8" style="color:red;">{{ form.department.errors.as_text }}</div>
+              {% endif %}
+            </div>
 
-          </form>
-        </span>
-
-        <span id="id_addition3" style="display: none;">
-
-          <form method="POST">
-            {% csrf_token %}
+ 
+            <div class="form-group row justify-content-center pt-3">
+              <label class="col-11 col-md-3 col-lg-2 col-form-label" for="{{form.title.id_for_label}}" >
+                役職</label>
+              <div class="col-11 col-md-8 col-lg-6">
+                <input type="form.title.widget.input_type" class="form-control"
+                  name="{{form.title.name}}"
+                  value="{{form.title.value| default:''}}"
+                  id="{{form.title.id_for_label}}" >
+              </div>
+            </div>
+            <div class="row justify-content-center my-auto">
+              {% if form.title.errors %}
+                <div class="col-11 col-lg-8" style="color:red;">{{ form.title.errors.as_text }}</div>
+              {% endif %}
+            </div>
 
             <div class= "d-flex justify-content-center mt-5">
-              <button type="submit" class="btn btn-primary shadow" name="next2" value="ToConfirm2">次へ進む</button>
+              <button type="submit" class="btn btn-primary shadow" name="next2" value="ToConfirm_{{user.id}}">
+                選んだパートナーにユーザー追加申請する</button>
             </div>
           </form>
         </span>
-    
-
+        
       {% endif %}
 
+      <!-- 入力した内容を確認 -->
       {% if flag_step == 2 %}
 
-        <div class="row justify-content-center">
-          <div class="col-11 col-md-9 col-lg-6">
+        <div class="row justify-content-center mt-4">
+          <h5 class="text-black text-center">ユーザー登録（ご申請内容）</h5>
+        </div>
 
+        <div class="row justify-content-center mt-2">
+          <div class="col-11 col-md-9 col-lg-6">
+        
             <form method="POST"
-              action="{% url 'accounts:mypage_buyer' %}"
-              class="p-4 m-4 bg-light border border-success rounded form-group">
+              class="p-4 m-2 bg-light border border-primary-subtle rounded form-group">
 
               {% csrf_token %}
-              <table class="table table-striped table-bordered table-responsive">
-                <tbody class="text-center">
-                  <tr><td width="33%">あなた</td><td style="text-align: right;">{{ form.personname.value }}さん</td></tr>
-                  <tr><td width="33%">メールアドレス</td><td style="text-align: right;">{{ form.email.value }}</td></tr>
-                  <tr><td width="33%">電話番号</td><td style="text-align: right;">{{ form.tel.value }}</td></tr>
+
+              <table class="table table-bordered border-primary-subtle">
+                <tbody> <!-- 郵便番号のところは住所にする -->
+                  <tr>
+                    <th scope="col" width="33%" class="table-primary">お取引者</th>
+                    <td style="text-align: right;">{{ entity.entityName }}</td></tr>
+                  <tr>
+                    <th scope="col" width="33%" class="table-primary">代表者</th>
+                    <td style="text-align: right;">{{ entity.representitive }}さん</td></tr>
+                  <tr>
+                    <th scope="col" width="33%" class="table-primary">郵便番号</th>
+                    <td style="text-align: right;">{{ entity.zip_entity }}</td></tr>
+                  <tr>
+                    <th scope="col" width="33%" class="table-primary">電話番号</th>
+                    <td style="text-align: right;">{{ entity.tel_entity }}</td></tr>
                 </tbody>
               </table>
 
-             <table class="table table-striped table-bordered">
-                <tbody> <!-- 重便番号のところは住所にする -->
-                  <tr><td width="33%">お取引者</td><td style="text-align: right;">{{ entity.entityname.value }}</td></tr>
-                  <tr><td width="33%">代表者</td><td style="text-align: right;">{{ entity.representitive.value }}</td></tr>
-                  <tr><td width="33%">郵便番号</td><td style="text-align: right;">{{ entity.postal_code.value }}</td></tr>
-                  <tr><td width="33%">電話番号</td><td style="text-align: right;">{{ entity.tel_main.value }}</td></tr>
+              <table class="table table-striped table-bordered table-responsive">
+                <tbody class="text-center">
+                  <tr>
+                    <th scope="col" width="33%" class="table-primary">あなたのお名前</th>
+                    <td style="text-align: right;">{{ form.userName.value }}さん</td></tr>
+                  <tr>
+                    <th scope="col" width="33%" class="table-primary">電話番号</th>
+                    <td style="text-align: right;">{{ form.tel_user.value }}</td></tr>
+                  <tr>
+                    <th scope="col" width="33%" class="table-primary">部署</th>
+                    <td style="text-align: right;">{{ form.department.value }}</td></tr>
+                  <tr>
+                    <th scope="col" width="33%" class="table-primary">役職</th>
+                    <td style="text-align: right;">{{ form.title.value }}</td></tr>
                 </tbody>
               </table>
 
               <hr>
 
               <div class="d-flex justify-content-center">
-                <button type="submit" class="btn btn-outline-primary me-2" name="next2" value="BackToInput">戻る</button>
-                <button type="submit" class="btn btn-primary" name="next2" value="ToSave&Apply">パートナーに参加を申請</button>
+                <button type="submit" class="btn btn-outline-primary me-2"
+                  name="next2"
+                  value="BackToInput_{{user.id}}_{{entity.id}}">
+                  戻る</button>
+
+                <button type="submit" class="btn btn-primary"
+                  name="next2"
+                  value="ToSave&Apply_{{user.id}}_{{entity.id}}">
+                  パートナー企業に参加を申請</button>
               </div>
 
-              <!-- {{ form.entityname.as_hidden }} -->
+              {% for field in form %}
+                {{ field.as_hidden }}
+              {% endfor %}
 
-            </form>
-          </div>
-        </div>
-        </div>
-      </div>
-
-        <!--        
-        {% for field in form %}
-          {{ field.as_hidden }}
-        {% endfor %}
-        -->
+            </form> <!-- end form -->
+          </div> <!-- end col -->
+        </div> <!-- end row -->
 
       {% endif %}
-
     {% endif %}
-    
-    </div> <!-- end row -->
+
+    <!--        
+    {% for field in form %}
+      {{ field.as_hidden }}
+    {% endfor %}
+    -->
+
   </div> <!-- end container -->
 </div>
+
 
 <style type="text/css">
     .hidden {
@@ -289,14 +330,10 @@
     var SearchInput = document.getElementById('id_SearchInput');
     var BuyerSelect = document.getElementById('id_BuyerSelect');
 
-    let obj_buyEntityname = JSON.parse('{{ json_buyEntityname|safe }}' || "null");
+    let obj_buyEntityName = JSON.parse('{{ json_buyEntityName|safe }}' || "null");
     
     var addition1 = document.getElementById('id_addition1');
     var addition2 = document.getElementById('id_addition2');
-    var addition3 = document.getElementById('id_addition3');
-  
-    //var searchInput = document.getElementById('id_searchInput');  // 検索入力フィールドを取得
-    //var selecter = document.getElementById('id_buyerSelect');
 
     NewOrNot.addEventListener('click', function(){
 
@@ -304,14 +341,12 @@
         console.log('id_radio1が認識されました');
         addition1.style.display = "block";
         addition2.style.display = "none";
-        addition3.style.display = "none";
       }
 
       if (id_radio2.checked) {      
         console.log('id_radio2が認識されました');
         addition1.style.display = "none";
         addition2.style.display = "block";
-        addition3.style.display = "block";
       }
     });
 
@@ -324,39 +359,42 @@
         .toLowerCase(); // 英数字を小文字に変換
     }
 
-    // ★★★ 工事中 25/07/19
+    // ★★ 工事中 25/07/19
     //「Javascriptで入力フォームからリストをリアルタイムで検索する方法」を参照（URLは下記）
     //https://design-tera.com/blog/archives/6666/
     SearchInput.addEventListener('input', function() {
 
-      console.log('inputイベントが認識されました1');
+      console.log('inputイベントで' + SearchInput.value + 'が認識されました1');
 
       //const HiddenBuyerOptions = document.getElementById('id_HiddenBuyerSelect').options;
-      const BuyerOptions = document.getElementById('id_BuyerSelect').options;
-      const NormalizedInput = normalizeText(SearchInput.value); // 入力されたクエリを正規化
-      const keywords = NormalizedInput.split(/[\s\u3000]+/).filter(keyword => keyword); // スペースで分割してキーワード配列を生成
+      var BuyerOptions = document.getElementById('id_BuyerSelect').options;
+      var NormalizedInput = normalizeText(SearchInput.value); // 入力されたクエリを正規化
+      var keywords = NormalizedInput.split(/[\s\u3000]+/).filter(keyword => keyword); // スペースで分割してキーワード配列を生成
 
+      console.log('nomalizeTextにより' + NormalizedInput + 'に変換されました');
       for (let i=BuyerOptions.length-1 ; i >= 0 ; i--) {
         BuyerOptions.remove( i );
       }
 
-      let obj_buyEntityname = JSON.parse('{{ json_buyEntityname|safe }}' || "null");
+      let obj_buyEntityName = JSON.parse('{{ json_buyEntityName|safe }}' || "null");
       //「safe」はエスケープを無効化する.Django側で''を除いた形で認識する
       //https://se-memorandum.com/django-safe/
-      console.log(obj_buyEntityname);
+
+      console.log(obj_buyEntityName);
       console.log('forEachに入る前です');
 
-      Object.keys(obj_buyEntityname).forEach((key) => {
+      //keyおよびobj_buyEntityName[key]には、entityNameが入る
+      Object.keys(obj_buyEntityName).forEach((key) => {
 
-        matches = keywords.some(keyword => obj_buyEntityname[key].includes(keyword));
+        matches = keywords.some(keyword => normalizeText(obj_buyEntityName[key]).includes(keyword));
 
-        console.log(key, obj_buyEntityname[key]);
+        console.log(key, obj_buyEntityName[key]);
         if(matches){
           let option = document.createElement('option');
           option.value = key;  //option.valueは非表示部。（key, value）のvalueと間違わないように！
-          option.text = obj_buyEntityname[key];         
+          option.text = obj_buyEntityName[key];         
           //option.setAttribute("value", key);  //option.valueは非表示部。（key, value）のvalueと間違わないように！
-          //option.appendChild(document.createTextNode(obj_buyEntityname[key]));
+          //option.appendChild(document.createTextNode(obj_buyEntityName[key]));
 
           console.log('BuyerOptions=', BuyerOptions);
           console.log('option.innerHTML=', option.innerHTML);
@@ -364,102 +402,13 @@
           BuyerOptions.add(option);
         }
       });
+    });
 
-    BuyerSelect.addEventListener('change', (event) => {
+    BuyerSelect.addEventListener('click', (event) => {
       console.log('BuyerSelect.addEventListener(change)に入りました');
-      SearchInput.value = obj_buyEntityname[event.target.value];  
+      SearchInput.value = obj_buyEntityName[event.target.value];  
     });
-  
-  /*
-      for (var item in obj_buyEntityname) {
-        matches = keywords.some(keyword => obj_buyEntityname[item].includes(keyword));
-
-        if(matches){
-          let option = document.createElement('option');
-          option.value = item;
-          option.innerHTML = item + '　　　' + obj_buyEntityname[item];
-          console.log(item, obj_buyEntityname[item]);
-          BuyOptions.appendChild(option);
-        }        
-      }
-*/
-      /*
-      for (let i=BuyerListItems.length-1 ; i >= 0 ; i--) {
-        BuyerListItems.remove( i );
-      }
-      */
-    });
-
   });
-
-/*
-     if (NormalizedInput.trim() === '') { // クエリが空の場合は全アイテムを表示
-
-        console.log('正規化された結果クエリが「空」の場合');
-        BuyerListItems.forEach(item => {
-          item.classList.remove('hidden');
-        });
-
-      } else { // クエリがある場合、各リストアイテムに対して処理を行う
-
-        console.log('正規化された結果クエリが「空でない」の場合');
-  
-        BuyerListItems.forEach(item => {
-          // アイテムのテキストを正規化
-          const text = normalizeText(item.textContent);
-          // キーワードのいずれかがテキストに含まれているかチェック
-          const matches = keywords.some(keyword => text.includes(keyword));
-
-          if (matches) { // マッチした場合、アクティブクラスを追加し非表示クラスを削除
-            BuyerListItems.classList.remove('hidden');
-          } else { // マッチしない場合、アクティブクラスを削除し非表示クラスを追加
-            BuyerListItems.classList.add('hidden');
-          }
-        });
-      }
-*/
-/*
-  // 入力フィールドの入力イベントに応じた処理
-    searchInput.addEventListener('input', function() {
-
-      // ★★★ 25/06/21 入力値を含む項目でリストを作る
-      const normalizedInput = normalizeText(searchInput.value); // 入力されたクエリを正規化
-      const keywords = normalizedInput.split(/[\s\u3000]+/).filter(keyword => keyword); // スペースで分割してキーワード配列を生成E
-
-      for (let i=BuyerSelect.length-1 ; i >= 0 ; i--) {
-        BuyerSelect.remove( i );
-      }
-      
-      if (normalizedInput.trim() === '') { // クエリが空の場合は全アイテムを表示
-        BuyerSelect.forEach(item => {
-          item.classList.remove('hidden');
-        });
-      } else { // クエリがある場合、各リストアイテムに対して処理を行う
-  
-        BuyerSelect.forEach(item => {
-          // アイテムのテキストを正規化
-          const text = normalizeText(item.textContent);
-          // キーワードのいずれかがテキストに含まれているかチェック
-          const matches = keywords.some(keyword => text.includes(keyword));
-
-          if (matches) { // マッチした場合、アクティブクラスを追加し非表示クラスを削除
-            BuyerSelect.classList.remove('hidden');
-          } else { // マッチしない場合、アクティブクラスを削除し非表示クラスを追加
-            BuyerSelect.classList.add('hidden');
-          }
-        });
-      }
-    });
-  
-*/
-    
-    /* これはパートナーを選択後に何かしら処理が発生する場合に利用 */
-    /*
-    selecter.addEventListener('change', function(){
-
-      buyername = selecter.value;  
-      addition3.style.display = "block";
-    });*/
 
 
 </script>

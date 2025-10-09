@@ -1,8 +1,0 @@
-{{ approver.personname }} 様 参加希望者から申請が届いています。
-
-下記URLよりサイトにアクセスのうえ、申請のご確認をお願いいたします。
-
-申請の確認用URL
-{{ protocol}}://{{ domain }}{% url 'accounts:userAdd_buyer' token %}
-
-株式会社Qnee（キユーニー）

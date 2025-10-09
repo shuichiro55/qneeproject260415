@@ -1,0 +1,119 @@
+
+<script>
+
+  document.addEventListener('DOMContentLoaded', function() {
+
+    console.log('DOMContentLoadedが認識されました');
+
+    const BankSearchInput = document.getElementById('id_bankSearchInput');
+    const BankSelect = document.getElementById('id_bankSelect');
+    
+    const BranchSearchInput = document.getElementById('id_branchSearchInput');
+    const BranchSelect = document.getElementById('id_branchSelect');
+
+    const json_banks = JSON.parse('{{json_banks|safe}}' || 'null');
+    const json_bankCode_branches = JSON.parse('{{json_bankCode_branches|safe}}' || 'null');
+    //「safe」はエスケープを無効化する.HTML上で''がない状態で認識する
+    //https://se-memorandum.com/django-safe/
+
+
+    BankSearchInput.addEventListener('input', () => {
+
+      console.log('BankSearchInputのinputイベント通過');
+      var BankOptions = BankSelect.options;
+      var NormalizedInput = normalizeText(BankSearchInput.value); // 入力されたクエリを正規化
+      var keywords = NormalizedInput.split(/[\s\u3000]+/).filter(keyword => keyword); // スペースで分割してキーワード配列を生成
+
+      console.log('BankSelect.value='+ BankSelect.value);
+
+      for (let i=BankOptions.length-1 ; i >= 0 ; i--) {
+        BankOptions.remove( i );
+      }
+
+      Object.keys(json_banks).forEach((key) => {
+
+        console.log('json_banks[key]='+ json_banks[key])
+        matches = keywords.some(keyword => normalizeText(json_banks[key]).includes(keyword));
+        console.log(key, json_banks[key]);
+        
+        if(matches){
+         let option = document.createElement('option');
+          option.value = key;
+          option.text = key + '　　　' + json_banks[key];
+          console.log(key, json_banks[key]);
+          BankOptions.add(option);
+        }
+      });
+    });
+
+
+    var json_branches;
+
+    BranchSearchInput.addEventListener('input', () => {
+
+      console.log('BranchSearchInputのinputイベント通過');
+      var BranchOptions = BranchSelect.options;
+      var NormalizedInput = normalizeText(BranchSearchInput.value); // 入力されたクエリを正規化
+      var keywords = NormalizedInput.split(/[\s\u3000]+/).filter(keyword => keyword); // スペースで分割してキーワード配列を生成
+
+      if(BankSelect.value != "" && BankSelect.value != null){
+        console.log('BankSelect.value='+ BankSelect.value);
+        json_branches = json_bankCode_branches[BankSelect.value];
+        console.log(json_branches);
+
+        for (let i=BranchOptions.length-1 ; i >= 0 ; i--) {
+          BranchOptions.remove( i );
+        }
+
+        Object.keys(json_branches).forEach((key) => {
+
+          console.log('json_branches[key]='+ json_branches[key])
+          matches = keywords.some(keyword => normalizeText(json_branches[key]).includes(keyword));
+          console.log(key, json_branches[key]);
+        
+          if(matches){
+           let option = document.createElement('option');
+            option.value = key;
+            option.text = key + '　　　' + json_branches[key];
+            console.log(key, json_branches[key]);
+            BranchOptions.add(option);
+          }
+        });       
+      }
+    });
+
+    BankSearchInput.addEventListener('input', () => {
+    });
+
+    BankSelect.addEventListener('change', (event) => {
+
+      json_branches = json_bankCode_branches[event.target.value];
+      console.log(json_branches);
+
+      var BranchOptions = BranchSelect.options;
+
+      for (let i=BranchOptions.length-1 ; i >= 0 ; i--) {
+        BranchOptions.remove( i );
+      }
+
+      Object.keys(json_branches).forEach((key) => {
+
+        let option = document.createElement('option');
+        option.value = key;
+        option.text = key + '　　　' + json_branches[key];
+        console.log(key, json_branches[key]);
+        BranchOptions.add(option);
+      });       
+    });
+
+    function normalizeText(text) {
+      console.log('inputイベント内でnormalizeTextが呼ばれました.');
+      return text
+        .normalize("NFKC") // 半角を全角文字に変換
+        .replace(/[\u30a1-\u30f6]/g, match => 
+        String.fromCharCode(match.charCodeAt(0) - 0x60)) // 全角カタカナをひらがなに変換
+        .toLowerCase(); // 英数字を小文字に変換
+    }
+  });
+
+</script>

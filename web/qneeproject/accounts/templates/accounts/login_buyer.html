@@ -4,31 +4,37 @@
 
 {% block content %}
 
-<div class="login-bg min-vh-100 min-vw-100 align-items-center" style="background-color:#def5f9;">
+<div class="authentication-bg min-vh-100 min-vw-100 align-items-center">
 
   <div class="container">
+
+    <!-- 本番環境ではmessagesは「DEBUG=False」として非表示とする -->
+    <div class="row justify-content-center">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" role="alert">
+          <span>{{ message }}</span>
+        </div>
+      {% endfor %}
+    </div>
+    <!-- メッセージはerror/warning/success/infoのmessage.tagsが付けられて保存される。 -->
+    <!-- message.tagsはsettings.pyのMESSAGE_TAGSで定義できる  25/01/10 -->
+    <!-- extra_tagはsettings.pyのMESSAGE_TAGSで定義できる  25/01/10 -->
+
     <div class="d-flex flex-column">
       <div class="row justify-content-center my-auto">
         <div class="col-11 col-md-8 col-lg-6 col-xl-5">
-
-          <div class="row">
-            {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}" role="alert" style="background-color: #fcf7fa;">
-              <span>{{ message }}</span>
-            </div>
-            {% endfor %}
-          </div>
-
-          <div class="d-flex justify-content-center pb-3">
+  
+          <div class="d-flex justify-content-center">
             <h3 class="text-black">{% bs_icon 'clouds' color='cornflowerblue' size='1.5em' %} Welcome to Qnee Connect !</h3>
           </div>
 
-          <p></p>
-          <h5>パートナー・ログイン</h5>
+          <div class="row justify-content-center mt-4">          
+            <h5>パートナー・ログイン</h5>
+          </div>
 
           <form method="POST"
             action="{% url 'accounts:login_buyer' %}"
-            class="form-group bg-light border border-success rounded p-4 mb-4 ">
+            class="form-group bg-light border border-success rounded p-4">
 
             {{ form.non_field_errors }}
             {% for field in form %}
@@ -42,11 +48,13 @@
             {% csrf_token %}
           </form>     
 
-          <h5>パートナー登録</h5>
+          <div class="row justify-content-center mt-4">
+            <h5>パートナー登録</h5>
+          </div>
 
           <form method="GET"
-            action="{% url 'accounts:userCreate1_buyer' %}"
-            class="form-group bg-light border border-success rounded p-4 mb-3 ">
+            action="{% url 'accounts:userCreate_buyer' %}"
+            class="form-group bg-light border border-success rounded p-4">
 
             <button type="submit" class="btn btn-primary w-100 shadow" >登録する</button>
             <input type="hidden" name="next" value="{{ next }}" />

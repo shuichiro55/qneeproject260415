@@ -2,15 +2,23 @@ from django import forms
 from django.db import models
 from django.contrib.auth.forms import \
   AuthenticationForm, UserCreationForm, PasswordChangeForm
-from .models import CustomUser, BankAccount 
+from .models import CustomUser, LegalEntity, BankAccount 
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
-from .models import LegalEntity, UserEntityRelation
+#from .models import LegalEntity, UserEntityRelation
 
 import unicodedata, re
+from django.core.validators import RegexValidator
+from django.contrib.auth.validators import UnicodeUsernameValidator
 
 UserModel = get_user_model()
+
+name_validator = UnicodeUsernameValidator()
+tel_regex = RegexValidator(regex=r'^[0-9０-９ー―－‐₋⁻-]+$', message = ("ハイフン「-」なしで数字のみご入力下さい（最大15桁）　例：09012345678."))
+zip_regex = RegexValidator(regex=r'^[0-9０-９]{7}+$', message = ("7桁の数字のみご入力ください　例: '1234567'"))
+
+tran_zen_han = str.maketrans('―－‐ー₋—⁻０１２３４５６７８９', '-------0123456789')
 
 #ログインフォーム
 class MyLoginForm(AuthenticationForm):
@@ -50,30 +58,30 @@ class UserCreateForm(UserCreationForm):
 class MyPageForm_admin(forms.ModelForm):
   class Meta:
     model = CustomUser
-    fields = ('personname', )
+    fields = ('userName', )
 
 class MyPageForm_buyer(forms.ModelForm):
   class Meta:
     model = CustomUser
-    fields = ('personname', )
+    fields = ('userName', )
 
 class MyPageForm_seller(forms.ModelForm):
   class Meta:
     model = CustomUser
-    fields = ('personname', )
+    fields = ('userName', )
 
 #ログインフォーム
-class MyLoginForm(AuthenticationForm):
-
-  class Meta:
-    model = UserModel
-    fields = ('email', 'password')
-
-  def __init__(self, *args, **kwargs):
-    super().__init__(*args, **kwargs)
-    for field in self.fields.values():
-      field.widget.attrs['class'] = 'form-control'
-      field.widget.attrs['placeholder'] = field.label
+#class MyLoginForm(AuthenticationForm):
+#
+#  class Meta:
+#    model = UserModel
+#    fields = ('email', 'password')
+#
+#  def __init__(self, *args, **kwargs):
+#    super().__init__(*args, **kwargs)
+#    for field in self.fields.values():
+#      field.widget.attrs['class'] = 'form-control'
+#      field.widget.attrs['placeholder'] = field.label
 
 
 """パスワード変更フォーム"""
@@ -87,60 +95,84 @@ class MyPasswordChangeForm(PasswordChangeForm):
 
 class EntitySetForm_buyer(forms.Form):
 
-  class Meta:
-    model = UserEntityRelation
-    fields = ('personname', 'tel_direct', )
-    labels = {
-      'personname': 'お名前（個人名）',
-      'tel_direct': '電話番号（直通）',
+  """ ユーザー（担当者）情報 """
+  entityName = forms.CharField(label='取引主体名', max_length=100)
+  userName = forms.CharField(label='あなたのお名前', max_length=100)
+  tel_user = forms.CharField(label='電話番号（直通）', max_length=30)
+  department = forms.CharField(label='所属部署', max_length=100)
+  title = forms.CharField(label='役職', max_length=100)
 
-    }
+  #class Meta:
+  #  model = UserEntityRelation
+  #  fields = ('userName', 'tel_user', )
+  #  labels = {
+  #    'userName': 'お名前（個人名）',
+  #    'tel_direct': '電話番号（直通）',
+  #  }
 
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
-      
+
     for field in self.fields.values():
       field.widget.attrs['class'] = 'form-control'
 
-    #self.fields['personname'].widget.attrs['placeholder'] = '記入例：山田 太郎'
-    #self.fields['tel_direct'].widget.attrs['placeholder'] = '数字のみ、ご記載ください'
+    self.fields['userName'].widget.attrs['placeholder'] = '記入例：山田 太郎'
+    self.fields['tel_user'].widget.attrs['placeholder'] = '数字のみご記載ください'
 
-  def clean_personname(self):
-    personname =self.cleaned_data.get('personname')
-    print(f'self.cleaned_data[personname]={personname} (in EntitySetForm_buyer)')
+  def clean_entityName(self):
+    entityName = self.cleaned_data.get('entityName', None)
+    print(f'self.cleaned_data[entityName]={entityName} (in EntitySetForm_buyer)')
+    if entityName is None:
+      raise forms.ValidationError('データが選択されていません。')
+    if entityName is not None :
+      if LegalEntity.objects.filter(entityName=entityName).exists() == False:
+        raise forms.ValidationError('登録された以外のデータが選択されています。')
+      return unicodedata.normalize('NFKC', entityName)
 
-    return unicodedata.normalize('NFKC', self.cleaned_data['personname'])
+    return entityName
+    
+  def clean_userName(self):
+    userName =self.cleaned_data.get('userName', None)
+    print(f'self.cleaned_data[userName]={userName} (in EntitySetForm_buyer)')
+    return unicodedata.normalize('NFKC', self.cleaned_data['userName'])
 
-  def clean_tel_direct(self):
-    tel1 = self.cleaned_data['tel_direct'].translate(tran_zen_han)
+  def clean_tel_user(self):
+    tel1 = self.cleaned_data['tel_user'].translate(tran_zen_han)
     tel2 = unicodedata.normalize('NFKC', ''.join(re.findall('[0-9０-９]+', tel1)))
-    print(f'tel2:{tel2}（clean_tel_direct. in class EntitySetForm_seller）')
+    print(f'tel2:{tel2}（clean_tel_user. in class EntitySetForm_buyer）')
     return tel2
 
+  def clean_department(self):
+    department =self.cleaned_data.get('department', None)
+    print(f'self.cleaned_data[department]={department} (in EntitySetForm_buyer)')
+    return unicodedata.normalize('NFKC', self.cleaned_data['department'])
 
-from django.core.validators import RegexValidator
-from django.contrib.auth.validators import UnicodeUsernameValidator
+  def clean_title(self):
+    title =self.cleaned_data.get('title', None)
+    print(f'self.cleaned_data[title]={title} (in EntitySetForm_buyer)')
+    return unicodedata.normalize('NFKC', self.cleaned_data['title'])
 
-name_validator = UnicodeUsernameValidator()
-tel_regex = RegexValidator(regex=r'^[0-9０-９ー―－‐₋⁻-]+$', message = ("ハイフン「-」なしで数字のみご入力下さい（最大15桁）　例：09012345678."))
+
+class EntityCreateForm_buyer(forms.Form):
+
+  """ パートナー情報 """
+  entityName = forms.CharField(label='取引主体名', max_length=100)
+  entityName_selected = forms.CharField(label='取引主体名', max_length=100)
+
+  representitive = forms.CharField(label='代表者名', max_length=100)
+  zip_entity = forms.CharField(label='郵便番号', max_length=15)
+  # ★★ 240801 現状では郵便番号どまりだが、住所を入力するようにする
+  tel_entity = forms.CharField(label='電話番号（代表）', max_length=30)
 
 
-class EntityCreateForm_buyer(forms.ModelForm):
-
-  #企業の場合の入力値、個人の場合はpersonnameが入る
-  entityname = models.CharField('取引主体名', max_length=150, unique=False, default="", null=True, blank=True, validators=[name_validator],)
-  representitive = models.CharField('代表者名', max_length=150, unique=False, default="", null=True, validators=[name_validator],)
-  tel_main = models.CharField(_('電話番号（代表）'), max_length=30, default="", null=False, validators=[tel_regex])
-
-  #企業の場合、住所は全部入力する
-  postal_code_regex = RegexValidator(regex=r'^[0-9]+$', message = _("Postal Code must be entered in the format: '1234567'. Up to 7 digits allowed."))
-  postal_code = models.CharField(_('郵便番号'), max_length=7, default="", null=False, blank=True, validators=[postal_code_regex])
-
-  personname = models.CharField('お名前（個人）', blank=False, max_length=150, unique=False, null=True,)
-  tel_direct = models.CharField(_('電話番号（直通）'), max_length=30, default="", null=False, validators=[tel_regex])
-
-  department = models.CharField(_('部署名'), max_length=150, default="", blank=True, null=True)   # Entityが法人の場合
-  title = models.CharField(_('役職名'), max_length=150, default="", blank=True, null=True)        # Entityが法人の場合
+  """ ユーザー情報（個人のとき） """
+  lastName = forms.CharField(label='お名前（個人）', max_length=50)
+  firstName = forms.CharField(label='お名前（個人）', max_length=50)
+  lastName_kana = forms.CharField(label='お名前（個人）', max_length=50)
+  firstName_kana = forms.CharField(label='お名前（個人）', max_length=50)
+  tel_user = forms.CharField(label='電話番号（直通）', max_length=30)
+  department = forms.CharField(label='部署名', max_length=100)
+  title = forms.CharField(label='役職名', max_length=100)
 
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
@@ -148,25 +180,40 @@ class EntityCreateForm_buyer(forms.ModelForm):
     for field in self.fields.values():
       field.widget.attrs['class'] = 'form-control'
 
-    self.fields['personname'].widget.attrs['placeholder'] = '記入例：山田 太郎'
-    self.fields['tel_main'].widget.attrs['placeholder'] = '数字のみ、ご記載ください'
-    self.fields['postal_code'].widget.attrs['placeholder'] = '数字のみ、ご記載ください'
-    self.fields['tel_direct'].widget.attrs['placeholder'] = '数字のみ、ご記載ください'
-
-  def clean_personname(self):
-    print(self.cleaned_data['personname'])
-    personname =self.cleaned_data.get('personname')
-    personname 
-    print(f'self.cleaned_data[personname]={personname} (in EntityCreateForm_buyer)')
-
-    return unicodedata.normalize('NFKC', self.cleaned_data['personname'])
+    # 注釈が必要な項目だけ
+    self.fields['userName'].widget.attrs['placeholder'] = '記入例：窮仁 太郎'
+    self.fields['tel_entity'].widget.attrs['placeholder'] = '数字のみご記載ください。'
+    self.fields['zip_entity'].widget.attrs['placeholder'] = '数字のみご記載ください。'
+    self.fields['tel_user'].widget.attrs['placeholder'] = '数字のみご記載ください。'
+    self.fields['zip_user'].widget.attrs['placeholder'] = '数字のみご記載ください。'
+  
         
-  def clean_entityname(self):
-    entityname = self.cleaned_data.get('entityname')
-    print(f'self.cleaned_data[entityname]={entityname} (in EntityCreateForm_buyer)')
-    if entityname is not None :
-      return unicodedata.normalize('NFKC', entityname)   
-    return entityname
+  def clean_entityName(self):
+    entityName = self.cleaned_data.get('entityName')
+    print(f'self.cleaned_data[entityName]={entityName} (in EntityCreateForm_buyer)')
+    if entityName is not None :
+      return unicodedata.normalize('NFKC', entityName)   
+    return entityName
+
+  def clean_tel_entity(self):
+    tel1 = self.cleaned_data['tel_entity'].translate(tran_zen_han)
+    tel2 = unicodedata.normalize('NFKC', ''.join(re.findall('[0-9０-９]+', tel1)))
+    print(f'tel2:{tel2}（clean_tel_entity. in class EntityCreateform_buyer）')
+    return tel2
+    
+  def clean_zip_entity(self):
+    zip1 = self.cleaned_data['zip_entity'].translate(tran_zen_han)
+    zip2 = unicodedata.normalize('NFKC', ''.join(re.findall('[0-9０-９]+', zip1)))
+    return zip2
+
+  def clean_userName(self):
+    return unicodedata.normalize('NFKC', self.cleaned_data['userName'])
+
+  def clean_tel_user(self):
+    tel1 = self.cleaned_data['tel_user'].translate(tran_zen_han)
+    tel2 = unicodedata.normalize('NFKC', ''.join(re.findall('[0-9０-９]+', tel1)))
+    print(f'tel2:{tel2}（clean_tel_user. in class EntityCreateform_buyer）')
+    return tel2
 
   def clean_department(self):
     department = self.cleaned_data['department']
@@ -181,60 +228,105 @@ class EntityCreateForm_buyer(forms.ModelForm):
       return unicodedata.normalize('NFKC', title)
     return title
 
-  def clean_tel_main(self):
-    tel1 = self.cleaned_data['tel_main'].translate(tran_zen_han)
-    tel2 = unicodedata.normalize('NFKC', ''.join(re.findall('[0-9０-９]+', tel1)))
-    print(f'tel2:{tel2}（clean_tel_main. in class EntityCreateform_buyer）')
-    return tel2
-    
-  def clean_postal_code(self):
-    postal_code1 = self.cleaned_data['postal_code'].translate(tran_zen_han)
-    postal_code2 = unicodedata.normalize('NFKC', ''.join(re.findall('[0-9０-９]+', postal_code1)))
-    return postal_code2
 
-  def clean_tel_direct(self):
-    tel1 = self.cleaned_data['tel_direct'].translate(tran_zen_han)
-    tel2 = unicodedata.normalize('NFKC', ''.join(re.findall('[0-9０-９]+', tel1)))
-    print(f'tel2:{tel2}（clean_tel_direct. in class EntityCreateform_buyer）')
-    return tel2
-
-
-tran_zen_han = str.maketrans('―－‐ー₋—⁻０１２３４５６７８９', '-------0123456789')
-
-
-# ★★★ 25/06/17 
-class UserAddForm_buyer(UserCreationForm):
+## Metaを使う時には、forms.ModelFormを継承するべき 25/06/02
+class AgreementConfirmForm_buyer(forms.Form):
 
   class Meta:
-    model = UserModel
-    fields = ('is_approver_buyer_all', 'is_approver_buyer_add', 'is_approver_buyer_qpay', )
+    model = LegalEntity
+    fields = ('membershipConsent_boolean')
+
+
+# 25/08/24 設定したモデルは6/17 
+class UserAddForm_buyer(forms.Form):
+
+  canApprove_all = forms.BooleanField(label='承認権限（全部）')
+  canApprove_add = forms.BooleanField(label='承認権限（参加）')
+  canApprove_qpay = forms.BooleanField(label='承認権限（Qpay）')
 
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
+    #for field in self.fields.values():
+    #  field.widget.attrs['class'] = 'form-check form-switch'
+
+# 25/08/30追加 
+class PermissionUpdateForm_buyer(forms.Form):
+ 
+  canApprove_all = forms.BooleanField(label='承認権限（全部）')
+  canApprove_add = forms.BooleanField(label='承認権限（参加）')
+  canApprove_qpay = forms.BooleanField(label='承認権限（Qpay）')
+
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+    #for field in self.fields.values():
+    #  field.widget.attrs['class'] = 'form-check form-switch'
+
+# ★★ 250929 エンティティを選択するケースがカバーされていない
+class EntitySetForm_seller(forms.Form):
+
+  entityName = forms.CharField(label='取引主体名', max_length=100)
+  userName = forms.CharField(label='あなたのお名前', max_length=100)
+  tel_user = forms.CharField(label='電話番号（直通）', max_length=30)
+  department = forms.CharField(label='所属部署', max_length=100)
+  title = forms.CharField(label='役職', max_length=100)
+  
+
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+
     for field in self.fields.values():
-      field.widget.attrs['class'] = 'form-check form-switch'
+      field.widget.attrs['class'] = 'form-control'
 
-    self.fields['is_approver_buyer_all'].widget.attrs['label'] = "すべて"
-    self.fields['is_approver_buyer_add'].widget.attrs['label'] = "ユーザー追加"
-    self.fields['is_approver_buyer_qpay'].widget.attrs['label'] = "前払いの承認"
+    self.fields['userName'].widget.attrs['placeholder'] = '例：山田 太郎'
+    self.fields['tel_user'].widget.attrs['placeholder'] = '数字のみご記載ください'
+
+  def clean_entityName(self):
+    entityName = self.cleaned_data.get('entityName', None)
+    print(f'self.cleaned_data[entityName]={entityName} (in EntitySetForm_seller)')
+    if entityName is None:
+      raise forms.ValidationError('データが選択されていません。')
+    if entityName is not None :
+      if LegalEntity.objects.filter(entityName=entityName).exists() == False:
+        raise forms.ValidationError('登録された以外のデータが選択されています。')
+      return unicodedata.normalize('NFKC', entityName)
+
+  def clean_userName(self):
+    return unicodedata.normalize('NFKC', self.cleaned_data['userName'])
+
+  def clean_tel_user(self):
+    tel1 = self.cleaned_data['tel_user'].translate(tran_zen_han)
+    tel2 = unicodedata.normalize('NFKC', ''.join(re.findall('[0-9０-９]+', tel1)))
+    print(f'tel2:{tel2}（clean_tel_user. in class EntitySetForm_seller）')
+    return tel2
 
 
-class EntityCreateForm_seller(forms.ModelForm):
+class EntityCreateForm_seller(forms.Form):
 
-  #企業の場合の入力値、個人の場合はpersonnameが入る
-  entityname = models.CharField('取引主体名', max_length=150, unique=False, default="", null=True, blank=True, validators=[name_validator],)
-  representitive = models.CharField('代表者名', max_length=150, unique=False, default="", null=True, validators=[name_validator],)
-  tel_main = models.CharField(_('電話番号（代表）'), max_length=30, default="", null=False, validators=[tel_regex])
+  # ★★ 250927 個人（type2=1）に対するの対応を追加
 
-  #企業の場合、住所は全部入力する
-  postal_code_regex = RegexValidator(regex=r'^[0-9]+$', message = _("Postal Code must be entered in the format: '1234567'. Up to 7 digits allowed."))
-  postal_code = models.CharField(_('郵便番号'), max_length=7, default="", null=False, blank=True, validators=[postal_code_regex])
+  """ 個人・法人の共通項目 """
+  lastName = forms.CharField(label='姓（last name）', max_length=50)
+  firstName = forms.CharField(label='名（first name）', max_length=50)
+  lastName_kana = forms.CharField(label='姓（フリガナ）', max_length=50)
+  firstName_kana = forms.CharField(label='名（フリガナ）', max_length=50)
 
-  personname = models.CharField('お名前（個人）', blank=False, max_length=150, unique=False, null=True,)
-  tel_direct = models.CharField(_('電話番号（直通）'), max_length=30, default="", null=False, validators=[tel_regex])
+  tel_user = forms.CharField(label='電話番号（直通）', max_length=30)
 
-  department = models.CharField(_('部署名'), max_length=150, default="", blank=True, null=True)   # Entityが法人の場合
-  title = models.CharField(_('役職名'), max_length=150, default="", blank=True, null=True)        # Entityが法人の場合
+  """ 個人のときだけ（type2=1）の項目 """
+  # ★★ 250927 住所を入力するようにする
+  zip_user = forms.CharField(label='郵便番号', max_length=15, required=False)
+
+  """ 法人だけの項目 """
+  entityName = forms.CharField(label='取引主体名', max_length=100, required=False)  # 個人の場合はuserNameと同じ情報となる
+  representitive = forms.CharField(label='代表者名', max_length=100, required=False)
+  zip_entity = forms.CharField(label='郵便番号', max_length=15, required=False)
+
+  # ★★ 260927 住所を入力するようにする
+  tel_entity = forms.CharField(label='電話番号（代表）', max_length=30, required=False)
+
+  """ 法人だけにある担当者情報 """
+  department = forms.CharField(label='部署名', max_length=100, required=False)
+  title = forms.CharField(label='役職名', max_length=100, required=False)
 
 
   def __init__(self, *args, **kwargs):
@@ -242,25 +334,55 @@ class EntityCreateForm_seller(forms.ModelForm):
       
     for field in self.fields.values():
       field.widget.attrs['class'] = 'form-control'
-      field.widget.attrs['placeholder'] = field.label
 
-    self.fields['personname'].widget.attrs['placeholder'] = '記入例：山田 太郎'
-    self.fields['tel_main'].widget.attrs['placeholder'] = '数字のみ、ご記載ください'
-    self.fields['postal_code'].widget.attrs['placeholder'] = '数字のみ、ご記載ください'
-    self.fields['tel_direct'].widget.attrs['placeholder'] = '数字のみ、ご記載ください'
+    self.fields['lastName'].widget.attrs['placeholder'] = '例：山田'
+    self.fields['firstName'].widget.attrs['placeholder'] = '例：太郎'
+    self.fields['lastName_kana'].widget.attrs['placeholder'] = '例：ヤマダ'
+    self.fields['firstName_kana'].widget.attrs['placeholder'] = '例：タロウ'
+    self.fields['tel_entity'].widget.attrs['placeholder'] = '数字のみ、ご記載ください'
+    self.fields['zip_entity'].widget.attrs['placeholder'] = '数字のみ、ご記載ください'
+    self.fields['tel_user'].widget.attrs['placeholder'] = '数字のみ、ご記載ください'
 
-  def clean_personname(self):
-    print(self.cleaned_data['personname'])
-    personname =self.cleaned_data.get('personname')
-    print(f'self.cleaned_data[personname]={personname} (in EntityCreateForm_seller)')
-    return unicodedata.normalize('NFKC', self.cleaned_data['personname'])
-        
-  def clean_entityname(self):
-    entityname = self.cleaned_data.get('entityname')
-    print(f'self.cleaned_data[entityname]={entityname} (in EntityCreateForm_seller)')
-    if entityname is not None :
-      return unicodedata.normalize('NFKC', entityname)   
-    return entityname
+
+  def clean_lastName(self):
+    lastName = re.sub("[\u3000 \t]", "", self.cleaned_data['lastName'])
+    return unicodedata.normalize('NFKC', lastName)
+    # unicodedaata.normalize('NFKC',)で「unicodeの正規化」
+    # カタカナは半角を全角に、数字は全角を半角にする
+
+  def clean_lastName_kana(self):
+    lastName_kana = re.sub("[\u3000 \t]", "", self.cleaned_data['lastName_kana']) # スペースとタブを削除
+    lastName_kana = unicodedata.normalize('NFKC', lastName_kana)
+    print(f'lastName_kana={lastName_kana} in def clean_lastName_kana in EntityCreateForm_seller')
+    if bool(re.search(r'[ァ-ヶ]', lastName_kana)) == False:
+      raise forms.ValidationError('カナ以外の文字が入力されています')
+    return lastName_kana
+  
+    
+  def clean_firstName(self):
+    firstName = re.sub("[\u3000 \t]", "", self.cleaned_data['firstName'])
+    return unicodedata.normalize('NFKC', firstName)
+    # unicodedaata.normalize('NFKC',)で「unicodeの正規化」
+    # カタカナは半角を全角に、数字は全角を半角にする
+
+  def clean_firstName_kana(self):
+    firstName_kana = re.sub("[\u3000 \t]", "", self.cleaned_data['firstName_kana'])
+    firstName_kana = unicodedata.normalize('NFKC', firstName_kana)
+    if bool(re.search(r'[ァ-ヶ]', firstName_kana)) == False:
+      raise forms.ValidationError('カナ以外の文字が入力されています')
+    return firstName_kana
+
+  def clean_tel_user(self):
+    tel_user = self.cleaned_data['tel_user'].translate(tran_zen_han)
+    tel_user = unicodedata.normalize('NFKC', ''.join(re.findall(r'\d+', tel_user)))
+    print(f'tel_user:{tel_user}（clean_tel_user. in class EntityCreateform_seller）')
+    return tel_user
+
+  def clean_zip_user(self):
+    zip_user = self.cleaned_data['zip_user'].translate(tran_zen_han)
+    zip_user = unicodedata.normalize('NFKC', ''.join(re.findall(r'\d+', zip_user)))
+    print(f'self.cleaned_data[zip_user]={zip_user} (clean_zip_user in EntityCreateForm_seller)')
+    return zip_user
 
   def clean_department(self):
     department = self.cleaned_data['department']
@@ -275,75 +397,70 @@ class EntityCreateForm_seller(forms.ModelForm):
       return unicodedata.normalize('NFKC', title)
     return title
 
-  def clean_tel_main(self):
-    tel1 = self.cleaned_data['tel_main'].translate(tran_zen_han)
+
+  def clean_entityName(self):
+    entityName = self.cleaned_data.get('entityName')
+    print(f'self.cleaned_data[entityName]={entityName} (in EntityCreateForm_seller)')
+    if entityName is None :
+      raise forms.ValidationError('この項目は必須となります。ご入力お願いたします。')
+    return entityName
+
+  def clean_tel_entity(self):
+    tel1 = self.cleaned_data['tel_entity'].translate(tran_zen_han)
     tel2 = unicodedata.normalize('NFKC', ''.join(re.findall('[0-9０-９]+', tel1)))
-    print(f'tel2:{tel2}（clean_tel_main. in class EntityCreateform_seller）')
+    print(f'tel2:{tel2}（clean_tel_entity. in class EntityCreateform_seller）')
     return tel2
     
-  def clean_postal_code(self):
-    postal_code1 = self.cleaned_data['postal_code'].translate(tran_zen_han)
-    postal_code2 = unicodedata.normalize('NFKC', ''.join(re.findall('[0-9０-９]+', postal_code1)))
-    return postal_code2
+  def clean_zip_entity(self):
+    zip1 = self.cleaned_data['zip_entity'].translate(tran_zen_han)
+    zip2 = unicodedata.normalize('NFKC', ''.join(re.findall('[0-9０-９]+', zip1)))
+    return zip2
 
-  def clean_tel_direct(self):
-    tel1 = self.cleaned_data['tel_direct'].translate(tran_zen_han)
-    tel2 = unicodedata.normalize('NFKC', ''.join(re.findall('[0-9０-９]+', tel1)))
-    print(f'tel2:{tel2}（clean_tel_direct. in class EntityCreateform_seller）')
-    return tel2
-
-# 使っていないから削除予定
-class EntityConfirmForm_buyer(forms.Form):
-
-  class Meta:
-    model = LegalEntity
-
-# 使っていないから削除予定
-class EntityConfirmForm_seller(forms.Form):
-
-  class Meta:
-    model = LegalEntity
-
-
-## Metaを使う時には、forms.ModelFormを継承するべき 25/06/02
-class AgreementConfirmForm_buyer(forms.Form):
-
-  class Meta:
-    model = LegalEntity
-    fields = ('is_consent_membership')
 
 class AgreementConfirmForm_seller(forms.Form):
 
   class Meta:
     model = LegalEntity
-    fields = ('is_consent_membership')
+    fields = ('membershipConsent_boolean')
 
 
-#class MyPageForm_buyer(forms.ModelForm):
-#
-#  class Meta:
-#    model = LegalEntity
-#    fields = ('personname', 'tel', 'entityname', 'department', 'title', 'postal_code')
-#
-#class MyPageForm_seller(forms.ModelForm):
-#
-#  class Meta:
-#    model = LegalEntity
-#    fields = ('personname', 'tel', 'entityname', 'department', 'title', 'postal_code')
+class UserAddForm_seller(forms.Form):
 
+  #applyUser_id = forms.IntegerField(label='申請者ユーザーID')
+  canApprove_all = forms.BooleanField(label='承認権限（全部）')
+  canApprove_add = forms.BooleanField(label='承認権限（参加）')
+  canApprove_qpay = forms.BooleanField(label='承認権限（Qpay）')
+
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+    #for field in self.fields.values():
+    #  field.widget.attrs['class'] = 'form-check form-switch'
+
+
+# 25/08/30追加 
+class PermissionUpdateForm_seller(forms.Form):
+
+  canApprove_all = forms.BooleanField(label='承認権限（全部）')
+  canApprove_add = forms.BooleanField(label='承認権限（参加）')
+  canApprove_qpay = forms.BooleanField(label='承認権限（Qpay）')
+
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+    #for field in self.fields.values():
+    #  field.widget.attrs['class'] = 'form-check form-switch'
 
 # 24/06/30作成
 class ContactForm(forms.Form):
 
-  name = forms.CharField(label='お名前')
+  userName = forms.CharField(label='お名前')
   email = forms.EmailField(label='メールアドレス')
   title = forms.CharField(label='件名')
   message = forms.CharField(label='メッセージ', widget=forms.Textarea)
 
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
-    #self.fields['name'].widget.attrs['placeholder'] = 'お名前をご入力してください。'
-    self.fields['name'].widget.attrs['class'] = 'form-control'
+    #self.fields['userName'].widget.attrs['placeholder'] = 'お名前をご入力してください。'
+    self.fields['userName'].widget.attrs['class'] = 'form-control'
 
     #self.fields['email'].widget.attrs['placeholder'] = 'メールアドレスをご入力してください。'
     self.fields['email'].widget.attrs['class'] = 'form-control'
@@ -354,19 +471,50 @@ class ContactForm(forms.Form):
     #self.fields['message'].widget.attrs['placeholder'] = 'メッセージををご入力してください。'
     self.fields['message'].widget.attrs['class'] = 'form-control'
 
+class BankSelectForm(forms.ModelForm):
+
+  class Meta:
+    model = BankAccount
+    fields = (
+      'bankCode',
+      'branchCode',
+    ) 
+
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+
+    for field in self.fields.values():
+      field.widget.attrs['class'] = 'form-control'
+
+  def clean_bankCode(self):
+    bankCode = self.cleaned_data.get('bankCode')
+    bankCode = unicodedata.normalize('NFKC', bankCode)
+    print(f'pass1 self.cleaned_data[bankCode]={bankCode} (in BankSelectForm)')
+    if re.match(r"^\d{4}$", bankCode) is None:
+      print(f'pass2 self.cleaned_data[bankCode]={bankCode} (bankCode is None or blank in BankSelectForm)')
+      raise forms.ValidationError('銀行が選択されていません') 
+    return bankCode
+  
+  def clean_branchCode(self):
+    branchCode = self.cleaned_data.get('branchCode')
+    branchCode = unicodedata.normalize('NFKC', branchCode)
+    print(f'pass1 self.cleaned_data[branchCode]={branchCode} (in BankSelectForm)')
+    if re.match(r"^\d{3}$", branchCode) is None:
+      print(f'pass2 self.cleaned_data[branchCode]={branchCode} (branchCode is None or blank inBankSelectForm)')
+      raise forms.ValidationError('支店が選択されていません')
+    return branchCode
+
 # 24/07/14作成
 class BankAccountForm(forms.ModelForm):
 
   class Meta:
     model = BankAccount
     fields = (
-      'temporal_tx_id', # 取引と紐づいて受取口座を設定する際に利用 25/02/01
-      'entity_id',
-      'BankCode',
-      'BankName',
-      'BranchCode',
-      'BranchName',
-      'holdername',
+      'bankCode',
+      'bankName',
+      'branchCode',
+      'branchName',
+      'holderName',
       'accountNumber',
     ) 
 
@@ -394,23 +542,6 @@ class BankAccountForm(forms.ModelForm):
 #
 #    return accountNumber
 
-
-class InfoEditForm_seller(forms.ModelForm):
-
-  #企業の場合の入力値、個人の場合はpersonnameが入る
-  entityname = models.CharField('取引主体名', max_length=150, unique=False, default="", null=True, blank=True, validators=[name_validator],)
-  representitive = models.CharField('代表者名', max_length=150, unique=False, default="", null=True, validators=[name_validator],)
-  tel_main = models.CharField(_('電話番号（代表）'), max_length=30, default="", null=False, validators=[tel_regex])
-
-  #企業の場合、住所は全部入力する
-  postal_code_regex = RegexValidator(regex=r'^[0-9]+$', message = _("Postal Code must be entered in the format: '1234567'. Up to 7 digits allowed."))
-  postal_code = models.CharField(_('郵便番号'), max_length=7, default="", null=False, blank=True, validators=[postal_code_regex])
-
-  personname = models.CharField('お名前（個人）', blank=False, max_length=150, unique=False, null=True,)
-  tel_direct = models.CharField(_('電話番号（直通）'), max_length=30, default="", null=False, validators=[tel_regex])
-
-  department = models.CharField(_('部署名'), max_length=150, default="", blank=True, null=True)   # Entityが法人の場合
-  title = models.CharField(_('役職名'), max_length=150, default="", blank=True, null=True)        # Entityが法人の場合
 
 
 # 25/05/17 パスワード変更用意追加

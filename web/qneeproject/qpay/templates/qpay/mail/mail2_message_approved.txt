@@ -1,6 +1,6 @@
-{{ tx.seller_user_personname }} 様 ご利用ありがとうございます。
+{{ tx.sellUser_userName }} 様 ご利用ありがとうございます。
 
-{{ tx.buyer_entityname }} 様が {{ tx.seller_entityname }} 様の申請を承認されました。
+{{ tx.buyer_entityname }} 様が {{ tx.sellEntityName }} 様の申請を承認されました。
 下記に移った先から銀行口座をご登録お願いいたします。
 
 銀行口座登録用URL

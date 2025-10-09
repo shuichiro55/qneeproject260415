@@ -1,0 +1,171 @@
+{% extends "index/base_qconnect_buyer.html" %}
+
+{% load bootstrap_icons %}
+{% load humanize %}
+
+{% block content %}
+{% csrf_token %}
+
+
+<div class="authentication-bg min-vh-100 min-vw-100 align-items-start">
+
+  <div class="container">
+
+    <!-- 本番環境ではmessagesは「DEBUG=False」として非表示とする -->
+    <div class="row justify-content-center">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" role="alert">
+          <span>{{ message }}</span>
+        </div>
+      {% endfor %}
+    </div>
+
+    <nav aria-label="breadcrumb" role="navigation">
+      <ol class="breadcrumb text-dark mt-1" >
+        <li class="breadcrumb-item text-dark text-decoration:underline"><a href="{% url 'accounts:mypage_buyer' %}">マイページ・ホーム</a></li>
+        <li class="breadcrumb-item text-dark" aria-current="page"><a href="{% url 'accounts:infoEdit_buyer' %}">設定メニュー</a></li>
+        <li class="breadcrumb-item text-dark active" aria-current="page">ユーザー権限一覧</li>
+      </ol>
+    </nav>
+
+    <div class="d-flex justify-content-center mt-4">
+      <h5>{% bs_icon 'files' color='cornflowerblue' size='1.8em' %}　ユーザー権限一覧</h5>
+
+    </div>
+
+    <div class="row justify-content-center my-auto">
+    
+      <div class="col-10 col-md-8 col-lg-6 col-xl-5">
+
+        <form method="POST" class="bg-light rounded-2 mt-2 p-3">
+          {% csrf_token %}
+
+          <div class="d-flex justify-content-start">
+
+            {% if loginUser.canApprove_all == True %}
+              <button type="submit" class="btn btn-outline-primary bg-light"
+                name="next1" value="Edit_{{loginUser.id}}">
+                権限を編集</button>
+                <!-- リストでは「name="next1"」とし、編集画面では「name="next2"」とする-->
+            {% else %}
+              <span class="d-inline-block" tabindex="0"
+                data-bs-toggle="tooltip"
+                data-ba-placement="top"
+                title="編集権限がありません">
+                <button type="submit" class="btn btn-outline-primary bg-light"
+                  name="next1" value="Edit_{{loginUser.id}}" disabled>
+                  権限を編集</button>
+              </span>
+            {% endif %}
+
+          </div>
+
+          <table class="table table-bordered border-primary-subtle table-responsive mt-2">
+            <tbody class="text-center">
+              <tr>
+                <th scope="col" width="40%" colspan="2" class="table-primary" style="text-align: left;">申請者</th>
+                <td style="text-align: right;">{{ loginUser.userName }}さん</td></tr>
+              <tr>
+                <th scope="col"width="40%" colspan="2" class="table-primary" style="text-align: left;">電話番号</th>
+                <td style="text-align: right;">{{ loginUser.tel_user }}</td></tr>
+              <tr>
+                <th scope="col" width="40%" colspan="2" class="table-primary" style="text-align: left;">所属部署</th>
+                <td style="text-align: right;">{{ loginUser.department }}</td></tr>
+              <tr> 
+                <th scope="col"  width="40%" colspan="2" class="table-primary" style="text-align: left;">役職</th>
+                <td style="text-align: right;">{{ loginUser.title }}</td></tr>
+ 
+              <tr>
+                <th scope="col" td width="15%" rowspan="3" class="table-primary" style="text-align: left;">
+                  権限</th>
+                <th width="25%" class="table-primary" style="text-align: left;">すべて</td>
+                <td style="text-align: right;">
+                  {% if loginUser.canApprove_all %} 権限あり {% else %} 権限なし {% endif %}
+                </td></tr>
+              <tr>
+                <th width="25%" class="table-primary" style="text-align: left;">参加承認</th>
+                <td style="text-align: right;">
+                  {% if loginUser.canApprove_add %} 権限あり {% else %} 権限なし {% endif %}
+                </td></tr>
+              <tr>
+                <th width="25%" class="table-primary" style="text-align: left;">Ｑｐａｙ</th>                  
+                <td style="text-align: right;">
+                  {% if loginUser.canApprove_qpay %} 権限あり {% else %} 権限なし {% endif %}
+                </td></tr>
+            </tbody>
+          </table>
+
+          <hr>
+
+          {% for eachUser in entityUsers %}
+
+            {% if eachUser.id != loginUser.id %}
+
+              <div class="d-flex justify-content-start">
+
+                {% if loginUser.canApprove_all == True %}
+                  <button type="submit" class="btn btn-outline-primary bg-light"
+                    name="next1" value="Edit_{{eachUser.id}}">
+                    権限を編集</button>
+                    <!-- リストでは「name="next1"」とし、編集画面では「name="next2"」とする-->
+                {% else %}
+                  <span class="d-inline-block" tabindex="0"
+                    data-bs-toggle="tooltip"
+                    data-ba-placement="top"
+                    title="編集権限がありません">
+                    <button type="submit" class="btn btn-outline-primary bg-light"
+                      name="next1" value="Edit_{{eachUser.id}}" disabled>
+                      権限を編集</button>
+                  </span>
+                {% endif %}
+              </div>
+
+              <table class="table table-bordered border-primary-subtle table-responsive mt-2">
+                <tbody class="text-center">
+                  <tr>
+                    <th scope="col" width="40%" colspan="2" class="table-primary" style="text-align: left;">申請者</td>
+                    <td style="text-align: right;">{{ eachUser.userName }}さん</td></tr>
+                  <tr>
+                    <th scope="col"width="40%" colspan="2" class="table-primary" style="text-align: left;">電話番号</td>
+                    <td style="text-align: right;">{{ eachUser.tel_user }}</td></tr>
+                  <tr>
+                    <th scope="col" width="40%" colspan="2" class="table-primary" style="text-align: left;">所属部署</td>
+                    <td style="text-align: right;">{{ eachUser.department }}</td></tr>
+                  <tr> 
+                    <th scope="col"  width="40%" colspan="2" class="table-primary" style="text-align: left;">役職</td>
+                    <td style="text-align: right;">{{ eachUser.title }}</td></tr>
+  
+                  <tr>
+                    <th scope="col" td width="15%" rowspan="3" class="table-primary" style="text-align: left;">
+                      権限</td>
+                    <th width="25%" class="table-primary" style="text-align: left;">すべて</td>
+                    <td style="text-align: right;">
+                      {% if eachUser.canApprove_all %} 権限あり {% else %} 権限なし {% endif %}
+                    </td></tr>
+                  <tr>
+                    <th width="25%" class="table-primary" style="text-align: left;">参加承認</td>
+                    <td style="text-align: right;">
+                      {% if eachUser.canApprove_add %} 権限あり {% else %} 権限なし {% endif %}
+                    </td></tr>
+                  <tr>
+                    <th width="25%" class="table-primary" style="text-align: left;">Ｑｐａｙ</td>                  
+                    <td style="text-align: right;">
+                      {% if eachUser.canApprove_qpay %} 権限あり {% else %} 権限なし {% endif %}
+                    </td></tr>
+                </tbody>
+              </table>
+
+              <hr>
+            {% endif %}
+
+          {% empty %}
+            データがありません
+          {% endfor %}
+
+        </form>
+      </div>
+    </div> <!-- end row -->
+  </div> <!-- end container -->
+</div>
+
+{% endblock %}

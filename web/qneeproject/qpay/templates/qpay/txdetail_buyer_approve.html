@@ -3,14 +3,23 @@
 
 {% block content %}
 
-<div class="authentication-bg min-vh-100 min-vw-100 align-items-start" style="background-color: #def5f9;">
+<div class="authentication-bg min-vh-100 min-vw-100 align-items-start">
 
-  <div class="container mt-2">
+  <div class="container">
+
+    <!-- 本番環境ではmessagesは「DEBUG=False」として非表示とする -->
+    <div class="row justify-content-center my-auto">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" role="alert">
+          <span>{{ message }}</span>
+        </div>
+      {% endfor %}
+    </div>
 
     <nav aria-label="breadcrumb" role="navigation">
-      <ol class="breadcrumb text-dark rounded-2">
-        <li class="breadcrumb-item text-primary"><a href="{% url 'accounts:mypage_buyer' %}">マイページ・ホーム</a></li>
-        <li class="breadcrumb-item active" aria-current="page">前払い申請</li>
+      <ol class="breadcrumb text-dark mt-1">
+        <li class="breadcrumb-item text-dark"><a href="{% url 'accounts:mypage_buyer' %}">マイページ・ホーム</a></li>
+        <li class="breadcrumb-item text-dark active" aria-current="page">前払い申請</li>
       </ol>
     </nav>
 
@@ -32,9 +41,9 @@
           <div class="container">
             <table class="table table-striped table-bordered">
               <tbody>
-                <tr class="table-info"><td width="45%">処理状況</td><td style="text-align:center;">{{ tx.tx_status_char }}</td></tr>
-                <tr><td width="45%">受注者</td><td style="text-align:right;">{{ tx.sellerEntityname }}</td></tr>
-                <tr><td width="45%">申請者</td><td style="text-align:right;">{{ tx.sellerUser_personname }}</td></tr>
+                <tr class="table-info"><td width="45%">処理状況</td><td style="text-align:center;">{{ tx.txStatus_char }}</td></tr>
+                <tr><td width="45%">受注者</td><td style="text-align:right;">{{ tx.sellerEntityName }}</td></tr>
+                <tr><td width="45%">申請者</td><td style="text-align:right;">{{ tx.sellerUser_userName }}</td></tr>
                 <tr><td width="45%">申請額</td><td style="text-align:right;">{{ tx.requested_amount|intcomma }}</td></tr>
                 <tr>
                   <td width="45%">エビデンス</td>
@@ -60,8 +69,7 @@
             <hr>
             
             <div class="d-flex justify-content-center">
-              <a href="{% url 'qpay:txlist_buyer_approve' tx.pk page_num %}" class="btn btn-outline-primary me-3" >
-                一覧</a>
+              <!-- <a href="{% url 'qpay:txlist_buyer_approve' tx.pk page_num %}" class="btn btn-outline-primary me-3" >一覧</a> -->
               <button type="submit" class="btn btn-primary me-3" name="next" value="approve">承認</button>
               <button type="submit" class="btn btn-primary" name="next" value="reject">否認</button>
             </div>

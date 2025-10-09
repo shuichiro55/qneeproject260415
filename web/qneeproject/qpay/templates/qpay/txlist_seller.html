@@ -5,17 +5,25 @@
 {% csrf_token %}
 
 
-<div class="authentication-bg min-vh-100 min-vw-100 align-items-start" style="background-color:#def5f9;">
+<div class="authentication-bg min-vh-100 min-vw-100 align-items-start">
 
-  <div class="container mt-2">
+  <div class="container">
+
+    <!-- 本番環境ではmessagesは「DEBUG=False」として非表示とする -->
+    <div class="row justify-content-center my-auto">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" role="alert">
+          <span>{{ message }}</span>
+        </div>
+      {% endfor %}
+    </div>
 
     <nav aria-label="breadcrumb" role="navigation">
-      <ol class="breadcrumb text-dark rounded-2">
-        <li class="breadcrumb-item text-primary"><a href="{% url 'accounts:mypage_seller' %}">マイページ・ホーム</a></li>
-        <li class="breadcrumb-item active" aria-current="page">取引履歴・書類発行</li>
+      <ol class="breadcrumb text-dark mt-1">
+        <li class="breadcrumb-item text-dark"><a href="{% url 'accounts:mypage_seller' %}">マイページ・ホーム</a></li>
+        <li class="breadcrumb-item text-dark active" aria-current="page">取引履歴・書類発行</li>
       </ol>
     </nav>
-
     
     <div class="d-flex justify-content-center mt-3">
       <h5>取引一覧</h5>
@@ -46,11 +54,11 @@
               {% for item in page_obj %}
                 <tr>
                   <td scope="row" style="text-align:center;">{{ forloop.counter }}</td>
-                  <td>{{ item.buyer_entityname }}</td>
+                  <td>{{ item.buyer_entityName }}</td>
                   <td>{{ item.requested_amount|intcomma }}</td>
                   <td style="text-align:center">{{ item.requested_at|date:"y.n.j" }}<br>{{ item.requested_at|date:"H:i" }}</td>
                   <td style="text-align:center"><img src="{{ item.evidence.url }}" class="img-thumbnail" style="width:50;height:auto"/></td>
-                  <td style="text-align:center">{{ item.tx_status_char|linebreaksbr }}</td>
+                  <td style="text-align:center">{{ item.txStatus_char|linebreaksbr }}</td>
                   <td style="text-align:center">{{ item.approved_at|date:"y.n.j" }}<br>{{ item.approved_at|date:"H:i" }}</td>
                   <td style="text-align:center">
                     <a href="{% url 'qpay:txdetail_seller' item.pk page_obj.number %}"
@@ -77,17 +85,3 @@
 </div>
 
 {% endblock %}
-
-<!--
- {% for item in object_list %}
-<div class="p-4 m-4 bg-light border border-success rounded">
-  <h2 class="text-success">{{ item.title }}</h2>
-    <h6>物件名：{{ item.article_name }}</h6>
-    <h6>対象数：{{ item.number }} 橋</h6>
-    <h6>その他：{{ item.other }}</h6>
-    <div class="mt-3">
-      <a href="{% url 'detail-article' item.pk %}">詳細</a>
-    </div>
-</div>
-{% endfor %}
--->

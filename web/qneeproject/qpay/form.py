@@ -16,18 +16,17 @@ class TxCreateForm(forms.ModelForm):
   class Meta:
     model = QpayTx
     fields = (
-      'id',
-      'buyEntityname',
+      'buyEntityName',
       'requested_amount',
-      'original_payment_date',
-      'sellUser_email',
-      'sellUser_personname',
-      'sellEntityname'
+      'exPayment_date',
+      'sellUser_userName',
+      'sellEntityName'
+      #'sellUser_email',
     )
 #    widgets = {
-#      'original_payment_date': forms.SelectDateWidget
+#      'exPayment_date': forms.SelectDateWidget
 #    }
-#    widgets= {'sellUser_personname':forms.HiddenInput(), 'sellEntityname':forms.HiddenInput()}
+#    widgets= {'sellUser_userName':forms.HiddenInput(), 'sellEntityName':forms.HiddenInput()}
     
   def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -38,21 +37,21 @@ class TxCreateForm(forms.ModelForm):
 
   def clean_requested_amount(self):
       requested_amount = self.cleaned_data.get('requested_amount')
-      print(f'self.cleaned_data[entityname]={requested_amount} (in TxCreateForm)')
+      print(f'self.cleaned_data[entityName]={requested_amount} (in TxCreateForm)')
       if requested_amount is None or "" :
         raise forms.ValidationError("申請金額をご入力ください.")
       return requested_amount
   
-  def clean_original_payment_date(self):
-      original_payment_date = self.cleaned_data.get('original_payment_date')
-      print(f'self.cleaned_data[original_payment_date]={original_payment_date} (in TxCreateForm)')
+  def clean_exPayment_date(self):
+      exPayment_date = self.cleaned_data.get('exPayment_date')
+      print(f'self.cleaned_data[exPayment_date]={exPayment_date} (in TxCreateForm)')
       print(f'datetime.date.today()={datetime.date.today()}')
       
-      if original_payment_date is None or "" :
+      if exPayment_date is None or "" :
         raise forms.ValidationError('「当初報酬日」にもともとの報酬の支払日を入力してください.')
-      if original_payment_date <= datetime.date.today():
+      if exPayment_date <= datetime.date.today():
         raise forms.ValidationError("入力された「当初報酬日」が本日以前になっています.")
-      return original_payment_date
+      return exPayment_date
 
 
 class TxEvidenceForm(forms.ModelForm):
@@ -60,10 +59,9 @@ class TxEvidenceForm(forms.ModelForm):
   class Meta:
     model = QpayTx
     fields = (
-      'id',
       'evidence',
     )
-    #widgets= {'sellUser_personname':forms.HiddenInput(), 'sellEntityname':forms.HiddenInput()}
+    #widgets= {'sellUser_userName':forms.HiddenInput(), 'sellEntityName':forms.HiddenInput()}
 
   # ★全部のフィールドに'form-control'をセットするべきか？ 2025/02/14
   def __init__(self, *args, **kwargs):
@@ -74,7 +72,7 @@ class TxEvidenceForm(forms.ModelForm):
 
   def clean_evidence(self):
       evidence = self.cleaned_data.get('evidence')
-      print(f'self.cleaned_data[entityname]={evidence} (in TxEvidenceForm)')
+      print(f'self.cleaned_data[entityName]={evidence} (in TxEvidenceForm)')
       if evidence is None or "" :
         raise forms.ValidationError('証明書ファイルを選択してください')   
       return evidence
