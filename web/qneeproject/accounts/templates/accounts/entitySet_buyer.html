@@ -8,8 +8,7 @@
 
   <div class="container">
 
-    <!-- 本番環境ではmessagesは「DEBUG=False」として非表示とする -->
-    <div class="row justify-content-center my-auto">
+    <div class="row justify-content-center mt-1">
       {% for message in messages %}
         <div class="alert alert-{{ message.tags }}" role="alert">
           <span>{{ message }}</span>
@@ -64,7 +63,8 @@
       {% if flag_step == 1 %}
 
         <div class="row justify-content-center mt-4">
-          <h5 class="text-black text-center">パートナー登録</h5>
+          <h5 class="text-black text-center">
+            <b>パートナー登録</b></h5>
         </div>
 
         <div class="row justify-content-center mt-5">
@@ -234,7 +234,8 @@
       {% if flag_step == 2 %}
 
         <div class="row justify-content-center mt-4">
-          <h5 class="text-black text-center">ユーザー登録（ご申請内容）</h5>
+          <h5 class="text-black text-center">
+            <b>ユーザー登録（ご申請内容）</b></h5>
         </div>
 
         <div class="row justify-content-center mt-2">

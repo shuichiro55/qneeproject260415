@@ -8,8 +8,7 @@
 
   <div class="container mt-2">
 
-    <!-- 本番環境ではmessagesは「DEBUG=False」として非表示とする -->
-    <div class="row justify-content-center">
+    <div class="row justify-content-center mt-1">
       {% for message in messages %}
         <div class="alert alert-{{ message.tags }}" role="alert">
           <span>{{ message }}</span>
@@ -28,7 +27,7 @@
     {% if flag_step == 1 %}
 
       <div class="d-flex justify-content-center mt-4">
-        <h5>証明書のアップロード</h5>
+        <h5><b>証明書のアップロード</b></h5>
       </div>
 
       <div class="row justify-content-center px-3">

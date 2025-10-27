@@ -11,8 +11,7 @@
 
   <div class="container">
 
-    <!-- 本番環境ではmessagesは「DEBUG=False」として非表示とする -->
-    <div class="row justify-content-center my-auto">
+    <div class="row justify-content-center mt-1">
       {% for message in messages %}
         <div class="alert alert-{{ message.tags }}" role="alert">
           <span>{{ message }}</span>
@@ -29,7 +28,8 @@
 
     
     <div class="d-flex justify-content-center mt-3">
-      <h5>{% bs_icon 'receipt-cutoff' color='cornflowerblue' size='2.5em' %}　取引一覧</h5>
+      <h5>{% bs_icon 'receipt-cutoff' color='cornflowerblue' size='2.5em' %}
+        <b>　取引一覧</b></h5>
     </div>
 
     {% if object_list.count >= 1 %}

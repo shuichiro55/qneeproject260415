@@ -31,17 +31,26 @@ class TxStatus(models.IntegerChoices):
 class QpayTx(models.Model):
 
   sellEntity = models.ForeignKey(LegalEntity, verbose_name='ゲスト・エンティティ',
-    null=False, related_name='sellEntity_qpaytxs', on_delete=models.CASCADE)
+    null=False,
+    related_name='sellEntity_txs',
+    on_delete=models.CASCADE)
+
   sellEntityName = models.CharField('ゲスト・エンティティ名', max_length=150, unique=False, null=False, blank=True)
   # sellerEntity_id = models.IntegerField('ゲスト・エンティティID', null=False, blank=False, )
 
-  sellUser = models.ForeignKey(CustomUser, verbose_name='ゲスト・ユーザー', null=False, related_name='sellUser_qpaytxs', on_delete=models.CASCADE)
+  sellUser = models.ForeignKey(CustomUser, verbose_name='ゲスト・ユーザー',
+    null=False,
+    related_name='sellUser_txs', on_delete=models.CASCADE)
+
   sellUser_userName =models.CharField('ゲスト・ユーザー名', max_length=150, unique=False, null=False,)
   # sellerUser_id = models.IntegerField('ゲストID', null=False, blank=False, )
   # sellUser_email = models.EmailField('ゲスト・メールアドレス', unique=False, null=False, blank=False,)
 
   buyEntity = models.ForeignKey(LegalEntity, verbose_name='パートナー・エンティティ',
-    null=False, related_name='buyEntity_qpaytxs', on_delete=models.CASCADE)
+    null=False,
+    related_name='buyEntity_txs',
+    on_delete=models.CASCADE)
+
   # !! 初期値は「""」とし、値がセットされているかを判定できるようにする.
   buyEntityName = models.CharField('パートナー・エンティティ名', max_length=150,
     unique=False,
@@ -54,15 +63,8 @@ class QpayTx(models.Model):
   """ buyUserは、承認した人を登録するようにする """
   buyUser = models.ForeignKey(CustomUser, verbose_name='パートナー・ユーザー',
     null=True,
-    related_name='buyUser_qpaytxs',
+    related_name='buyUser_txs',
     on_delete=models.CASCADE)
-  #buyUser_email = models.EmailField('パートナー・メールアドレス',
-  #  unique=False,
-  #  null=True,
-  #  blank=False)
-  #buyUser_userName =models.CharField('パートナー・ユーザー名', max_length=150,
-  #  unique=False,
-  #  null=False,)
 
   requested_at = models.DateTimeField(_('ご申請時点'), null=True)
   requested_amount = models.IntegerField(_('ご申請金額（円）'), null=False)

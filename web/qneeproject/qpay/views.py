@@ -29,7 +29,7 @@ from django.core.mail import EmailMessage
 from accounts.models import CustomUser
 from django.db import models
 
-usermodel = get_user_model()
+UserModel = get_user_model()
 
 def top(request):
   return render(request, 'qpay/top.html')
@@ -43,7 +43,7 @@ class TxCreateView(generic.CreateView):
 
   def get(self, request, *args, **kwargs):
 
-    sellUser = usermodel.objects.get(email=self.request.user)
+    sellUser = UserModel.objects.get(email=self.request.user)
     sellEntity = LegalEntity.objects.get(pk=sellUser.entity_id)
 
     #dict_sellEntityName = dict((str(idx), f) for idx, f in enumerate(sellUser.entity.all().values_list('entityName', flat=True), 1))
@@ -95,7 +95,7 @@ class TxCreateView(generic.CreateView):
         sellUser_id = next.split('_')[1]
         sellEntity_id = next.split('_')[2]
 
-        sellUser = usermodel.objects.get(pk=sellUser_id)
+        sellUser = UserModel.objects.get(pk=sellUser_id)
         sellEntity = LegalEntity.objects.get(pk=sellEntity_id)
 
         tx.sellUser = sellUser
@@ -140,12 +140,12 @@ class TxCreateView(generic.CreateView):
         sellUser_id = next.split('_')[1]
         sellEntity_id = next.split('_')[2]
 
-        sellUser = usermodel.objects.get(pk=sellUser_id)
+        sellUser = UserModel.objects.get(pk=sellUser_id)
         sellEntity = LegalEntity.objects.get(pk=sellEntity_id)
 
         dict_buyEntityName = dict((str(idx), f) for idx, f in enumerate(LegalEntity.objects.filter(type1=1).values_list('entityName', flat=True), 1))
         print(f'dict_buyEntityName ={dict_buyEntityName} def get in TxCreateView')
-        #dict_sellEntityName = dict((str(idx), f) for idx, f in enumerate(sellUser.entities.all().values_list('entityName', flat=True), 1))
+        #dict_sellEntityName = dict((str(idx), f) for idx, f in enumerate(sellUser.entitys.all().values_list('entityName', flat=True), 1))
         #print(f'dict_sellEntityName ={dict_sellEntityName} def get in TxCreateView')
 
         context = {
@@ -168,7 +168,7 @@ class TxCreateView(generic.CreateView):
       sellEntity_id = next.split('_')[2]
       tx_id = next.split('_')[3]
 
-      sellUser = usermodel.objects.get(pk=sellUser_id)
+      sellUser = UserModel.objects.get(pk=sellUser_id)
       sellEntity = LegalEntity.objects.get(pk=sellEntity_id)
       tx = QpayTx.objects.get(pk=tx_id)
 
@@ -181,7 +181,7 @@ class TxCreateView(generic.CreateView):
 
       dict_buyEntityName = dict((str(idx), f) for idx, f in enumerate(LegalEntity.objects.filter(type1=1).values_list('entityName', flat=True), 1))
       print(f'dict_buyEntityName ={dict_buyEntityName} def get in TxCreateView')
-      #dict_sellEntityName = dict((str(idx), f) for idx, f in enumerate(sellUser.entities.all().values_list('entityName', flat=True), 1))
+      #dict_sellEntityName = dict((str(idx), f) for idx, f in enumerate(sellUser.entitys.all().values_list('entityName', flat=True), 1))
       #print(f'dict_sellEntityName ={dict_sellEntityName} def get in TxCreateView')
 
       context = {
@@ -207,7 +207,7 @@ class TxCreateView(generic.CreateView):
       sellEntity_id = next.split('_')[2]
       tx_id = next.split('_')[3]
 
-      sellUser = usermodel.objects.get(pk=sellUser_id)
+      sellUser = UserModel.objects.get(pk=sellUser_id)
       sellEntity = LegalEntity.objects.get(pk=sellEntity_id)
       tx = QpayTx.objects.get(pk=tx_id)
 
@@ -237,7 +237,7 @@ class TxCreateView(generic.CreateView):
       sellEntity_id = next.split('_')[2]
       tx_id = next.split('_')[3]
 
-      sellUser = usermodel.objects.get(pk=sellUser_id)
+      sellUser = UserModel.objects.get(pk=sellUser_id)
       sellEntity = LegalEntity.objects.get(pk=sellEntity_id)
       tx = QpayTx.objects.get(pk=tx_id)
 
@@ -339,7 +339,7 @@ class TxListView_buyer_approve(generic.UpdateView):
 
   def get(self, request, *args, **kwargs):
 
-    user =usermodel.objects.get(email=self.request.user)
+    user =UserModel.objects.get(email=self.request.user)
 
     # 承認待ちの取引を抽出する
     object_list = QpayTx.objects.filter(buyEntity = user.entity, txStatus_int=1).order_by('-requested_at')
@@ -385,7 +385,7 @@ class TxListView_buyer_history(LoginRequiredMixin, generic.UpdateView):
 
   def get(self, request, *args, **kwargs):
 
-    user =usermodel.objects.get(email=self.request.user)
+    user = UserModel.objects.get(email=self.request.user)
     object_list = QpayTx.objects.filter(buyEntity = user.entity).order_by('-created_at')
     print(f'request.user={request.user} def get in TxListView_buyer_history')
 
@@ -429,7 +429,7 @@ class TxListView_seller(LoginRequiredMixin, generic.UpdateView):
 
   def get(self, request, *args, **kwargs):
 
-    user =usermodel.objects.get(email=self.request.user)
+    user = UserModel.objects.get(email=self.request.user)
     object_list = QpayTx.objects.filter(sellEntity = user.entity).order_by('-requested_at')
     print(f'request.user={request.user} def get in TxListView_seller')
 

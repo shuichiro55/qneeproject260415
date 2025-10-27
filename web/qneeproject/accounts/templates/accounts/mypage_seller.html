@@ -8,8 +8,7 @@
 
   <div class="container">
 
-    <!-- 本番環境ではmessagesは「DEBUG=False」として非表示とする -->
-    <div class="row justify-content-center">
+    <div class="row justify-content-center mt-1">
       {% for message in messages %}
         <div class="alert alert-{{ message.tags }}" role="alert">
           <span>{{ message }}</span>
@@ -30,7 +29,7 @@
                 <h5 class="my-0 fw-normal">報酬の前払い申請</h5>
               </div>
 
-              <div class="card-body shadow pb-1">
+              <div class="card-body shadow pb-0">
                 {% bs_icon 'send' color='cornflowerblue' size='2.5em' %}
 
                 <!-- <p class="mb-4">パートナーに報酬前払い申請します</p> -->
@@ -54,7 +53,7 @@
                 <h5 class="my-0 fw-normal">取引履歴・書類発行</h5>
               </div>
 
-              <div class="card-body shadow pb-1">
+              <div class="card-body shadow pb-0">
                 {% bs_icon 'receipt-cutoff' color='cornflowerblue' size='2.5em' %}
 
                 <form method="GET" action="{% url 'qpay:txlist_seller' %}" class="mt-3">
@@ -74,7 +73,7 @@
                 <h5 class="my-0 fw-normal">登録情報変更</h5>
               </div>
 
-              <div class="card-body shadow pb-1">
+              <div class="card-body shadow pb-0">
                 {% bs_icon 'pencil-square' color='cornflowerblue' size='2.5em' %}
         
                 <form method="GET" action="{% url 'accounts:infoEdit_seller' %}" class="mt-3">

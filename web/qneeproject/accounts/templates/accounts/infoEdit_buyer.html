@@ -8,7 +8,6 @@
 
   <div class="container">
 
-    <!-- 本番環境ではmessagesは「DEBUG=False」として非表示とする -->
     <div class="row justify-content-center mt-1">
       {% for message in messages %}
         <div class="alert alert-{{ message.tags }}" role="alert">
@@ -41,7 +40,7 @@
             パスワード変更</button>
         </form>
 
-        <form method="GET" action="{% url 'accounts:permissionSettings_buyer' %}">
+        <form method="GET" action="{% url 'accounts:permissionSets_buyer' %}">
           {% csrf_token %}
             
           <button type="submit" class="btn btn-primary w-100 shadow"

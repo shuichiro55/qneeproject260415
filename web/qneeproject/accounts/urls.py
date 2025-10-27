@@ -54,8 +54,8 @@ urlpatterns = [
 
   # ★★ 25/08/29追加 テストはこれから
   #path('permissionList_buyer', views.PermissionUpdateView_buyer.as_view(), name='permissionList_buyer'),
-  path('permissionSettings_buyer', views.PermissionSettingsView_buyer.as_view(), name='permissionSettings_buyer'),
-  path('permissionSettings_seller', views.PermissionSettingsView_seller.as_view(), name='permissionSettings_seller'),
+  path('permissionSets_buyer', views.PermissionSetsView_buyer.as_view(), name='permissionSets_buyer'),
+  path('permissionSets_seller', views.PermissionSetsView_seller.as_view(), name='permissionSets_seller'),
 
   # ★★ 25/06/17追加 テストはこれから、 tokenは申請したユーザーのid
   path('<str:applyuser_id>/<str:buyentity_id>/userAdd_buyer', views.UserAddView_buyer.as_view(), name='userAdd_buyer'),

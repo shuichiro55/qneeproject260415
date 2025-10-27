@@ -20,12 +20,8 @@ zip_regex = RegexValidator(regex=r'^[0-9０-９]{7}+$', message = ("7桁の数�
 class BankAccount(models.Model):
 
   holderName =  models.CharField(
-    '口座名義',
-    max_length=100,
-    unique=False,
-    null=False,
-    blank=False,
-    default="",
+    '口座名義', max_length=100,
+    unique=False, null=False, blank=False, default="",
   )
 
   entity_id = models.IntegerField('エンティティID', null=False, blank=True, default=0)
@@ -53,21 +49,14 @@ class LegalEntity(models.Model):
 
   #企業の場合の入力値、個人の場合はuser.nameが入る
   entityName = models.CharField(
-    '取引主体名',
-    max_length=100,
-    unique=False,
-    null=False,
-    blank=False,
-    default="",
+    '取引主体名', max_length=100,
+    unique=False, null=False, blank=False, default="",
     validators=[name_validator],)
     #error_messages={'unique':_("ご入力の名前は既に存在します。次のリストからお選び下さい。")},)
 
   representitive = models.CharField(
-    '代表者名',
-    max_length=100,
-    unique=False,
-    null=True,
-    blank=True,
+    '代表者名', max_length=100,
+    unique=False, null=True, blank=True,
     validators=[name_validator],
     # error_messages={'unique': _("ご記載の名前は既に使われています")},
   )
@@ -192,19 +181,13 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
   #  default="",
   #)
 
-  userName = models.CharField(_('お名前'),
-    max_length=100,
-    unique=False,
-    null=True,
-    blank=True,
-    default="",
+  userName = models.CharField(
+    _('お名前'),max_length=100,
+    unique=False, null=True, blank=True, default="",
   )
-  userName_kana = models.CharField(_('お名前（カナ）'),
-    max_length=50,
-    unique=False,
-    null=False,
-    blank=True,
-    default="",
+  userName_kana = models.CharField(
+    _('お名前（カナ）'), max_length=50,
+    unique=False, null=False, blank=True, default="",
   )
 
   choice1 = ((0, ''), (1, 'パートナー'), (2, 'ゲスト'), (3, 'Qnee')) #内部管理用
@@ -222,21 +205,21 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
   zip_user = models.CharField(_('郵便番号'),
     max_length=15, null=True, blank=True, default="", validators=[zip_regex])
 
-  entity = models.ForeignKey(
-    LegalEntity,
+  entity = models.ForeignKey(LegalEntity,
     verbose_name='取引主体',
     # through="UserEntityRelation",
+    null=True, blank=True, default=None,
     on_delete=models.CASCADE,
-    related_name='entity_users',
-    null=True,
-    blank=True,
-    default=None)
-  
-  department = models.CharField(_('部署名'),
-    max_length=100, null=False, blank=True,  default="", )   # Entityが法人の場合
+    related_name='entity_users')
 
-  title = models.CharField(_('役職名'),
-    max_length=100, null=False, blank=True, default="", )  
+
+  department = models.CharField(
+    _('部署名'), max_length=100,
+    null=False, blank=True,  default="")   # Entityが法人の場合
+
+  title = models.CharField(
+    _('役職名'), max_length=100,
+    null=False, blank=True, default="")  
 
   is_active = models.BooleanField(_('アクティブ'), default=False)   # 利用規約に同意した時点
 
@@ -257,6 +240,9 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
   canApprove_qpay = models.BooleanField(_('承認権限（Qpay）'), null=True, default=False)
   # ゲストであればQpayを申請内容を最終確認する権限
   # パートナーであればゲストからのQpayの申請を承認する権限 
+
+  canReceive = models.BooleanField(_('メール受信'), null=True, default=True)
+  # Qneeからのサービスの案内を受信可能か
 
   joined_at = models.DateTimeField(_('登録日'), default=timezone.now,)
 

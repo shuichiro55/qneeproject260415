@@ -1912,3 +1912,14 @@ ul.pattern .color6 {
   background-repeat: no-repeat;
 }
 
+/* 三角（共通） */
+.triangle {
+/*   background-color: #333; */
+  height: 18px;
+  width: 200px;
+}
+/* 下三角形 */
+.triangle-bottom {
+  background: linear-gradient(to top, rgb(19, 150, 244), rgb(180, 227, 247));
+  clip-path: polygon(0 0, 50% 100%, 100% 0);
+}

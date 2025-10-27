@@ -8,8 +8,7 @@
 
   <div class="container">
 
-    <!-- 本番環境ではmessagesは「DEBUG=False」として非表示とする -->
-    <div class="row justify-content-center my-auto">
+    <div class="row justify-content-center mt-1">
       {% for message in messages %}
         <div class="alert alert-{{ message.tags }}" role="alert">
           <span>{{ message }}</span>
@@ -57,7 +56,8 @@
     </div>
 
     <div class="row justify-content-center mt-4 mb-4">
-      <h5 class="text-black text-center">本登録</h5>
+      <h5 class="text-black text-center">
+        <b>本登録</b></h5>
     </div>
 
     <!-- 個人の場合 -->
@@ -238,7 +238,8 @@
       {% if flag_step == 1 %}
 
         <div class="row justify-content-center mt-4">
-          <h5 class="text-black text-center">本登録（個人ゲスト用のご入力）</h5>
+          <h5 class="text-black text-center">
+            <b>本登録（個人ゲスト用のご入力）</b></h5>
         </div>
         
 
@@ -335,7 +336,8 @@
       {% if flag_step == 2 %}
 
         <div class="row justify-content-center mt-4">
-          <h5 class="text-black text-center">本登録（確認画面）</h5>
+          <h5 class="text-black text-center">
+            <b>本登録（確認画面）</b></h5>
         </div>
 
         <div class="row justify-content-center mt-2">
@@ -408,7 +410,8 @@
       {% if flag_step == 1 %}
 
         <div class="row justify-content-center mt-4">
-          <h5 class="text-black text-center">法人ゲスト用登録（ご入力）</h5>
+          <h5 class="text-black text-center">
+            <b>法人ゲスト用登録（ご入力）</b></h5>
         </div>
 
         <div class="row justify-content-center mt-5">
@@ -596,7 +599,8 @@
       {% if flag_step == 2 %}
 
         <div class="row justify-content-center mt-4">
-          <h5 class="text-black text-center">法人ゲスト用登録（ご入力内容）</h5>
+          <h5 class="text-black text-center">
+            <b>法人ゲスト用登録（ご入力内容）</b></h5>
         </div>
 
         <div class="row justify-content-center mt-2">
@@ -678,9 +682,9 @@
 
 
 <style type="text/css">
-    .hidden {
-        display: none; /* 非表示のアイテムにはdisplay:noneを適用 */
-    }
+  .hidden {
+    display: none; /* 非表示のアイテムにはdisplay:noneを適用 */
+  }
 </style>
 
 <script>

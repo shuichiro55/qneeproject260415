@@ -39,6 +39,8 @@ INSTALLED_APPS = [
   'django.contrib.staticfiles',
   'accounts.apps.AccountsConfig',
   'qpay',
+  'send',
+
   'django_bootstrap5',
   'django_bootstrap_icons',
   'django.contrib.humanize',

@@ -11,8 +11,7 @@
 
   <div class="container">
 
-    <!-- 本番環境ではmessagesは「DEBUG=False」として非表示とする -->
-    <div class="row justify-content-center">
+    <div class="row justify-content-center mt-1">
       {% for message in messages %}
         <div class="alert alert-{{ message.tags }}" role="alert">
           <span>{{ message }}</span>
@@ -30,13 +29,13 @@
     
     <div class="d-flex justify-content-center mt-3">
       <h5>{% bs_icon 'pencil-square' color='cornflowerblue' size='1.8em' %}
-        　ユーザー権限の編集</h5>
+        <b>　ユーザー権限の編集</b></h5>
     </div>
 
     <div class="row justify-content-center mt-2">
       <div class="col-10 col-md-8 col-lg-6 col-xl-5">
 
-        <form method="POST" action="{% url 'accounts:permissionSettings_seller' %}"
+        <form method="POST" action="{% url 'accounts:permissionSets_seller' %}"
           class="form-group bg-light rounded-2 p-3">
 
           {% csrf_token %}         

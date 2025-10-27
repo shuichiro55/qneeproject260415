@@ -305,10 +305,10 @@ class EntityCreateForm_seller(forms.Form):
   # ★★ 250927 個人（type2=1）に対するの対応を追加
 
   """ 個人・法人の共通項目 """
-  lastName = forms.CharField(label='姓（last name）', max_length=50)
-  firstName = forms.CharField(label='名（first name）', max_length=50)
-  lastName_kana = forms.CharField(label='姓（フリガナ）', max_length=50)
-  firstName_kana = forms.CharField(label='名（フリガナ）', max_length=50)
+  lastName = forms.CharField(label='姓（last name）', max_length=50, validators=[name_validator])
+  firstName = forms.CharField(label='名（first name）', max_length=50, validators=[name_validator])
+  lastName_kana = forms.CharField(label='姓（フリガナ）', max_length=50, validators=[name_validator])
+  firstName_kana = forms.CharField(label='名（フリガナ）', max_length=50, validators=[name_validator])
 
   tel_user = forms.CharField(label='電話番号（直通）', max_length=30)
 

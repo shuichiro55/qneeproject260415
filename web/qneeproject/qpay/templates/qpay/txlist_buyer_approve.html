@@ -10,8 +10,7 @@
 
   <div class="container">
 
-    <!-- 本番環境ではmessagesは「DEBUG=False」として非表示とする -->
-    <div class="row justify-content-center my-auto">
+    <div class="row justify-content-center mt-1">
       {% for message in messages %}
         <div class="alert alert-{{ message.tags }}" role="alert">
           <span>{{ message }}</span>
@@ -28,7 +27,8 @@
 
     
     <div class="d-flex justify-content-center mt-3">
-      <h5>{% bs_icon 'inbox' color='cornflowerblue' size='2.5em' %}　承認待ちボックス</h5>
+      <h5>{% bs_icon 'inbox' color='cornflowerblue' size='2.5em' %}
+        <b>　承認待ちボックス</b></h5>
     </div>
 
     {% if object_list.count >= 1 %}
@@ -59,7 +59,7 @@
                   {% if item.txStatus_int == 1 %}
 
                     <tr>
-                      <td  style="text-align:center">{{ forloop.counter }}</td>
+                      <td style="text-align:center">{{ forloop.counter }}</td>
                       <td>{{ item.sellerEntityName }}</td>
                       <td>{{ item.requested_amount|intcomma }}</td>
                       <td style="text-align:center">{{ item.requested_at|date:"y/n/j" }}<br>{{ item.requested_at|date:"H:i:s" }}</td>

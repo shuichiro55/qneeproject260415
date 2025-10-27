@@ -816,23 +816,23 @@ class AgreementConfirmView_buyer(generic.CreateView):
 
   def post(self, request, *args, **kwargs):
   
-    checkbox_value = request.POST.get('check_consent', None)  
-    button_value = self.request.POST.get('next', None) 
+    checkValue = request.POST.get('checkConsent', None)  
+    buttonValue = self.request.POST.get('next', None) 
 
-    print(f'checkbox_value={checkbox_value}')
+    print(f'checkValue={checkValue}')
 
 
-    if button_value.find('agree') >= 0:
+    if buttonValue.find('agree') >= 0:
 
-      applyUser = usermodel.objects.get(pk=button_value.split('_')[1]) 
-      buyEntity = LegalEntity.objects.get(pk=button_value.split('_')[2])
+      applyUser = usermodel.objects.get(pk=buttonValue.split('_')[1]) 
+      buyEntity = LegalEntity.objects.get(pk=buttonValue.split('_')[2])
       print(f'applyUser.email={applyUser.email}')
       print(f'applyUser.userName={applyUser.userName}')
       print(f'applyUser.tel_user={applyUser.tel_user}')
       print(f'applyUser.department={applyUser.department}')
       print(f'applyUser.title={applyUser.title}')
 
-      if checkbox_value == 'agree': # 規約同意にチェックされた場合
+      if checkValue == 'agree': # 規約同意にチェックされた場合
 
         buyEntity.membershipConsent_boolean = True
         buyEntity.membershipConsent_at = timezone.now()
@@ -843,7 +843,7 @@ class AgreementConfirmView_buyer(generic.CreateView):
             既に「canApprove_all=True」の人がいるかで処理を分ける """
         approvers = usermodel.objects.filter(
           Q(entity_id=buyEntity.id) & (Q(canApprove_all=True) | Q(canApprove_add=True)))
-        #queryset_users = usermodel.objects.prefetch_related('entities').filter(entities=entity.id, is_buyUser_ApproveAll=True)
+        #queryset_users = usermodel.objects.prefetch_related('entitys').filter(entitys=entity.id, is_buyUser_ApproveAll=True)
 
         # データ取得参考（https://noauto-nolife.com/post/django-foreignkey-related-name/）
     
@@ -906,12 +906,12 @@ class AgreementConfirmView_buyer(generic.CreateView):
         return render(self.request, 'accounts/agreementConfirm_buyer.html', context)
 
 
-    if button_value.find('disagree') >= 0:
+    if buttonValue.find('disagree') >= 0:
 
       messages.error(request, "「同意しない」のボタンが押されました。", extra_tags='no check')
 
-      user = usermodel.objects.get(pk=button_value.split('_')[1]) 
-      entity = LegalEntity.objects.get(pk=button_value.split('_')[2])
+      user = usermodel.objects.get(pk=buttonValue.split('_')[1]) 
+      entity = LegalEntity.objects.get(pk=buttonValue.split('_')[2])
 
       context = {
         'flag_step': 1,
@@ -1214,7 +1214,7 @@ class UserAddView_seller(generic.TemplateView, LoginRequiredMixin):
 
 
 """ mypageから「ユーザーごとの権限」を確認・編集する """
-class PermissionSettingsView_buyer(generic.View):
+class PermissionSetsView_buyer(generic.View):
 # ★★★ 250828作成開始
 
   def get(self, request, **kwargs):  #selfはメソッドを呼んだインスタンス自体
@@ -1247,10 +1247,10 @@ class PermissionSettingsView_buyer(generic.View):
         char_CanApproveAdd = editedUser.canApprove_add
         char_CanApproveQpay = editedUser.canApprove_qpay
 
-        print(f'char_CanApproveAll={char_CanApproveAll} after next1.find(Edit) in PermissionSettingsView_buyer')
-        print(f'char_CanApproveAdd={char_CanApproveAdd} after next1.find(Edit) in PermissionSettingsView_buyer')
-        print(f'char_CanApproveQpay={char_CanApproveQpay} after next1.find(Edit) in PermissionSettingsView_buyer')
-        print(f'editedUser.id={editedUser.id} after next1.find(Edit) in PermissionSettingsView_buyer')
+        print(f'char_CanApproveAll={char_CanApproveAll} after next1.find(Edit) in PermissionSetsView_buyer')
+        print(f'char_CanApproveAdd={char_CanApproveAdd} after next1.find(Edit) in PermissionSetsView_buyer')
+        print(f'char_CanApproveQpay={char_CanApproveQpay} after next1.find(Edit) in PermissionSetsView_buyer')
+        print(f'editedUser.id={editedUser.id} after next1.find(Edit) in PermissionSetsView_buyer')
 
         init_dict = {
         }
@@ -1291,9 +1291,9 @@ class PermissionSettingsView_buyer(generic.View):
 
         editedUser.save()
 
-        print(f'char_CanApproveAll={char_CanApproveAll} after next2.find(PermissionSet) in PermissionSettingsView_buyer')
-        print(f'char_CanApproveAdd={char_CanApproveAdd} after next2.find(PermissionSet) in PermissionSettingsView_buyer')
-        print(f'char_CanApproveQpay={char_CanApproveQpay} after next2.find(PermissionSet) in PermissionSettingsView_buyer')
+        print(f'char_CanApproveAll={char_CanApproveAll} after next2.find(PermissionSet) in PermissionSetsView_buyer')
+        print(f'char_CanApproveAdd={char_CanApproveAdd} after next2.find(PermissionSet) in PermissionSetsView_buyer')
+        print(f'char_CanApproveQpay={char_CanApproveQpay} after next2.find(PermissionSet) in PermissionSetsView_buyer')
         print(f'editedUser.id={editedUser.id} after next2.find(PermissionSet)')
 
         loginUser = usermodel.objects.get(email=self.request.user)
@@ -1308,7 +1308,7 @@ class PermissionSettingsView_buyer(generic.View):
 
 
 """ mypageから「ユーザーごとの権限」を確認・編集する """
-class PermissionSettingsView_seller(generic.View):
+class PermissionSetsView_seller(generic.View):
 # ★★★ 2509025作成開始
 
   def get(self, request, **kwargs):  #selfはメソッドを呼んだインスタンス自体
@@ -1327,7 +1327,7 @@ class PermissionSettingsView_seller(generic.View):
     return TemplateResponse(request, 'accounts/permissionList_seller.html', context)
 
 
-  def post(self, request, **kwargs):  #selfはメソッドを呼んだインスタンス自体
+  def post(self, request):  #selfはメソッドを呼んだインスタンス自体
 
     next1 = self.request.POST.get('next1', None)
 
@@ -1341,10 +1341,10 @@ class PermissionSettingsView_seller(generic.View):
         char_CanApproveAdd = editedUser.canApprove_add
         char_CanApproveQpay = editedUser.canApprove_qpay
 
-        print(f'char_CanApproveAll={char_CanApproveAll} after next1.find(Edit) in PermissionSettingsView_seller')
-        print(f'char_CanApproveAdd={char_CanApproveAdd} after next1.find(Edit) in PermissionSettingsView_seller')
-        print(f'char_CanApproveQpay={char_CanApproveQpay} after next1.find(Edit) in PermissionSettingsView_seller')
-        print(f'editedUser.id={editedUser.id} after next1.find(Edit) in PermissionSettingsView_seller')
+        print(f'char_CanApproveAll={char_CanApproveAll} after next1.find(Edit) in PermissionSetsView_seller')
+        print(f'char_CanApproveAdd={char_CanApproveAdd} after next1.find(Edit) in PermissionSetsView_seller')
+        print(f'char_CanApproveQpay={char_CanApproveQpay} after next1.find(Edit) in PermissionSetsView_seller')
+        print(f'editedUser.id={editedUser.id} after next1.find(Edit) in PermissionSetsView_seller')
 
         init_dict = {
         }
@@ -1385,9 +1385,9 @@ class PermissionSettingsView_seller(generic.View):
 
         editedUser.save()
 
-        print(f'char_CanApproveAll={char_CanApproveAll} after next2.find(PermissionSet) in PermissionSettingsView_seller')
-        print(f'char_CanApproveAdd={char_CanApproveAdd} after next2.find(PermissionSet) in PermissionSettingsView_seller')
-        print(f'char_CanApproveQpay={char_CanApproveQpay} after next2.find(PermissionSet) in PermissionSettingsView_seller')
+        print(f'char_CanApproveAll={char_CanApproveAll} after next2.find(PermissionSet) in PermissionSetsView_seller')
+        print(f'char_CanApproveAdd={char_CanApproveAdd} after next2.find(PermissionSet) in PermissionSetsView_seller')
+        print(f'char_CanApproveQpay={char_CanApproveQpay} after next2.find(PermissionSet) in PermissionSetsView_seller')
         print(f'editedUser.id={editedUser.id} after next2.find(PermissionSet)')
 
         loginUser = usermodel.objects.get(email=self.request.user)
@@ -1862,17 +1862,17 @@ class AgreementConfirmView_seller(generic.UpdateView):
 
   def post(self, request, *args, **kwargs):
 
-    checkbox_value = request.POST.get('check_consent', None)  
-    button_value = self.request.POST.get('next', None) 
-    print(f'entity.membershipConsent_boolean={checkbox_value}')
+    checkValue = request.POST.get('checkConsent', None)  
+    buttonValue = self.request.POST.get('next', None) 
+    print(f'entity.membershipConsent_boolean={checkValue}')
 
-    if button_value.find('agree') >= 0:
+    if buttonValue.find('ToAgree') >= 0:
 
-      print(f'button_value={button_value}')
-      applyUser = usermodel.objects.get(pk=button_value.split('_')[1]) 
-      sellEntity = LegalEntity.objects.get(pk=button_value.split('_')[2])
+      print(f'buttonValue={buttonValue}')
+      applyUser = usermodel.objects.get(pk=buttonValue.split('_')[1]) 
+      sellEntity = LegalEntity.objects.get(pk=buttonValue.split('_')[2])
 
-      if checkbox_value == 'agree':  # 規約同意にチェックされた場合
+      if checkValue == 'ToAgree':  # 規約同意にチェックされた場合
 
         sellEntity.membershipConsent_boolean = True
         sellEntity.membershipConsent_at = timezone.now()
@@ -1958,12 +1958,12 @@ class AgreementConfirmView_seller(generic.UpdateView):
           return render(self.request, 'accounts/agreementConfirm_seller.html', context)
 
 
-    if button_value.find('disagree') >= 0:
+    if buttonValue.find('ToDisagree') >= 0:
 
       messages.error(request, "「同意しない」のボタンが押されました。", extra_tags='no check')
 
-      applyUser = usermodel.objects.get(pk=button_value.split('_')[1]) 
-      sellEntity = LegalEntity.objects.get(pk=button_value.split('_')[2])
+      applyUser = usermodel.objects.get(pk=buttonValue.split('_')[1]) 
+      sellEntity = LegalEntity.objects.get(pk=buttonValue.split('_')[2])
 
       context = {
         'flag_step': 1,
@@ -2157,8 +2157,8 @@ class MyPageView_buyer(generic.DetailView, LoginRequiredMixin):
     try:
       user = usermodel.objects.get(pk=self.kwargs['user_id'])
     except:
+      print(f'request.user={self.request.user} def get in MyPageView_buyer')
       user = usermodel.objects.get(email=self.request.user) 
-      print(f'request.user={request.user} def get in MyPageView_buyer')
 
     if user.type1 != 1:
 

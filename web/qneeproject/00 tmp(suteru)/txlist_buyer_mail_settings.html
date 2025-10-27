@@ -1,0 +1,97 @@
+{% extends "index/base_qconnect_buyer.html" %}
+{% load humanize %}
+{% block title %}各種案内{% endblock %}
+
+{% block content %}
+<div class="container mt-2">
+      <nav aria-label="breadcrumb" role="navigation">
+      <ol class="breadcrumb text-dark rounded-2">
+        <li class="breadcrumb-item text-primary"><a href="{% url 'accounts:mypage_buyer' %}">マイページ・ホーム</a></li>
+        <li class="breadcrumb-item active" aria-current="page">各種案内</li>
+      </ol>
+    </nav>
+    <div class="d-flex justify-content-center mt-3">
+      <h5>各種案内</h5>
+    </div>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>名前</th>
+        <th>メールアドレス</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in page_obj %}
+      <tr>
+        <td>{{ item.buyer_entityname }}</td>
+        <td>{{ item.buyer_entityname }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="mt-3">
+    <a href="{% url 'send:register' %}" class="btn btn-primary">個別登録</a>
+    <button type="button" data-popup-url="{% url 'send:member' %}" class="btn btn-primary" id="openRecipientsBtn">配信先一覧</button>
+    
+    <!-- Modal -->
+    <div class="modal fade" id="recipientsModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">メール送信対象</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="閉じる"></button>
+          </div>
+          <div class="modal-body" id="recipientsModalBody">
+            <div class="text-muted">読み込み中...</div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" data-bs-dismiss="modal">閉じる</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // クエリ文字列付きのリンクもモーダル内で動くよう、モーダル内のクリックは Ajax で差し替える
+      async function loadIntoModal(url) {
+        const body = document.getElementById('recipientsModalBody');
+        body.innerHTML = '<div class="text-muted">読み込み中...</div>';
+        const res = await fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" }});
+        body.innerHTML = await res.text();
+
+        // モーダル内の <a> クリック（ページネーション、検索）をキャッチして再読込
+        body.querySelectorAll('a.page-link').forEach(a => {
+          a.addEventListener('click', (e) => {
+            e.preventDefault();
+            const nextUrl = a.getAttribute('href');
+            const base = document.getElementById('openRecipientsBtn').dataset.popupUrl;
+            // 相対の ?q=... をエンドポイントに連結
+            loadIntoModal(base + (nextUrl.startsWith('?') ? nextUrl : ''));
+          });
+        });
+        // 検索フォームの送信も Ajax
+        const form = body.querySelector('form');
+        if (form) {
+          form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const params = new URLSearchParams(new FormData(form));
+            const base = document.getElementById('openRecipientsBtn').dataset.popupUrl;
+            loadIntoModal(`${base}?${params.toString()}`);
+          });
+        }
+      }
+
+      document.getElementById('openRecipientsBtn').addEventListener('click', async (e) => {
+        const url = e.currentTarget.dataset.popupUrl;
+        await loadIntoModal(url);
+        const modal = new bootstrap.Modal(document.getElementById('recipientsModal'));
+        modal.show();
+      });
+    </script>
+  
+    <a href="{% url 'send:import' %}" class="btn btn-primary">CSV取込</a>
+    <a href="{% url 'send:export' %}" class="btn btn-primary">CSV出力</a>
+  </div>
+</div>
+{% endblock %}

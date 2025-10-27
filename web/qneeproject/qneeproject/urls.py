@@ -34,6 +34,7 @@ urlpatterns = [
     path('', TemplateView.as_view(template_name="index/index_corporate.html"),name="index_corporate"), 
     path('accounts/', include('accounts.urls')),
     path('qpay/', include('qpay.urls')),
+    path('send/', include('send.urls')),
     path('',include('contact.urls')),
 
     path('corporate_info', TemplateView.as_view(template_name="index/corporate_info.html"),name="corporate_info"),

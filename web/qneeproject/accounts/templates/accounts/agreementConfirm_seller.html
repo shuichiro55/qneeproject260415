@@ -8,8 +8,7 @@
   
   <div class="container">
 
-    <!-- 本番環境ではmessagesは「DEBUG=False」として非表示とする -->
-    <div class="row justify-content-center my-auto">
+    <div class="row justify-content-center mt-1">
       {% for message in messages %}
         <div class="alert alert-{{ message.tags }}" role="alert">
           <span>{{ message }}</span>
@@ -84,22 +83,24 @@
             <div class="btn-group btn-group-vertical d-flex justify-content-center" data-toggle="buttons">
               <label class="btn active">
                 <input id="checkbox" type="checkbox"
-                  name="check_consent"
-                  value="agree">
+                  name="checkConsent"
+                  value="ToAgree">
                 <span> 利用規約に同意する </span>
               </label>
             </div>
 
             <div class="d-flex justify-content-center mt-3">
               <button id="next1" type="submit" class="btn btn-primary me-2"
-                name="next" value="disagree_{{user.id}}_{{entity.id}}"
+                name="next"
+                value="ToDisagree_{{user.id}}_{{entity.id}}"
                 data-bs-toggle="tooltip"
                 data-bs-placement="bottom"
                 title="">同意しない
               </button>
             
               <button id="next2" type="submit" class="btn btn-primary ms-2 shadow"
-                name="next" value="agree_{{user.id}}_{{entity.id}}"
+                name="next"
+                value="ToAgree_{{user.id}}_{{entity.id}}"
                 data-bs-toggle="tooltip"
                 data-bs-placement="bottom"
                 title="上記「利用規約に同意します」にチェックしたうえクリック"

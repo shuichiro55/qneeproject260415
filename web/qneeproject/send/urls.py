@@ -1,16 +1,27 @@
 #from accounts.form import EmailAuthenticationForm  #INSTALLED_APPSに登録済み
 from django.urls import path
 from . import views
-from django.conf import settings
-from django.conf.urls.static import static
 
-# 2025/02/15時点で参照せず
-from django.urls import re_path
+# 2025/10/10時点で参照せず
+#from django.urls import re_path
+#from django.conf import settings
+#from django.conf.urls.static import static
 
 app_name = 'send'
 
 urlpatterns = [
 
-  path('regular_send/', views.RegularSendView.as_view(), name='regular_send'),
+  path('servInfoMailSets/', views.ServInfoMailSetsView.as_view(), name='servInfoMailSets'),
+  path('<int:buyUser_id>/<int:buyEntity>/servInfoMailSets/', views.ServInfoMailSetsView.as_view(), name='servInfoMailSets'),
+
+  path('register/', views.register, name='register'),
+  #path('member/', views.member, name='member'),
+  #path('<int:user_id><int:entity_id>/member/', views.member, name='member'),  path('import/', views.import_csv, name='import'),
+  path('export/', views.export_csv, name='export'),  # 251010追加 txlist_buyer_mail_settings.htmlから呼ばれている 
+  path('import/finalize/', views.finalize_import, name='finalize_import'),
+
+  #path('txlist_buyer_settings/', views.TxListView_buyer_settings.as_view(), name='txlist_buyer_settings'),
+  #path('<int:page_num>/txlist_buyer_settings/', views.TxListView_buyer_settings.as_view(), name='txlist_buyer_settings'),
+  #path('<int:tx_id>/<int:page_num>/txlist_buyer_settings/', views.TxListView_buyer_settings.as_view(), name='txlist_buyer_settings'),
 
 ]
