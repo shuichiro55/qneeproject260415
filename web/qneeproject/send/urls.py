@@ -14,14 +14,13 @@ urlpatterns = [
   path('servInfoMailSets/', views.ServInfoMailSetsView.as_view(), name='servInfoMailSets'),
   path('<int:buyUser_id>/<int:buyEntity>/servInfoMailSets/', views.ServInfoMailSetsView.as_view(), name='servInfoMailSets'),
 
+  path('taskAgent/', views.TaskAgentView.as_view(), name='taskAgent'),
+
+  # 小原さんのコード
   path('register/', views.register, name='register'),
   #path('member/', views.member, name='member'),
   #path('<int:user_id><int:entity_id>/member/', views.member, name='member'),  path('import/', views.import_csv, name='import'),
   path('export/', views.export_csv, name='export'),  # 251010追加 txlist_buyer_mail_settings.htmlから呼ばれている 
   path('import/finalize/', views.finalize_import, name='finalize_import'),
-
-  #path('txlist_buyer_settings/', views.TxListView_buyer_settings.as_view(), name='txlist_buyer_settings'),
-  #path('<int:page_num>/txlist_buyer_settings/', views.TxListView_buyer_settings.as_view(), name='txlist_buyer_settings'),
-  #path('<int:tx_id>/<int:page_num>/txlist_buyer_settings/', views.TxListView_buyer_settings.as_view(), name='txlist_buyer_settings'),
 
 ]

@@ -1,6 +1,8 @@
 {% extends "index/base_qconnect_buyer.html" %}
+
 {% load humanize %}
 {% load form_tags %}
+{% load bootstrap_icons %}
 
 {% block title %}各種案内{% endblock %}
 
@@ -12,21 +14,30 @@
 
     <div class="row justify-content-center mt-1">
       {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}" role="alert">
+        <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
           <span>{{ message }}</span>
         </div>
       {% endfor %}
     </div>
 
     <nav aria-label="breadcrumb" role="navigation">
-      <ol class="breadcrumb text-dark rounded-2">
-        <li class="breadcrumb-item text-primary"><a href="{% url 'accounts:mypage_buyer' %}">マイページ・ホーム</a></li>
-        <li class="breadcrumb-item active" aria-current="page">各種案内</li>
+      <ol class="breadcrumb bg-light-subtle px-2 rounded-3 mt-1">
+        <li class="breadcrumb-item">
+          <a href="{% url 'accounts:mypage_buyer' %}">
+            {% bs_icon 'house' color='cornflowerblue' size='1.2em' %}
+            マイページトップ</a>
+        </li>
+        <li class="breadcrumb-item" aria-current="page">
+          {% bs_icon 'send' color='text-secondary' size='1.1em' %}
+          各種案内
+        </li>
       </ol>
     </nav>
 
-    <div class="d-flex justify-content-center mt-3">
-      <h5><b>Ｑｐａｙご案内メール</b></h5>
+
+    <div class="d-flex justify-content-center mt-4">
+      <h5 class="text-secondary mt-2 me-3"><b>Ｑｐａｙご案内メール</b></h5>
+      <i class="bi bi-mailbox" style="font-size:2.5em; color:hotpink;"></i>
     </div>
 
     <!-- パートナー側は、１ユーザー・１パートナーの前提 -->
@@ -40,55 +51,99 @@
     <!-- 下記のユーザーやエンティティの値の引き渡しをする形態ではないと思われたこと -->
 
     <!-- ユーザーの選択により下記項目を適宜追加 -->
-    <!-- addition1 「送信先＝未登録ユーザー」選択後⇒「手入力／ファイル入力」選択 -->
-    <!-- addition2 「送信先＝登録ユーザー」選択後⇒データから取得 -->
-    <!-- addition3 「手入力」選択後⇒「手入力画面」 -->
-    <!-- addition4 「ファイル入力」選択後⇒「エクセル／CSV」選択 -->
-    <!-- addition5　「ファイルアップロード」 -->
+    <!-- addition2 「送信先＝未登録ユーザー」選択後⇒「手入力／ファイル入力」選択 -->
+    <!-- addition3 「送信先＝登録ユーザー」選択後⇒データから取得 -->
+    <!-- addition4 「手入力」選択後⇒「手入力画面」 -->
+    <!-- addition5 「ファイル入力」選択後⇒「エクセル／CSV」選択 -->
+    <!-- addition6　「ファイルアップロード」 -->
 
     <div class="row justify-content-center mt-3 mx-2">
-
       <div class="col-md-8 col-lg-6">
-        <h6 class="control-label"><b>送信先</b></h6>
+          <h6 class="control-label text-secondary"><b>ご案内設定</b></h6>
       </div>
     </div>
 
     <div class="row justify-content-center mx-2">
       <div class="btn-group btn-group-toggle col-md-8 col-lg-6"
         data-toggle="buttons"
-        id="id_NewOrNot">
+        id="id_WhoWhenWhat">
 
-        <label class="btn btn-secondary" for="id_NewOrNot_A">
+        <label class="btn btn-secondary" for="id_WhoWhenWhat_A">
           <input type="radio"
-            id="id_NewOrNot_A"
-            name="name_NewOrNot"
+            id="id_WhoWhenWhat_A"
+            name="name_WhoWhenWhat"
             autocomplete="off">
-          未登録ユーザー
+          誰に
         </label>
 
-        <!-- autocompleteは過去の入力情報を自動的に補完する機能-->        
-        <label class="btn btn-secondary" for="id_NewOrNot_B">
+        <!-- autocompleteは過去の入力情報を自動的に補完する機能-->
+        <label class="btn btn-secondary" for="id_WhoWhenWhat_B">
           <input type="radio"
-            id="id_NewOrNot_B"
-            name="name_NewOrNot"
+            id="id_WhoWhenWhat_B"
+            name="name_WhoWhenWhat"
             autocomplete="off">
-          登録ユーザー
+          いつ
         </label>
-      </div>
-
+        
+        <label class="btn btn-secondary" for="id_WhoWhenWhat_C">
+          <input type="radio"
+            id="id_WhoWhenWhat_C"
+            name="name_WhoWhenWhat"
+            autocomplete="off">
+          どんな
+        </label>
+      </div> <!-- end of btn-group -->
     </div> <!-- end row -->
 
-    <!-- 「送信先＝未登録ユーザー」選択後、入力方法（手入力／ファイル）を選ぶパート -->
-    <span id="id_addition1" style="display: none;">
 
-      <div class="row justify-content-center mt-2">
+    <!-- 「登録済みユーザー」か「未登録ユーザー」かを選択 -->
+    <span id="id_addition_Who1" style="display:none;" data-bs-target="#recipientsModal">
+
+      <div class="row justify-content-center mt-1">
         <div class="triangle triangle-bottom"></div>
       </div>
 
-      <div class="row justify-content-center mt-1 mx-2">
-
+      <div class="row justify-content-center mx-2">
         <div class="col-md-8 col-lg-6">
-            <h6 class="control-label"><b>取り込み方</b></h6>
+          <h6 class="control-label text-secondary"><b>対象者はどちらか</b></h6>
+        </div>
+      </div>
+
+      <div class="row justify-content-center mx-2">
+        <div class="btn-group btn-group-toggle col-md-8 col-lg-6"
+          data-toggle="buttons"
+          id="id_NewOrNot">
+
+          <label class="btn btn-secondary" for="id_NewOrNot_A">
+            <input type="radio"
+              id="id_NewOrNot_A"
+              name="name_NewOrNot"
+              autocomplete="off">
+            未登録ユーザー
+          </label>
+
+          <!-- autocompleteは過去の入力情報を自動的に補完する機能-->        
+          <label class="btn btn-secondary" for="id_NewOrNot_B">
+            <input type="radio"
+              id="id_NewOrNot_B"
+              name="name_NewOrNot"
+              autocomplete="off">
+            登録ユーザー
+          </label>
+        </div>
+      </div>
+    </span>
+
+    <!-- 「送信先＝未登録ユーザー」選択後、入力方法（手入力／ファイル）を選ぶパート -->
+    <span id="id_addition_Who2" style="display: none;">
+
+      <div class="row justify-content-center mt-1">
+        <div class="triangle triangle-bottom"></div>
+      </div>
+
+      <div class="row justify-content-center mx-2">
+        <div class="col-md-8 col-lg-6">
+            <h6 class="control-label text-secondary"><b>取り込み方</b></h6>
         </div>
       </div>
 
@@ -113,15 +168,19 @@
           </label> 
         </div>   
       </div> <!-- end row -->
-
     </span>
+
 
     <!-- 未登録ユーザーの手入力を選択後、入力画面を表示 -->
     <!-- ★★ 251019 メンバー追加と、登録済みメンバーのプレビューを工事 -->
-    <span id="id_addition2" style="display: none;">
+    <span id="id_addition_Who3" style="display: none;">
 
-      <div class="row justify-content-center mt-3 mx-2">
-        <div class="col-md-8 col-lg-6 bg-light">
+      <div class="row justify-content-center mt-1">
+        <div class="triangle triangle-bottom"></div>
+      </div>
+
+      <div class="row justify-content-center mt-3 mx-4">
+        <div class="col-md-8 col-lg-6 bg-light rounded-1">
 
           <div class="mt-2">アドレスをご入力して追加</div>
           <div class="input-group">
@@ -135,55 +194,79 @@
               name="name_NewItemAddBtn">
               追加</button>
           </div>
+
           <hr>
 
-          <div class="">送信先リスト</div>
-          <div class="row justify-content-center mt-2 mx-2 pb-3"
-            id="id_FormList"
-            class="formList"></div>
-          <!-- 下記のページを参考に作成 -->
-          <!-- JavaScriptで上記「追加」ボタンでメールアドレスが入力されたフォームを追加する -->
-          <!-- https://blog.take-it-easy.site/web-develop/add-remove-elements-dynamic-with-javascript/ -->
-        </div>
-      </div>
+          <form method="post" class="bg-light">
+            {% csrf_token %}
 
+            <div class="row align-items-center mt-4 mb-4 mx-1">
+              <div class="col-4">
+                <h6 class="mb-1"><b>送信先リスト</b></h6>
+              </div>
+              <div class="col-8">
+                <button type="submit"
+                  class="btn btn-primary rounded-1 shadow ms-2"
+                  id="id_fixAddrBtn"
+                  name="name_fixAddrBtn"
+                  value="{{buyUser.id}}_{{buyEntity.id}}">
+                  宛先決定
+                </button>
+              </div>
+            </div> <!-- end of row -->
+
+            <div class="row justify-content-center mt-4 mx-2 pb-3"
+              id="id_FormList"
+              class="formList">
+            </div>
+            <!-- 下記のページを参考に作成 -->
+            <!-- JavaScriptで上記「追加」ボタンでメールアドレスが入力されたフォームを追加する -->
+            <!-- https://blog.take-it-easy.site/web-develop/add-remove-elements-dynamic-with-javascript/ -->
+
+          </form>
+
+        </div> <!-- endo of col -->
+      </div> <!-- end of row --> 
     </span>
 
 
     <!-- 未登録ユーザーのファイル入力を選択後、ファイルタイプを選択するパーツ -->
-    <span id="id_addition3" style="display: none;">
+    <span id="id_addition_Who4" style="display: none;">
 
-      <div class="row justify-content-center mt-2">
+      <div class="row justify-content-center mt-1">
         <div class="triangle triangle-bottom"></div>
       </div>
 
       <div class="row justify-content-center mt-2 mx-2">
-      <div class="col-md-8 col-lg-6"
-        id="id_ExcelOrCSV">
+        <div class="col-md-8 col-lg-6"
+          id="id_ExcelOrCSV">
 
-        <h6 class="control-label"><b>ファイルタイプ</b></h6>
+          <h6 class="control-label text-secondary"><b>ファイルタイプ</b></h6>
 
-        <div class="form-check form-check-inline mt-1 ms-3">
-          <input class="form-check-input" type="radio"
-            id="id_ExcelOrCSV_A"
-            name="name_ExcelOrCSV"
-            value="Excel">
-          <label class="form-check-label" for="id_ExcelOrCSV_A">エクセル</label>
-        </div>
-        <div class="form-check form-check-inline">
-          <input class="form-check-input" type="radio"
-            id="id_ExcelOrCSV_B"
-            name="name_ExcelOrCSV"
-            value="CSV">
-          <label class="form-check-label" for="id_ExcelOrCSV_B">ＣＳＶ</label>
-        </div>
+          <div class="form-check form-check-inline mt-1 ms-3">
+            <input class="form-check-input" type="radio"
+              id="id_ExcelOrCSV_A"
+              name="name_ExcelOrCSV"
+              value="Excel">
+            <label class="form-check-label text-secondary" for="id_ExcelOrCSV_A">
+              エクセル</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio"
+              id="id_ExcelOrCSV_B"
+              name="name_ExcelOrCSV"
+              value="CSV">
+            <label class="form-check-label text-secondary" for="id_ExcelOrCSV_B">
+              ＣＳＶ</label>
+          </div>
+
+        </div> <!-- end of col -->
       </div> <!-- end of row -->
-      </div> <!-- end of col -->
     </span>
 
 
     <!-- 未登録ユーザーのファイル入力を選択後、ファイルタイプを選択するパート -->
-    <span id="id_addition4" style="display: none;">
+    <span id="id_addition_Who5" style="display: none;">
 
       <div class="row justify-content-center mt-2">
         <div class="triangle triangle-bottom"></div>
@@ -193,7 +276,7 @@
       <div class="row justify-content-center mt-3 mx-2">
         <div class="col-md-8 col-lg-6">
  
-          <form method="post" enctype="multipart/form-data" clss="bg-light">
+          <form method="post" enctype="multipart/form-data" class="bg-light">
             {% csrf_token %}
 
             {% if form.memberAddress.errors %}
@@ -218,11 +301,11 @@
           </form>
         </div>
       </div>
-
     </span>
 
+
     <!-- 登録済みユーザーへの案内（「送信先＝登録ユーザー」選択後、DBデータから送信先抽出） -->
-    <span id="id_addition5" style="display:none;" data-bs-target="#recipientsModal">
+    <span id="id_addition_Who6" style="display:none;" data-bs-target="#recipientsModal">
 
       <div class="row justify-content-center mt-2 mx-4">
         <div class="col-md-8 col-lg-6 bg-light rounded-1">
@@ -238,45 +321,209 @@
                   宛先編集</button>
               </div>
             </div>
+          </div> 
+          
+        </div> <!-- end of col -->
+      </div> <!-- end of row -->
+
+      <div class="modal fade" id="recipientsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">送信対象先</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="閉じる"></button>
+            </div>
+            <div class="modal-body" id="recipientsModalBody">
+              <div class="table-responsive">
+                <table class="table table-sm align-middle">
+                  <thead>
+                    <tr>
+                      <th style="text-align:center">除外</th>
+                      <th>ユーザー名</th>
+                      <th>メール</th>
+                      <th>ゲスト先</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for sellUser in sellEntitysUsers %}
+                      <tr>
+                        <td style="text-align:center">
+                          <input type="checkbox"
+                            name="name_checkbox"
+                            value="{{ item.pk }}">
+                        </td>
+                        <td>{{ sellUser.userName }}</td>
+                        <td>{{ sellUser.email }}</td>
+                        <td>{{ sellUser.entity__entityName }}</td>
+                      </tr>
+                    {% empty %}
+                      <tr><td colspan="2" class="text-muted">対象がありません。</td></tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div> <!-- end of table-reaponsive -->
+
+              <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">閉じる</button>
+              </div>
+
+            </div> <!-- end of moda body -->
+          </div>  <!-- end of modal-content -->
+        </div> <!-- end of modal-dialog -->
+      </div> <!-- end of modal-fade -->
+    </span>
+
+    
+    <!-- 送信のタイミングを設定する画面を表示　-->
+    <span id="id_addition_When1" style="display:none;" data-bs-target="#recipientsModal">
+
+      <!-- いま送信ボタン、定期送信設定する画面を表示する-->
+      <div class="row justify-content-center mt-5 mx-2">
+        <div class="col-md-8 col-lg-6">
+
+          <div class="row justify-content-center">
+            <div class="col-6">
+
+              <div class="d-flex justify-content-start mt-3">
+                <i class="bi bi-record2-fill" style="font-size:1.4em; color:hotpink;"></i>
+                <h6 class="text-secondary ms-1 me-3"><b>いまだけ送信</b></h5>
+              </div>
+            </div>
+
+            <div class="col-6">
+              <div class="d-flex justify-content-end mt-3">
+
+                <form method="post" class="row mt-2 mx-1">
+                  {% csrf_token %}
+
+                  <button
+                    class="btn btn-primary shadow"
+                    name="next2"
+                    value="ToSendNow_{{buyUser.id}}_{{buyEntity.id}}">
+                    送信を始めます</button>
+                </form>
+              </div> <!-- end of d-flex -->
+            </div> <!-- end of col -->
+          </div> <!-- end of row -->
+
+          <hr class="mt-2">
+
+          <div class="d-flex justify-content-start mt-4">
+            <i class="bi bi-record2-fill" style="font-size:1.4em; color:hotpink;"></i>
+            <h6 class="text-secondary ms-1 me-3"><b>定期配信</b></h5>
+            <i class="bi bi-repeat" style="font-size:1.7em; color:cornflowerblue;"></i>
           </div>
 
-          <hr>
+          <form method="post" class="row mt-2 ms-4">
+            {% csrf_token %}
+
+            <div class="form-group" id="id_RepeatOnOff">
+              <div class="d-flex justify-content-center">
+                <div class="radio me-5">
+                  <input type="radio"
+                    name="name_RepeatOnOff"
+                    id="id_RepeatOnOff_A"
+                    {% if repeatOnOff == 'on' %}checked{% endif %}
+                    value="on">
+                  <label for="on">する</label>
+                </div>
+                <div class="radio ms-5">
+                  <input type="radio"
+                    name="name_RepeatOnOff"
+                    id="id_RepeatOnOff_B"
+                    {% if repeatOnOff == 'off' %}checked{% endif %}
+                    value="off">
+                  <label for="off">しない</label>
+                </div>
+              </div>
+            </div>
+
+            <span id="id_addition_When2" style="display: none;" class="">
+              <hr>
+
+              <div class="form-group row justify-content-start mt-2">
+                <label class="col-4 col-md-4 col-form-label">
+                  開始日
+                </label>
+                <div class="col-8 col-md-8">
+                  {{ RepeatSetForm.startDate|add_class:"form-select" }}
+                </div>
+              </div>
+
+              <div class="form-group row justify-content-start mt-1">
+                <label class="col-4 col-md-4 col-form-label">
+                  {{ RepeatSetForm.interval.label }}
+                </label>
+                <div class="col-8 col-md-8">
+                  {{ RepeatSetForm.interval|add_class:"form-select" }}
+                </div>
+              </div> <!-- end of form-group row -->
+
+              <div class="form-group row justify-content-start mt-1">
+                <label class="col-4 col-md-4 col-form-label">
+                  {{ RepeatSetForm.dayOfMonth.label }}
+                </label>
+                <div class="col-8 col-md-8">
+                  {{ RepeatSetForm.dayOfMonth|add_class:"form-select" }}
+                </div>
+              </div> <!-- end of form-group row -->
+            </span>
+
+            <div class= "d-flex justify-content-end mt-4">
+              <button
+                class="btn btn-primary shadow"
+                name="next2"
+                value="ToSaveSendSets_{{buyUser.id}}_{{buyEntity.id}}">
+                設定を変更する
+              </button>
+            </div>
+
+          </form>
+
+        </div> <!-- endo of col -->
+      </div> <!-- end of row -->
+    </span>
+
+
+    <!-- 送信する内容を編集する -->
+    <span id="id_addition_What1" style="display:none;" data-bs-target="#recipientsModal">
+
+      <div class="row justify-content-center mt-3 mx-4">
+        <div class="col-md-8 col-lg-6 bg-light rounded-1">
 
           <div class="row justify-content-start mx-1">
-            {% if mailform2.title.errors %}
+            {% if mailForm1.title.errors %}
               <div class="" style="color:red;">
-                {{ mailform2.title.errors.as_text }}</div>
+                {{ mailForm1.title.errors.as_text }}</div>
             {% endif %}
           </div>
+          <label class="form-label mt-2"
+            for="{{mailForm1.title.id_for_label}}" >
+            メール件名
+          </label>
           <div class="form-group row justify-content-start mx-1">
-            <label class="col-3 col-form-label"
-              for="{{mailform2.title.id_for_label}}" >
-              メール件名</label>
-            <div class="col-9">
-              <input type="{{mailform2.title.widget.input_type}}" class='form-control'
-                name='{{mailform2.title.name}}'
-                value="{{mailform2.title.value}}"
-                id='{{mailform2.title.id_for_label}}' >
-            </div>
-          </div> <!-- end of row -->
+              <input type="{{mailForm1.title.widget.input_type}}" class='form-control'
+                name='{{mailForm1.title.name}}'
+                value="{{mailForm1.title.value}}"
+                id='{{mailForm1.title.id_for_label}}' >
+          </div> <!-- end of form-group row -->
 
           <div class="row justify-content-start mx-1">
-            {% if mailform2.message.errors %}
+            {% if mailForm1.message.errors %}
               <div class="" style="color:red;">
-                {{ mailform2.message.errors.as_text }}</div>
+                {{ mailForm1.message.errors.as_text }}</div>
             {% endif %}
           </div>
+          <label class="form-label mt-2"
+            for="{{mailForm1.message.id_for_label}}" >
+            メール本文
+          </label>
           <div class="form-group row justify-content-start mb-4 mx-1">
-            <label class="col-3 col-form-label"
-              for="{{mailform2.message.id_for_label}}" >
-              メール本文</label>
-            <div class="col-9">
-              <textarea class="form-control" rows="5"
-                name="{{mailform2.message.name}}"
-                value="{{mailform2.message.value|default:''}}"
-                id='{{mailform2.message.id_for_label}}'></textarea>
-            </div>
-          </div> <!-- end of row -->
+            <textarea class="form-control" rows="5"
+              name="{{mailForm1.message.name}}"
+              value="{{mailForm1.message.value|default:''}}"
+              id='{{mailForm1.message.id_for_label}}'></textarea>
+          </div> <!-- end of form-group row -->
 
         </div> <!-- end of col -->
       </div> <!-- end of row -->
@@ -316,18 +563,16 @@
                     {% endfor %}
                   </tbody>
                 </table>
-                </div>
+              </div> <!-- end of table-reaponsive -->
 
-                <div class="modal-footer">
-                  <button class="btn btn-secondary" data-bs-dismiss="modal">閉じる</button>
-                </div>
-
+              <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">閉じる</button>
               </div>
+
             </div> <!-- end of moda body -->
           </div>  <!-- end of modal-content -->
         </div> <!-- end of modal-dialog -->
       </div> <!-- end of modal-fade -->
-
     </span>
 
   </div> <!-- end of container -->
@@ -348,39 +593,105 @@
 
     console.log('DOMContentLoadedが認識されました');
 
+    var WhoWhenWhat = document.getElementById('id_WhoWhenWhat');
+
     var NewOrNot = document.getElementById('id_NewOrNot');
     var EachOrFile = document.getElementById('id_EachOrFile');
     var NewItemInput = document.getElementById('id_NewItemInput');
     var NewItemAddBtn = document.getElementById('id_NewItemAddBtn');
     var FormList = document.getElementById('id_FormList');
     var ExcelOrCSV = document.getElementById('id_ExcelOrCSV');
-   
-    var addition1 = document.getElementById('id_addition1'); /* 「未登録ユーザー」選択後⇒「手入力／ファイル入力」選択 */
-    var addition2 = document.getElementById('id_addition2'); /* 「手入力」選択後⇒「手入力画面」 */
-    var addition3 = document.getElementById('id_addition3'); /* 「ファイル入力」選択後⇒「エクセル／CSV」選択 */
-    var addition4 = document.getElementById('id_addition4'); /* 「ファイルアップロード」 */
-    var addition5 = document.getElementById('id_addition5'); /* 「登録ユーザー」選択後⇒データから取得 */
 
+    var NewOrNot2 = document.getElementById('id_NewOrNot2');
+    var RepeatYesOrNot = document.getElementById('id_RepeatOnOff');
+
+    var addition_Who1 = document.getElementById('id_addition_Who1'); /* 「登録ユーザー」選択後⇒データから取得 */
+    var addition_Who2 = document.getElementById('id_addition_Who2'); /* 「未登録ユーザー」選択後⇒「手入力／ファイル入力」選択 */
+    var addition_Who3 = document.getElementById('id_addition_Who3'); /* 「手入力」選択後⇒「手入力画面」 */
+    var addition_Who4 = document.getElementById('id_addition_Who4'); /* 「ファイル入力」選択後⇒「エクセル／CSV」選択 */
+    var addition_Who5 = document.getElementById('id_addition_Who5'); /* 「ファイルアップロード」 */
+    var addition_Who6 = document.getElementById('id_addition_Who6'); /* 「登録ユーザー」選択後⇒データから取得 */
+
+    var addition_When1 = document.getElementById('id_addition_When1'); /* いつ送るかの前に対象を選択する */
+    var addition_When2 = document.getElementById('id_addition_When2'); /* いつ送るかの前に対象を選択する */
+    var addition_What1 = document.getElementById('id_addition_What1'); /* メール内容を編集する */
+
+
+    WhoWhenWhat.addEventListener('click', function(){
+
+      console.log('WhoWhenWhat.addEventListenerのclickが認識されました');
+      if (id_WhoWhenWhat_A.checked) { /* 宛先を設定 */
+        console.log('id_WhoWhenWhat_Aが認識されました');
+        addition_Who1.style.display = "block";
+        addition_Who2.style.display = "none";
+        addition_Who3.style.display = "none";
+        addition_Who4.style.display = "none";
+        addition_Who5.style.display = "none";
+        addition_Who6.style.display = "none";
+        addition_When1.style.display = "none";
+        addition_What1.style.display = "none";
+      }
+
+      if (id_WhoWhenWhat_B.checked) { /* いつ送信するかを設定 */
+        console.log('id_WhoWhenWhat_Bが認識されました');
+        addition_Who1.style.display = "none";
+        addition_Who2.style.display = "none";
+        addition_Who3.style.display = "none";
+        addition_Who4.style.display = "none";
+        addition_Who5.style.display = "none";
+        addition_Who6.style.display = "none";
+        addition_When1.style.display = "block";
+        if (id_RepeatOnOff_A.checked) {
+          console.log('id_RepeatOnOff_A.checked==Trueが認識されました');
+          addition_When2.style.display = "block";
+        }else{
+          console.log('id_RepeatOnOff_A.checked==Falseが認識されました');
+          addition_When2.style.display = "none";
+        }
+        addition_What1.style.display = "none";
+      }
+
+      if (id_WhoWhenWhat_C.checked) { /* メール内容を編集 */
+        console.log('id_WhoWhenWhat_Cが認識されました');
+        addition_Who1.style.display = "none";
+        addition_Who2.style.display = "none";
+        addition_Who3.style.display = "none";
+        addition_Who4.style.display = "none";
+        addition_Who5.style.display = "none";
+        addition_Who6.style.display = "none";
+        addition_When1.style.display = "none";
+        addition_When2.style.display = "none";
+        addition_What1.style.display = "block";
+      }        
+    });
 
     NewOrNot.addEventListener('click', function(){
 
       console.log('NewOrNot.addEventListenerのclickが認識されました');
       if (id_NewOrNot_A.checked) { /* 送信先＝未登録先 */
         console.log('id_NewOrNot_Aが認識されました');
-        addition1.style.display = "block";
-        addition2.style.display = "none";
-        addition3.style.display = "none";
-        addition4.style.display = "none";
-        addition5.style.display = "none";
+        addition_Who1.style.display = "block";
+        addition_Who2.style.display = "block";
+        addition_Who3.style.display = "none";
+        addition_Who4.style.display = "none";
+        addition_Who5.style.display = "none";
+        addition_Who6.style.display = "none";
+        addition_When1.style.display = "none";
+        addition_When2.style.display = "none";
+        addition_What1.style.display = "none";
       }
 
       if (id_NewOrNot_B.checked) { /* 送信先＝登録者 */
         console.log('id_NewOrNot_Bが認識されました');
-        addition1.style.display = "none";
-        addition2.style.display = "none";
-        addition3.style.display = "none"; 
-        addition4.style.display = "none";
-        addition5.style.display = "block";
+        addition_Who1.style.display = "block";
+        addition_Who2.style.display = "none";
+        addition_Who3.style.display = "none";
+        addition_Who4.style.display = "none"; 
+        addition_Who5.style.display = "none";
+        addition_Who6.style.display = "block";
+        addition_When1.style.display = "none";
+        addition_When2.style.display = "none";
+        addition_What1.style.display = "none";
       }
     });
 
@@ -420,24 +731,33 @@
 
     });
     
+
     EachOrFile.addEventListener('click', function(){
       console.log('EachOrFile.addEventListenerのclickが認識されました');
       if (id_EachOrFile_A.checked) { /* 未登録⇒手入力 */
         console.log('id_EachOrFile_Aが認識されました');
-        addition1.style.display = "block";
-        addition2.style.display = "block";
-        addition3.style.display = "none";
-        addition4.style.display = "none";
-        addition5.style.display = "none";
+        addition_Who1.style.display = "block";
+        addition_Who2.style.display = "block";
+        addition_Who3.style.display = "block";
+        addition_Who4.style.display = "none";
+        addition_Who5.style.display = "none";
+        addition_Who6.style.display = "none";
+        addition_When1.style.display = "none";
+        addition_When2.style.display = "none";
+        addition_What1.style.display = "none";
       }
 
       if (id_EachOrFile_B.checked) { /* 未登録⇒ファイル入力 */
         console.log('id_EachOrFile_Bが認識されました');
-        addition1.style.display = "block";
-        addition2.style.display = "none";
-        addition3.style.display = "block";
-        addition4.style.display = "none";
-        addition5.style.display = "none";
+        addition_Who1.style.display = "block";
+        addition_Who2.style.display = "block";
+        addition_Who3.style.display = "none";
+        addition_Who4.style.display = "block";
+        addition_Who5.style.display = "none";
+        addition_Who6.style.display = "none";
+        addition_When1.style.display = "none";
+        addition_When2.style.display = "none";
+        addition_What1.style.display = "none";
       }
     });
 
@@ -446,21 +766,61 @@
       console.log('ExcelOrCSV.addEventListenerのclickが認識されました');
       if (id_ExcelOrCSV_A.checked) { /* 未登録⇒ファイル入力⇒エクセル取り込み */
         console.log('id_ExcelOrCSC_Aが認識されました');
-        addition1.style.display = "block";
-        addition2.style.display = "none";
-        addition3.style.display = "block";
-        addition4.style.display = "block";
-        addition5.style.display = "none";
+        addition_Who1.style.display = "block";
+        addition_Who2.style.display = "block";
+        addition_Who3.style.display = "none";
+        addition_Who4.style.display = "block";
+        addition_Who5.style.display = "block";
+        addition_Who6.style.display = "none";
+        addition_When1.style.display = "none";
+        addition_When2.style.display = "none";
+        addition_What1.style.display = "none";
       }
 
       if (id_ExcelOrCSV_B.checked) { /* 未登録⇒ファイル入力⇒CSV取り込み */      
         console.log('id_ExcelOrCSV_Bが認識されました');
-        addition1.style.display = "block";
-        addition2.style.display = "none";
-        addition3.style.display = "block";
-        addition4.style.display = "block";
-        addition5.style.display = "none";
+        addition_Who1.style.display = "block";
+        addition_Who2.style.display = "block";
+        addition_Who3.style.display = "none";
+        addition_Who4.style.display = "block";
+        addition_Who5.style.display = "block";
+        addition_Who6.style.display = "none";
+        addition_When1.style.display = "none";
+        addition_When2.style.display = "none";
+        addition_What1.style.display = "none";
+      }
+    });
 
+
+    RepeatYesOrNot.addEventListener('click', function(){
+
+      console.log('RepeatOnOff.addEventListenerのclickが認識されました');
+      if (id_RepeatOnOff_A.checked) { /* 送信先＝未登録先 */
+        console.log('id_RepeatOnOff_Aが認識されました');
+        addition_Who1.style.display = "none";
+        addition_Who2.style.display = "none";
+        addition_Who3.style.display = "none";
+        addition_Who4.style.display = "none";
+        addition_Who5.style.display = "none";
+        addition_Who6.style.display = "none";
+        addition_When1.style.display = "block";
+        addition_When2.style.display = "block";
+        addition_What1.style.display = "none";
+        /* addition_When3.style.display = "none"; */
+      }
+
+      if (id_RepeatOnOff_B.checked) { /* 送信先＝登録者 */
+        console.log('id_RepeatOnOff_Bが認識されました');
+        addition_Who1.style.display = "none";
+        addition_Who2.style.display = "none";
+        addition_Who3.style.display = "none";
+        addition_Who4.style.display = "none"; 
+        addition_Who5.style.display = "none";
+        addition_Who6.style.display = "none";
+        addition_When1.style.display = "block";
+        addition_When2.style.display = "none";
+        addition_What1.style.display = "none";
+        /* addition_When3.style.display = "none"; */
       }
     });
 

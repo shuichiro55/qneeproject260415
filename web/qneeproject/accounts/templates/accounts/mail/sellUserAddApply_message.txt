@@ -3,6 +3,6 @@
 下記URLよりサイトにアクセスのうえ、申請のご確認をお願いいたします。
 
 申請の確認用URL
-{{ protocol}}://{{ domain }}{% url 'accounts:userAdd_buyer' applyuser_id buyentity_id %}
+{{ protocol}}://{{ domain }}{% url 'accounts:userAdd_seller' token1 token2 %}
 
 株式会社Qnee（キユーニー）

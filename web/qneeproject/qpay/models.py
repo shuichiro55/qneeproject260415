@@ -22,11 +22,11 @@ def user_directory_path(instance, filename):
 
 class TxStatus(models.IntegerChoices):
   """ 状態 """
-  UNPROCESSED = 1 # 未処理
-  APPROVED = 2    # 承認済み（前払い未了）
-  DISAPPROVED = 3 # 否認済み
-  QNEE_PAYED = 4  # 前払い完了（Qnee⇒Seller）
-  BUYER_PAYED = 5 # Qnee受領（Buyer⇒Qnee）
+  UNPROCESSED = 1 # 「未処理」：未処理
+  APPROVED = 2    # 「承認」：承認済み（前払い未了）
+  DISAPPROVED = 3 # 「否認」：否認済み
+  QNEE_PAYED = 4  # 「前払済」：前払い完了（Qnee⇒Seller）
+  BUYER_PAYED = 5 # 「完了」：Qnee受領（Buyer⇒Qnee）
   
 class QpayTx(models.Model):
 
@@ -60,11 +60,13 @@ class QpayTx(models.Model):
   #buyer_entity_choice = models.IntegerField(_('パートナー・エンティティ（選択リスト）'), choices=[(idx, f) for idx, f in enumerate(LegalEntity.objects.filter(type1=1).values_list('entityName', flat=True), 1)], default=1)
   #buyEntity_choice = models.IntegerField(_('お支払者'), default=1)
 
-  """ buyUserは、承認した人を登録するようにする """
+  """ buyUserは、最後に承認・否認した人を登録するようにする """
   buyUser = models.ForeignKey(CustomUser, verbose_name='パートナー・ユーザー',
     null=True,
     related_name='buyUser_txs',
     on_delete=models.CASCADE)
+
+  buyUser_userName =models.CharField('ゲスト・ユーザー名', max_length=150, unique=False, null=True,)
 
   requested_at = models.DateTimeField(_('ご申請時点'), null=True)
   requested_amount = models.IntegerField(_('ご申請金額（円）'), null=False)
@@ -77,7 +79,7 @@ class QpayTx(models.Model):
     validators=[FileExtensionValidator(['jpg', 'png', 'jpeg', 'pdf', ])], null=False, default=None) 
 
   txStatus_int = models.IntegerField(choices=TxStatus.choices, default=1, verbose_name='処理状況 No')
-  txStatus_char = models.CharField(max_length=20, null=False, blank=False, default="承認待ち", verbose_name='処理状況')
+  txStatus_char = models.CharField(max_length=20, null=False, blank=False, default="未処理", verbose_name='処理状況')
   
   # 1: UNPROCESSED 承認待ち
   # 2: APPROVED 承認済み（前払い未了）

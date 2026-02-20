@@ -1,0 +1,174 @@
+{% extends "index/base_qconnect_buyer.html" %}
+
+{% load humanize %}
+{% load bootstrap_icons %}
+
+{% block content %}
+{% csrf_token %}
+
+
+<div class="authentication-bg min-vh-100 min-vw-100 align-items-start">
+
+  <div class="container">
+
+    <div class="row justify-content-center mt-1">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
+          <span>{{ message }}</span>
+        </div>
+      {% endfor %}
+    </div>
+
+    <nav aria-label="breadcrumb" role="navigation">
+      <ol class="breadcrumb bg-light-subtle px-2 rounded-3 mt-1">
+        <li class="breadcrumb-item"><a href="{% url 'accounts:mypage_buyer' %}">
+          {% bs_icon 'house' color='cornflowerblue' size='1.2em' %}
+          マイページトップ</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'accounts:infoEdit_buyer' %}">
+          {% bs_icon 'gear' color='cornflowerblue' size='1.2em' %}
+          設定メニュー</a></li>
+        <li class="breadcrumb-item" aria-current="page">ユーザー権限編集</li>
+      </ol>
+    </nav>
+    
+    <div class="d-flex text-left mt-4">
+      <h5 class="text-secondary me-1"><b>ユーザー権限の編集</b></h5>
+      <i class="bi bi-pencil-square" style="font-size:1.8em; color:hotpink;"></i>
+    </div>
+
+    <div class="row justify-content-center mt-2">
+      <div class="col-10 col-md-8 col-lg-6 col-xl-5">
+
+        <form method="POST" action="{% url 'accounts:permissionSets_buyer' %}"
+          class="form-group bg-light rounded-2 p-3">
+
+          {% csrf_token %}         
+          {{ form.non_field_errors }}
+
+          <table class="table table-bordered border-primary-subtle table-responsive">
+            <tbody class="text-center">
+              <tr>
+                <th scope="col" width="33%" class="table-primary" style="text-align: left;">申請者</th>
+                <td style="text-align: right;">{{ editedUser.userName }}さん</td></tr>
+              <tr>
+                <th scope="col" width="33%" class="table-primary" style="text-align: left;">電話番号</th>
+                <td style="text-align: right;">{{ editedUser.tel_user }}</td></tr>
+              <tr>
+                <th scope="col" width="33%" class="table-primary" style="text-align: left;">所属部署</th>
+                <td style="text-align: right;">{{ editedUser.department }}</td></tr>
+              <tr>
+                <th scope="col" width="33%" class="table-primary" style="text-align: left;">役職</th>
+                <td style="text-align: right;">{{ editedUser.title }}</td></tr>
+            </tbody>
+          </table>
+
+          <hr>
+
+          <table class="table table-bordered border-primary-subtle table-responsive">
+            <tbody class="text-center">
+              <tr>
+                <th scope="col" width="33%" class="table-primary" style="text-align: left;">各種権限</th>
+                <td style="text-align: left;">
+                  <div class="form-check form-switch ms-2">
+                    <input class="form-check-input col-xs-3 col-lg-2" type="checkbox"
+                      id="{{form.canApprove_all.id_for_label}}"
+                      name="{{form.canApprove_all.name}}"
+                      value="True">
+                    <label class="form-check-label col-xs-6 col-lg-6 ms-3" for="{{form.canApprove_all.id_for_label}}">
+                      すべて</label>
+                  </div>
+
+                  <div class="form-check form-switch ms-2">
+                    <input class="form-check-input col-xs-3 col-lg-2" type="checkbox"
+                      id="{{form.canApprove_add.id_for_label}}"
+                      name="{{form.canApprove_add.name}}"
+                      value="True">
+                    <label class="form-check-label col-xs-6 col-lg-6 ms-3" for="{{form.canApprove_add.id_for_label}}">
+                      ユーザー追加</label>
+                  </div>
+      
+                  <div class="form-check form-switch ms-2">
+                    <input class="form-check-input col-xs-3 col-lg-2" type="checkbox"
+                      id="{{form.canApprove_qpay.id_for_label}}"
+                      name="{{form.canApprove_qpay.name}}"
+                      value="True">
+                    <label class="form-check-label col-xs-6 col-lg-6 ms-3" for="{{form.canApprove_qpay.id_for_label}}">
+                      Ｑｐａｙ承認</label>
+                  </div>                               
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          </hr>
+          <p></p>
+          
+          <div class="d-flex justify-content-center pt-3">
+            <button type="submit" class="btn btn-primary w-30 shadow ms-1"
+              name="next2", value="PermissionSet_{{editedUser.id}}" >
+              編集終わり</button>
+          </div>
+
+        </form>
+      </div>
+
+    </div> <!-- end row -->
+  </div> <!-- end container -->
+
+</div>
+
+<style>
+  .active-underline {
+    text-decoration: underline !important; 
+    /* Bootstrapのスタイルを上書きするために!importantを使用する場合がある */
+  }
+</style>
+
+<script>
+
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOMContentLoaded in permissionUpate_buyer.html が認識されました');
+
+    var CanApproveAll = document.getElementById("{{ form.canApprove_all.id_for_label }}");
+    var value_CanApproveAll = "{{ editedUser.canApprove_all }}"; // DjangoからJSに値を渡す
+    
+    console.log(value_CanApproveAll)
+
+    if ("{{ editedUser.canApprove_all }}" == "True") {
+      console.log('value_CanApproveAll == on で判定されました');
+
+      CanApproveAll.checked = true;
+    } else {
+      CanApproveAll.checked = false;
+    }
+
+    var CanApproveAdd = document.getElementById("{{ form.canApprove_add.id_for_label }}");
+    var value_CanApproveAdd = "{{ editedUser.canApprove_add }}"; // DjangoからJSに値を渡す
+
+    console.log(value_CanApproveAdd)
+
+    if ("{{ editedUser.canApprove_add }}" == "True") {
+      console.log('value_CanApproveAdd == on で判定されました');
+      CanApproveAdd.checked = true;
+    } else {
+      CanApproveAdd.checked = false;
+    }
+
+    var CanApproveQpay = document.getElementById("{{ form.canApprove_qpay.id_for_label }}");
+    var value_CanApproveQpay = "{{ editedUser.canApprove_qpay }}"; // DjangoからJSに値を渡す
+
+    console.log(value_CanApproveQpay)
+
+    if ("{{ editedUser.canApprove_qpay }}" == "True") {
+      console.log('value_CanApproveQpay == on で判定されました');
+      CanApproveQpay.checked = true;
+    } else {
+      CanApproveQpay.checked = false;
+    }
+
+  });
+
+</script>
+
+{% endblock %}
+

@@ -58,22 +58,24 @@ urlpatterns = [
   path('permissionSets_seller', views.PermissionSetsView_seller.as_view(), name='permissionSets_seller'),
 
   # ★★ 25/06/17追加 テストはこれから、 tokenは申請したユーザーのid
-  path('<str:applyuser_id>/<str:buyentity_id>/userAdd_buyer', views.UserAddView_buyer.as_view(), name='userAdd_buyer'),
-  path('<str:applyuser_id>/<str:buyentity_id>/userAdd_seller', views.UserAddView_seller.as_view(), name='userAdd_seller'),
+  path('<str:token1>/<str:token2>/userAdd_buyer', views.UserAddView_buyer.as_view(), name='userAdd_buyer'),
+  path('<str:token1>/<str:token2>/userAdd_seller', views.UserAddView_seller.as_view(), name='userAdd_seller'),
 
   path('userAdd_buyer', views.UserAddView_buyer.as_view(), name='userAdd_buyer'),
+  path('userAdd_seller', views.UserAddView_seller.as_view(), name='userAdd_seller'),
 
   path('passwordChange_buyer/', views.MyPasswordChangeView_buyer.as_view(), name='passwordChange_buyer'),
-  path('passwordChange2_buyer/', views.MyPasswordChange2View_buyer.as_view(), name='passwordChange2_buyer'),
+  #path('passwordChange2_buyer/', views.MyPasswordChange2View_buyer.as_view(), name='passwordChange2_buyer'),
 
   path('passwordChange_seller/', views.MyPasswordChangeView_seller.as_view(), name='passwordChange_seller'),
-  path('passwordChange2_seller/', views.MyPasswordChange2View_seller.as_view(), name='passwordChange2_seller'),
+  #path('passwordChange2_seller/', views.MyPasswordChange2View_seller.as_view(), name='passwordChange2_seller'),
 
   path('passwordChange_admin/', views.MyPasswordChangeView_admin.as_view(), name='passwordChange_admin'),
-  path('passwordChange2_admin/', views.MyPasswordChange2View_admin.as_view(), name='passwordChange2_admin'),
+  #path('passwordChange2_admin/', views.MyPasswordChange2View_admin.as_view(), name='passwordChange2_admin'),
 
   # 25/04/27 <int:user_id>は要否検討
   # path('<int:user_id>/mypage_admin/', views.MyPageView_admin.as_view(), name='mypage_admin'),
+  path('<int:user_id>/mypage_admin/', views.MyPageView_admin.as_view(), name='mypage_admin'),
   path('mypage_admin/', views.MyPageView_admin.as_view(), name='mypage_admin'),
 
   path('<int:user_id>/mypage_seller/', views.MyPageView_seller.as_view(), name='mypage_seller'),
@@ -91,6 +93,9 @@ urlpatterns = [
   path('<int:user_id>/infoEdit_seller/', views.InfoEditView_seller.as_view(), name='infoEdit_seller'),  # 24/08/21追加
   path('infoEdit_seller/', views.InfoEditView_seller.as_view(), name='infoEdit_seller'),  # 24/08/21追加
 
+  path('<int:user_id>/infoEdit_seller/', views.InfoEditView_seller.as_view(), name='infoEdit_admin'),  # 24/08/21追加
+  path('infoEdit_seller/', views.InfoEditView_seller.as_view(), name='infoEdit_admin'),  # 26/2/20追加
+
   #path('<int:user_id>/<int:entity_id>/infoEdit_buyer/', views.InfoEditView_buyer.as_view(), name='info_buyer_seller'),  # 25/05/15追加
   #path('infoEdit_buyer/', views.InfoEditView_seller.as_view(), name='infoEdit_buyer'),  # 25/05/15追加
 
@@ -99,5 +104,17 @@ urlpatterns = [
   path('bankAccountCreate/', views.BankAccountCreateView.as_view(), name='bankAccountCreate'),  # 24/07/14追加
   #path('<int:entity_id>/bankAccountCreate/', views.BankAccountCreateView.as_view(), name='bankAccountCreate'),  # 24/07/14追加
   path('<int:tx_id>/bankAccountCreate/', views.BankAccountCreateView.as_view(), name='bankAccountCreate'),  # 24/07/14追加
+
+  path('passwordReset_buyer/', views.MyPasswordResetView_buyer.as_view(), name='passwordReset_buyer'),
+  path('accounts/passwordResetDone_buyer/', views.MyPasswordResetDoneView_buyer.as_view(), name='passwordResetDone_buyer'),
+  path('passwordReset_buyer/<uidb64>/<token>/', views.MyPasswordResetConfirmView_buyer.as_view(), name='passwordResetConfirm_buyer'),
+
+  path('passwordReset_seller/', views.MyPasswordResetView_seller.as_view(), name='passwordReset_seller'),
+  path('accounts/passwordResetDone_seller/', views.MyPasswordResetDoneView_seller.as_view(), name='passwordResetDone_seller'),
+  path('passwordReset_seller/<uidb64>/<token>/', views.MyPasswordResetConfirmView_seller.as_view(), name='passwordResetConfirm_seller'),
+
+  path('passwordReset_admin/', views.MyPasswordResetView_admin.as_view(), name='passwordReset_admin'),
+  path('accounts/passwordResetDone_admin/', views.MyPasswordResetDoneView_admin.as_view(), name='passwordResetDone_admin'),
+  path('passwordReset_admin/<uidb64>/<token>/', views.MyPasswordResetConfirmView_admin.as_view(), name='passwordResetConfirm_admin'),
 
 ]

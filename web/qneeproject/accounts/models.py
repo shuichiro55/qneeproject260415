@@ -72,12 +72,16 @@ class LegalEntity(models.Model):
   zip_entity = models.CharField(_('郵便番号'), max_length=15,
     null=False, blank=False, default="",validators=[zip_regex])
 
-  address1 = models.CharField(_('都道府県・区市町村・丁目番地'),
-    max_length=100,
+  address1 = models.CharField(_('都道府県・区市町村'),
+    max_length=30,
     null=True)
 
-  address2 = models.CharField(_('建物名・部屋番号'),
-    max_length=100,
+  address2 = models.CharField(_('〇丁目〇番〇号'),
+    max_length=20,
+    null=True)
+
+  address3 = models.CharField(_('建物・マンション名・部屋番号'),
+    max_length=30,
     null=True)
 
   # 手数料は加盟企業（発注者）ごとに設定できるようにする
@@ -101,7 +105,7 @@ class LegalEntity(models.Model):
     _('契約合意の日時'), null=True, blank=True,)
 
   # 会員登録した日時
-  joined_at = models.DateTimeField(_('登録日'), null=True, blank=True)
+  #joined_at = models.DateTimeField(_('登録日'), null=True, blank=True)
 
   def __str__(self):
     return f'{self.entityName}'

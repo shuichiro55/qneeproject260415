@@ -1,0 +1,139 @@
+{% extends "index/base_qconnect_buyer.html" %}
+
+{% load bootstrap_icons %}
+{% load humanize %}
+
+{% block content %}
+
+<div class="authentication-bg min-vh-100 min-vw-100 align-items-start">
+
+  <div class="container">
+
+    <div class="row justify-content-center mt-1">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
+          <span>{{ message }}</span>
+        </div>
+      {% endfor %}
+    </div>
+
+    <nav aria-label="breadcrumb" role="navigation">
+      <ol class="breadcrumb bg-light-subtle px-2 rounded-3 mt-1">
+        <li class="breadcrumb-item">
+          <a href="{% url 'accounts:mypage_buyer' %}">
+            {% bs_icon 'house' color='cornflowerblue' size='1.2em' %}
+            マイページトップ</a>
+          </li>
+        <li class="breadcrumb-item" aria-current="page">前払い申請</li>
+      </ol>
+    </nav>
+
+    <div class="d-flex justify-content-center mt-4">
+      <h5 class="text-secondary pt-1"><b>承認処理　</b></h5>
+      {% bs_icon 'person-check' color='hotpink' size='2.2em' %}
+    </div>
+
+    <div class="row justify-content-center mx-1">
+      <div class="col-md-9 col-lg-6">
+
+        <form method="POST"
+          action="{% url 'qpay:txApproveDetail_buyer' tx.pk page_num %}"
+          class="form-group bg-light border border-success-subtle rounded p-2">
+  
+          {% csrf_token %}
+
+          <div class="container">
+            <table class="table table-sm table-bordered border-primary-subtle table-responsive mt-1">
+              <tbody>
+                {% if tx.txStatus_int == 1 %}
+                  <tr class="table-warning">
+                {% elif tx.txStatus_int == 3 %}
+                  <tr class="table-danger">
+                {% else %}
+                  <tr class="table-info">
+                {% endif %}
+                  <td width="45%" class="table-primary"><b>取引状況</b></td>
+                  <td style="text-align:right;">{{ tx.txStatus_char }}</td></tr>
+
+                <tr>
+                  <td width="45%" class="table-primary"><b>受注者</b></td>
+                  <td style="text-align:right;">{{ tx.sellEntityName }}</td></tr>
+                <tr>
+                  <td width="45%" class="table-primary"><b>申請者</b></td>
+                  <td style="text-align:right;">{{ tx.sellUser_userName }}</td></tr>
+                <tr>
+                  <td width="45%" class="table-primary"><b>申請額</b></td>
+                  <td style="text-align:right;">{{ tx.requested_amount|intcomma }}</td></tr>
+                <tr>
+                  <td width="45%" class="table-primary"><b>証明書類</b></td>
+                  <td style="text-align:center;">
+                    <div style="text-align:center">
+                      <img src="{{ tx.evidence.url }}"
+                        class="img-fluid"
+                        style="width:50;height:auto; cursor:zoom-in;"
+                        data-bs-toggle="modal"
+                        data-bs-target="#imageModal"/>
+                    </div>
+                  </td>
+                  <!-- モーダルウィンドウ外枠 -->
+                  <div class="modal fade"
+                    id="imageModal" 
+                    tabindex="-1" aria-hidden="true"> 
+                    <!-- 「id」を上記「data-bs-target」に合わせる。「tabindex」は「Esc」で閉じる -->
+                    <div class="modal-dialog"> <!-- 大きさ指定なしは「Medium」 -->
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h6 class="modal-title">証明書類</h6>
+                          <!-- 閉じるボタン: data-bs-dismiss="modal" が重要 -->
+                          <button type="button"
+                            class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                          <img src="{{ tx.evidence.url }}" class="img-fluid" alt="拡大画像">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </tr>
+              </tbody>
+            </table>
+
+            <table class="table table-sm table-bordered border-primary-subtle table-responsive mt-0">
+              <tbody>
+                <tr class="table-info">
+                  <td width="45%" class="table-primary"><b>ゲスト受取り</b></td>
+                  <td style="text-align:right;">{{ tx.to_seller_amount|intcomma }}</td></tr>
+                <tr>
+                  <td width="45%" class="table-primary" >＋Qnee前払額</td>
+                  <td style="text-align:right;">{{ tx.advance_amount|intcomma }}</td></tr>
+                <tr>
+                  <td width="45%" class="table-primary" >－前払手数料</td>
+                  <td style="text-align:right;">{{ tx.advance_fee|intcomma }}</td></tr>
+                <tr>
+                  <td width="45%" class="table-primary" >－振込手数料</td><td style="text-align:right;">{{ tx.transfer_fee|intcomma }}</td></tr>
+              </tbody>
+            </table>
+
+            <hr>
+            
+            <div class="d-flex justify-content-center mb-2">
+              <button type="submit" class="btn btn-outline-primary" name="next" value="BackToList">一覧</button>
+              <button type="submit" class="btn btn-primary ms-1" name="next" value="ApproveQpay">
+                <span>
+                  <i class="bi bi-hand-thumbs-up-fill" style="font-size:1.5em; color:hotpink"></i>
+                </span>
+                承認
+            </button>
+              <button type="submit" class="btn btn-primary ms-1" name="next" value="RejectQpay">否認</button>
+            </div>
+
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

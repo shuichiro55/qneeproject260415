@@ -1,0 +1,134 @@
+{% extends "index/base_qconnect_seller.html" %}
+
+{% load bootstrap_icons %}
+{% load humanize %} 
+
+{% block content %}
+{% csrf_token %}
+
+<div class="authentication-bg min-vh-100 min-vw-100 align-items-start">
+
+  <div class="container mt-2">
+
+    <div class="row justify-content-center mt-1">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
+          <span>{{ message }}</span>
+        </div>
+      {% endfor %}
+    </div>
+
+    <nav aria-label="breadcrumb" role="navigation">
+      <ol class="breadcrumb bg-light-subtle px-2 rounded-3 mt-1">
+        <li class="breadcrumb-item text-primary"><a href="{% url 'accounts:mypage_seller' %}">
+          {% bs_icon 'house' color='cornflowerblue' size='1.2em' %}
+          マイページトップ</a></li>
+          <li class="breadcrumb-item" aria-current="page">前払い申請</li>
+      </ol>
+    </nav>
+
+
+    {% if flag_step == 1 %}
+
+      <div class="d-flex justify-content-center mt-4">
+        <h5><b>証明書のアップロード</b></h5>
+      </div>
+
+      <div class="row justify-content-center px-3">
+        <div class="col-md-8 col-lg-6">
+
+          <form method="POST"
+            action="{% url 'qpay:txCreate' %}"
+            class="form-group bg-light border border-success-subtle rounded p-4 m-4 "
+            enctype="multipart/form-data">
+        
+            {% csrf_token %}
+
+            {% if form.evidence.errors %}
+              <div style="color:red;">{{ form.evidence.errors.as_text }}<br></div>
+            {% endif %}
+
+            <div class="row justify-content-center">
+              <input type="file" class="form-control"
+                name="{{form.evidence.name}}"
+                value="{{form.evidence.value|default:''}}"
+                placeholder="報酬額を証明する資料アップロードしてください"
+                id="{{form.evidence.id_for_label}}" >
+            </div>
+
+            <!--
+            <div class="form-group row justify-content-center pt-3">
+              <label class="col-11 col-md-3 col-lg-2 col-form-label" for='{{form.evidence.id_for_label}}' ></label>
+              <div class="col-md-8 col-lg-6">
+                <input type="file" class="form-control"
+                  name="{{form.evidence.name}}"
+                  value="{{form.evidence.value|default:''}}"
+                  placeholder="報酬額を証明する資料アップロードしてください"
+                  id="{{form.evidence.id_for_label}}" >
+              </div>
+            </div>
+          -->
+
+          <hr>
+          
+            <div class="d-flex justify-content-center pt-3">         
+              <button type="submit" class="btn btn-primary"
+                name="next"
+                value="ToEvidenceConfirm_{{sellUser.id}}_{{sellEntity.id}}_{{tx.id}}">
+                アップロード・ファイルの確認へ</button>
+            </div>
+
+          </form>
+
+        {% endif %}
+
+
+        {% if flag_step == 2 %}
+
+          <div class="d-flex justify-content-center mt-2">
+            <h5>アップロード・ファイルの確認</h5>
+          </div>
+
+          <div class="row justify-content-center px-4">
+            <div class="col-md-8 col-lg-6">
+              <form method="POST"
+                action="{% url 'qpay:txCreate' %}"
+                class="form-group bg-light border border-success-subtle rounded p-3"
+                enctype="multipart/form-data">
+        
+                {% csrf_token %}
+                
+           
+                <div class="d-flex justify-content-center pt-3">
+                  <button type="submit" class="btn btn-outline-primary me-1"
+                    name="next"
+                    value="ToEvidenceSelect_{{sellUser.id}}_{{sellEntity.id}}_{{tx.id}}">
+                    再アップロード</button>
+                  <button type="submit" class="btn btn-primary"
+                    name="next"
+                    value="Complete_{{sellUser.id}}_{{sellEntity.id}}_{{tx.id}}">
+                    パートナーに申請</button>
+                </div>
+
+                <hr>
+
+                <div class="row justify-content-center">
+                  <img src="{{ tx.evidence.url}}" class="img-thumbnail">
+                </div>
+
+                {% for field in form %}
+                  {{ field.as_hidden }}
+                {% endfor %}
+
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    {% endif %}
+
+  </div>
+</div>
+
+{% endblock %}

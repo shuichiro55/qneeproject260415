@@ -85,7 +85,7 @@ class TxCreateConfirmForm(forms.ModelForm):
     fields = ('requested_amount', 'evidence')
 
 # 24/7/9 発注者が承認するために表示する一覧表。表示項目は未精査
-class TxListForm_buyer_approve(forms.ModelForm):
+class TxApproveForm_buyer(forms.ModelForm):
 
   class Meta:
     model = QpayTx
@@ -94,7 +94,7 @@ class TxListForm_buyer_approve(forms.ModelForm):
 
 
 # 24/7/9 発注者が書類を発行するために表示する取引履歴。表示項目は未精査
-class TxListForm_buyer_history(forms.ModelForm):
+class TxListForm_buyer(forms.ModelForm):
 
   class Meta:
     model = QpayTx

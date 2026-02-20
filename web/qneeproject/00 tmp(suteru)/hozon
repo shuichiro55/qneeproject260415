@@ -117,3 +117,156 @@
   });
 
 </script>
+# ★★★ 250925作成開始
+class UserAddView_seller(generic.TemplateView, LoginRequiredMixin):
+
+  """ 承認者がユーザー参加を承認するためビュー """
+  """ ①申請者におけるAgreementConfirmView⇒②承認者へのメール⇒③メール内リンクから呼ばれる """
+  """ 承認者はself.request.userとなる為、申請者のuser.idで管理する """
+  """ 最終編集 250927 """
+
+  model = CustomUser
+  template_name = 'accounts/userAdd_seller.html'
+  form_class = UserAddForm_seller
+  #timeout_seconds = getattr(settings, 'ACTIVATION_TIMEOUT_SECONDS', 60*60*24)
+  timeout_seconds = getattr(settings, 'ACTIVATION_TIMEOUT_SECONDS', 60*60*72)
+
+
+  """ 承認者が受領したメール内のリンクから呼ばれる """
+  def get(self, request, **kwargs):  #selfはメソッドを呼んだインスタンス自体
+  
+    try:
+      token_applyUserID = kwargs.get('applyuser_id')    # URLから<token>（暗号化されたuser_id）を取り出す（kwargsはdict型）   
+      applyUserID = loads(token_applyUserID, max_age=self.timeout_seconds)
+      print(f'applyUserID={applyUserID} in def get in UserAddView_seller')
+      applyUser = usermodel.objects.get(pk=applyUserID)
+
+      token_sellEntityID = kwargs.get('sellentity_id')    # URLから<token>（暗号化されたuser_id）を取り出す（kwargsはdict型）   
+      sellEntityID = loads(token_sellEntityID, max_age=self.timeout_seconds)
+      print(f'sellEntityID={sellEntityID} in def get in UserAddView_seller')
+      sellEntity = LegalEntity.objects.get(pk=sellEntityID)
+
+    except usermodel.DoesNotExist:
+      message = "ID情報によるユーザー情報取得ができません。"
+      messages.add_message(self.request, messages.WARNING, message) 
+      return TemplateResponse(request,'accounts/login_seller.html', {'form':MyLoginForm}) 
+
+    except SignatureExpired:  # 期限切れ
+      # この段階でCustomUserインスタンスが生成されている。
+      # ★★ 250925 時間内に承認されない場合の対応追加（権限者、申請者に未処理であることをメール通知）
+      return TemplateResponse(request,'accounts/login_seller.html', {'form':MyLoginForm}) 
+
+    except BadSignature:      # tokenが間違っている
+      return HttpResponseBadRequest() 
+
+    messages.add_message(request, messages.SUCCESS, 'あなたにユーザー追加の申請が行われました.')
+ 
+    context = {
+      'form': self.form_class(),
+      'applyUser': applyUser,
+      'sellEntity': sellEntity,
+    }
+    return TemplateResponse(request, 'accounts/userAdd_seller.html', context)
+
+
+  def post(self, request, **kwargs):
+
+    print(f'pass1 ここ通っているかな in UserAddView_seller')
+    form = self.form_class(request.POST)
+    next = self.request.POST.get('next', '')
+
+    if next.find('ApproveUser') >= 0:
+
+      print(f'pass2 ここ通っているかな in UserAddView_seller')
+
+      applyUser = usermodel.objects.get(pk=next.split('_')[1])
+      sellEntity = LegalEntity.objects.get(pk=next.split('_')[2])
+      
+      char_CanApproveAll = self.request.POST.get('canApprove_all', None)
+      char_CanApproveAdd = self.request.POST.get('canApprove_add', None)
+      char_CanApproveQpay = self.request.POST.get('canApprove_qpay', None)
+
+      if char_CanApproveAll == "True":
+        applyUser.canApprove_all = True
+        print(f'pass1 canApprove_all = True at def post, class UserAddView_seller')
+      else: applyUser.canApprove_all = False
+
+      if char_CanApproveAdd == "True":
+        applyUser.canApprove_add = True
+        print(f'pass2 canApprove_add = True at def post, class UserAddView_seller')
+      else: applyUser.canApprove_add = False
+
+      if char_CanApproveQpay == "True":
+        applyUser.canApprove_qpay = True
+        print(f'pass3 canApprove_qpay = True at def post, class UserAddView_seller')
+      else: applyUser.canApprove_qpay = False
+
+      applyUser.entity = sellEntity
+      applyUser.approvedStatus_int = 2
+
+      applyUser.save()
+
+      # ここからは申請者に参加が認められたことを伝えるメール送信
+      current_site = get_current_site(self.request)
+      domain = current_site.domain
+
+      context = {
+        'protocol': self.request.scheme,
+        'domain': domain,
+        #'applyuser_id': dumps(applyUser.pk),  # 申請者のuser.pkを維持する
+        #'buyentity_id': dumps(buyEntity.pk),  # 申請者のentity.pkを維持する
+      }
+      subject = render_to_string('accounts/mail/sellUserAddReplyYes_subject.txt', context)
+      message = render_to_string('accounts/mail/sellUserAddReplyYes_message.txt', context)
+
+      from_email = 'shuichiro.tomihari.201604@gmail.com'
+      recipient_list = [applyUser.email]
+      #bcc =  ["toritoritorina@gmail.com"]  # BCCリスト
+      email = EmailMessage(subject, message, from_email, recipient_list)
+      email.send()
+
+      return TemplateResponse(request, 'accounts/mypage_seller.html')
+
+
+    if next.find('RefuseUser') >= 0:
+
+      # ★★ 250925時点で工事中
+
+      # 参加が否認されたことをメール送信する
+      applyUser = usermodel.objects.get(pk=next.split('_')[1])
+      sellEntity = LegalEntity.objects.get(pk=next.split('_')[2])
+
+      applyUser.approvedStatus_int = 3
+
+      # 否認されたことを本人に通知する
+      current_site = get_current_site(self.request)
+      domain = current_site.domain
+
+      context = {
+        'protocol': self.request.scheme,
+        'domain': domain,
+        #'applyuser_id': dumps(applyUser.pk),  # 申請者のuser.pkを維持する
+        #'buyentity_id': dumps(buyEntity.pk),  # 申請者のentity.pkを維持する
+      }
+      subject = render_to_string('accounts/mail/sellUserAddReplyNo_subject.txt', context)
+      message = render_to_string('accounts/mail/sellUserAddReplyNo_message.txt', context)
+
+      from_email = 'shuichiro.tomihari.201604@gmail.com'
+      recipient_list = [applyUser.email]
+      #bcc =  ["toritoritorina@gmail.com"]  # BCCリスト
+      email = EmailMessage(subject, message, from_email, recipient_list)
+      email.send()
+
+      return render(request, 'accounts/login_seller.html.html')
+
+    
+    print(f'pass2 本当はここは通らないんだけど！ in UserAddView_seller')
+    applyUser = usermodel.objects.get(pk=next.split('_')[1])
+    sellEntity = LegalEntity.objects.get(pk=next.split('_')[2])
+
+    context = {
+      'form': form,
+      'applyUser': applyUser,
+      'sellEntity': sellEntity,
+    }
+    return TemplateResponse(request, 'accounts/userAdd_seller.html', context)

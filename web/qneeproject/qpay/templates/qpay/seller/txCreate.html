@@ -1,0 +1,291 @@
+{% extends "index/base_qconnect_seller.html" %}
+
+{% load bootstrap_icons %}
+{% load humanize %}
+
+{% block content %}
+{% csrf_token %}
+
+<div class="authentication-bg min-vh-100 min-vw-100 align-items-start">
+
+  <div class="container mt-2">
+
+    <div class="row justify-content-center mt-1">
+
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
+          <span>{{ message }}</span>
+        </div>
+      {% endfor %}
+    </div>
+
+    <nav aria-label="breadcrumb" role="navigation">
+      <ol class="breadcrumb bg-light-subtle px-2 rounded-3 mt-1">
+        <li class="breadcrumb-item text-primary"><a href="{% url 'accounts:mypage_seller' %}">
+          {% bs_icon 'house' color='cornflowerblue' size='1.2em' %}
+          マイページトップ</a></li>
+        <li class="breadcrumb-item" aria-current="page">前払い申請</li>
+      </ol>
+    </nav>
+
+    <div class ="row justify-content-center">
+      <div class="col-10">
+        <div class="progress mt-3 mb-5" style="height: 12px" >
+          <div class="progress-bar bg-danger progress-bar-striped progress-bar-animated" role="progressbar"
+            style="width: 35%"
+            aria-valuenow="35" aria-valuemin="0" aria-valuemax="100">
+            申請内容のご登録
+          </div>
+
+          <div class="progress-bar bg-secondary" role="progressbar"
+            style="width: 35%"
+            aria-valuenow="70" aria-valuemin="0" aria-valuemax="100">
+            承認待ち
+          </div>
+
+          <div class="progress-bar bg-secondary" role="progressbar"
+            style="width: 30%"
+            aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+            口座設定
+        </div>
+
+      </div>
+    </div>
+
+
+    {% if flag_step == 1 %}
+
+      <div class="d-flex justify-content-center">
+        <h5 class="text-secondary">
+          <b> 申請内容の入力　</b></h5>
+        {% bs_icon 'pencil-square' color='hotpink' size='1.8em' %}
+      </div>
+
+      <div class="row justify-content-center mt-1">
+        <div class="col-lg-10 col-xl-9 col-xxl-8">
+
+          <form method="POST"
+            action="{% url 'qpay:txCreate' %}"
+            class="form-group bg-light border border-success-subtle rounded mx-0 p-3"
+            enctype="multipart/form-data">
+
+            {% csrf_token %}
+
+            {{ form.non_field_errors }}
+
+            {% if form.sellEntityName.errors %}
+              <div style="color:red;">{{ form.sellEntityName.errors.as_text }}<br></div>
+            {% endif %}
+            <div class="form-group row justify-content-center">
+              <label class="col-md-4 col-form-label"
+                for="{{form.sellEntityName.id_for_label}}" >
+                報酬を貰う方</label>
+              <div class="col-md-8">
+                <input type="{{form.sellEntityName.widget.input_type}}" class="form-control"
+                  name="{{form.sellEntityName.name}}"
+                  value="{{form.sellEntityName.value|default:''}}"
+                  readonly
+                  placeholder=""
+                  id="{{form.sellEntityName.id_for_label}}" >
+              </div>
+            </div>
+
+            <!-- １ユーザーが複数エンティティに属する場合の処理（今後検討）
+            {% if form.sellEntityName.errors %}
+              <div style="color:red;">{{ form.sellEntityName.errors.as_text }}<br></div>
+            {% endif %}
+            <div class="form-group row justify-content-center pt-3">
+              <label class="col-11 col-md-3 col-form-label" for="{{form.sellEntityName.id_for_label}}" >
+                報酬を貰う方</label>
+              <div class="col-md-8 col-xl-7">
+                <select class="form-select"
+                  name="{{form.sellEntityName.name}}"
+                  value="{{form.sellEntityName.value}}"
+                  id="{{form.sellEntityName.id_for_label}}">
+          
+                  {% if temporal_sellEntityName == "" %}
+                    <option value="" selected></option>
+                    {% for key, value in dict_sellEntityName.items %}
+                      <option value="{{ value }}">{{ value }}</option>
+                    {% endfor %}
+
+                  {% else %}
+
+                    {% for key, value in dict_sellEntityName.items %}
+                      {% if value == temporal_sellEntityName %}
+                        <option value="{{value}}" selected>{{value}}</option>
+                      {% else %}
+                        <option value="{{ value }}">{{ value }}</option>
+                      {% endif %}
+                    {% endfor %}
+
+                  {% endif %}
+              
+                </select>
+              </div>
+            </div>
+              -->
+
+            {% if form.buyEntityName.errors %}
+              <div style="color:red;">{{ form.buyEntityName.errors.as_text }}<br></div>
+            {% endif %}
+            <div class="form-group row justify-content-center mt-2">
+              <label class="col-md-4 col-form-label" id="{{form.buyEntityName.id_for_label}}">
+                報酬を払う方</label>
+
+                <div class="col-md-8">
+                <select class="form-select"
+                  name="{{form.buyEntityName.name}}"
+                  value="{{form.buyEntityName.value}}"
+                  id="{{form.buyEntityName.id_for_label}}">
+
+                  {% if temporal_buyEntityName == "" %}
+                    <option value="" selected></option>
+                    {% for key, value in dict_buyEntityName.items %}
+                      <option value="{{ value }}">{{ value }}</option>
+                    {% endfor %}
+
+                  {% else %}
+
+                    {% for key, value in dict_buyEntityName.items %}
+                      {% if value == temporal_buyEntityName %}
+                        <option value="{{value}}" selected>{{value}}</option>
+                      {% else %}
+                        <option value="{{ value }}">{{ value }}</option>
+                      {% endif %}
+                    {% endfor %}
+
+                  {% endif %}
+                  
+                </select>
+              </div>
+            </div>
+
+            {% if form.requested_amount.errors %}
+              <div style="color:red;">{{ form.rquested_amount.errors.as_text }}<br></div>
+            {% endif %}
+            <div class="form-group row justify-content-center mt-2">
+              <label class="col-md-4 col-form-label"
+                for='{{form.requested_amount.id_for_label}}' >
+                申請額</label>
+              <div class="col-md-8">
+                <input type='form.requested_amount.widget.input_type' class='form-control'
+                  name="{{form.requested_amount.name}}"
+                  value="{{form.requested_amount.value|default:''}}"
+                  placeholder=""
+                  id="{{form.requested_amount.id_for_label}}" >
+              </div>
+            </div>
+            {% if form.exPayment_date.errors %}
+              <div style="color:red;">{{ form.exPayment_date.errors.as_text }}<br></div>
+            {% endif %}
+
+            <div class="form-group row justify-content-center mt-2">
+              <label class="col-md-4 col-form-label" for='{{form.exPayment_date.id_for_label}}' >
+                当初報酬日</label>
+              <div class="col-md-8">
+                <input type="date" class='form-control'
+                  name="{{form.exPayment_date.name}}"
+                  value="{{form.exPayment_date.value|default:''}}"
+                  placeholder=""
+                  id="{{form.exPayment_date.id_for_label}}" >
+              </div>
+            </div>
+
+          
+            <div class="d-flex justify-content-center mt-4">
+              <button type="submit" class="btn btn-primary"
+                name="next"
+                value="ToConfirm_{{sellUser.id}}_{{sellEntity.id}}">
+                入力内容確認へ</button>
+            </div>
+            <!--<button type="submit" class="btn btn-outline-secondary" name="next" value="back">一覧に戻る</button> -->
+            <!-- <input type="hidden" name="next" value="{{ next }}" /> -->
+
+            {{ form.sellUser_email.as_hidden}}
+            {{ form.sellUser_userName.as_hidden}}
+            <!-- {{ form.buyEntityName.as_hidden}} ここで表示してしまうとフォームで「報酬を貰う人」が表示されない -->
+
+          </form>
+        </div>
+      </div>
+
+    {% endif %}
+
+
+    {% if flag_step == 2 %}
+
+      <div class="d-flex justify-content-center mt-2">
+        <h5><b>申請内容のご確認</b></h5>
+      </div>
+
+      <div class="row justify-content-center mt-2">
+        <div class="col-md-9 col-lg-6">
+
+          <form method="POST"
+            action="{% url 'qpay:txCreate' %}"
+            class="p-4 m-4 bg-light border border-success-subtle rounded form-group"
+            enctype="multipart/form-data">
+
+            {% csrf_token %}
+            <table class="table table-bordered border-primary-subtle table-responsive">
+              <tbody class="text-center">
+                <tr>
+                  <th scope="col" width="45%" class="table-primary">パートナー</th>
+                  <td style="text-align: right;">{{ form.buyEntityName.value }}　様</td></tr>
+                <tr>
+                  <th scope="col" width="45%" class="table-primary">報酬を貰う人</th>
+                  <td style="text-align: right;">{{ sellEntity.entityName }}　様</td></tr>
+                <tr>
+                  <th scope="col" width="45%" class="table-primary">ご申請者</th>
+                  <td style="text-align: right;">{{ sellUser.userName }}　様</td></tr>
+                <tr>
+                  <th scope="col" width="45%" class="table-primary">ご申請額</th>
+                  <td style="text-align: right;">{{ form.requested_amount.value|intcomma }}</td></tr>
+              </tbody>
+            </table>
+
+            <table class="table table-bordered border-primary-subtle">
+              <tbody>
+                <tr class="table-info">
+                  <th scope="col" width="45%" class="table-primary">受け取り金額</th>
+                  <td style="text-align: right;">{{ tx.to_seller_amount|intcomma }}</td></tr>
+                <tr>
+                  <th scope="col" width="45%" class="table-primary">＋前払額</th>
+                  <td style="text-align: right;">{{ tx.advance_amount|intcomma }}</td></tr>
+                <tr>
+                  <th scope="col" width="45%" class="table-primary">－前払手数料</th>
+                  <td style="text-align: right;">{{ tx.advance_fee|intcomma }}</td></tr>
+                <tr>
+                  <th scope="col" width="45%" class="table-primary">－振込手数料</th>
+                  <td style="text-align: right;">{{ tx.transfer_fee|intcomma }}</td></tr>
+              </tbody>
+            </table>
+
+            <hr>
+
+            <div class="d-flex justify-content-center">
+              <button type="submit" class="btn btn-outline-primary me-2"
+                name="next"
+                value="BackToInput_{{sellUser.id}}_{{sellEntity.id}}_{{tx.id}}">
+                戻る</button>
+              <button type="submit" class="btn btn-primary"
+                name="next"
+                value="ToEvidenceSelect_{{sellUser.id}}_{{sellEntity.id}}_{{tx.id}}">
+                証明書アップロードへ</button>
+            </div>
+
+            {% for field in form %}
+              {{ field.as_hidden }}
+            {% endfor %}
+
+          </form>
+        </div>
+      </div>
+
+    {% endif %}
+
+  </div>
+</div>
+
+{% endblock %}
