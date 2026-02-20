@@ -265,7 +265,7 @@
     </span>
 
 
-    <!-- 未登録ユーザーのファイル入力を選択後、ファイルタイプを選択するパート -->
+    <!-- メールアドレスのリストをファイルのアップロードする -->
     <span id="id_addition_Who5" style="display: none;">
 
       <div class="row justify-content-center mt-2">
@@ -275,6 +275,36 @@
 
       <div class="row justify-content-center mt-3 mx-2">
         <div class="col-md-8 col-lg-6">
+
+          <form method="POST"
+            action="{% url 'qpay:txCreate' %}"
+            class="form-group bg-light border border-success-subtle rounded p-4 m-4 "
+            enctype="multipart/form-data">
+        
+            {% csrf_token %}
+
+            {% if form.mailAddressFile.errors %}
+              <div style="color:red;">{{ form.mailAddressFile.errors.as_text }}<br></div>
+            {% endif %}
+
+            <div class="row justify-content-center">
+              <input type="file" class="form-control"
+                name="{{form.mailAddressFile.name}}"
+                value="{{form.mailAddressFile.value|default:''}}"
+                placeholder="アップロードするファイルを指定してください"
+                id="{{form.mailAddressFile.id_for_label}}" >
+            </div>
+
+          <hr>
+          
+            <div class="d-flex justify-content-center pt-3">         
+              <button type="submit" class="btn btn-primary"
+                name="next"
+                value="ToEvidenceConfirm_{{sellUser.id}}_{{sellEntity.id}}_{{tx.id}}">
+                アップロード・ファイルの確認へ</button>
+            </div>
+
+          </form>
  
           <form method="post" enctype="multipart/form-data" class="bg-light">
             {% csrf_token %}
