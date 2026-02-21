@@ -14,6 +14,9 @@ from .form import RepeatSetForm
 from django.http import HttpResponse, HttpResponseBadRequest #, HttpResponseRedirect
 from django.template.response import TemplateResponse
 
+from .form import EmailAddrFileUploadForm
+import openpyxl
+
 #from django.utils import timezone
 #import calendar
 #import datetime
@@ -50,8 +53,11 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
     self.buyEntity_id = buyEntity.pk
 
     sellEntitys_pkList = QpayTx.objects.select_related('buyEntity').filter(buyEntity=buyEntity).order_by('-created_at').values_list('sellEntity')
-    # 関係しているゲストのpk（複数）を取得
-    
+    # 関係しているゲスト
+    # values_list("name", "team", flat=False) ⇒nameとteamの複数指定は「flag=False」
+    # <QuerySet [('山下', 'ファルコンズ'), ('瀬戸', 'タイガース'), ]
+    # values("team")は、辞書型で取得{'team', 'ファルコンズ'}
+
     sellEntitysUsers = UserModel.objects.select_related('entity').filter(entity__pk__in=sellEntitys_pkList).values('userName','email','entity__entityName')
     # 関係しているゲストのユーザー（複数）を取得
 
@@ -59,7 +65,7 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
     # .values('id','customuser_id','customuser__userName','customuser__email')
     # https://yk5656.hatenablog.com/entry/20210410/1617980400
     # 「yuki5656 diary Djangoでデータを取得してみる(外部キー) Authorモデル側」を参考
-    # 【コメント：prefetch_relatedは、「」多モデル側（customuser）側から隠せ巣親モデル（Foreignkeyの参照先モデル）から取得する場合のコードを参考】
+    # 【コメント：prefetch_relatedは、多モデル側（customuser）側から隠せ巣親モデル（Foreignkeyの参照先モデル）から取得する場合のコードを参考】
 
     # SQL確認用コード
     print(f'sql1={sellEntitys_pkList.query}')
@@ -308,7 +314,7 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
       log = ServInfoMailLog.objects.create()
       log.buyEntity = buyEntity
       log.sendUser = buyUser
-      log.sendList.clear()
+      log.mailingList.clear()
 
        # 入力されたアドレスに送付
 
@@ -320,12 +326,12 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
         print(f'pass4 addresss={address} def post in SevInfoMailSetsView')
 
         if address != None:
-          log.sendList[str(i)] = address
+          log.mailingList[str(i)] = address
         else:
           break
         i += 1
 
-      print(f'pass5 log.sendList={log.sendList}def post in SevInfoMailSetsView')
+      print(f'pass5 log.smailingList={log.mailingList}def post in SevInfoMailSetsView')
 
       log.save()
 
@@ -337,35 +343,69 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
 
     if next1 != None:
 
-      if next1.find('ToExportCSV') >=0 :
+      if next1.find("ToUploadEmailAddrFile") >= 0:
 
-        response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="users.csv"'
-        writer = csv.writer(response)
-        writer.writerow(['名前', 'メールアドレス'])
+        entity_id = request.session.get('entity_id', None)
+        entity = LegalEntity.objects.get(pk=entity_id)
+        mailLog = ServInfoMailLog.objects.get_or_create(buyEntity=entity, sent_at__isnull=True).ordered_by('-created_at').first()
+        " 順参照（子⇒親）はselect_related、逆参照（親⇒子）はprefetch_relatedを使う"
 
-        entity = LegalEntity.objects.get(email=request.user)
-        entityUsers = entity.entity_users.all()
+        if mailLog:
+          # mailLog.mailingList
 
-        for user in entityUsers():
-          writer.writerow([user.userName, user.email])
-        
-        return response
+          form = EmailAddrFileUploadForm(request.POST, request.FILES)
+          if form.is_valid():
 
-      if next1.find('ToImportCSV') >= 0:
+            # アップロードされたファイルをメモリ内で読み込む
+            excelFile = request.FILES['file']
+            wb = openpyxl.load_workbook(excelFile)
+            sheet = wb.active # アクティブなシートを選択
 
-        form = CSVUploadForm(request.POST, request.FILES)
-        if form.is_valid():
+            # 2行目から1行ずつループ（1行目がヘッダーと想定）
+            # min_row=2 で開始行、max_col=2 で2項目目までを指定
+            for row in sheet.iter_rows(min_row=2, max_col=2, values_only=True):
+                address, name = row # 1行から2つの項目を取り出す
+                
+                # ここでデータベースへの保存などの処理を行う
+                # 例: MyModel.objects.create(name=item1, value=item2)
+                print(f"メールアドレス: {address}, 名前: {name}")
 
-          data = request.FILES['file'].read().decode('utf-8')
-          reader = csv.reader(io.StringIO(data))
-          preview_data = [row for row in reader if row]
-          request.session['csv_data'] = preview_data
-          return TemplateResponse(request, 'send/import_preview.html', {'rows': preview_data})
-        
-        return TemplateResponse(request, 'send/import_csv.html', {'form': form})
+            return render(request, 'success.html')
+    else:
+        form = EmailAddrFileUploadForm()
 
-      return HttpResponseBadRequest()  # 基本的にはここには来ない
+    return render(request, 'servInfoMailStes.html', {'form': form})
+
+
+      #if next1.find('ToExportCSV') >=0 :
+      #
+      #  response = HttpResponse(content_type='text/csv')
+      #  response['Content-Disposition'] = 'attachment; filename="users.csv"'
+      #  writer = csv.writer(response)
+      #  writer.writerow(['名前', 'メールアドレス'])
+      #
+      #  entity = LegalEntity.objects.get(email=request.user)
+      #  entityUsers = entity.entity_users.all()
+      #
+      #  for user in entityUsers():
+      #    writer.writerow([user.userName, user.email])
+      #
+      #  return response
+      #
+      #if next1.find('ToImportCSV') >= 0:
+      #
+      #  form = CSVUploadForm(request.POST, request.FILES)
+      #  if form.is_valid():
+      #
+      #    data = request.FILES['file'].read().decode('utf-8')
+      #    reader = csv.reader(io.StringIO(data))
+      #    preview_data = [row for row in reader if row]
+      #    request.session['csv_data'] = preview_data
+      #    return TemplateResponse(request, 'send/import_preview.html', {'rows': preview_data})
+      #  
+      #  return TemplateResponse(request, 'send/import_csv.html', {'form': form})
+      #
+      #return HttpResponseBadRequest()  # 基本的にはここには来ない
 
 
 def register(request):
@@ -408,6 +448,28 @@ def export_csv(self, request):
   for user in LegalEntity.objects.all():
     writer.writerow([user.personname, user.email])
   return response
+
+
+"""  """
+class TaskAgentView(LoginRequiredMixin, generic.UpdateView):
+  
+  def get(self, request, *args, **kwargs):
+
+    next = self.request.POST.get('next', None)
+
+    if next.find("ToUploadFile") >= 0:
+
+      context = {}
+      return render(request, 'send/admin/servInfoMailSets.html', context)  
+
+    context = {}
+    return render(request, 'send/admin/servInfoMailSets.html', context)  
+
+
+  def post(self, request, *args, **kwargs):
+    context = {}
+    return render(request, 'accounts/admin/mypage.html', context)  
+  
 
 """  """
 class TaskAgentView(LoginRequiredMixin, generic.UpdateView):

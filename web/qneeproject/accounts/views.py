@@ -100,7 +100,14 @@ class MyLoginView_buyer(LoginView):
 
       if self.request.user.is_authenticated:
 
-        user = usermodel.objects.get(email=self.request.user) 
+        user = usermodel.objects.get(email=self.request.user)
+        entity = LegalEntity.objects.get(entity=user.entity)
+
+        self.request.session['user_id'] = user.id
+        self.request.session['entity_id'] = entity.id
+        # ログイン後は下記で取得
+        # request.session.get('user_id')、request.session.pop('user_id', None)
+
         print(f'user={user} in get_success_url in MyLoginView_buyer')
 
         if user.type1 != 1:

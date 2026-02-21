@@ -104,14 +104,22 @@ class UserEntryForm(forms.Form):
   userName = forms.CharField(label='あなたのお名前', max_length=100)
   email = forms.CharField(label='メールアドレス', max_length=150)
 
+class EmailAddrFileUploadForm(forms.Form):
+  fileType = forms.ChoiceField(
+    label='', choices=[("1", "エクセルファイル"),("2", "CSVファイル"),])
+  # ★★ 260220 googleスプレッドシートを加えるか
+ 
+  emailAddrFile = forms.FileField()
 
 
 ## 以下、小原さんのコードからコピペ
+
+
 class CSVUploadForm(forms.Form):
   file = forms.FileField()
 
 class ImportExportForm(forms.Form):
-    import_file = forms.FileField(label="取り込み（Excel/CSV）", required=False)
-    export_format = forms.ChoiceField(
-        label="出力形式", choices=[("xlsx", "EXCEL"), ("csv", "CSV")], initial="xlsx"
-    )
+  import_file = forms.FileField(label="取り込み（Excel/CSV）", required=False)
+  export_format = forms.ChoiceField(
+    label="出力形式", choices=[("xlsx", "EXCEL"), ("csv", "CSV")], initial="xlsx"
+  )

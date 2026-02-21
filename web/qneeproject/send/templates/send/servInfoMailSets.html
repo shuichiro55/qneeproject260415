@@ -277,31 +277,53 @@
         <div class="col-md-8 col-lg-6">
 
           <form method="POST"
-            action="{% url 'qpay:txCreate' %}"
+            action="{% url 'send:servInfoMailSets' %}"
             class="form-group bg-light border border-success-subtle rounded p-4 m-4 "
             enctype="multipart/form-data">
         
             {% csrf_token %}
 
-            {% if form.mailAddressFile.errors %}
-              <div style="color:red;">{{ form.mailAddressFile.errors.as_text }}<br></div>
+            {% if form.fileType.errors %}
+              <div style="color:red;">{{ form.fileType.errors.as_text }}<br></div>
             {% endif %}
-
             <div class="row justify-content-center">
               <input type="file" class="form-control"
-                name="{{form.mailAddressFile.name}}"
-                value="{{form.mailAddressFile.value|default:''}}"
-                placeholder="アップロードするファイルを指定してください"
-                id="{{form.mailAddressFile.id_for_label}}" >
+                name="{{form.fileType.name}}"
+                value="{{form.fileType.value|default:''}}"
+                id="{{form.fileType.id_for_label}}" >
             </div>
 
-          <hr>
-          
+            {% if form.mailAddrFile.errors %}
+              <div style="color:red;">{{ form.mailAddrFile.errors.as_text }}<br></div>
+            {% endif %}
+            <div class="row justify-content-center">
+              <input type="file" class="form-control"
+                name="{{form.mailAddrFile.name}}"
+                value="{{form.mailAddrFile.value|default:''}}"
+                placeholder="アップロードするファイルを指定してください"
+                id="{{form.mailAddrFile.id_for_label}}" >
+            </div>
+
+            <hr>
+
             <div class="d-flex justify-content-center pt-3">         
               <button type="submit" class="btn btn-primary"
-                name="next"
-                value="ToEvidenceConfirm_{{sellUser.id}}_{{sellEntity.id}}_{{tx.id}}">
-                アップロード・ファイルの確認へ</button>
+                name="next1"
+                value="ToUploadEmailAddrFile">
+                プレビュー</button>
+            </div>
+
+            <div class="d-flex justify-content-center pt-3">         
+              <button type="submit" class="btn btn-primary"
+                name="next1"
+                value="ToPreviewEmailAddrFile">
+                プレビュー
+              </button>
+              <button type="submit" class="btn btn-primary ms-2"
+                name="next1"
+                value="ToUploadEmailAddrFile">
+                アップロード
+              </button>
             </div>
 
           </form>
@@ -534,7 +556,7 @@
           <div class="form-group row justify-content-start mx-1">
               <input type="{{mailForm1.title.widget.input_type}}" class='form-control'
                 name='{{mailForm1.title.name}}'
-                value="{{mailForm1.title.value}}"
+                value="{{mailForm1.title.value|default:''}}"
                 id='{{mailForm1.title.id_for_label}}' >
           </div> <!-- end of form-group row -->
 

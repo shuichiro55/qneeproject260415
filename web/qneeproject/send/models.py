@@ -12,15 +12,18 @@ class ServInfoMailLog(models.Model):
     on_delete=models.CASCADE,
     related_name='list_sndEntitys')
   
-  sendUser = models.OneToOneField(CustomUser,
+  sendUser = models.ForeignKey(CustomUser,
     verbose_name='作成者',
     null=True, blank=True, default=None,
     on_delete=models.CASCADE,
     related_name='list_sndUsers')
 
-  sendList = models.JSONField(_('送信先'), default=dict, null=True)
+  mailingList = models.JSONField(_('送信先'), null=True)
+  #「 番号」「メールアドレス」「名前」の3つを保存する（3つ目はなくてもよい）
+  # 送信する際に「null」の場合は、宛先を設定する必要があることをメッセージ
 
-  sent_at = models.DateTimeField(_('送信日時'), default=timezone.now,)
+  created_at = models.DateTimeField(_('モデル生成日時'), default=timezone.now,)
+  sent_at = models.DateTimeField(_('送信日時'), null=True)
 
   #recvEntity = models.ForeignKey(LegalEntity,
   #  verbose_name='取引主体（受信側）',
