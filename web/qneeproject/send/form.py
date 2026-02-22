@@ -2,10 +2,8 @@ from django import forms
 #from accounts.models import LegalEntity
 
 interval_CHOICES = [
-  ("1", "1カ月おき"),("2", "2カ月おき"), ("3", "3カ月おき"),("4", "4カ月おき"),
-]
-
-dayOfMonth_CHOICES = [("1", "10日"),("2", "20日"), ("3", "月末"),]
+  ("1", "1カ月おき"),("2", "2カ月おき"), ("3", "3カ月おき"),("4", "4カ月おき"),]
+dayOfMonth_CHOICES = [("1", "10日"),("2", "20日"),("3", "月末"),]
 
 
 #from django.utils import timezone
@@ -38,10 +36,6 @@ class RepeatSetForm(forms.Form):
 
     list_startDate = []  # 日付を8個まで追加する
     listCnt = 0
-
-    #if startDate != "":
-    #  list_startDate.append((startDate.strftime('%Y/%m/%d'), startDate.strftime('%Y/%m/%d')))
-
 
     # 開始日の同月は、月内での日付を見て追加する
     if listCnt < 9 and today.day < 10:
@@ -92,7 +86,7 @@ class RepeatSetForm(forms.Form):
     self.fields['startDate'].choices = list_startDate
 
 
-class ServInfoMailContentForm(forms.Form):
+class ServInfoMailForm(forms.Form):
 
   title = forms.CharField(label='メール件名', max_length=100)
   message = forms.CharField(
@@ -104,12 +98,26 @@ class UserEntryForm(forms.Form):
   userName = forms.CharField(label='あなたのお名前', max_length=100)
   email = forms.CharField(label='メールアドレス', max_length=150)
 
-class EmailAddrFileUploadForm(forms.Form):
-  fileType = forms.ChoiceField(
-    label='', choices=[("1", "エクセルファイル"),("2", "CSVファイル"),])
+class AddrFileUpForm(forms.Form):
+
+  fileType = forms.ChoiceField(label='ファイルタイプ', choices=[("excel", "excel"),("csv", "csv"),]) #, widget=forms.RadioSelect)
   # ★★ 260220 googleスプレッドシートを加えるか
  
-  emailAddrFile = forms.FileField()
+  addrFile = forms.FileField()
+
+  def clean_fileType(self):
+    fileType = self.cleaned_data.get('fileType')
+    print(f'self.cleaned_data[fileType]={fileType} (clean_fileType in AddrFileUpForm)')
+    if fileType is None or "" :
+      raise forms.ValidationError('ファイル種別が正しく認識されていません')   
+    return fileType
+
+  def clean_addrFile(self):
+    addrFile = self.cleaned_data.get('addrFile')
+    print(f'self.cleaned_data[addrFile]={addrFile} (clean_fileType in AddrFileUpForm)')
+    if addrFile is None or "" :
+      raise forms.ValidationError('証明書ファイルを選択してください')   
+    return addrFile
 
 
 ## 以下、小原さんのコードからコピペ

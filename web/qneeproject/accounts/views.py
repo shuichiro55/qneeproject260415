@@ -92,6 +92,7 @@ class MyLoginView_buyer(LoginView):
 
     print(f'通過1 get_success_url in MyLoginView_buyer')
 
+    # ★★ 260220 ここ何していたか？
     if 'token' in self.kwargs:
       token =self.kwargs['token']
       return reverse_lazy('qpay:txdetail_buyer_approve_before', kwargs={'token': token})
@@ -101,14 +102,19 @@ class MyLoginView_buyer(LoginView):
       if self.request.user.is_authenticated:
 
         user = usermodel.objects.get(email=self.request.user)
-        entity = LegalEntity.objects.get(entity=user.entity)
+        print(f'user.id={user.id} in get_success_url in MyLoginView_buyer')
 
-        self.request.session['user_id'] = user.id
-        self.request.session['entity_id'] = entity.id
+        entity = LegalEntity.objects.get(pk=user.entity_id,)
+
+        self.request.session['buyUser_id'] = user.id
+        self.request.session['buyEntity_id'] = entity.id
+
+        buyEntity_id = self.request.session.get('buyEntity_id',None)
+        print(f'self.request.session.get(buyEntity_id,None)={buyEntity_id}')
+
+        if user.type1 == 3: type1_name = "スタッフ"
         # ログイン後は下記で取得
         # request.session.get('user_id')、request.session.pop('user_id', None)
-
-        print(f'user={user} in get_success_url in MyLoginView_buyer')
 
         if user.type1 != 1:
           if user.type1 == 1: type1_name = "パートナー"
@@ -434,11 +440,6 @@ class UserCreateView_buyer(generic.CreateView):
       }
       return TemplateResponse(request, 'accounts/buyer/userCreate.html', context)
 
-  def form_invalid(self, form):
-    print(f'ここまで来てる4（form_invalid in class UserCreateView_buyer）')
-    print(form.errors)
-    #form.instance.user = self.request.user
-    return super().form_invalid(form)
 
 
 class UserCreateView_seller(generic.CreateView):

@@ -3,6 +3,11 @@ from accounts.models import CustomUser, LegalEntity
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+def getInitDict_sendMonth():
+  return {'1':'1','2':'0',3:'1','4':'0','5':'1','6':'0','7':'1','8':'0','9':'1','10':'0','11':'1','12':'0'}
+
+def getInitDict_sendDay():
+  return {'1':'1','2':'0','3':'0'}
 
 class ServInfoMailLog(models.Model):
 
@@ -18,7 +23,7 @@ class ServInfoMailLog(models.Model):
     on_delete=models.CASCADE,
     related_name='list_sndUsers')
 
-  mailingList = models.JSONField(_('送信先'), null=True)
+  #mailingList = models.OneToOneField(_('送信先'), null=True)
   #「 番号」「メールアドレス」「名前」の3つを保存する（3つ目はなくてもよい）
   # 送信する際に「null」の場合は、宛先を設定する必要があることをメッセージ
 
@@ -31,11 +36,10 @@ class ServInfoMailLog(models.Model):
   #  on_delete=models.CASCADE,
   #  related_name='list_rcvEntitys')
 
-def getInitDict_sendMonth():
-  return {'1':'1','2':'0',3:'1','4':'0','5':'1','6':'0','7':'1','8':'0','9':'1','10':'0','11':'1','12':'0'}
-
-def getInitDict_sendDay():
-  return {'1':'1','2':'0','3':'0'}
+class AddrProfile(models.Model):
+  addr_id = models.CharField(max_length=6)
+  data = models.JSONField(default=dict, blank=True)
+  logLink = models.ForeignKey(ServInfoMailLog, on_delete=models.CASCADE, null=True)
 
 class ServInfoMailSets(models.Model):
 

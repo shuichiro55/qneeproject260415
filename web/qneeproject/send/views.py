@@ -7,14 +7,13 @@ from django.contrib.auth import get_user_model
 from django.views import generic
 from qpay.models import QpayTx
 from accounts.models import LegalEntity
-from send.models import ServInfoMailSets, ServInfoMailLog
+from send.models import ServInfoMailSets, ServInfoMailLog, AddrProfile
 
 from django.urls import reverse, reverse_lazy
-from .form import RepeatSetForm 
 from django.http import HttpResponse, HttpResponseBadRequest #, HttpResponseRedirect
 from django.template.response import TemplateResponse
 
-from .form import EmailAddrFileUploadForm
+from .form import AddrFileUpForm
 import openpyxl
 
 #from django.utils import timezone
@@ -31,8 +30,8 @@ from django.core.mail import EmailMessage
 #from django.core.paginator import Paginator
 #from django.core.mail import EmailMessage
 
-#from .forms import CSVUploadForm, UserEntryForm #edited by s.tomihari 251010
-from .form import ServInfoMailContentForm, CSVUploadForm, UserEntryForm, ImportExportForm
+from .form import RepeatSetForm, UserEntryForm, ServInfoMailForm
+from .form import CSVUploadForm, ImportExportForm #小原さん作成
 import datetime
 import calendar
 
@@ -41,16 +40,21 @@ UserModel = get_user_model()
 
 class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
 
-  buyUser_id = -1
-  buyEntity_id = -1
+  #buyUser_id = -1  おそらく変更できない（get内で変更したが、post内で変更されていない）
+  #buyEntity_id = -1
+
+  #" 定期配信の設定値 "
+  #repeatOnOff = 'on'
+  #interval = 2 # 初期値は2か月おき
+  #dayOfMonth = 1 # 初期値は10日
 
   def get(self, request, *args, **kwargs):
 
-    buyUser = UserModel.objects.get(email=self.request.user)
-    buyEntity = LegalEntity.objects.get(pk=buyUser.entity_id)
+    #buyUser = UserModel.objects.get(email=self.request.user)
+    #buyEntity = LegalEntity.objects.get(pk=buyUser.entity_id)
 
-    self.buyUser_id = buyUser.pk
-    self.buyEntity_id = buyEntity.pk
+    buyEntity_id = self.request.session.get('buyEntity_id', None)
+    buyEntity = LegalEntity.objects.get(pk=buyEntity_id)
 
     sellEntitys_pkList = QpayTx.objects.select_related('buyEntity').filter(buyEntity=buyEntity).order_by('-created_at').values_list('sellEntity')
     # 関係しているゲスト
@@ -72,55 +76,55 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
     print(f'sql2={sellEntitysUsers.query}')
     print(f'sellEntitysUsers={sellEntitysUsers}')
 
-    exists = ServInfoMailSets.objects.filter(buyEntity=buyEntity).exists()
-    if exists:
-      mailSets =ServInfoMailSets.objects.get(buyEntity=buyEntity)
-      repeatOnOff = mailSets.repeatOnOff
-    
-    if exists == True and repeatOnOff == 'on':
-      startDate = mailSets.startDate
-      interval = mailSets.interval
-      dayOfMonth = mailSets.dayOfMonth
-      print(f'pass0-1 interval={interval} def get in SevInfoMailSetsView')
-
+    mailSets, created = ServInfoMailSets.objects.get_or_create(buyEntity=buyEntity)
+    " フォームの「startDate」の初期値セット（保存しない） "
+    if mailSets.startDate is not None:
+      str_startDate = mailSets.startDate.strftime('%Y/%m/%d')
     else:
+      str_startDate = self.nearStartDate()
 
-      """ ①モデル未設定、または②「repaeaOnOff=='off'」の場合 """
-
-      today = datetime.date.today()
-      if today.day < 10:
-        startDate = datetime.date(today.year, today.month, 10).strftime('%Y/%m/%d')
-      elif today.day <20:
-        startDate = datetime.date(today.year, today.month, 20).strftime('%Y/%m/%d')
-      elif today.day < calendar.monthrange(today.year, today.month)[1]:
-        startDate = calendar.monthrange(today.year, today.month)[1]
-      else:
-        startDate = datetime.date(today.year, today.month+1 , 10).strftime('%Y/%m/%d')       
-
-      interval = 2; dayOfMonth = 1
-
-      print(f'pass0-2 buyEntity.id={buyEntity.id} interval={interval} def get in SevInfoMailSetsView')
+    print(f'pass0-1 mailSets={mailSets} def get in SevInfoMailSetsView')
 
     init_data = {
-      'startDate':startDate,
-      'interval':interval,
-      'dayOfMonth':dayOfMonth}
+      'startDate':str_startDate,
+      'interval':mailSets.interval,
+      'dayOfMonth':mailSets.dayOfMonth
+    }
     print(f'init_data={init_data}')
 
     context = {
-      'buyUser': buyUser,
-      'buyEntity': buyEntity,
-      'sellEntitysUsers': sellEntitysUsers,
-      'mailForm1': ServInfoMailContentForm(),  # 
-      'mailForm2': ServInfoMailContentForm(),  # 使っていない
-
-      'repeatOnOff': repeatOnOff,
+      'addrFileUpForm': AddrFileUpForm(),
+      'mailForm': ServInfoMailForm(),
+      'repeatOnOff': mailSets.repeatOnOff,
       'RepeatSetForm': RepeatSetForm(initial=init_data),
     }
     return TemplateResponse(request, 'send/servInfoMailSets.html', context)
 
+  def nearStartDate():
+    today = datetime.date.today()
+    if today.day < 10:
+      str_startDate = datetime.date(today.year, today.month, 10).strftime('%Y/%m/%d')
+    elif today.day <20:
+      str_startDate = datetime.date(today.year, today.month, 20).strftime('%Y/%m/%d')
+    elif today.day < calendar.monthrange(today.year, today.month)[1]:
+      str_startDate = calendar.monthrange(today.year, today.month)[1]
+    else:
+      str_startDate = datetime.date(today.year, today.month+1 , 10).strftime('%Y/%m/%d')       
+
+    return str_startDate
 
   def post(self, request, *args):
+
+    buyEntity_id = self.request.session.get('buyEntity_id', None)
+    print(f'buyEntity_id={buyEntity_id}')
+
+    buyEntity = LegalEntity.objects.get(pk=buyEntity_id)
+    buyUser = UserModel.objects.get(entity=buyEntity)
+
+    sellEntitys_pkList = QpayTx.objects.select_related('buyEntity').filter(buyEntity=buyEntity).order_by('-created_at').values_list('sellEntity')
+    sellEntitysUsers = UserModel.objects.select_related('entity').filter(entity__pk__in=sellEntitys_pkList).values('userName','email','entity__entityName')
+
+    mailSets = ServInfoMailSets.objects.get(buyEntity=buyEntity)
 
     next2 = self.request.POST.get('next2', None)
 
@@ -129,12 +133,6 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
       if next2.find("ToSendNow") >= 0:
 
         print(f'pass1 def post if "ToSendNow" in SevInfoMailSetsView')
-
-        buyUser = UserModel.objects.get(pk=next2.split('_')[1])
-        buyEntity = LegalEntity.objects.get(pk=next2.split('_')[2])
-
-        sellEntitys_pkList = QpayTx.objects.select_related('buyEntity').filter(buyEntity=buyEntity).order_by('-created_at').values_list('sellEntity')
-        sellEntitysUsers = UserModel.objects.select_related('entity').filter(entity__pk__in=sellEntitys_pkList).values('userName','email','entity__entityName')
 
         current_site = get_current_site(self.request)
         domain = current_site.domain
@@ -170,32 +168,16 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
       if next2.find("ToSaveSendSets") >= 0:
 
         print(f'pass2 def post if "ToSaveSendSets" in SevInfoMailSetsView')
-        buyUser = UserModel.objects.get(pk=next2.split('_')[1])
-        buyEntity = LegalEntity.objects.get(pk=next2.split('_')[2])
 
         """  定期配信の設定を更新（EntityCreateViewで初期設定済み） """
         #mailSets = ServInfoMailSets.objects.create(
         #  startDate=startDate, interval=interval, dayOfMonth=dayOfMonth)
 
-        print(f'buyUser={buyUser.id} buyEntity={buyEntity.id} def post if "ToSaveSendSets" in SevInfoMailSetsView')
-
-        print(f'pass2-0 def post if "ToSaveSendSets" in SevInfoMailSetsView')          
-        repeatOnOff= self.request.POST.get("name_RepeatOnOff", None)
-        print(f'pass2-1 repeatOnOff={repeatOnOff} def post if "ToSaveSendSets" in SevInfoMailSetsView')
-
+        repeatOnOff = self.request.POST.get("name_RepeatOnOff", None)
 
         if repeatOnOff == 'on':
-
-          print(f'pass2-3 def post if "ToSaveSendSets" in SevInfoMailSetsView')
-
-          # 初回設定（既存データなし）と設定更新（既存データあり）に分ける
-          try:
-            mailSets =ServInfoMailSets.objects.get(buyEntity=buyEntity)
-          except:
-            # EntityCreateView_sellerでモデル生成しているので基本ここは通らない
-            mailSets =ServInfoMailSets.objects.create()
-            mailSets.buyEntity = buyEntity
-
+          
+          #mailSets.buyEntity = buyEntity
           mailSets.repeatOnOff = repeatOnOff
 
           str_startDate = self.request.POST.get("startDate", None)
@@ -244,58 +226,27 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
 
         if repeatOnOff == 'off':
 
-          self.buyUser_id = buyUser.pk
-          self.buyEntity_id = buyEntity.pk
-
-          sellEntitys_pkList = QpayTx.objects.select_related('buyEntity').filter(buyEntity=buyEntity).order_by('-created_at').values_list('sellEntity')
-          # 関係しているゲストのpk（複数）を取得
-    
-          sellEntitysUsers = UserModel.objects.select_related('entity').filter(entity__pk__in=sellEntitys_pkList).values('userName','email','entity__entityName')
-          # 関係しているゲストのユーザー（複数）を取得
-
-          try:
-            mailSets =ServInfoMailSets.objects.get(buyEntity=buyEntity)
-          except:
-            # EntityCreateView_sellerでモデル生成しているので基本ここは通らない
-            mailSets =ServInfoMailSets.objects.create()
-            mailSets.buyEntity = buyEntity
-
+          #mailSets.buyEntity = buyEntity
           mailSets.repeatOnOff = repeatOnOff
-          
-          today = datetime.date.today()
-          if today.day < 10:
-            startDate = datetime.date(today.year, today.month, 10).strftime('%Y/%m/%d')
-          elif today.day <20:
-            startDate = datetime.date(today.year, today.month, 20).strftime('%Y/%m/%d')
-          elif today.day < calendar.monthrange(today.year, today.month)[1]:
-            startDate = calendar.monthrange(today.year, today.month)[1]
-          else:
-            startDate = datetime.date(today.year, today.month+1 , 10).strftime('%Y/%m/%d')       
-
-          #interval = 2; dayOfMonth = 1 #デフォルトで設定しているので不要
-    
+          mailSets.startDate = None
+   
           mailSets.save()
 
           init_data = {
-            'startDate':startDate,
+            'startDate':self.nearStartDate(),
             'interval':2,
             'dayOfMonth':1,
           }
-          print(f'pass3-1 init_data={init_data} startDate={startDate}')
+          print(f'pass3-1 init_data={init_data} mailSets.startDate={mailSets.startDate}')
 
           context = {
-            'buyUser': buyUser,
-            'buyEntity': buyEntity,
             'sellEntitysUsers': sellEntitysUsers,
-            'mailForm1': ServInfoMailContentForm(),  # 
-            'mailForm2': ServInfoMailContentForm(),  # 使っていない
+            'addrFileUpForm': AddrFileUpForm(),            
+            'mailForm1': ServInfoMailForm(), 
 
             'repeatOnOff': repeatOnOff,
             'RepeatSetForm': RepeatSetForm(initial=init_data),
           }
-        
-          print(f'pass3-3')
-
           return TemplateResponse(self.request, 'send/servInfoMailSets.html', context)
         
 
@@ -306,17 +257,10 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
 
       print(f'pass3 btnValue={btnValue} def post in SevInfoMailSetsView')
 
-      buyUser = UserModel.objects.get(pk=btnValue.split('_')[0])
-      buyEntity = LegalEntity.objects.get(pk=btnValue.split('_')[1])
 
-      print(f'buyUser={buyUser.id} buyEntity={buyEntity.id} def post in SevInfoMailSetsView')
-
-      log = ServInfoMailLog.objects.create()
-      log.buyEntity = buyEntity
-      log.sendUser = buyUser
-      log.mailingList.clear()
-
-       # 入力されたアドレスに送付
+      # ★★ 260222 mailListがセットされてない場合はエラーを出す
+      log = ServInfoMailLog.objects.create(buyEntity=buyEntity, sendUser=buyUser)
+      log.save()
 
       # 送付先のログ作成
       i = 1
@@ -326,7 +270,13 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
         print(f'pass4 addresss={address} def post in SevInfoMailSetsView')
 
         if address != None:
-          log.mailingList[str(i)] = address
+          # ★★ 260222 JSON形式での保存方法を確認する
+          # {{code:'1', address:'', name:''},{code:'2', address:'', name:''}}の形式で保存
+          data = {"address":address, "name":""}
+          profile = AddrProfile.objects.create(addr_id=str(i), data=data)
+          profile.logLink = log
+          profile.save()
+
         else:
           break
         i += 1
@@ -343,39 +293,96 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
 
     if next1 != None:
 
-      if next1.find("ToUploadEmailAddrFile") >= 0:
+      print(f'pass-6-1 ファイル読み込みプロセス')
+      if next1.find("ToUploadAddrFile") >= 0:
 
-        entity_id = request.session.get('entity_id', None)
-        entity = LegalEntity.objects.get(pk=entity_id)
-        mailLog = ServInfoMailLog.objects.get_or_create(buyEntity=entity, sent_at__isnull=True).ordered_by('-created_at').first()
-        " 順参照（子⇒親）はselect_related、逆参照（親⇒子）はprefetch_relatedを使う"
+        mailLog = ServInfoMailLog.objects.filter(buyEntity=buyEntity, sent_at__isnull=True).order_by('-created_at').first()
 
-        if mailLog:
-          # mailLog.mailingList
+        if mailLog is None: mailLog = ServInfoMailLog.objects.create(buyEntity=buyEntity)
+        " select_relatedは、ForeignKey（外部キー）やOneToOneFieldの順方向参照 "
+        " prefetch_relatedは、ManyToManyField、または逆方向のForeignKey "
 
-          form = EmailAddrFileUploadForm(request.POST, request.FILES)
-          if form.is_valid():
+        print(f'pass-6-2 ファイル読み込みプロセス')
+        form = AddrFileUpForm(request.POST, request.FILES)
+       
+        fileType = request.POST.get("fileType", None)
+        print(f'fileType={fileType} in ServInfoMailSetsView')
 
-            # アップロードされたファイルをメモリ内で読み込む
-            excelFile = request.FILES['file']
-            wb = openpyxl.load_workbook(excelFile)
+        if form.is_valid():
+
+          fileType = form.cleaned_data['fileType']  
+          addrFile = form.cleaned_data['addrFile'] # アップロードされたファイルをメモリ内で読み込む
+
+          log = ServInfoMailLog.objects.create(buyEntity=buyEntity, sendUser=buyUser)
+          log.save()
+
+          print(f'pass-6-4 ファイル読み込みプロセス')
+
+          if fileType == "excel":
+
+            wb = openpyxl.load_workbook(addrFile)
             sheet = wb.active # アクティブなシートを選択
 
             # 2行目から1行ずつループ（1行目がヘッダーと想定）
             # min_row=2 で開始行、max_col=2 で2項目目までを指定
+            i = 1
             for row in sheet.iter_rows(min_row=2, max_col=2, values_only=True):
-                address, name = row # 1行から2つの項目を取り出す
-                
-                # ここでデータベースへの保存などの処理を行う
-                # 例: MyModel.objects.create(name=item1, value=item2)
-                print(f"メールアドレス: {address}, 名前: {name}")
+              address, name = row # 1行から2つの項目を取り出す
 
-            return render(request, 'success.html')
-    else:
-        form = EmailAddrFileUploadForm()
+              data = {"address":address, "name":name}
+              profile = AddrProfile.objects.create(addr_id=str(i), data=data)
+              profile.logLink = log
+              profile.save()
 
-    return render(request, 'servInfoMailStes.html', {'form': form})
+              i += 1
 
+              # ★★ 260222 JSON形式での保存方法を確認する
+              # ★★ 260223 前回の送信以降に作成したデータが消す（ウォーニングも出す）
+              # ★★ 260223 csvからも読み込むようにする
+              # ★★ 260223 読込用ファイルをダウンロードできるようにする
+
+              # addr_id = "1" ,{"address":"-@-", "name":"富張"}の形式で保存              
+
+              # ここでデータベースへの保存などの処理を行う
+              # 例: MyModel.objects.create(name=item1, value=item2)
+            
+            profiles = AddrProfile.objects.filter(logLink=log)
+            for each in profiles:
+              print(each.data["address"], each.data["name"])  # 辞書としてアクセス
+
+        else:
+          print(form.errors)  # エラー内容を確認
+        
+
+        if mailSets.startDate is not None:
+          str_startDate = mailSets.startDate.strftime('%Y/%m/%d')
+        else:
+          str_startDate =self.nearStartDate()
+
+        print(f'pass 6-6 mailSets.startDate={mailSets.startDate}, mailSets.interval={mailSets.interval} mailSets.dayOfMonth={mailSets.dayOfMonth} def get in SevInfoMailSetsView')
+
+        init_data = {
+          'startDate':str_startDate,
+          'interval':mailSets.interval,
+          'dayOfMonth':mailSets.dayOfMonth}
+        print(f'init_data={init_data}')
+
+        context = {
+          'addrFileUpForm': AddrFileUpForm(),
+          'mailForm': ServInfoMailForm(),  # 
+          'repeatOnOff': mailSets.repeatOnOff,
+          'RepeatSetForm': RepeatSetForm(initial=init_data),
+        }
+
+        return TemplateResponse(request, 'send/servInfoMailSets.html', context)
+
+
+    return TemplateResponse(request, 'send/servInfoMailSets.html', {'addrFileUpForm': AddrFileUpForm()})
+
+  def form_invalid(self, form):
+    print(f'ここまで来てる4（form_invalid in class SerInfoMailSetsView）')
+    print(form.errors)
+    return super().form_invalid(form)
 
       #if next1.find('ToExportCSV') >=0 :
       #
