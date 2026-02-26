@@ -15,6 +15,7 @@ from django.template.response import TemplateResponse
 
 from .form import AddrFileUpForm
 import openpyxl
+from django.contrib import messages
 
 #from django.utils import timezone
 #import calendar
@@ -40,18 +41,9 @@ UserModel = get_user_model()
 
 class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
 
-  #buyUser_id = -1  おそらく変更できない（get内で変更したが、post内で変更されていない）
-  #buyEntity_id = -1
-
-  #" 定期配信の設定値 "
-  #repeatOnOff = 'on'
-  #interval = 2 # 初期値は2か月おき
-  #dayOfMonth = 1 # 初期値は10日
-
+  # buyEntity_id = -1  get内で変更後、post内で値変わらず
+   
   def get(self, request, *args, **kwargs):
-
-    #buyUser = UserModel.objects.get(email=self.request.user)
-    #buyEntity = LegalEntity.objects.get(pk=buyUser.entity_id)
 
     buyEntity_id = self.request.session.get('buyEntity_id', None)
     buyEntity = LegalEntity.objects.get(pk=buyEntity_id)
@@ -93,7 +85,7 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
     print(f'init_data={init_data}')
 
     context = {
-      'addrFileUpForm': AddrFileUpForm(),
+      'addrFileUpForm': AddrFileUpForm(), 'flag_fileUp': 1,
       'mailForm': ServInfoMailForm(),
       'repeatOnOff': mailSets.repeatOnOff,
       'RepeatSetForm': RepeatSetForm(initial=init_data),
@@ -116,7 +108,7 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
   def post(self, request, *args):
 
     buyEntity_id = self.request.session.get('buyEntity_id', None)
-    print(f'buyEntity_id={buyEntity_id}')
+    print(f'buyEntity_id from session={buyEntity_id}')
 
     buyEntity = LegalEntity.objects.get(pk=buyEntity_id)
     buyUser = UserModel.objects.get(entity=buyEntity)
@@ -259,7 +251,12 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
 
 
       # ★★ 260222 mailListがセットされてない場合はエラーを出す
-      log = ServInfoMailLog.objects.create(buyEntity=buyEntity, sendUser=buyUser)
+      log = ServInfoMailLog.objects.filter(
+        buyEntity=buyEntity, repeat=True, sent_at=None
+        ).order_by('-created_at').first()
+
+      if log is None:
+        log = ServInfoMailLog.objects.create(buyEntity=buyEntity)
       log.save()
 
       # 送付先のログ作成
@@ -272,8 +269,8 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
         if address != None:
           # ★★ 260222 JSON形式での保存方法を確認する
           # {{code:'1', address:'', name:''},{code:'2', address:'', name:''}}の形式で保存
-          data = {"address":address, "name":""}
-          profile = AddrProfile.objects.create(addr_id=str(i), data=data)
+          profile = AddrProfile.objects.create(
+            addr_id=str(i), address=address)
           profile.logLink = log
           profile.save()
 
@@ -296,29 +293,50 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
       print(f'pass-6-1 ファイル読み込みプロセス')
       if next1.find("ToUploadAddrFile") >= 0:
 
-        mailLog = ServInfoMailLog.objects.filter(buyEntity=buyEntity, sent_at__isnull=True).order_by('-created_at').first()
+        mailLog = ServInfoMailLog.objects.filter(
+          buyEntity=buyEntity, repeat=True, sent_at=None
+          ).order_by('-created_at').first()
 
-        if mailLog is None: mailLog = ServInfoMailLog.objects.create(buyEntity=buyEntity)
+        if mailLog is None:
+          mailLog = ServInfoMailLog.objects.create(buyEntity=buyEntity)
         " select_relatedは、ForeignKey（外部キー）やOneToOneFieldの順方向参照 "
         " prefetch_relatedは、ManyToManyField、または逆方向のForeignKey "
 
         print(f'pass-6-2 ファイル読み込みプロセス')
         form = AddrFileUpForm(request.POST, request.FILES)
-       
-        fileType = request.POST.get("fileType", None)
-        print(f'fileType={fileType} in ServInfoMailSetsView')
 
         if form.is_valid():
 
           fileType = form.cleaned_data['fileType']  
           addrFile = form.cleaned_data['addrFile'] # アップロードされたファイルをメモリ内で読み込む
 
-          log = ServInfoMailLog.objects.create(buyEntity=buyEntity, sendUser=buyUser)
+          log = ServInfoMailLog.objects.filter(
+            buyEntity=buyEntity, repeat=True, sent_at=None
+            ).order_by('-created_at').first()
+
+          if log is None:
+            log = ServInfoMailLog.objects.create(buyEntity=buyEntity)
+          
           log.save()
 
           print(f'pass-6-4 ファイル読み込みプロセス')
 
           if fileType == "excel":
+
+            # アドレスを読み込む前に、未送信のアドレスリストを削除
+            oldProfiles = AddrProfile.objects.select_related('logLink').filter(
+              logLink__buyEntity=buyEntity, repeat=True, sent_at=None)
+
+            print(f'before delete')
+            for each in oldProfiles:
+              print(f'each.addr_id={each.addr_id}, each.address={each.address}, each.name={each.name}, each.sent_at={each.sent_at}')  # 辞書としてアクセス
+
+            AddrProfile.objects.select_related('logLink').filter(
+              logLink__buyEntity=buyEntity, repeat=True, sent_at=None).delete()
+            print(f'after delete')
+            #for each in oldProfiles:
+            #  print(f'eeach.addr_id={each.addr_id}, ach.address={each.address}, each.name={each.name} each.sent_at={each.sent_at}')  # 辞書としてアクセス
+
 
             wb = openpyxl.load_workbook(addrFile)
             sheet = wb.active # アクティブなシートを選択
@@ -328,15 +346,14 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
             i = 1
             for row in sheet.iter_rows(min_row=2, max_col=2, values_only=True):
               address, name = row # 1行から2つの項目を取り出す
-
-              data = {"address":address, "name":name}
-              profile = AddrProfile.objects.create(addr_id=str(i), data=data)
+              print(f'addr_id={str(i)}, address={address}, name={name}') 
+              profile = AddrProfile.objects.create(
+                addr_id=str(i), address=address, name=name)
               profile.logLink = log
               profile.save()
 
               i += 1
 
-              # ★★ 260222 JSON形式での保存方法を確認する
               # ★★ 260223 前回の送信以降に作成したデータが消す（ウォーニングも出す）
               # ★★ 260223 csvからも読み込むようにする
               # ★★ 260223 読込用ファイルをダウンロードできるようにする
@@ -346,12 +363,50 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
               # ここでデータベースへの保存などの処理を行う
               # 例: MyModel.objects.create(name=item1, value=item2)
             
-            profiles = AddrProfile.objects.filter(logLink=log)
-            for each in profiles:
-              print(each.data["address"], each.data["name"])  # 辞書としてアクセス
+            " 確認出力 "
+            profiles = AddrProfile.objects.select_related('logLink').filter(
+              logLink__buyEntity=buyEntity, repeat=True, sent_at=None)
+            #for each in profiles:
+            #  print(each['address'], each['name'])  # 辞書としてアクセス
+            #print(f'json.dumps(list(profiles))={json.dumps(profiles)}')
+            #print(f'list(profiles)={list(profiles)}')
+
+
+          # ★★ 260223 CSC読み込みを作る（エクセルの部分をコピーしただけ）
+          elif fileType == "csv":
+
+            data = addrFile.read().decode('utf-8')
+            # addrFile.read(): バイナリデータ（bytes型）を読み込み
+            # decode('utf-8')：読み込んだバイナリデータをUTF-8形式の文字列（str型）に変換
+
+            reader = csv.reader(io.StringIO(data))
+            # Pythonでメモリ上の文字列（CSV形式）をファイルのように扱い、csvモジュールで読み込む
+
+            rows = [row for row in reader if row]
+            # 空行を除外して、全てのデータをリストのリストとして変数に格納する
+
+            print(f'rows={rows} def post if csv in ServInfoMailSetsView')
+            #request.session['rows_data'] = rows
+
+            i = 0
+            for address, name in rows:
+              if address.find('@') >= 0:
+                i += 1
+                profile = AddrProfile.objects.create(
+                  addr_id=str(i), address=address, name= name)
+                profile.logLink = log
+                profile.save()
+
+            " 確認出力 "
+            profiles = AddrProfile.objects.select_related('logLink').filter(
+              logLink__buyEntity=buyEntity, repeat=True, sent_at=None)
+            print(f'profiles={profiles}')
+
+          else: # ファイルタイプの選択が正しくない場合
+            messages.add_message(request, messages.INFO, 'ファイルタイプを認識できません.')
 
         else:
-          print(form.errors)  # エラー内容を確認
+          print(form.errors)  #「form.in_valid()==False」の場合
         
 
         if mailSets.startDate is not None:
@@ -368,14 +423,92 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
         print(f'init_data={init_data}')
 
         context = {
+          'WhoWhenWhat':'who',
+          'NewOrNot':'new',
+          'FileOrManual':'file',
+          'FileType':fileType,
+
+          'flag_fileUp': 2,
+          'profiles':profiles,
           'addrFileUpForm': AddrFileUpForm(),
-          'mailForm': ServInfoMailForm(),  # 
+          'mailForm': ServInfoMailForm(),
           'repeatOnOff': mailSets.repeatOnOff,
           'RepeatSetForm': RepeatSetForm(initial=init_data),
         }
 
         return TemplateResponse(request, 'send/servInfoMailSets.html', context)
 
+
+      # ★★ 260223 再アップロードを創り込む
+      if next1.find("ToUploadAgain") >= 0:
+
+        ServInfoMailLog.objects.filter(
+          buyEntity=buyEntity, repeat=True, sent_at=None).delete()
+        AddrProfile.objects.select_related('logLink').filter(
+          logLink__buyEntity=buyEntity, repeat=True, sent_at=None).delete()
+        # models.pyで「on_delete = CASCADE」と設定してServInfoMailLogを削除する選択も
+
+        if mailSets.startDate is not None:
+          str_startDate = mailSets.startDate.strftime('%Y/%m/%d')
+        else:
+          str_startDate =self.nearStartDate()
+
+        print(f'pass 7-1 mailSets.startDate={mailSets.startDate}, mailSets.interval={mailSets.interval} mailSets.dayOfMonth={mailSets.dayOfMonth} def get in SevInfoMailSetsView')
+
+        init_data = {
+          'startDate':str_startDate,
+          'interval':mailSets.interval,
+          'dayOfMonth':mailSets.dayOfMonth}
+        print(f'init_data={init_data}')
+
+        context = {
+          'WhoWhenWhat':'who',
+          'NewOrNot':'new',
+          'FileOrManual':'file',
+          'FileType':self.request.POST.get('fileType'),
+
+          'flag_fileUp': 1,
+          'addrFileUpForm': AddrFileUpForm(),
+          'mailForm': ServInfoMailForm(),
+          'repeatOnOff': mailSets.repeatOnOff,
+          'RepeatSetForm': RepeatSetForm(initial=init_data),
+        }
+
+        return TemplateResponse(request, 'send/servInfoMailSets.html', context)
+
+
+      # ★★ 260225 アドレスリストを保存する（実際には保存済み）
+      if next1.find("ToSaveAddrList") >= 0:
+
+        if mailSets.startDate is not None:
+          str_startDate = mailSets.startDate.strftime('%Y/%m/%d')
+        else:
+          str_startDate =self.nearStartDate()
+
+        print(f'pass 7-1 mailSets.startDate={mailSets.startDate}, mailSets.interval={mailSets.interval} mailSets.dayOfMonth={mailSets.dayOfMonth} def get in SevInfoMailSetsView')
+        FileType = self.request.POST.get('FileType')
+        print(f'self.request.POST.get(FileType)={FileType}')
+
+        init_data = {
+          'startDate':str_startDate,
+          'interval':mailSets.interval,
+          'dayOfMonth':mailSets.dayOfMonth}
+        print(f'init_data={init_data}')
+
+        context = {
+          'WhoWhenWhat':'who',
+          'NewOrNot':'new',
+          'FileOrManual':'file',
+          'FileType':self.request.POST.get('fileType'),
+
+          'flag_fileUp': 3,
+          'addrFileUpForm': AddrFileUpForm(),
+          'mailForm': ServInfoMailForm(),
+          'repeatOnOff': mailSets.repeatOnOff,
+          'RepeatSetForm': RepeatSetForm(initial=init_data),
+        }
+
+        return TemplateResponse(request, 'send/servInfoMailSets.html', context)
 
     return TemplateResponse(request, 'send/servInfoMailSets.html', {'addrFileUpForm': AddrFileUpForm()})
 

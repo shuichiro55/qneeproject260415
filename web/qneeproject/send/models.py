@@ -23,6 +23,8 @@ class ServInfoMailLog(models.Model):
     on_delete=models.CASCADE,
     related_name='list_sndUsers')
 
+  repeat = models.BooleanField(default=True)
+
   #mailingList = models.OneToOneField(_('送信先'), null=True)
   #「 番号」「メールアドレス」「名前」の3つを保存する（3つ目はなくてもよい）
   # 送信する際に「null」の場合は、宛先を設定する必要があることをメッセージ
@@ -38,7 +40,11 @@ class ServInfoMailLog(models.Model):
 
 class AddrProfile(models.Model):
   addr_id = models.CharField(max_length=6)
-  data = models.JSONField(default=dict, blank=True)
+  address = models.CharField(max_length=100, blank=True)
+  name = models.CharField(max_length=50, blank=True)
+  repeat = models.BooleanField(default=True)
+  sent_at = models.DateTimeField(_('送信日時'), null=True)
+
   logLink = models.ForeignKey(ServInfoMailLog, on_delete=models.CASCADE, null=True)
 
 class ServInfoMailSets(models.Model):
