@@ -1,25 +1,73 @@
 from django import forms
-#from accounts.models import LegalEntity
+
+from django.contrib.auth import get_user_model
+from accounts.models import LegalEntity
+from send.models import ServInfoMailSets, AddList
+import unicodedata
 
 interval_CHOICES = [
   ("1", "1カ月おき"),("2", "2カ月おき"), ("3", "3カ月おき"),("4", "4カ月おき"),]
 dayOfMonth_CHOICES = [("1", "10日"),("2", "20日"),("3", "月末"),]
 
+list_CHOICES=[('',''),]
 
 #from django.utils import timezone
 import calendar
 import datetime
 from dateutil.relativedelta import relativedelta
+  
+usermodel = get_user_model()
+
+
+class AddListSelectForm(forms.Form):
+
+  nameOfAppliedList = forms.CharField(max_length=50)
+  listOfListName = forms.ChoiceField(label="リスト名の選択",
+    choices=list_CHOICES, 
+    required=False,)
+
+  def __init__(self, *args, **kwargs):
+    self.buyEntity_id = kwargs.pop('buyEntity_id', None)
+    super().__init__(*args, **kwargs)
+
+    buyEntity = LegalEntity.objects.get(pk=self.buyEntity_id)
+    mailSets = ServInfoMailSets.objects.get(buyEntity=buyEntity)
+
+
+    if AddList.objects.filter(buyEntity=buyEntity).exists():
+      addLists = AddList.objects.filter(buyEntity=buyEntity)
+
+      """
+      " パートナーが作成した全リストを選択リストに格納 "
+      list_listName = []
+      for addList in addLists:
+
+        if addList.listName is not None:
+          list_listName.append((addList.listName, addList.listName))
+
+      list_listName.append(('適用なし', '適用なし'))
+      self.fields['listOfListName'].choices = list_listName
+      """
+      
+      " 適用中リストがあれば、初期値にリスト名を入れる "
+      if AddList.objects.filter(pk=mailSets.appliedList_id).exists():
+      # get() でオブジェクトを取得してエラー（DoesNotExist）をハンドリングするより
+      # filter().exists() を使用する方が処理速度が速く、コードもクリーンになる
+
+        appliedList = AddList.objects.get(pk=mailSets.appliedList_id)
+        self.fields['nameOfAppliedList'].initial = appliedList.listName
+        self.fields['listOfListName'].initial = appliedList.listName
+
 
 class RepeatSetForm(forms.Form):
   
-  startDate = forms.ChoiceField(label="開始日", required=False,)
-  interval = forms.ChoiceField(label="間隔", choices=interval_CHOICES, required=False)
+  startDate = forms.ChoiceField(label="開始日（選択）", required=False,)
+  interval = forms.ChoiceField(label="間隔（選択）", choices=interval_CHOICES, required=False)
   dayOfMonth = forms.ChoiceField(label="月の◯日", choices=dayOfMonth_CHOICES, required=False)
 
   #holidayAdjust = forms.ChoiceField(label="休日調整", choices=choices_holidayAdjust, initial="before")
 
-  def __init__(self, *args, **kwargs):    
+  def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
 
     #print(f'startDate={startDate} interval={interval} dayOfMonth={dayOfMonth}')
@@ -82,7 +130,7 @@ class RepeatSetForm(forms.Form):
       listCnt+=1; date = datetime.date(after3M.year, after3M.month, lastDay_after3M)
       list_startDate.append((date.strftime('%Y/%m/%d'), date.strftime('%Y/%m/%d')))
 
-    print(f'list_startDate={list_startDate}')
+    #print(f'list_startDate={list_startDate}')
     self.fields['startDate'].choices = list_startDate
 
 
@@ -98,27 +146,49 @@ class UserEntryForm(forms.Form):
   userName = forms.CharField(label='あなたのお名前', max_length=100)
   email = forms.CharField(label='メールアドレス', max_length=150)
 
-class AddrFileUpForm(forms.Form):
 
-  fileType = forms.ChoiceField(label='ファイルタイプ', choices=[("excel", "excel"),("csv", "csv"),]) #, widget=forms.RadioSelect)
-  # ★★ 260220 googleスプレッドシートを加えるか
+class AddFileUpForm(forms.Form):
+
+  fileType = forms.ChoiceField(label='ファイルタイプ',
+    choices=[("excel", "excel"),("csv", "csv"),]) #, widget=forms.RadioSelect)
  
-  addrFile = forms.FileField()
+  addFile = forms.FileField()
 
   def clean_fileType(self):
     fileType = self.cleaned_data.get('fileType')
-    print(f'self.cleaned_data[fileType]={fileType} (clean_fileType in AddrFileUpForm)')
+    print(f'self.cleaned_data[fileType]={fileType} (clean_fileType in AddFileUpForm)')
     if fileType is None or "" :
       raise forms.ValidationError('ファイル種別が正しく認識されていません')   
     return fileType
 
-  def clean_addrFile(self):
-    addrFile = self.cleaned_data.get('addrFile')
-    print(f'self.cleaned_data[addrFile]={addrFile} (clean_fileType in AddrFileUpForm)')
-    if addrFile is None or "" :
+  def clean_addFile(self):
+    addFile = self.cleaned_data.get('addFile')
+    print(f'self.cleaned_data[addFile]={addFile} (clean_fileType in AddFileUpForm)')
+    if addFile is None or "" :
       raise forms.ValidationError('証明書ファイルを選択してください')   
-    return addrFile
+    return addFile
 
+
+class AddListNameForm(forms.Form):
+  listName = forms.CharField(
+    label='アドレスリスト名', 
+    max_length=50)
+  
+  def __init__(self, *args, **kwargs):
+    self.buyEntity_id = kwargs.pop('buyEntity_id', None)
+    super().__init__(*args, **kwargs)
+
+  def clean_listName(self):
+    listName = unicodedata.normalize('NFKC', self.cleaned_data['listName'])
+    sameDataCnt = AddList.objects.prefetch_related('buyEntity').filter(
+      buyEntity__pk=self.buyEntity_id, listName=listName).count()
+    print(f'listName={listName} buyEntity_id={self.buyEntity_id} sameDataCnt={sameDataCnt}in AddListNameForm')
+
+    if sameDataCnt >= 1:
+      print(f'sameCnt={sameDataCnt} in AddListNameForm2')
+      raise forms.ValidationError('既に同じ名前での登録があります、別名でご登録お願いします。')
+    
+    return listName
 
 ## 以下、小原さんのコードからコピペ
 

@@ -35,7 +35,7 @@
     </div>
 
 
-    {% if object_list.count >= 1 %}
+    {% if objectList.count >= 1 %}
       <div class="row justify-content-center">
  
         <form method="POST" class="bg-light rounded-1 p-3">
@@ -60,7 +60,7 @@
           
               <tbody>
 
-                {% for item in page_obj %}
+                {% for item in pageObj %}
 
                   <tr>
                     <td rowspan="2" style="vertical-align:middle; text-align:center;">
@@ -74,7 +74,7 @@
                     {% endif %}
                       {{ item.txStatus_char|linebreaksbr }}</td>
                     <td rowspan="2" style="vertical-align:middle; text-align:center">
-                      <a href="{% url 'qpay:txDetail_buyer' item.id page_obj.number %}"
+                      <a href="{% url 'qpay:txDetail_buyer' item.id pageObj.number %}"
                         class="btn btn-outline-primary">表示</a>
                     </td>
                   </tr>
@@ -113,7 +113,7 @@
           
               <tbody>
 
-                {% for item in page_obj %}
+                {% for item in pageObj %}
 
                   <tr>
                     <td rowspan="2" style="vertical-align:middle; text-align:center;">
@@ -153,7 +153,7 @@
                     </div> 
 
                     <td rowspan="2" style="vertical-align:middle; text-align:center">
-                      <a href="{% url 'qpay:txDetail_buyer' item.id page_obj.number %}"
+                      <a href="{% url 'qpay:txDetail_buyer' item.id pageObj.number %}"
                         class="btn btn-outline-primary">表示</a>
                     </td>
                   </tr>
@@ -192,7 +192,7 @@
 {% endblock %}
 
 <!--
- {% for item in object_list %}
+ {% for item in objectList %}
 <div class="p-4 m-4 bg-light border border-success rounded">
   <h2 class="text-success">{{ item.title }}</h2>
     <h6>物件名：{{ item.article_name }}</h6>

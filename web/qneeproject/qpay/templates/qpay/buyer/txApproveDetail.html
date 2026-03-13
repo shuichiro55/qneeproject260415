@@ -37,7 +37,7 @@
       <div class="col-md-9 col-lg-6">
 
         <form method="POST"
-          action="{% url 'qpay:txApproveDetail_buyer' tx.pk page_num %}"
+          action="{% url 'qpay:txApproveDetail_buyer' tx.pk pageNum %}"
           class="form-group bg-light border border-success-subtle rounded p-2">
   
           {% csrf_token %}
@@ -118,14 +118,16 @@
             <hr>
             
             <div class="d-flex justify-content-center mb-2">
-              <button type="submit" class="btn btn-outline-primary" name="next" value="BackToList">一覧</button>
+              <button type="submit" class="btn btn-outline-primary" name="next" value="BackToList">
+                一覧</button>
               <button type="submit" class="btn btn-primary ms-1" name="next" value="ApproveQpay">
                 <span>
                   <i class="bi bi-hand-thumbs-up-fill" style="font-size:1.5em; color:hotpink"></i>
                 </span>
                 承認
-            </button>
-              <button type="submit" class="btn btn-primary ms-1" name="next" value="RejectQpay">否認</button>
+              </button>
+              <button type="submit" class="btn btn-primary ms-1" name="next" value="RejectQpay">
+                否認</button>
             </div>
 
           </div>

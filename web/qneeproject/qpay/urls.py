@@ -19,25 +19,25 @@ urlpatterns = [
 
   path('txApprove_buyer/', views.TxApproveView_buyer.as_view(), name='txApprove_buyer'),
   path('<int:tx_id>/txApprove_buyer/', views.TxApproveView_buyer.as_view(), name='txApprove_buyer'),
-  path('<int:tx_id>/<int:page_num>/txApprove_buyer/', views.TxApproveView_buyer.as_view(), name='txApprove_buyer'),
+  path('<int:tx_id>/<int:pageNum>/txApprove_buyer/', views.TxApproveView_buyer.as_view(), name='txApprove_buyer'),
 
   path('txList_buyer/', views.TxListView_buyer.as_view(), name='txList_buyer'),
-  path('<int:page_num>/txList_buyer/', views.TxListView_buyer.as_view(), name='txList_buyer'),
-  path('<int:tx_id>/<int:page_num>/txList_buyer/', views.TxListView_buyer.as_view(), name='txList_buyer'),
+  path('<int:pageNum>/txList_buyer/', views.TxListView_buyer.as_view(), name='txList_buyer'),
+  path('<int:tx_id>/<int:pageNum>/txList_buyer/', views.TxListView_buyer.as_view(), name='txList_buyer'),
 
   path('txList_seller/', views.TxListView_seller.as_view(), name='txList_seller'),
-  path('<int:page_num>/txList_seller/', views.TxListView_seller.as_view(), name='txList_seller'),
-  path('<int:tx_id>/<int:page_num>/txList_seller/', views.TxListView_seller.as_view(), name='txList_seller'),
+  path('<int:pageNum>/txList_seller/', views.TxListView_seller.as_view(), name='txList_seller'),
+  path('<int:tx_id>/<int:pageNum>/txList_seller/', views.TxListView_seller.as_view(), name='txList_seller'),
 
   path('txApproveDetailPre_buyer/<token>/', views.TxApproveDetailPreView_buyer.as_view(), name='txApproveDetailPre_buyer'),
 
   path('<int:tx_id>/txApproveDetail_buyer/', views.TxApproveDetailView_buyer.as_view(), name='txApproveDetail_buyer'),
-  path('<int:tx_id>/<int:page_num>/txApproveDetail_buyer/', views.TxApproveDetailView_buyer.as_view(), name='txApproveDetail_buyer'),
-  # 「int:page_num」は承認後、TxListにおいて結果を確認するときに使う
+  path('<int:tx_id>/<int:pageNum>/txApproveDetail_buyer/', views.TxApproveDetailView_buyer.as_view(), name='txApproveDetail_buyer'),
+  # 「int:pageNum」は承認後、TxListにおいて結果を確認するときに使う
 
   path('<int:tx_id>/txDetail_buyer/', views.TxDetailView_buyer.as_view(), name='txDetail_buyer'),
-  path('<int:tx_id>/<int:page_num>/txDetail_buyer/', views.TxDetailView_buyer.as_view(), name='txDetail_buyer'),
+  path('<int:tx_id>/<int:pageNum>/txDetail_buyer/', views.TxDetailView_buyer.as_view(), name='txDetail_buyer'),
 
-  path('<int:tx_id>/<int:page_num>/txDetail_seller/', views.TxDetailView_seller.as_view(), name='txDetail_seller'),
+  path('<int:tx_id>/<int:pageNum>/txDetail_seller/', views.TxDetailView_seller.as_view(), name='txDetail_seller'),
 
 ]

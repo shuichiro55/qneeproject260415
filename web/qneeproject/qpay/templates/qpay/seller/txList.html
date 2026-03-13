@@ -58,7 +58,7 @@
             </thead>
 
             <tbody>
-              {% for item in page_obj %}
+              {% for item in pageObj %}
                 <tr>
                   <td rowspan="2" style="text-align:center; vertical-align:middle">
                     {{ forloop.counter }}</td>
@@ -66,7 +66,7 @@
                   <td rowspan="2" style="text-align:center; vertical-align:middle">
                     {{ item.txStatus_char|linebreaksbr }}</td>
                   <td rowspan="2" style="text-align:center; vertical-align:middle">
-                    <a href="{% url 'qpay:txDetail_seller' item.pk page_obj.number %}"
+                    <a href="{% url 'qpay:txDetail_seller' item.pk pageObj.number %}"
                       class="btn btn-outline-primary rounded-1">
                       表示</a>
                   </td>
@@ -106,7 +106,7 @@
             </thead>
 
             <tbody>
-              {% for item in page_obj %}
+              {% for item in pageObj %}
                 <tr>
                   <td rowspan="2" style="text-align:center; vertical-align:middle;">
                     {{ forloop.counter }}</td>
@@ -139,7 +139,7 @@
                   <td rowspan="2" style="text-align:center; vertical-align:middle;">
                     {{ item.txStatus_char|linebreaksbr }}</td>
                   <td rowspan="2" style="text-align:center; vertical-align:middle;">
-                    <a href="{% url 'qpay:txDetail_seller' item.pk page_obj.number %}"
+                    <a href="{% url 'qpay:txDetail_seller' item.pk pageObj.number %}"
                       class="btn btn-outline-primary rounded-1">
                       表示</a>
                   </td>

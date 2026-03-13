@@ -28,81 +28,79 @@
           {% csrf_token %}         
           {{ form.non_field_errors }}
 
-          {% for applyUser in applyUsers %}
-            <table class="table table-sm table-bordered border-primary-subtle table-responsive mt-3">
-              <tbody class="text-center">
+          <table class="table table-sm table-bordered border-primary-subtle table-responsive mt-3">
+            <tbody class="text-center">
+              <tr>
+                <th scope="col" width="33%" class="table-primary" style="text-align:left;">申請者</th>
+                <td style="text-align: right;">{{ applyUser.userName }}さん</td></tr>
+              <tr>
+                <th scope="col" width="33%" class="table-primary" style="text-align:left;">電話番号</th>
+                <td style="text-align: right;">{{ applyUser.tel_user }}</td></tr>
                 <tr>
-                  <th scope="col" width="33%" class="table-primary" style="text-align:left;">申請者</th>
-                  <td style="text-align: right;">{{ applyUser.userName }}さん</td></tr>
-                <tr>
-                  <th scope="col" width="33%" class="table-primary" style="text-align:left;">電話番号</th>
-                  <td style="text-align: right;">{{ applyUser.tel_user }}</td></tr>
-                <tr>
-                  <th scope="col" width="33%" class="table-primary" style="text-align:left;">所属部署</th>
-                  <td style="text-align: right;">{{ applyUser.department }}</td></tr>
-                <tr>
-                  <th scope="col" width="33%" class="table-primary" style="text-align:left;">役職</th>
-                  <td style="text-align: right;">{{ applyUser.title }}</td></tr>
-              </tbody>
-            </table>
+                <th scope="col" width="33%" class="table-primary" style="text-align:left;">所属部署</th>
+                <td style="text-align: right;">{{ applyUser.department }}</td></tr>
+              <tr>
+                <th scope="col" width="33%" class="table-primary" style="text-align:left;">役職</th>
+                <td style="text-align: right;">{{ applyUser.title }}</td></tr>
+            </tbody>
+          </table>
 
-            <table class="table table-sm table-bordered border-primary-subtle table-responsive">
-              <tbody class="text-center">
-                <tr>
-                  <th scope="col" width="33%" class="table-primary" style="text-align:left;">各種権限</th>
-                  <td style="text-align:left;">
-                  
-                    <div class="form-check form-switch ms-2">
-                      <input class="form-check-input col-xs-3 col-lg-2" type="checkbox"
-                        id="{{form.canApprove_all.id_for_label}}"
-                        name="{{form.canApprove_all.name}}"
-                        value="True">
-                      <label class="form-check-label col-xs-6 col-lg-6 ms-3"
-                        for="{{form.canApprove_all.id_for_label}}">
-                        すべて</label>
-                    </div>
+          <table class="table table-sm table-bordered border-primary-subtle table-responsive">
+            <tbody class="text-center">
+              <tr>
+                <th scope="col" width="33%" class="table-primary" style="text-align:left;">各種権限</th>
+                <td style="text-align:left;">
+                
+                  <div class="form-check form-switch ms-2">
+                    <input class="form-check-input col-xs-3 col-lg-2" type="checkbox"
+                      id="{{form.canApprove_all.id_for_label}}"
+                      name="{{form.canApprove_all.name}}"
+                      value="True">
+                    <label class="form-check-label col-xs-6 col-lg-6 ms-3"
+                      for="{{form.canApprove_all.id_for_label}}">
+                      すべて</label>
+                  </div>
 
-                    <div class="form-check form-switch ms-2">
-                      <input class="form-check-input col-xs-3 col-lg-2" type="checkbox"
-                        id="{{form.canApprove_add.id_for_label}}"
-                        name="{{form.canApprove_add.name}}"
-                        value="True">
-                       <label class="form-check-label col-xs-6 col-lg-6 ms-3"
-                        for="{{form.canApprove_add.id_for_label}}">
-                      ユーザー追加</label>
-                    </div>
+                  <div class="form-check form-switch ms-2">
+                    <input class="form-check-input col-xs-3 col-lg-2" type="checkbox"
+                      id="{{form.canApprove_add.id_for_label}}"
+                      name="{{form.canApprove_add.name}}"
+                      value="True">
+                     <label class="form-check-label col-xs-6 col-lg-6 ms-3"
+                      for="{{form.canApprove_add.id_for_label}}">
+                    ユーザー追加</label>
+                  </div>
             
-                    <div class="form-check form-switch ms-2">
-                      <input class="form-check-input col-xs-3 col-lg-2" type="checkbox"
-                        id="{{form.canApprove_qpay.id_for_label}}"
-                        name="{{form.canApprove_qpay.name}}"
-                        value="True">
-                      <label class="form-check-label col-xs-6 col-lg-6 ms-3"
-                        for="{{form.canApprove_qpay.id_for_label}}">
-                        Ｑｐａｙ承認</label>
-                    </div>
+                  <div class="form-check form-switch ms-2">
+                    <input class="form-check-input col-xs-3 col-lg-2" type="checkbox"
+                      id="{{form.canApprove_qpay.id_for_label}}"
+                      name="{{form.canApprove_qpay.name}}"
+                      value="True">
+                    <label class="form-check-label col-xs-6 col-lg-6 ms-3"
+                      for="{{form.canApprove_qpay.id_for_label}}">
+                      Ｑｐａｙ承認</label>
+                  </div>
 
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                </td>
+              </tr>
+            </tbody>
+          </table>
 
-            <p></p>
+          <p></p>
           
-            <div class="d-flex justify-content-center pt-2">
-              <button type="submit" class="btn btn-outline-primary bg-light w-30 shadow me-1"
-                name="next"
-                value="RefuseUser_{{applyUser.id}}_{{buyEntity.id}}" >
-                追加しない</button>  
+          <div class="d-flex justify-content-center pt-2">
+            <button type="submit" class="btn btn-outline-primary bg-light w-30 shadow me-1"
+              name="next"
+              value="RefuseUser_{{applyUser.id}}_{{buyEntity.id}}" >
+              追加しない</button>  
 
-              <button type="submit" class="btn btn-primary w-30 shadow ms-1"
-                name="next"
-                value="ApproveUser_{{applyUser.id}}_{{buyEntity.id}}" >
-                ユーザー追加</button>
-            </div>
+            <button type="submit" class="btn btn-primary w-30 shadow ms-1"
+              name="next"
+              value="ApproveUser_{{applyUser.id}}_{{buyEntity.id}}" >
+              ユーザー追加</button>
+          </div>
 
-            <hr>
-          {% endfor %}
+          <hr>
 
         </form>
 

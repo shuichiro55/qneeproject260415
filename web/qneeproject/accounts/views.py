@@ -1,5 +1,6 @@
 from django.contrib.auth import logout, get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 
 from django.contrib.auth.views import \
   LoginView, PasswordChangeView, \
@@ -60,7 +61,7 @@ from django.core.paginator import Paginator
 
 #from django import forms
 
-usermodel = get_user_model()  #get_user_model は、settings.py で AUTH_USER_MODEL に指定されているモデルを取得する関数
+UserModel = get_user_model()  #get_user_model は、settings.py で AUTH_USER_MODEL に指定されているモデルを取得する関数
 
 # MyLoginView_sellerでロインした場合に通る想定
 # MyLoginView_buyerでログインしたListViewに遷移される
@@ -101,7 +102,7 @@ class MyLoginView_buyer(LoginView):
 
       if self.request.user.is_authenticated:
 
-        user = usermodel.objects.get(email=self.request.user)
+        user = UserModel.objects.get(email=self.request.user)
         print(f'user.id={user.id} in get_success_url in MyLoginView_buyer')
 
         entity = LegalEntity.objects.get(pk=user.entity_id,)
@@ -151,21 +152,25 @@ class MyLoginView_seller(LoginView):
 
     print(f'通過1 get_success_url in MyLoginView_seller')
 
-    user = usermodel.objects.get(email=self.request.user)
+    sellUser = UserModel.objects.get(email=self.request.user)
+    sellEntity = LegalEntity.objects.get(pk=sellUser.entity_id)
 
-    if user.type1 != 2:
-      if user.type1 == 1: type1_name = "パートナー"
-      if user.type1 == 2: type1_name = "ゲスト"
-      if user.type1 == 3: type1_name = "スタッフ"
+    self.request.session['sellUser_id'] = sellUser.id
+    self.request.session['sellEntity_id'] = sellEntity.id
+
+    if sellUser.type1 != 2:
+      if sellUser.type1 == 1: type1_name = "パートナー"
+      if sellUser.type1 == 2: type1_name = "ゲスト"
+      if sellUser.type1 == 3: type1_name = "スタッフ"
 
       message = type1_name + "での登録です。" + type1_name + "でログインしてください。"
       messages.add_message(self.request, messages.INFO, message) 
       logout(self.request)
-      print(f'user.type1={user.type1} in get_success_url in MyLoginView_seller')
+      print(f'user.type1={sellUser.type1} in get_success_url in MyLoginView_seller')
 
-      if user.type1 == 1: return reverse_lazy('accounts:login_buyer')
-      if user.type1 == 2: return reverse_lazy('accounts:login_seller')
-      if user.type1 == 3: return reverse_lazy('accounts:login_admin')
+      if sellUser.type1 == 1: return reverse_lazy('accounts:login_buyer')
+      if sellUser.type1 == 2: return reverse_lazy('accounts:login_seller')
+      if sellUser.type1 == 3: return reverse_lazy('accounts:login_admin')
 
     return reverse_lazy('accounts:mypage_seller')
 
@@ -184,7 +189,7 @@ class MyLoginView_admin(LoginView):
   def get_success_url(self):
 
     print(f'通過1 get_success_url in MyLoginView_admin')
-    user = usermodel.objects.get(email=self.request.user)
+    user = UserModel.objects.get(email=self.request.user)
 
     if user.type1 != 3:
       if user.type1 == 1: type1_name = "パートナー"
@@ -228,6 +233,7 @@ class MyPasswordResetView_buyer(PasswordResetView):
   
   # PasswordResetFormでの項目はemail
 
+
 class MyPasswordResetDoneView_buyer(PasswordResetDoneView):
     """パスワード変更用URLを送りましたページ"""
     template_name = 'accounts/buyer/passwordResetDone.html'
@@ -257,6 +263,7 @@ class MyPasswordResetView_seller(PasswordResetView):
   success_url = reverse_lazy('accounts:passwordResetDone_seller')
   
   # PasswordResetFormでの項目はemail
+
 
 class MyPasswordResetDoneView_seller(PasswordResetDoneView):
     """パスワード変更用URLを送りましたページ"""
@@ -317,7 +324,7 @@ class MyPasswordChangeView_buyer(PasswordChangeView):
 
   def get_context_data(self, **kwargs):
     context = super().get_context_data(**kwargs)
-    user = usermodel.objects.get(email=self.request.user)
+    user = UserModel.objects.get(email=self.request.user)
     context['user_id'] = user.id
     user_id = context['user_id'] 
     print(f'user_id = {user_id} get_context_data in MyPasswordChangeView_buyer')
@@ -338,7 +345,7 @@ class MyPasswordChangeView_seller(PasswordChangeView):
 
   def get_context_data(self, **kwargs):
     context = super().get_context_data(**kwargs)
-    user = usermodel.objects.get(email=self.request.user)
+    user = UserModel.objects.get(email=self.request.user)
     context['user_id'] = user.id
     user_id = context['user_id'] 
     print(f'user_id = {user_id} get_context_data in MyPasswordChangeView_seller')
@@ -359,7 +366,7 @@ class MyPasswordChangeView_admin(PasswordChangeView):
 
   def get_context_data(self, **kwargs):
     context = super().get_context_data(**kwargs)
-    user = usermodel.objects.get(email=self.request.user)
+    user = UserModel.objects.get(email=self.request.user)
     context['user_id'] = user.id
     user_id = context['user_id'] 
     print(f'user_id = {user_id} get_context_data in MyPasswordChangeView_admin')
@@ -418,8 +425,8 @@ class UserCreateView_buyer(generic.CreateView):
         'user': user,
       }
 
-      subject = render_to_string('accounts/buy/mail/userTempRegister_subject.txt', context1)
-      message = render_to_string('accounts/buy/mail/userTempRegister_message.txt', context1)
+      subject = render_to_string('accounts/buyer/mail/userTempRegister_subject.txt', context1)
+      message = render_to_string('accounts/buyer/mail/userTempRegister_message.txt', context1)
 
       print(context1)
       print(f'メールアドレス：{user.email}')
@@ -541,7 +548,7 @@ class UserCreateView_admin(generic.CreateView):
       #user.email = self.request.user
       user.type1 = 3  # パートナー：1、ゲスト：2、Qnee：3で登録 25/04/27
       user.type2 = 1  # 個人として登録
-      user.is_active = True
+      #user.is_active = True
       """ is_active=Trueにしないとログインできない """
       """ パートナー、ゲストはEntityCreateViewでアクティブ化 """
 
@@ -589,7 +596,10 @@ class EntityCreateView_buyer(generic.CreateView, LoginRequiredMixin):
 
   form_class = EntityCreateForm_buyer
   timeout_seconds = getattr(settings, 'ACTIVATION_TIMEOUT_SECONDS', 60*60*24)
-  dict_buyEntityName = dict((f, f) for idx, f in enumerate(LegalEntity.objects.filter(type1=1).values_list('entityName', flat=True), 1))
+  #dict_buyEntityName = dict((f, f) for idx, f in enumerate(LegalEntity.objects.filter(type1=1).values_list('entityName', flat=True), 1))
+  
+  """ 初回のマイグレーションの時のみ下記を採用する """
+  #dict_buyEntityName = {'Qnee','Qnee'}
   # 「flat=True」はリスト、「flat=False」はタプル
 
   """（ビューにおいて）GETリクエストを受け取ったときに呼び出される（実践Django P121）"""
@@ -598,6 +608,18 @@ class EntityCreateView_buyer(generic.CreateView, LoginRequiredMixin):
   """ def getでは、メールから本登録に進む場合に呼ばれ、
       ①新規パートナー登録か、②既存パートナーにユーザー追加を選択するテンプレートを送る """
 
+  def dispatch(self, request, *args, **kwargs):
+  
+    self.request.session['dict_buyEntityname'] = \
+      dict((f, f) for idx, f in enumerate(LegalEntity.objects.filter(type1=1).values_list('entityName', flat=True), 1))
+  
+    """ 初回のマイグレーションの時のみ下記を採用する """
+    #dict_buyEntityName = {'Qnee','Qnee'}
+    # 「flat=True」はリスト、「flat=False」はタプル
+  
+    return super().dispatch(request, *args, **kwargs)
+  
+
   def get(self, request, **kwargs):  #selfはメソッドを呼んだインスタンス自体
   
     try:
@@ -605,26 +627,26 @@ class EntityCreateView_buyer(generic.CreateView, LoginRequiredMixin):
       token = kwargs.get('token', None)
       user_pk = loads(token, max_age=self.timeout_seconds)
       print(f'token = {token}, user_pk = {user_pk} in def get of EntitySetView_buyer')
-      user = usermodel.objects.get(pk=user_pk)
+      user = UserModel.objects.get(pk=user_pk)
 
-    except usermodel.DoesNotExist:
+    except UserModel.DoesNotExist:
       message = "申し訳ありませんが、ユーザー情報が確認できません"
       messages.add_message(self.request, messages.WARNING, message) 
-      return TemplateResponse(request,'accounts/buyer/login_admin', {'form':MyLoginForm}) 
+      return TemplateResponse(request,'accounts/buyer/login.html', {'form':MyLoginForm}) 
 
     except SignatureExpired:  # 時間切れ
       # ★★ 250824 テスト未了。メルアド重複で登録不可にならないようUserオブジェクトを削除
-      usermodel.objects.get(email=self.request.user).delete()
+      UserModel.objects.get(email=self.request.user).delete()
       message = "規定の時間を超えたため、再度、お手続きをお願いいたします"
       messages.add_message(self.request, messages.WARNING, message)
 
-      return TemplateResponse(request,'accounts/buyer/login_admin', {'form':MyLoginForm}) 
+      return TemplateResponse(request,'accounts/buyer/login.html', {'form':MyLoginForm}) 
 
     except BadSignature:      # tokenが間違っている
       return HttpResponseBadRequest()
     
     # 仮登録が完了し、メールからのリンクにより本登録を開始した時点
-    user.is_active = True #Trueにしないとログインできない
+    #user.is_active = True #Trueにしないとログインできない
 
     user.save()
     self.user_id = user.id
@@ -633,7 +655,7 @@ class EntityCreateView_buyer(generic.CreateView, LoginRequiredMixin):
     ### ここからしたが工事中（25/06/08） ###
     ### dict_buyEntityNameのデータをselectに格納するようにする 
 
-    #dict_buyEntityName = dict((str(idx), f) for idx, f in enumerate(LegalEntity.objects.filter(type1=1).values_list('entityName', flat=True), 1))
+    dict_buyEntityName = self.request.session.get('dict_buyEntityname')
     #print(f'dict_buyEntityName={dict_buyEntityName} def get in EntityCreateView_buyer')
 
     init_dict = {
@@ -647,8 +669,8 @@ class EntityCreateView_buyer(generic.CreateView, LoginRequiredMixin):
       'form': EntitySetForm_buyer(initial=init_dict),
       'temporal_buyEntityName': "",
       # コメント(25/06/08)：Selectボックスで未選択であることを示す。選択後はページ移動でデータ保持するために使う
-      'dict_buyEntityName': self.dict_buyEntityName,
-      'json_buyEntityName': json.dumps(self.dict_buyEntityName),
+      'dict_buyEntityName': dict_buyEntityName,
+      'json_buyEntityName': json.dumps(dict_buyEntityName),
     }
 
     print(f'ここ来てる1 request.user={request.user} email={user.email} type2={user.type2}（get in class EntityCreateView_buyer）')
@@ -658,19 +680,18 @@ class EntityCreateView_buyer(generic.CreateView, LoginRequiredMixin):
 
   def post(self, request, *args, **kwargs):
 
-    print(f'pass-1 self.request.user={self.request.user} in def post next1 EntityCreateView_buyer')
-
     next1 = self.request.POST.get('next1', None)
     next2 = self.request.POST.get('next2', None)
     # next1は、新規entityを登録する際の処理種別
     # next2は、既存entityにuser追加する際の処理種別
 
+    print(f'pass-1 self.request.POST.get(next2)={next2} in def post next1 EntityCreateView_buyer')
     """ 新規のパートナー登録をする処理 """
     if next1 != None:
 
       if next1.find('ToEntityCreate') >= 0:
 
-        user = usermodel.objects.get(pk=next1.split('_')[1]) 
+        user = UserModel.objects.get(pk=next1.split('_')[1]) 
 
         context = {
           'flag_step': 1,
@@ -684,9 +705,10 @@ class EntityCreateView_buyer(generic.CreateView, LoginRequiredMixin):
       """ 入力内容を確認する画面 """
       if next1.find('ToConfirm') >= 0:
 
-        user = usermodel.objects.get(pk=next1.split('_')[1]) 
-        form = self.form_class(request.POST, nextCase=1)
+        user = UserModel.objects.get(pk=next1.split('_')[1]) 
+        form = self.form_class(request.POST)
         # 260103 nextCaseを追加（①パートナー追加と②ユーザー追加に分ける）
+        # 260301 ユーザー追加の場合はEntitySetform_buyerを利用（nextCaseをなくした）
 
         if form.is_valid():
         # 下記①、②、③の順で実行
@@ -730,7 +752,7 @@ class EntityCreateView_buyer(generic.CreateView, LoginRequiredMixin):
       # データ確認画面から入力画面に戻る時の処理 2025/02/14
       if next1.find('BackToInput') >= 0:
 
-        user = usermodel.objects.get(pk=next1.split('_')[1]) 
+        user = UserModel.objects.get(pk=next1.split('_')[1]) 
 
         context = {
           'user': user,
@@ -744,7 +766,7 @@ class EntityCreateView_buyer(generic.CreateView, LoginRequiredMixin):
       if next1.find('ToSave') >= 0: # 確認した内容をデータベースに登録
 
         # 250802 フォームをモデルフォームから通常フォームに変更したことに伴い変更
-        user = usermodel.objects.get(pk=next1.split('_')[1]) 
+        user = UserModel.objects.get(pk=next1.split('_')[1]) 
 
         entity = LegalEntity.objects.create()
         entity.entityName = self.request.POST['entityName']
@@ -811,11 +833,14 @@ class EntityCreateView_buyer(generic.CreateView, LoginRequiredMixin):
 
       if next2.find('ToConfirm') >= 0:  # 登録済みパートナーにユーザー追加
 
-        user = usermodel.objects.get(pk=next2.split('_')[1]) 
+        user = UserModel.objects.get(pk=next2.split('_')[1]) 
 
-        form = self.form_class(request.POST, nextCase=2)
+        #form = form_class(request.POST, nextCase=2)
+        form = EntitySetForm_buyer(request.POST)
+
         # form_class=EntityCreateForm_buyer
         # 260103 nextCaseを追加（①新規パートナーと②ユーザー追加を場合分け）
+        # 260301 EntitySetForm_buyerを使うように修正
 
         # ★★ 250914 バリデーション（エンティティが選ばれているかを含む）を対応
 
@@ -848,15 +873,20 @@ class EntityCreateView_buyer(generic.CreateView, LoginRequiredMixin):
             'flag_step': 2,
             'form' : EntitySetForm_buyer(initial=init_dict),
           }
-          return render(self.request, 'accounts/buyer/entitySet.html', context)  # 確認画面に行く
+
+          return TemplateResponse(self.request, 'accounts/buyer/entitySet.html', context)  # 確認画面に行く
+        else:
+          return TemplateResponse(self.request, 'accounts/buyer/entitySet.html', context)  # 確認画面に行く
 
 
       if next2.find('BackToInput') >= 0:
 
         form = EntitySetForm_buyer(request.POST)  # form_class=EntityCreateForm_buyer
 
-        user = usermodel.objects.get(pk=next2.split('_')[1]) 
+        user = UserModel.objects.get(pk=next2.split('_')[1]) 
         entity = LegalEntity.objects.get(pk=next2.split('_')[2])
+
+        dict_buyEntityName = self.request.session.get('dict_buyEntityname')
 
         context = {
           'user': user,
@@ -865,8 +895,8 @@ class EntityCreateView_buyer(generic.CreateView, LoginRequiredMixin):
           'form': form,
           'temporal_buyEntityName': entity.entityName,
           # Note(25/06/08)：選択済み内容をページ移動後も維持するために使う（初期は空欄）
-          'dict_buyEntityName': self.dict_buyEntityName,
-          'json_buyEntityName': json.dumps(self.dict_buyEntityName),
+          'dict_buyEntityName': dict_buyEntityName,
+          'json_buyEntityName': json.dumps(dict_buyEntityName),
         }
         return TemplateResponse(request, 'accounts/buyer/entitySet.html', context)
 
@@ -875,7 +905,7 @@ class EntityCreateView_buyer(generic.CreateView, LoginRequiredMixin):
 
         form = EntitySetForm_buyer(request.POST)  # form_class=EntityCreateForm_buyer
 
-        user = usermodel.objects.get(pk=next2.split('_')[1]) 
+        user = UserModel.objects.get(pk=next2.split('_')[1]) 
         entity = LegalEntity.objects.get(pk=next2.split('_')[2])
         print(f'user.id={user.id} entity.id={entity.id} if next2.find(ToSave&Apply) >=0 in EntityCreateView_buyer')
 
@@ -921,8 +951,8 @@ class EntityCreateView_buyer(generic.CreateView, LoginRequiredMixin):
 #  def get_form_kwargs(self):
 #    print(f'self.user_id={self.user_id} def get_form_kwargs in EntityCreateView_buyer')
 #    kwargs =super(EntityCreateView_buyer, self).get_form_kwargs()
-#    user = usermodel.objects.gets(email=self.user.request_id)
-#    kwargs['user'] = usermodel.objects.gets(pk=self.user_id)
+#    user = UserModel.objects.gets(email=self.user.request_id)
+#    kwargs['user'] = UserModel.objects.gets(pk=self.user_id)
 #
 #   return kwargs
 
@@ -938,10 +968,10 @@ class AgreementConfirmView_buyer(generic.CreateView):
   def get(self, request, **kwargs):  #selfはメソッドを呼んだインスタンス自体
   
     try:
-      user = usermodel.objects.get(pk=self.kwargs['user_id'])
+      user = UserModel.objects.get(pk=self.kwargs['user_id'])
       entity = LegalEntity.objects.get(pk=self.kwargs['entity_id'])
 
-    except usermodel.DoesNotExist:
+    except UserModel.DoesNotExist:
       message = "申し訳ありませんが、ユーザー情報が確認できません。"
       messages.add_message(self.request, messages.INFO, message)
       return TemplateResponse(request,'accounts/buyer/login.html', {'form':MyLoginForm}) 
@@ -964,7 +994,7 @@ class AgreementConfirmView_buyer(generic.CreateView):
 
     if buttonValue.find('ToAgree') >= 0:
 
-      applyUser = usermodel.objects.get(pk=buttonValue.split('_')[1]) 
+      applyUser = UserModel.objects.get(pk=buttonValue.split('_')[1]) 
       buyEntity = LegalEntity.objects.get(pk=buttonValue.split('_')[2])
       print(f'applyUser.email={applyUser.email}')
       print(f'applyUser.userName={applyUser.userName}')
@@ -983,13 +1013,13 @@ class AgreementConfirmView_buyer(generic.CreateView):
         """ 「canApprove_all=True」「canApprove_add=True」の人に承認依頼する """
         """ ただし、一人目の場合はQneeが承認するようにする """
 
-        approvers = usermodel.objects.filter(
-          Q(entity_id=buyEntity.id) & (Q(canApprove_all=True) | Q(canApprove_add=True)))
-        #queryset_users = usermodel.objects.prefetch_related('entitys').filter(entitys=entity.id, is_buyUser_ApproveAll=True)
+        approvers = UserModel.objects.filter(
+          ~Q(pk=applyUser.id) & Q(entity_id=buyEntity.id) & (Q(canApprove_all=True) | Q(canApprove_add=True)))
+        #queryset_users = UserModel.objects.prefetch_related('entitys').filter(entitys=entity.id, is_buyUser_ApproveAll=True)
 
         # データ取得参考（https://noauto-nolife.com/post/django-foreignkey-related-name/）
     
-        if approvers.first() is None: # 参加を承認するユーザーがいない場合（一人目のユーザーの場合）
+        if approvers.first() is None: # 一人目のユーザーの場合（参加を承認するユーザーがいない場合）
 
           print(f'pass1 approvers.first() is None in def post AgreementConfirmView_buyer')
           applyUser.canApprove_all = True
@@ -1000,6 +1030,7 @@ class AgreementConfirmView_buyer(generic.CreateView):
           # ★★ 250906 Qneeが承認してから「is_active2=True」とする
 
           applyUser.approvedStatus_int = 2
+          applyUser.is_active = True
 
           applyUser.entity = buyEntity
           applyUser.save()
@@ -1019,15 +1050,16 @@ class AgreementConfirmView_buyer(generic.CreateView):
             context1 = {
               'protocol': self.request.scheme,
               'domain': domain,
-              'applyuser_id': dumps(applyUser.pk),  # 申請者のuser.pkを維持する
-              'buyentity_id': dumps(buyEntity.pk),  # 申請者のentity.pkを維持する
+              'token1': dumps(applyUser.pk),  # 申請者のuser.pkを維持する
+              'token2': dumps(buyEntity.pk),  # 申請者のentity.pkを維持する
             }
             print(f'applyuser.pk={applyUser.pk}, buyentity.pk={buyEntity.pk}')
-            subject = render_to_string('accounts/mail/buyUserAddApply_subject.txt', context1)
-            message = render_to_string('accounts/mail/buyUserAddApply_message.txt', context1)
+            subject = render_to_string('accounts/buyer/mail/userAddApply_subject.txt', context1)
+            message = render_to_string('accounts/buyer/mail/userAddApply_message.txt', context1)
 
             from_email = 'shuichiro.tomihari.201604@gmail.com'
-            recipient_list = [approver['email']]
+            recipient_list = [approver.email] # [approver['email']]
+            print(f'approver.email={approver.email}')
             #bcc =  ["toritoritorina@gmail.com"]  # BCCリスト
             email = EmailMessage(subject, message, from_email, recipient_list)
             email.send()
@@ -1053,7 +1085,7 @@ class AgreementConfirmView_buyer(generic.CreateView):
 
       messages.error(request, "「同意しない」のボタンが押されました。", extra_tags='no check')
 
-      user = usermodel.objects.get(pk=buttonValue.split('_')[1]) 
+      user = UserModel.objects.get(pk=buttonValue.split('_')[1]) 
       entity = LegalEntity.objects.get(pk=buttonValue.split('_')[2])
 
       context = {
@@ -1084,26 +1116,26 @@ class UserAddView_buyer(generic.TemplateView, LoginRequiredMixin):
   def get(self, request, **kwargs):  #selfはメソッドを呼んだインスタンス自体
 
     try:
-      token_applyUserID = kwargs.get('applyuser_id')    # URLから<token>（暗号化されたuser_id）を取り出す（kwargsはdict型）   
-      applyUserID = loads(token_applyUserID, max_age=self.timeout_seconds)
-      print(f'applyUserID={applyUserID} in def get in UserAddView_buyer')
-      applyUser = usermodel.objects.get(pk=applyUserID)
+      token_applyUserID = kwargs.get('token1')    # URLから<token>（暗号化されたuser_id）を取り出す（kwargsはdict型）   
+      applyUser_id = loads(token_applyUserID, max_age=self.timeout_seconds)
+      print(f'applyUserID={applyUser_id} in def get in UserAddView_buyer')
+      applyUser = UserModel.objects.get(pk=applyUser_id)
 
-      token_buyEntityID = kwargs.get('buyentity_id')    # URLから<token>（暗号化されたuser_id）を取り出す（kwargsはdict型）   
-      buyEntityID = loads(token_buyEntityID, max_age=self.timeout_seconds)
-      print(f'buyEntityID={buyEntityID} in def get in UserAddView_buyer')
-      buyEntity = LegalEntity.objects.get(pk=buyEntityID)
+      token_buyEntityID = kwargs.get('token2')    # URLから<token>（暗号化されたuser_id）を取り出す（kwargsはdict型）   
+      buyEntity_id = loads(token_buyEntityID, max_age=self.timeout_seconds)
+      print(f'buyEntityID={buyEntity_id} in def get in UserAddView_buyer')
+      buyEntity = LegalEntity.objects.get(pk=buyEntity_id)
 
       messages.add_message(request, messages.SUCCESS, 'あなたにユーザー追加の申請が行われました.')
  
       context = {
         'form': self.form_class(),
         'buyEntity': buyEntity,
-        'applyUsers': applyUser,
+        'applyUser': applyUser,
       }
       return TemplateResponse(request, 'accounts/buyer/userAdd.html', context)
 
-    except usermodel.DoesNotExist:
+    except UserModel.DoesNotExist:
       message = "申し訳ありませんが、申請者の情報が確認できません。"
       messages.add_message(self.request, messages.WARNING, message) 
       return TemplateResponse(request,'accounts/buyer/login.html', {'form':MyLoginForm}) 
@@ -1118,8 +1150,8 @@ class UserAddView_buyer(generic.TemplateView, LoginRequiredMixin):
 
     except: # マイページの設定画面から呼ばれる場合
 
-      buyUser = usermodel.objects.select_related('entity').get(email=self.request.user)
-      applyUsers = usermodel.objects.filter(entity=buyUser.entity, approvedStatus_int=1)
+      buyUser = UserModel.objects.select_related('entity').get(email=self.request.user)
+      applyUsers = UserModel.objects.filter(entity=buyUser.entity, approvedStatus_int=1)
 
       print(f'buyEntity={buyUser.entity} in UserAddView_buyer')
       context = {
@@ -1140,7 +1172,7 @@ class UserAddView_buyer(generic.TemplateView, LoginRequiredMixin):
     if next.find('ApproveUser') >= 0:
       print(f'pass1 ここ通っているかな in UserAddView_buyer')
 
-      applyUser = usermodel.objects.get(pk=next.split('_')[1])
+      applyUser = UserModel.objects.get(pk=next.split('_')[1])
       buyEntity = LegalEntity.objects.get(pk=next.split('_')[2])
 
       char_CanApproveAll = self.request.POST.get('canApprove_all', None)
@@ -1164,6 +1196,7 @@ class UserAddView_buyer(generic.TemplateView, LoginRequiredMixin):
 
       applyUser.entity = buyEntity
       applyUser.approvedStatus_int = 2
+      applyUser.is_active = True #ここでログインできるようになる
 
       applyUser.save()
 
@@ -1177,8 +1210,8 @@ class UserAddView_buyer(generic.TemplateView, LoginRequiredMixin):
         #'applyuser_id': dumps(applyUser.pk),  # 申請者のuser.pkを維持する
         #'buyentity_id': dumps(buyEntity.pk),  # 申請者のentity.pkを維持する
       }
-      subject = render_to_string('accounts/mail/buyUserAddReplyYes_subject.txt', context)
-      message = render_to_string('accounts/mail/buyUserAddReplyYes_message.txt', context)
+      subject = render_to_string('accounts/buyer/mail/userAddReplyYes_subject.txt', context)
+      message = render_to_string('accounts/buyer/mail/userAddReplyYes_message.txt', context)
 
       from_email = 'shuichiro.tomihari.201604@gmail.com'
       recipient_list = [applyUser.email]
@@ -1194,7 +1227,7 @@ class UserAddView_buyer(generic.TemplateView, LoginRequiredMixin):
       # ★★ 250917 申請者に理由があり追加できないことを伝える
       # ★★ 250917時点で工事中
 
-      applyUser = usermodel.objects.get(pk=next.split('_')[1])
+      applyUser = UserModel.objects.get(pk=next.split('_')[1])
       buyEntity = LegalEntity.objects.get(pk=next.split('_')[2])
 
       applyUser.approvedSatus_int = 3
@@ -1209,8 +1242,8 @@ class UserAddView_buyer(generic.TemplateView, LoginRequiredMixin):
         #'applyuser_id': dumps(applyUser.pk),  # 申請者のuser.pkを維持する
         #'buyentity_id': dumps(buyEntity.pk),  # 申請者のentity.pkを維持する
       }
-      subject = render_to_string('accounts/mail/buyUserAddReplyNo_subject.txt', context)
-      message = render_to_string('accounts/mail/buyUserAddReplyNo_message.txt', context)
+      subject = render_to_string('accounts/buyer/mail/userAddReplyNo_subject.txt', context)
+      message = render_to_string('accounts/buyer/mail/userAddReplyNo_message.txt', context)
 
       from_email = 'shuichiro.tomihari.201604@gmail.com'
       recipient_list = [applyUser.email]
@@ -1229,7 +1262,7 @@ class PermissionSetsView_buyer(generic.View):
 
   def get(self, request, **kwargs):  #selfはメソッドを呼んだインスタンス自体
 
-    loginUser = usermodel.objects.get(email=self.request.user)
+    loginUser = UserModel.objects.get(email=self.request.user)
     entity = LegalEntity.objects.get(pk=loginUser.entity_id)
     print(f'loginUser.id={loginUser.id}')
     print(f'loginUser.entity_id={loginUser.entity_id}')
@@ -1251,7 +1284,7 @@ class PermissionSetsView_buyer(generic.View):
 
       if next1.find('Edit') >=0: # リストで選択されたユーザーの設定を表示する
 
-        editedUser = usermodel.objects.get(pk=next1.split('_')[1])
+        editedUser = UserModel.objects.get(pk=next1.split('_')[1])
 
         char_CanApproveAll = editedUser.canApprove_all
         char_CanApproveAdd = editedUser.canApprove_add
@@ -1278,14 +1311,14 @@ class PermissionSetsView_buyer(generic.View):
       if next2.find('PermissionSet') >= 0: # 選択されたユーザーの設定を更新
         print(f'pass1 if next2.find(PermissionSet) def post in PermissionSettinsView_buyer')
 
-        editedUser = usermodel.objects.get(pk=next2.split('_')[1])
+        editedUser = UserModel.objects.get(pk=next2.split('_')[1])
 
         char_CanApproveAll = self.request.POST.get('canApprove_all', None)
         char_CanApproveAdd = self.request.POST.get('canApprove_add', None)
         char_CanApproveQpay = self.request.POST.get('canApprove_qpay', None)
 
         """ 「すべて」権限者を一人は残すようにする """
-        cnt_canApprove_all = usermodel.objects.filter(entity=editedUser.entity, canApprove_all=True).count()
+        cnt_canApprove_all = UserModel.objects.filter(entity=editedUser.entity, canApprove_all=True).count()
 
         if editedUser.canApprove == True and cnt_canApprove_all == 1:
           if char_CanApproveAll != "True":
@@ -1321,7 +1354,7 @@ class PermissionSetsView_buyer(generic.View):
         print(f'char_CanApproveQpay={char_CanApproveQpay} after next2.find(PermissionSet) in PermissionSetsView_buyer')
         print(f'editedUser.id={editedUser.id} after next2.find(PermissionSet)')
 
-        loginUser = usermodel.objects.get(email=self.request.user)
+        loginUser = UserModel.objects.get(email=self.request.user)
         entity = LegalEntity.objects.get(pk=loginUser.entity_id)
         entityUsers = entity.entity_users.all()
 
@@ -1338,7 +1371,7 @@ class PermissionSetsView_seller(generic.View):
 
   def get(self, request, **kwargs):  #selfはメソッドを呼んだインスタンス自体
 
-    loginUser = usermodel.objects.get(email=self.request.user)
+    loginUser = UserModel.objects.get(email=self.request.user)
     entity = LegalEntity.objects.get(pk=loginUser.entity_id)
     print(f'loginUser.id={loginUser.id}')
     print(f'loginUser.entity_id={loginUser.entity_id}')
@@ -1360,7 +1393,7 @@ class PermissionSetsView_seller(generic.View):
 
       if next1.find('Edit') >=0: # リストで選択されたユーザーの設定を表示する
 
-        editedUser = usermodel.objects.get(pk=next1.split('_')[1])
+        editedUser = UserModel.objects.get(pk=next1.split('_')[1])
 
         char_CanApproveAll = editedUser.canApprove_all
         char_CanApproveAdd = editedUser.canApprove_add
@@ -1394,7 +1427,7 @@ class PermissionSetsView_seller(generic.View):
         char_CanApproveQpay = self.request.POST.get('canApprove_qpay', None)
 
         """ 「すべて」権限者を一人は残すようにする """
-        cnt_canApprove_all = usermodel.objects.filter(entity=editedUser.entity, canApprove_all=True).count()
+        cnt_canApprove_all = UserModel.objects.filter(entity=editedUser.entity, canApprove_all=True).count()
 
         if editedUser.canApprove == True and cnt_canApprove_all == 1:
           if char_CanApproveAll != "True":
@@ -1430,7 +1463,7 @@ class PermissionSetsView_seller(generic.View):
         print(f'char_CanApproveQpay={char_CanApproveQpay} after next2.find(PermissionSet) in PermissionSetsView_seller')
         print(f'editedUser.id={editedUser.id} after next2.find(PermissionSet)')
 
-        loginUser = usermodel.objects.get(email=self.request.user)
+        loginUser = UserModel.objects.get(email=self.request.user)
         entity = LegalEntity.objects.get(pk=loginUser.entity_id)
         entityUsers = entity.entity_users.all()
 
@@ -1453,8 +1486,19 @@ class EntityCreateView_seller(generic.CreateView):
   template_name = 'accounts/seller/entityCreate.html'
   timeout_seconds = getattr(settings, 'ACTIVATION_TIMEOUT_SECONDS', 60*60*72)
 
-  dict_sellEntityName = dict((f, f) for idx, f in enumerate(LegalEntity.objects.filter(type1=2,type2=2).values_list('entityName', flat=True), 1))
-  # ゲストの場合は、個人と法人があるため抽出条件に「type2=2」とする
+  #dict_sellEntityName = dict((f, f) for idx, f in enumerate(LegalEntity.objects.filter(type1=2,type2=2).values_list('entityName', flat=True), 1))
+  #パートナー新規登録後に2人目のユーザーを追加しても反映されないため没
+
+  def dispatch(self, request, *args, **kwargs):
+  
+    self.request.session['dict_sellEntityname'] = \
+      dict((f, f) for idx, f in enumerate(LegalEntity.objects.filter(type1=2,type2=2).values_list('entityName', flat=True), 1))
+  
+    """ 初回のマイグレーションの時のみ下記を採用する """
+    #dict_sellEntityName = {'Qnee','Qnee'}
+    # 「flat=True」はリスト、「flat=False」はタプル
+  
+    return super().dispatch(request, *args, **kwargs)
 
 
   def get(self, request, **kwargs):  #selfはメソッドを呼んだインスタンス自体
@@ -1463,19 +1507,19 @@ class EntityCreateView_seller(generic.CreateView):
       # メール内のURLから<token>（暗号化されたuser_id）を取り出す（kwargsはdict型）
       token = kwargs.get('token', None)
       user_pk = loads(token, max_age=self.timeout_seconds)
-      user = usermodel.objects.get(pk=user_pk)
+      user = UserModel.objects.get(pk=user_pk)
       print(f'token = {token}, user_pk = {user_pk} in def get of EntityCreateView_seller')
 
-    except usermodel.DoesNotExist:
+    except UserModel.DoesNotExist:
       
-      usermodel.objects.get(email=self.request.user).delete()
+      UserModel.objects.get(email=self.request.user).delete()
       message = "申し訳ありませんが、ユーザー情報が確認できません"
       messages.add_message(self.request, messages.WARNING, message) 
       return TemplateResponse(request,'accounts/seller/login.html', {'form':MyLoginForm}) 
 
     except SignatureExpired:  # 時間切れ
       # ★★ 250824 テスト未了。メルアド重複で登録不可にならないようUserオブジェクトを削除
-      usermodel.objects.get(email=self.request.user).delete()
+      UserModel.objects.get(email=self.request.user).delete()
       message = "規定の時間を超えたため、再度、お手続きをお願いいたします"
       messages.add_message(self.request, messages.WARNING, message)
       return TemplateResponse(request,'accounts/seller/login.html', {'form':MyLoginForm}) 
@@ -1485,8 +1529,10 @@ class EntityCreateView_seller(generic.CreateView):
     
 
     # 仮登録が完了し、メールからのリンクにより本登録を開始した時点
-    user.is_active = True
+    user.is_active = False # 参加承認が得られた時点でTrueにする
     user.save()
+
+    dict_sellEntityName = self.request.session.get('dict_sellEntityname')
 
     print(f'ここ来てる1 self.request.user={self.request.user} email={user.email} type2={user.type2}（get in class EntityCreateView_seller）')
 
@@ -1515,8 +1561,8 @@ class EntityCreateView_seller(generic.CreateView):
         'form': EntitySetForm_seller(initial=init_dict),
         'temporal_sellEntityName': "",
         # コメント(25/06/08)：Selectボックスで未選択であることを示す。選択後はページ移動でデータ保持するために使う
-        'dict_sellEntityName': self.dict_sellEntityName,
-        'json_sellEntityName': json.dumps(self.dict_sellEntityName),
+        'dict_sellEntityName': dict_sellEntityName,
+        'json_sellEntityName': json.dumps(dict_sellEntityName),
       }
       print(f'ここ来てる2 self.request.user={self.request.user} email={user.email} type2={user.type2}（get in class EntityCreateView_seller）')
      
@@ -1525,7 +1571,7 @@ class EntityCreateView_seller(generic.CreateView):
 
   def post(self, request, *args, **kwargs):
 
-    #user = usermodel.objects.get(email=self.request.user) 
+    #user = UserModel.objects.get(email=self.request.user) 
 
     next1_indiv = self.request.POST.get('next1_indiv', None)
 
@@ -1539,7 +1585,7 @@ class EntityCreateView_seller(generic.CreateView):
 
     if next1_indiv != None:
 
-      user = usermodel.objects.get(pk=next1_indiv.split('_')[1]) 
+      user = UserModel.objects.get(pk=next1_indiv.split('_')[1]) 
       form = self.form_class(request.POST)
       
       if next1_indiv.find('ToConfirm') >= 0:
@@ -1613,7 +1659,7 @@ class EntityCreateView_seller(generic.CreateView):
 
         # ★★ 2500927 ゲストの場合はQneeの承認はなし（パートナーと異なる）
 
-        user.is_active = True
+        user.is_active = False
 
         user.save()
 
@@ -1642,7 +1688,7 @@ class EntityCreateView_seller(generic.CreateView):
     """ 法人用の処理 """
     if next1_corp != None:
 
-      user = usermodel.objects.get(pk=next1_corp.split('_')[1]) 
+      user = UserModel.objects.get(pk=next1_corp.split('_')[1]) 
       
       # ★★ 250930 これは新規ゲスト作成のときにいる？
       #form = self.form_class(request.POST)
@@ -1746,7 +1792,7 @@ class EntityCreateView_seller(generic.CreateView):
         # ★★ 25009254 Qneeはゲストに対しては承認しない
         # ★★ この部分はパートナーと異なる
 
-        user.is_active = True
+        user.is_active = False
         
         user.save()
 
@@ -1764,7 +1810,7 @@ class EntityCreateView_seller(generic.CreateView):
       # データ確認画面から入力画面に戻る時の処理 2025/02/14
       if next1_corp.find('BackToInput') >= 0:
 
-        user = usermodel.objects.get(pk=next1_corp.split('_')[1])
+        user = UserModel.objects.get(pk=next1_corp.split('_')[1])
 
         context = {
           'flag_step': 1,
@@ -1781,7 +1827,7 @@ class EntityCreateView_seller(generic.CreateView):
       if next2_corp.find('ToConfirm') >= 0:  # 登録済みパートナーにユーザー追加
 
         form = EntitySetForm_seller(request.POST) # form_class=EntityCreateForm_seller
-        user = usermodel.objects.get(pk=next2_corp.split('_')[1])
+        user = UserModel.objects.get(pk=next2_corp.split('_')[1])
 
         # ★★ 250914 バリデーション（エンティティが選ばれているかを含む）を対応
         if form.is_valid():
@@ -1819,7 +1865,7 @@ class EntityCreateView_seller(generic.CreateView):
           print(f'ここ来てる4（def post after if not form.is_valid in class EntityCreateView_seller）')
           entityName = self.request.POST.get('entityName')
           entity = LegalEntity.objects.get(entityName=entityName)
-
+          dict_sellEntityName = self.request.session.get('dict_sellEntityname')
 
           context = {
             'flag_step': 1,
@@ -1829,8 +1875,8 @@ class EntityCreateView_seller(generic.CreateView):
             'form' : form,
             'temporal_sellEntityName': entity.entityName,
             # コメント(25/06/08)：Selectボックスで未選択であることを示す。選択後はページ移動でデータ保持するために使う
-            'dict_sellEntityName': self.dict_sellEntityName,
-            'json_sellEntityName': json.dumps(self.dict_sellEntityName),
+            'dict_sellEntityName': dict_sellEntityName,
+            'json_sellEntityName': json.dumps(dict_sellEntityName),
 
           }
           return TemplateResponse(self.request, 'accounts/seller/entitySet.html', context)
@@ -1841,8 +1887,9 @@ class EntityCreateView_seller(generic.CreateView):
 
         form = EntitySetForm_seller(request.POST)  # form_class=EntityCreateForm_seller
 
-        user = usermodel.objects.get(pk=next2_corp.split('_')[1]) 
+        user = UserModel.objects.get(pk=next2_corp.split('_')[1]) 
         entity = LegalEntity.objects.get(pk=next2_corp.split('_')[2])
+        dict_sellEntityName = self.request.session.get('dict_sellEntityname')
 
         context = {
           'flag_step': 1,
@@ -1851,8 +1898,8 @@ class EntityCreateView_seller(generic.CreateView):
           'form': form,
           'temporal_sellEntityName': entity.entityName,
           # Note(25/06/08)：選択済み内容をページ移動後も維持するために使う（初期は空欄）
-          'dict_sellEntityName': self.dict_sellEntityName,
-          'json_sellEntityName': json.dumps(self.dict_sellEntityName),
+          'dict_sellEntityName': dict_sellEntityName,
+          'json_sellEntityName': json.dumps(dict_sellEntityName),
         }
         return TemplateResponse(request, 'accounts/seller/entitySet.html', context)
 
@@ -1861,7 +1908,7 @@ class EntityCreateView_seller(generic.CreateView):
 
         form = EntitySetForm_seller(request.POST)  # form_class=EntityCreateForm_buyer
 
-        user = usermodel.objects.get(pk=next2_corp.split('_')[1]) 
+        user = UserModel.objects.get(pk=next2_corp.split('_')[1]) 
         entity = LegalEntity.objects.get(pk=next2_corp.split('_')[2])
 
         #user.userName = self.request.POST.get('userName', None)
@@ -1903,7 +1950,7 @@ class EntityCreateView_seller(generic.CreateView):
   #def get_form_kwargs(self):
   #  print(f'pass4 def get_form_kwargs in EntityCreateView_seller')
   #  kwargs = super(EntityCreateView_seller, self).get_form_kwargs()
-  #  user = usermodel.objects.get(email=self.request.user)
+  #  user = UserModel.objects.get(email=self.request.user)
   #  userType2 = 2
   #  print(f'userType2={userType2} def get_form_kwargs in EntityCreateView_seller')
   #  kwargs.update({'userType2': userType2})
@@ -1924,10 +1971,10 @@ class AgreementConfirmView_seller(generic.UpdateView):
   def get(self, request, **kwargs):  #selfはメソッドを呼んだインスタンス自体
   
     try:
-      user = usermodel.objects.get(pk=self.kwargs['user_id'])
+      user = UserModel.objects.get(pk=self.kwargs['user_id'])
       entity = LegalEntity.objects.get(pk=self.kwargs['entity_id'])
 
-    except usermodel.DoesNotExist:
+    except UserModel.DoesNotExist:
       message = "申し訳ありませんが、ユーザー情報が確認できません。"
       messages.add_message(self.request, messages.INFO, message) 
       return redirect('accounts: login_seller') 
@@ -1949,7 +1996,7 @@ class AgreementConfirmView_seller(generic.UpdateView):
     if buttonValue.find('ToAgree') >= 0:
 
       print(f'buttonValue={buttonValue}')
-      applyUser = usermodel.objects.get(pk=buttonValue.split('_')[1]) 
+      applyUser = UserModel.objects.get(pk=buttonValue.split('_')[1]) 
       sellEntity = LegalEntity.objects.get(pk=buttonValue.split('_')[2])
 
       if checkValue == 'ToAgree':  # 規約同意にチェックされた場合
@@ -1979,16 +2026,17 @@ class AgreementConfirmView_seller(generic.UpdateView):
 
           """ ★★ 25/06/14追加（テストは未済み） 
              「canApprove_all=True」「canApprove_add=True」の人に承認依頼する """
-          approvers = usermodel.objects.filter(
-            Q(entity_id=sellEntity.id) & (Q(canApprove_all=True) | Q(canApprove_add=True)))
+          approvers = UserModel.objects.filter(
+            ~Q(pk=applyUser.id) & Q(entity_id=sellEntity.id) & (Q(canApprove_all=True) | Q(canApprove_add=True)))
     
-          if approvers.first() is None: # 参加を承認するユーザーがいない場合（一人目のユーザーの場合）
+          if approvers.first() is None: # 一人目のユーザーの場合（参加を承認するユーザーがいない場合）
           
             applyUser.canApprove_all = True
             applyUser.canApprove_add = True
             applyUser.canApprove_qpay = True
 
             applyUser.approvedStatus_int = 2
+            applyUser.is_active = True #ここでログインできるようになる
 
             applyUser.entity = sellEntity
             applyUser.save()
@@ -2010,13 +2058,13 @@ class AgreementConfirmView_seller(generic.UpdateView):
                 'token2': dumps(sellEntity.pk),
                 'user': approver,
               }
-              subject = render_to_string('accounts/mail/sellUserAddApply_subject.txt', context1)
-              message = render_to_string('accounts/mail/sellUserAddApply_message.txt', context1)
+              subject = render_to_string('accounts/seller/mail/userAddApply_subject.txt', context1)
+              message = render_to_string('accounts/seller/mail/userAddApply_message.txt', context1)
 
               #approver.email_user(subject, message)
 
               from_email = 'shuichiro.tomihari.201604@gmail.com'
-              recipient_list = [approver['email']]
+              recipient_list = [approver.email] # [approver['email']]
               #bcc =  ["toritoritorina@gmail.com"]  # BCCリスト
               email = EmailMessage(subject, message, from_email, recipient_list)
               email.send()
@@ -2045,7 +2093,7 @@ class AgreementConfirmView_seller(generic.UpdateView):
 
       messages.error(request, "「同意しない」のボタンが押されました。", extra_tags='no check')
 
-      applyUser = usermodel.objects.get(pk=buttonValue.split('_')[1]) 
+      applyUser = UserModel.objects.get(pk=buttonValue.split('_')[1]) 
       sellEntity = LegalEntity.objects.get(pk=buttonValue.split('_')[2])
 
       context = {
@@ -2079,10 +2127,10 @@ class UserAddView_seller(generic.CreateView, LoginRequiredMixin):
       applyUser_id = loads(token1, max_age=self.timeout_seconds)
       sellEntity_id = loads(token2, max_age=self.timeout_seconds)
 
-      applyUser = usermodel.objects.get(pk=applyUser_id)
+      applyUser = UserModel.objects.get(pk=applyUser_id)
       sellEntity = LegalEntity.objects.get(pk=sellEntity_id)
 
-    except usermodel.DoesNotExist:
+    except UserModel.DoesNotExist:
       message = "申し訳ありませんが、申請者の情報が確認できません。"
       messages.add_message(self.request, messages.INFO, message) 
       return redirect('accounts: login_seller') 
@@ -2108,29 +2156,90 @@ class UserAddView_seller(generic.CreateView, LoginRequiredMixin):
     next = self.request.POST.get('next', None)
     if next.find('ApproveUser') >= 0:
 
-      applyUser = usermodel.objects.get(pk=next.split('_')[1])
+      applyUser = UserModel.objects.get(pk=next.split('_')[1])
       sellEntity = LegalEntity.objects.get(pk=next.split('_')[2])
 
-      applyUser.canApprove_all = self.request.POST.get('canApprove_all', None)
-      applyUser.canApprove_add = self.request.POST.get('canApprove_add', None)
-      applyUser.canApprove_qpay = self.request.POST.get('canApprove_qpay', None)
-      applyUser.entity = sellEntity
-      applyUser.approvedStatus_int = 2    # パートナー内でユーザー追加が承認された時点
+      if applyUser.approvedStatus_int == 1:
 
-      applyUser.save()
-      
-      return TemplateResponse(request, 'accounts/seller/mypage.html')
+        applyUser.canApprove_all = self.request.POST.get('canApprove_all', None)
+        applyUser.canApprove_add = self.request.POST.get('canApprove_add', None)
+        applyUser.canApprove_qpay = self.request.POST.get('canApprove_qpay', None)
+        applyUser.entity = sellEntity
 
+        applyUser.approvedStatus_int = 2    # パートナー内でユーザー追加が承認された時点
+        applyUser.is_active = True #ここでログインできるようになる
+
+        applyUser.save()
+
+        current_site = get_current_site(self.request)
+        domain = current_site.domain
+
+        context1 = {
+          'protocol':  self.request.scheme,
+          'domain': domain,
+          'token1': dumps(applyUser.pk),
+          'token2': dumps(sellEntity.pk),
+          'user': applyUser,
+        }
+        subject = render_to_string('accounts/seller/mail/userAddReplyYes_subject.txt', context1)
+        message = render_to_string('accounts/seller/mail/userAddReplyYes_message.txt', context1)
+
+        #approver.email_user(subject, message)
+
+        from_email = 'shuichiro.tomihari.201604@gmail.com'
+        recipient_list = [applyUser.email] # [approver['email']]
+        #bcc =  ["toritoritorina@gmail.com"]  # BCCリスト
+        email = EmailMessage(subject, message, from_email, recipient_list)
+        email.send()      
+
+        return TemplateResponse(request, 'accounts/seller/mypage.html')
+
+      else:
+        init_dict = {
+          'canApprove_all': applyUser.canApprove_all,
+          'canApprove_add': applyUser.canApprove_add,
+          'canApprove_qpay': applyUser.canApprove_qpay,
+        }
+        form = self.form_class(initial=init_dict) 
+
+        context = {
+          'form': form,
+          'applyUser': applyUser,
+          'sellEntity': sellEntity,
+        }     
+        return TemplateResponse(request, 'accounts/seller/userAdd.html', context)
+  
 
     if next.find('RefuseUser') >= 0:
 
-      applyUser = usermodel.objects.get(pk=next.split('_')[1])
+      applyUser = UserModel.objects.get(pk=next.split('_')[1])
       sellEntity = LegalEntity.objects.get(pk=next.split('_')[2])
 
       applyUser.entity = sellEntity
       applyUser.approvedStatus_int = 3
 
       applyUser.save()
+
+      current_site = get_current_site(self.request)
+      domain = current_site.domain
+
+      context1 = {
+        'protocol':  self.request.scheme,
+        'domain': domain,
+        'token1': dumps(applyUser.pk),
+        'token2': dumps(sellEntity.pk),
+        'user': applyUser,
+      }
+      subject = render_to_string('accounts/seller/mail/userAddReplyNo_subject.txt', context1)
+      message = render_to_string('accounts/seller/mail/userAddReplyNo_message.txt', context1)
+
+      #approver.email_user(subject, message)
+
+      from_email = 'shuichiro.tomihari.201604@gmail.com'
+      recipient_list = [applyUser.email] # [approver['email']]
+      #bcc =  ["toritoritorina@gmail.com"]  # BCCリスト
+      email = EmailMessage(subject, message, from_email, recipient_list)
+      email.send()
 
       init_dict = {
         'canApprove_all': self.request.POST.get('canApprove_all', None),
@@ -2161,10 +2270,10 @@ class MyPageView_admin(generic.DetailView):
   
     # 「URLパラメーターがある場合」と「ない場合（ログインから）」に分ける   
     try:
-      user = usermodel.objects.get(pk=self.kwargs['user_id'])
+      user = UserModel.objects.get(pk=self.kwargs['user_id'])
     except:
       print(f'request.user={request.user} def get in MyPageView_admin')
-      user = usermodel.objects.get(email=self.request.user) 
+      user = UserModel.objects.get(email=self.request.user) 
   
     if user.type1 != 3:
 
@@ -2188,9 +2297,9 @@ class MyPageView_admin(generic.DetailView):
 
     # 「URLパラメーターがある場合」と「ない場合（ログインから）」に分ける   
     try:
-      self.object = usermodel.objects.get(pk=self.kwargs['user_id'])
+      self.object = UserModel.objects.get(pk=self.kwargs['user_id'])
     except:
-      self.object = usermodel.objects.get(email=self.request.user) 
+      self.object = UserModel.objects.get(email=self.request.user) 
       print(f'request.user={request.user} def get in MyPageView_buyer')
     
     next = self.request.POST.get('next', '')
@@ -2228,11 +2337,11 @@ class MyPageView_buyer(generic.DetailView, LoginRequiredMixin):
 
     # 「URLパラメーターがある場合」と「ない場合（ログインから）」に分ける   
     if 'user_id' in self.kwargs:
-      user = usermodel.objects.get(pk=self.kwargs['user_id'])
+      user = UserModel.objects.get(pk=self.kwargs['user_id'])
     else:
       if self.request.user.is_authenticated:
         print(f'request.user={self.request.user} def get in MyPageView_buyer')
-        user = usermodel.objects.get(email=self.request.user) 
+        user = UserModel.objects.get(email=self.request.user) 
       else:
         print(f'ログイン出来てません。 def get in MyPageView_buyer')
 
@@ -2258,7 +2367,7 @@ class MyPageView_buyer(generic.DetailView, LoginRequiredMixin):
     
     # 前払い、ユーザー追加の未処理（承認待ち）データを抽出
     cnt_toBeApproved_qpay = QpayTx.objects.filter(buyEntity=user.entity, txStatus_int=1).count()
-    cnt_toBeApproved_add = usermodel.objects.select_related('entity').filter(
+    cnt_toBeApproved_add = UserModel.objects.select_related('entity').filter(
       entity=user.entity, approvedStatus_int=1).count()
     print(f'cnt_toBeApproved_qpay={cnt_toBeApproved_qpay}')
 
@@ -2297,9 +2406,9 @@ class MyPageView_buyer(generic.DetailView, LoginRequiredMixin):
 
     # 「URLパラメーターがある場合」と「ない場合（ログインから）」に分ける   
     try:
-      self.object = usermodel.objects.get(pk=self.kwargs['user_id'])
+      self.object = UserModel.objects.get(pk=self.kwargs['user_id'])
     except:
-      self.object = usermodel.objects.get(email=self.request.user) 
+      self.object = UserModel.objects.get(email=self.request.user) 
       print(f'request.user={request.user} def get in MyPageView_buyer')
     
     next = self.request.POST.get('next', '')
@@ -2341,10 +2450,10 @@ class MyPageView_seller(generic.DetailView):
 
     # 「URLパラメーターがある場合」と「ない場合（ログインから）」に分ける   
     try:
-      user = usermodel.objects.get(pk=self.kwargs['user_id'])
+      user = UserModel.objects.get(pk=self.kwargs['user_id'])
     except:
       print(f'request.user={request.user} def get in MyPageView_seller')
-      user = usermodel.objects.get(email=self.request.user) 
+      user = UserModel.objects.get(email=self.request.user) 
 
     if user.type1 != 2:
 
@@ -2373,7 +2482,7 @@ class MyPageView_seller(generic.DetailView):
   def post(self, request, *args, **kwargs):
 
     print(f'ここに来てる1（def post in class MyPageView_seller）')
-    self.object = usermodel.objects.get(pk=self.kwargs['user_id'])
+    self.object = UserModel.objects.get(pk=self.kwargs['user_id'])
   
     next = self.request.POST.get('next', '')
     if next == 'apply_qpay':
@@ -2614,7 +2723,7 @@ class BankAccountCreateView(generic.CreateView):
 
   def get(self, request, *args, **kwargs):
 
-    sellUser = usermodel.objects.get(email=self.request.user) 
+    sellUser = UserModel.objects.get(email=self.request.user) 
 
     init_dict = {}
 
@@ -2692,7 +2801,7 @@ class BankAccountCreateView(generic.CreateView):
       if WhichAccount.find('NewAccount') >= 0:
       
         print(f'pass2 別の口座設定 WhichAccount={WhichAccount} post in BankAccountCreateView')
-        sellUser = usermodel.objects.get(pk=WhichAccount.split('_')[1]) 
+        sellUser = UserModel.objects.get(pk=WhichAccount.split('_')[1]) 
         sellEntity = LegalEntity.objects.get(pk=WhichAccount.split('_')[2])
 
         context = {
@@ -2715,7 +2824,7 @@ class BankAccountCreateView(generic.CreateView):
 
       if search.find('BankSearch') >= 0:
 
-        sellUser = usermodel.objects.get(pk=search.split('_')[1]) 
+        sellUser = UserModel.objects.get(pk=search.split('_')[1]) 
         sellEntity = LegalEntity.objects.get(pk=search.split('_')[2])
 
         bankSearchInput = self.request.POST['name_bankSearchInput']
@@ -2743,7 +2852,7 @@ class BankAccountCreateView(generic.CreateView):
 
       if search.find('BranchSearch') >= 0:
 
-        sellUser = usermodel.objects.get(pk=search.split('_')[1]) 
+        sellUser = UserModel.objects.get(pk=search.split('_')[1]) 
         sellEntity = LegalEntity.objects.get(pk=search.split('_')[2])
       
         bankCode = self.request.POST.get('bankCode', None)
@@ -2789,7 +2898,7 @@ class BankAccountCreateView(generic.CreateView):
 
       if next.find('ToInput') >= 0: # 口座名義・番号を入力する処理
 
-        sellUser = usermodel.objects.get(pk=next.split('_')[1]) 
+        sellUser = UserModel.objects.get(pk=next.split('_')[1]) 
         sellEntity = LegalEntity.objects.get(pk=next.split('_')[2])
 
         print(f'pass1 if next==ToInput post/form.is_valid in BankAccountCreateView')
@@ -2860,7 +2969,7 @@ class BankAccountCreateView(generic.CreateView):
 
       if next.find('ToConfirm') >= 0:
 
-        sellUser = usermodel.objects.get(pk=next.split('_')[1]) 
+        sellUser = UserModel.objects.get(pk=next.split('_')[1]) 
         sellEntity = LegalEntity.objects.get(pk=next.split('_')[2])
         print(f'next={next}')
 
@@ -2889,7 +2998,7 @@ class BankAccountCreateView(generic.CreateView):
 
       if next.find('BackToSelect') >= 0:
 
-        sellUser = usermodel.objects.get(pk=next.split('_')[1]) 
+        sellUser = UserModel.objects.get(pk=next.split('_')[1]) 
         sellEntity = LegalEntity.objects.get(pk=next.split('_')[2])
 
         form = self.form_class(self.request.POST)
@@ -2917,7 +3026,7 @@ class BankAccountCreateView(generic.CreateView):
 
       if next.find('Register') >= 0: # 口座名義・番号を登録する処理
 
-        sellUser = usermodel.objects.get(pk=next.split('_')[1]) 
+        sellUser = UserModel.objects.get(pk=next.split('_')[1]) 
         sellEntity = LegalEntity.objects.get(pk=next.split('_')[2])
 
         form = self.form_class(self.request.POST)
@@ -2974,7 +3083,7 @@ class BankAccountCreateView(generic.CreateView):
 
       if next.find('BackToInput') >= 0:
 
-        sellUser = usermodel.objects.get(pk=next.split('_')[1]) 
+        sellUser = UserModel.objects.get(pk=next.split('_')[1]) 
         sellEntity = LegalEntity.objects.get(pk=next.split('_')[2])
 
         form = self.form_class(self.request.POST)
@@ -3013,13 +3122,13 @@ class InfoEditView_buyer(generic.DetailView, LoginRequiredMixin):
 
     print(f'request.user={request.user} def get in InfoEditView_buyer')
     try:    # 通常ケース（管理画面がログアウトされていないとワークせずエラーケースに）
-      user = usermodel.objects.get(email=self.request.user)
+      user = UserModel.objects.get(email=self.request.user)
 
       # ユーザー追加の承認依頼の件数を抽出する 
-      cnt_toBeApproved_add = usermodel.objects.select_related('entity').filter(
+      cnt_toBeApproved_add = UserModel.objects.select_related('entity').filter(
       entity=user.entity, approvedStatus_int=1).count()
 
-    except usermodel.DoesNotExist:
+    except UserModel.DoesNotExist:
 
       # データが存在しない場合の処理
       messages.add_message(request, messages.WARNING, "ユーザー（self.request.user）が認識されていません") 
@@ -3044,11 +3153,11 @@ class InfoEditView_seller(generic.DetailView):
   def get(self, request, *args, **kwargs):
 
     try:  # 通常ケース（管理画面がログアウトされていないとワークせずエラーケースに）
-      sellUser = usermodel.objects.get(email=self.request.user)
+      sellUser = UserModel.objects.get(email=self.request.user)
       sellEntity = LegalEntity.objects.get(pk=sellUser.entity_id)
       print(f'request.user={request.user} def get in InfoEditView_seller')
 
-    except usermodel.DoesNotExist:
+    except UserModel.DoesNotExist:
 
       # データが存在しない場合の処理
       messages.add_message(request, messages.WARNING, "ユーザー（self.request.user）が認識されていません") 

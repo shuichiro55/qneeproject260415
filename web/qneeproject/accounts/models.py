@@ -227,7 +227,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
   is_active = models.BooleanField(_('アクティブ'), default=False)   # 利用規約に同意した時点
 
-  approvedStatus_int = models.IntegerField(choices=ApprovedStatus.choices, default=1, verbose_name='承認状況 No')
+  approvedStatus_int = models.IntegerField(choices=ApprovedStatus.choices,
+    default=1, verbose_name='承認状況 No')
   approvedStatus_char = models.CharField(max_length=20, null=False, blank=False, default="承認待ち", verbose_name='承認状況')
 
   # 登録の経過を確認するためのフラグ

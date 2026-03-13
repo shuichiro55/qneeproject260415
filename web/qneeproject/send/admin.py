@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import ServInfoMailSets, ServInfoMailLog
+from .models import ServInfoMailSets, ServInfoMailLog, AddList
 
 class ServInfoMailSetsAdmin(admin.ModelAdmin):
   list_display = (
@@ -16,5 +16,11 @@ class ServInfoMailLogAdmin(admin.ModelAdmin):
     'sendUser',
   )
 
+class AddListAdmin(admin.ModelAdmin):
+  list_display = (
+    'listName',
+  )
+
 admin.site.register(ServInfoMailSets, ServInfoMailSetsAdmin)
 admin.site.register(ServInfoMailLog, ServInfoMailLogAdmin)
+admin.site.register(AddList, AddListAdmin)

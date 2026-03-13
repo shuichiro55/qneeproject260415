@@ -38,7 +38,7 @@
       {% bs_icon 'inbox' color='cornflowerblue' size='2.2em' %}
     </div>
 
-    {% if object_list.count >= 1 %}
+    {% if objectList.count >= 1 %}
       <div class="row justify-content-center">
       
         <form method="GET" class="bg-light-subtle rounded-1 p-3">
@@ -64,7 +64,7 @@
 
                 <tbody>
               
-                  {% for item in page_obj %}
+                  {% for item in pageObj %}
 
                     <!-- データ抽出時に「txStatus_int=1」としている為、念のための条件 -->
                     {% if item.txStatus_int == 1 %}
@@ -76,7 +76,7 @@
                           <img src="{{ item.evidence.url }}" class="img-evidence" style="width:50;height:auto" /></td> -->
                         <td rowspan="2" style="vertical-align:middle; text-align:center">{{ item.txStatus_char|linebreaksbr }}</td>
                         <td rowspan="2" style="vertical-align:middle; text-align:center">
-                          <a href="{% url 'qpay:txApproveDetail_buyer' item.id page_obj.number %}"
+                          <a href="{% url 'qpay:txApproveDetail_buyer' item.id pageObj.number %}"
                             class="btn btn-outline-primary">移る</a>
                         </td>
                       </tr>
@@ -116,7 +116,7 @@
 
                 <tbody>
               
-                  {% for item in page_obj %}
+                  {% for item in pageObj %}
 
                     <!-- データ抽出時に「txStatus_int=1」としている為、念のための条件 -->
                     {% if item.txStatus_int == 1 %}
@@ -151,7 +151,7 @@
 
                         <td rowspan="2" style="vertical-align:middle; text-align:center;">{{ item.txStatus_char|linebreaksbr }}</td>
                         <td rowspan="2" style="vertical-align:middle; text-align:center;">
-                          <a href="{% url 'qpay:txApproveDetail_buyer' item.id page_obj.number %}"
+                          <a href="{% url 'qpay:txApproveDetail_buyer' item.id pageObj.number %}"
                             class="btn btn-outline-primary">移る</a>
                         </td>
                       </tr>
@@ -193,7 +193,7 @@
 {% endblock %}
 
 <!--
- {% for item in object_list %}
+ {% for item in objectList %}
 <div class="p-4 m-4 bg-light border border-success rounded">
   <h2 class="text-success">{{ item.title }}</h2>
     <h6>物件名：{{ item.article_name }}</h6>
