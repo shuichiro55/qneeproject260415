@@ -56,6 +56,7 @@ urlpatterns = [
   #path('permissionList_buyer', views.PermissionUpdateView_buyer.as_view(), name='permissionList_buyer'),
   path('permissionSets_buyer', views.PermissionSetsView_buyer.as_view(), name='permissionSets_buyer'),
   path('permissionSets_seller', views.PermissionSetsView_seller.as_view(), name='permissionSets_seller'),
+  path('permissionSets_admin', views.PermissionSetsView_admin.as_view(), name='permissionSets_admin'),
 
   # ★★ 25/06/17追加 テストはこれから、 tokenは申請したユーザーのid
   path('<str:token1>/<str:token2>/userAdd_buyer', views.UserAddView_buyer.as_view(), name='userAdd_buyer'),
@@ -93,8 +94,8 @@ urlpatterns = [
   path('<int:user_id>/infoEdit_seller/', views.InfoEditView_seller.as_view(), name='infoEdit_seller'),  # 24/08/21追加
   path('infoEdit_seller/', views.InfoEditView_seller.as_view(), name='infoEdit_seller'),  # 24/08/21追加
 
-  path('<int:user_id>/infoEdit_seller/', views.InfoEditView_seller.as_view(), name='infoEdit_admin'),  # 24/08/21追加
-  path('infoEdit_seller/', views.InfoEditView_seller.as_view(), name='infoEdit_admin'),  # 26/2/20追加
+  path('<int:user_id>/infoEdit_admin/', views.InfoEditView_admin.as_view(), name='infoEdit_admin'),  # 24/08/21追加
+  path('infoEdit_admin/', views.InfoEditView_admin.as_view(), name='infoEdit_admin'),  # 26/2/20追加
 
   #path('<int:user_id>/<int:entity_id>/infoEdit_buyer/', views.InfoEditView_buyer.as_view(), name='info_buyer_seller'),  # 25/05/15追加
   #path('infoEdit_buyer/', views.InfoEditView_seller.as_view(), name='infoEdit_buyer'),  # 25/05/15追加

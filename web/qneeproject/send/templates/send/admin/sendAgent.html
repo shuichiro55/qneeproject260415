@@ -1,4 +1,4 @@
-{% extends "index/base_qconnect_buyer.html" %}
+{% extends "buyer/index/base_qconnect.html" %}
 
 {% load humanize %}
 {% load form_tags %}
@@ -64,7 +64,7 @@
                 <button
                   class="btn btn-primary shadow"
                   name="next"
-                  value="ToStartTask_{{buyUser.id}}_{{buyEntity.id}}">
+                  value="ToStartTask">
                   起動
                 </button>
                 <button

@@ -34,7 +34,7 @@ class IndvAdd(models.Model):
   addList = models.ForeignKey(AddList, on_delete=models.CASCADE, null=True)
 
 
-class ServInfoMailLog(models.Model):
+class InvitationLog(models.Model):
 
   buyEntity = models.ForeignKey(LegalEntity,
     verbose_name='パートナー',
@@ -70,7 +70,7 @@ def getInitDict_sendMonth():
 def getInitDict_sendDay():
   return {'1':'1','2':'0','3':'0'}
 
-class ServInfoMailSets(models.Model):
+class InvitationSets(models.Model):
 
   buyEntity = models.OneToOneField(LegalEntity, 
     verbose_name='ゲスト・ユーザー',

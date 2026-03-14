@@ -188,22 +188,24 @@ class MyLoginView_admin(LoginView):
 
   def get_success_url(self):
 
-    print(f'通過1 get_success_url in MyLoginView_admin')
-    user = UserModel.objects.get(email=self.request.user)
+    adminUser = UserModel.objects.get(email=self.request.user)
+    adminEntity = LegalEntity.objects.get(pk=adminUser.entity_id,)
+    self.request.session['adminUser_id'] = adminUser.id
+    self.request.session['adminbuyEntity_id'] = adminEntity.id
 
-    if user.type1 != 3:
-      if user.type1 == 1: type1_name = "パートナー"
-      if user.type1 == 2: type1_name = "ゲスト"
-      if user.type1 == 3: type1_name = "スタッフ"
+    if adminUser.type1 != 3:
+      if adminUser.type1 == 1: type1_name = "パートナー"
+      if adminUser.type1 == 2: type1_name = "ゲスト"
+      if adminUser.type1 == 3: type1_name = "スタッフ"
 
       message = type1_name + "での登録です。" + type1_name + "でログインしてください。"
       messages.add_message(self.request, messages.INFO, message) 
       logout(self.request)
-      print(f'user.type1={user.type1} in get_success_url in MyLoginView_admin')
+      print(f'user.type1={adminUser.type1} in get_success_url in MyLoginView_admin')
 
-      if user.type1 == 1: return reverse_lazy('accounts:login_buyer')
-      if user.type1 == 2: return reverse_lazy('accounts:login_seller')
-      if user.type1 == 3: return reverse_lazy('accounts:login_admin')
+      if adminUser.type1 == 1: return reverse_lazy('accounts:login_buyer')
+      if adminUser.type1 == 2: return reverse_lazy('accounts:login_seller')
+      if adminUser.type1 == 3: return reverse_lazy('accounts:login_admin')
 
     return reverse_lazy('accounts:mypage_admin')
 
@@ -509,7 +511,7 @@ class UserCreateView_seller(generic.CreateView):
 
     else:
   
-      print(f'ここ来てる2（def post if form.is_valid=FALSE in class UserCreateView1_seller）')
+      print(f'ここ来てる2（def post if form.is_valid=FALSE in class UserCreateView_seller）')
       messages.add_message(self.request, messages.INFO, form.errors) 
 
       context = {
@@ -545,13 +547,17 @@ class UserCreateView_admin(generic.CreateView):
 
       user = form.save(commit=False)
 
-      #user.email = self.request.user
       user.type1 = 3  # パートナー：1、ゲスト：2、Qnee：3で登録 25/04/27
-      user.type2 = 1  # 個人として登録
-      #user.is_active = True
-      """ is_active=Trueにしないとログインできない """
-      """ パートナー、ゲストはEntityCreateViewでアクティブ化 """
+      user.type2 = 2  # Qnee（法人）として登録
 
+      """ ★★ 260314 Qneeが承認したときに「is_active=True」とするように変える """
+      user.is_active = True
+
+      entity, created = LegalEntity.objects.get_or_create(
+        entityName='株式会社Qnee',
+        type1=3, type2=2,)
+      
+      user.entity = entity
       user.save()
 
       print(f'ここまで来てる1 email={user.email} type2={user.type2} user.pk={user.pk} usr.passsword= {user.password}（def post if form.is_valid in class UserCreateView1_admin）')
@@ -580,7 +586,7 @@ class UserCreateView_admin(generic.CreateView):
 
     else:
   
-      print(f'ここ来てる2（def post if form.is_valid=FALSE in class UserCreateView1_admin）')
+      print(f'ここ来てる2（def post if form.is_valid=FALSE in class UserCreateView_admin）')
       print(form.errors)
 
       context2 = {
@@ -1367,6 +1373,115 @@ class PermissionSetsView_buyer(generic.View):
 
 """ mypageから「ユーザーごとの権限」を確認・編集する """
 class PermissionSetsView_seller(generic.View):
+# ★★★ 2509025作成開始
+
+  def get(self, request, **kwargs):  #selfはメソッドを呼んだインスタンス自体
+
+    loginUser = UserModel.objects.get(email=self.request.user)
+    entity = LegalEntity.objects.get(pk=loginUser.entity_id)
+    print(f'loginUser.id={loginUser.id}')
+    print(f'loginUser.entity_id={loginUser.entity_id}')
+    entityUsers = entity.entity_users.all()
+
+    context = {
+      'loginUser': loginUser,
+      'entity': entity,
+      'entityUsers': entityUsers,
+    }
+    return TemplateResponse(request, 'accounts/seller/permissionList.html', context)
+
+
+  def post(self, request):  #selfはメソッドを呼んだインスタンス自体
+
+    next1 = self.request.POST.get('next1', None)
+
+    if next1 != None:
+
+      if next1.find('Edit') >=0: # リストで選択されたユーザーの設定を表示する
+
+        editedUser = UserModel.objects.get(pk=next1.split('_')[1])
+
+        char_CanApproveAll = editedUser.canApprove_all
+        char_CanApproveAdd = editedUser.canApprove_add
+        char_CanApproveQpay = editedUser.canApprove_qpay
+
+        print(f'char_CanApproveAll={char_CanApproveAll} after next1.find(Edit) in PermissionSetsView_seller')
+        print(f'char_CanApproveAdd={char_CanApproveAdd} after next1.find(Edit) in PermissionSetsView_seller')
+        print(f'char_CanApproveQpay={char_CanApproveQpay} after next1.find(Edit) in PermissionSetsView_seller')
+        print(f'editedUser.id={editedUser.id} after next1.find(Edit) in PermissionSetsView_seller')
+
+        init_dict = {
+        }
+        context = {
+          'editedUser': editedUser,
+          'form': PermissionUpdateForm_seller(initial=init_dict),
+        }
+        return TemplateResponse(request, 'accounts/seller/permissionUpdate.html', context)
+
+
+    next2 = self.request.POST.get('next2', None)
+    form = PermissionUpdateForm_seller(self.request.POST)
+    form.is_valid() # canApprove_all=Trueの人が一人はいるかバリデーションする
+
+    if next2 != None:
+
+      if next2.find('PermissionSet') >= 0: # 選択されたユーザーの設定を更新
+        print(f'pass1 if next2.find(PermissionSet) def post in PermissionSettinsView_seller')
+
+        char_CanApproveAll = self.request.POST.get('canApprove_all', None)
+        char_CanApproveAdd = self.request.POST.get('canApprove_add', None)
+        char_CanApproveQpay = self.request.POST.get('canApprove_qpay', None)
+
+        """ 「すべて」権限者を一人は残すようにする """
+        cnt_canApprove_all = UserModel.objects.filter(entity=editedUser.entity, canApprove_all=True).count()
+
+        if editedUser.canApprove == True and cnt_canApprove_all == 1:
+          if char_CanApproveAll != "True":
+            message = "「すべて」の権限者が一人は必要です。"
+            messages.add_message(self.request, messages.WARNING, message) 
+
+            context = {
+              'editedUser': editedUser,
+              'form': PermissionUpdateForm_seller(),
+            }
+            return TemplateResponse(request, 'accounts/seller/permissionUpdate.html', context)
+
+
+        if char_CanApproveAll == "True":
+          editedUser.canApprove_all = True
+          print(f'pass1 canApprove_all = True')
+        else: editedUser.canApprove_all = False
+
+        if char_CanApproveAdd == "True":
+          editedUser.canApprove_add = True
+          print(f'pass2 canApprove_add = True')
+        else: editedUser.canApprove_add = False
+
+        if char_CanApproveQpay == "True":
+          editedUser.canApprove_qpay = True
+          print(f'pass3 canApprove_qpay = True')
+        else: editedUser.canApprove_qpay = False
+
+        editedUser.save()
+
+        print(f'char_CanApproveAll={char_CanApproveAll} after next2.find(PermissionSet) in PermissionSetsView_seller')
+        print(f'char_CanApproveAdd={char_CanApproveAdd} after next2.find(PermissionSet) in PermissionSetsView_seller')
+        print(f'char_CanApproveQpay={char_CanApproveQpay} after next2.find(PermissionSet) in PermissionSetsView_seller')
+        print(f'editedUser.id={editedUser.id} after next2.find(PermissionSet)')
+
+        loginUser = UserModel.objects.get(email=self.request.user)
+        entity = LegalEntity.objects.get(pk=loginUser.entity_id)
+        entityUsers = entity.entity_users.all()
+
+        context = {
+          'loginUser': loginUser,
+          'entityUsers': entityUsers,
+        }
+        return TemplateResponse(request, 'accounts/seller/permissionList.html', context)
+
+
+""" mypageから「ユーザーごとの権限」を確認・編集する """
+class PermissionSetsView_admin(generic.View):
 # ★★★ 2509025作成開始
 
   def get(self, request, **kwargs):  #selfはメソッドを呼んだインスタンス自体
@@ -2267,30 +2382,32 @@ class MyPageView_admin(generic.DetailView):
     if request.method != "GET":
       return HttpResponseNotAllowed("GET")
 
-  
-    # 「URLパラメーターがある場合」と「ない場合（ログインから）」に分ける   
-    try:
-      user = UserModel.objects.get(pk=self.kwargs['user_id'])
-    except:
-      print(f'request.user={request.user} def get in MyPageView_admin')
-      user = UserModel.objects.get(email=self.request.user) 
-  
-    if user.type1 != 3:
+    adminUser_id = self.request.session['adminUser_id']  
+    adminUser = UserModel.objects.get(pk= adminUser_id)
 
-      if user.type1 == 1:
+    # 「URLパラメーターがある場合」と「ない場合（ログインから）」に分ける   
+    #try:
+    #  user = UserModel.objects.get(pk=self.kwargs['user_id'])
+    #except:
+    #  print(f'request.user={request.user} def get in MyPageView_admin')
+    #  user = UserModel.objects.get(email=self.request.user) 
+  
+    if adminUser.type1 != 3:
+
+      if adminUser.type1 == 1:
         message = "パートナーで登録されています。パートナーでログインして下さい。"
         messages.add_message(request, messages.INFO, message) 
         logout(request)
         return HttpResponseRedirect(reverse('accounts:login', 1))
 
-      if user.type1 == 2:
+      if adminUser.type1 == 2:
         message = "ゲストで登録されています。ゲストでログインして下さい。"
         messages.add_message(request, messages.INFO, message) 
         logout(request)
         return HttpResponseRedirect(reverse('accounts:login', 2))
 
     return TemplateResponse(
-      request, "accounts/admin/mypage.html", { "user": user, }) 
+      request, "accounts/admin/mypage.html", { "user": adminUser, }) 
 
 
   def post(self, request, *args, **kwargs):
@@ -3173,3 +3290,29 @@ class InfoEditView_seller(generic.DetailView):
       'sellEntity': sellEntity,
     }
     return TemplateResponse(request, "accounts/seller/infoEdit.html", context) 
+
+
+"""メインメニューから呼ばれる登録情報変更ビュー"""
+class InfoEditView_admin(generic.DetailView):
+  
+  def get(self, request, *args, **kwargs):
+
+    try:  # 通常ケース（管理画面がログアウトされていないとワークせずエラーケースに）
+      adminUser = UserModel.objects.get(email=self.request.user)
+      print(f'request.user={request.user} def get in InfoEditView_admin')
+
+    except UserModel.DoesNotExist:
+
+      # データが存在しない場合の処理
+      messages.add_message(request, messages.WARNING, "ユーザー（self.request.user）が認識されていません") 
+
+    if adminUser.type1 == 1:
+
+      # 次のメッセージは確認できなかったので、要調整（トップページで出るようにする？）
+      messages.add_message(request, messages.WARNING, "ゲストとしてログインして下さい") 
+      return HttpResponseRedirect(reverse('accounts:logout'))
+
+    context = {
+      'adminUser': adminUser,
+    }
+    return TemplateResponse(request, "accounts/admin/infoEdit.html", context) 

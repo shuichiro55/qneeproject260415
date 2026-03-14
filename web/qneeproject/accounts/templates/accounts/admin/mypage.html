@@ -1,4 +1,4 @@
-{% extends "index/base_qconnect_admin.html" %}
+{% extends "admin/index/base_qconnect.html" %}
 
 {% load bootstrap_icons %}
 
@@ -28,7 +28,7 @@
       <div class="row justify-content-center mt-20 mx-3">
         <div class="col-md-10">
 
-          <form method="GET" action="{% url 'qpay:txApprove_buyer' %}" class="mt-3">
+          <form method="GET" action="{% url 'send:Inbox' %}" class="mt-3">
             {% csrf_token %}
 
             <button type="submit"
@@ -40,7 +40,7 @@
                 <i class="bi bi-inbox" style="font-size:2.0em; color:cornflowerblue"></i>
               </span>
               <span class="MenuBtn1Text">
-                <h5>　振込対応</h5>
+                <h5>　インボックス</h5>
               </span>
               
             </button>
@@ -51,7 +51,7 @@
       <div class="row justify-content-center mt-1 mx-3">
         <div class="col-md-10">
 
-          <form method="GET" action="{% url 'send:taskAgent' %}" class="mt-3">
+          <form method="GET" action="{% url 'send:sendAgent' %}" class="mt-3">
             {% csrf_token %}
 
             <button type="submit"
@@ -63,7 +63,7 @@
                 <i class="bi bi-envelope" style="font-size:2.0em; color:cornflowerblue"></i>
               </span>
               <span class="MenuBtn1Text">
-                <h5>　タスク運用</h5>
+                <h5>　招待エージェント</h5>
               </span>
 
             </button>
@@ -116,7 +116,7 @@
               <div class="card rounded-2 shadow">
                 <div class="card-header py-2">
                   <h5 class="my-0 w-normal">
-                    振込処理
+                    対応待ち
                   </h5>
                 </div>
 
@@ -175,7 +175,7 @@
                 <div class="card-body shadow pb-0">
                   {% bs_icon 'pencil-square' color='cornflowerblue' size='2.5em' %}
 
-                  <form method="GET" action="{% url 'accounts:infoEdit_buyer' %}" class="mt-3">
+                  <form method="GET" action="{% url 'accounts:infoEdit_admin' %}" class="mt-3">
                     {% csrf_token %}
                     <button type="submit" class="w-100 shadow btn btn-outline-primary btn-lg"
                       name="next"

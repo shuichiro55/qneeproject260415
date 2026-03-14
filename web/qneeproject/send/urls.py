@@ -14,7 +14,7 @@ urlpatterns = [
   path('servInfoMailSets/', views.ServInfoMailSetsView.as_view(), name='servInfoMailSets'),
   path('<int:buyUser_id>/<int:buyEntity>/servInfoMailSets/', views.ServInfoMailSetsView.as_view(), name='servInfoMailSets'),
 
-  path('taskAgent/', views.TaskAgentView.as_view(), name='taskAgent'),
+  path('taskAgent/', views.InvitationAgentView.as_view(), name='taskAgent'),
 
   # 小原さんのコード
   path('register/', views.register, name='register'),

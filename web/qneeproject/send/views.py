@@ -303,14 +303,14 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
           'addListSelectForm': AddListSelectForm(buyEntity_id=buyEntity_id),
           'flag_fileUp': 2,
           'adds':adds,
-          'addFileUpForm': AddFileUpForm(),
+          'addFileUpForm': form,
           'addListNameForm1': AddListNameForm(
             initial={
               'listName':'addList_file_' + datetime.datetime.now().strftime('%y%m%d%H%M%S'),},),
 
           'flag_manualInput': 1,
           'addListNameForm2': AddListNameForm(),
-          'mailForm': ServInfoMailForm(),
+          'mailForm': InvitationForm(),
           'repeatOnOff': mailSets.repeatOnOff,
           'RepeatSetForm': RepeatSetForm(initial=init_data),
         }
@@ -540,7 +540,7 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
         return TemplateResponse(request, 'send/servInfoMailSets.html', context)
 
 
-      if nextWho_fileInput.find("ToReadAddlistAgain") >= 0:
+      if nextWho_manualInput.find("ToInputAddListAgain") >= 0:
 
         AddList.objects.filter(
           buyEntity=buyEntity

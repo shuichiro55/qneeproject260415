@@ -1,4 +1,4 @@
-{% extends "index/base_qconnect_buyer.html" %}
+{% extends "buyer/index/base_qconnect.html" %}
 
 {% load bootstrap_icons %}
 
@@ -61,8 +61,8 @@
               {% endif %}
 
             </button>
-          </form> <!-- end col -->
-        {% endif %}
+          {% endif %}
+        </form> <!-- end col -->
 
         <form method="GET" action="{% url 'accounts:passwordChange_buyer' %}">
           {% csrf_token %}

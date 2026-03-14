@@ -41,7 +41,7 @@ class BankAccount(models.Model):
 
 class LegalEntity(models.Model):
 
-  choices1 = ((1, 'パートナー'), (2, 'ゲスト'))
+  choices1 = ((1, 'パートナー'), (2, 'ゲスト'), (3, 'Qnee'))
   type1 = models.IntegerField(default=1, null=False, blank=True, choices=choices1) #ユーザーが入力しない想定
 
   choices2 = ((1, '個人（法人組織でない）'), (2, '法人'))

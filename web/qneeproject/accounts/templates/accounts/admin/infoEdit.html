@@ -1,4 +1,4 @@
-{% extends "index/base_qconnect_admin.html" %}
+{% extends "admin/index/base_qconnect.html" %}
 
 {% load bootstrap_icons %}
 
@@ -35,34 +35,6 @@
     <div class="bg-light border border-success-subtle rounded p-5 mx-3">
 
       <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3" >
-
-
-        <form method="GET" action="{% url 'accounts:userAdd_admin' %}">
-          {% csrf_token %}
-
-          {% if cnt_toBeApproved_add >= 1 %}
-
-            <button type="submit"
-              class="MenuBtn2 color-9 w-100 rounded-1 shadow"
-              name="next"
-              value="Permission">
-
-              <span class="MenuBtn2IconCircle">
-                <i class="bi bi-person-add" style="font-size:2.2em; color:cornflowerblue"></i>
-              </span>
-              ユーザー追加承認
-
-              {% if cnt_toBeApproved_add >= 1 %}
-                　
-                <span class="badge bg-danger text-light rounded-1">
-                  {{ cnt_toBeApproved_add }}
-                </span>
-                <span class="visually-hidden">未承認データ</span>
-              {% endif %}
-
-            </button>
-          </form> <!-- end col -->
-        {% endif %}
 
         <form method="GET" action="{% url 'accounts:passwordChange_admin' %}">
           {% csrf_token %}
