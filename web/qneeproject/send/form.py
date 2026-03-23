@@ -2,7 +2,7 @@ from django import forms
 
 from django.contrib.auth import get_user_model
 from accounts.models import LegalEntity
-from send.models import ServInfoMailSets, AddList
+from send.models import InvitationSets, AddList
 import unicodedata
 
 interval_CHOICES = [
@@ -31,7 +31,7 @@ class AddListSelectForm(forms.Form):
     super().__init__(*args, **kwargs)
 
     buyEntity = LegalEntity.objects.get(pk=self.buyEntity_id)
-    mailSets = ServInfoMailSets.objects.get(buyEntity=buyEntity)
+    mailSets = InvitationSets.objects.get(buyEntity=buyEntity)
 
 
     if AddList.objects.filter(buyEntity=buyEntity).exists():
@@ -134,7 +134,7 @@ class RepeatSetForm(forms.Form):
     self.fields['startDate'].choices = list_startDate
 
 
-class ServInfoMailForm(forms.Form):
+class InvitationForm(forms.Form):
 
   title = forms.CharField(label='メール件名', max_length=100)
   message = forms.CharField(

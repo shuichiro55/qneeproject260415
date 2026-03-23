@@ -228,7 +228,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
   is_active = models.BooleanField(_('アクティブ'), default=False)   # 利用規約に同意した時点
 
   approvedStatus_int = models.IntegerField(choices=ApprovedStatus.choices,
-    default=1, verbose_name='承認状況 No')
+    default=1, verbose_name='参加承認')
   approvedStatus_char = models.CharField(max_length=20, null=False, blank=False, default="承認待ち", verbose_name='承認状況')
 
   # 登録の経過を確認するためのフラグ
@@ -238,18 +238,19 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
   is_staff = models.BooleanField(_('staff status'), default=False)
   is_admin = models.BooleanField(default=False)
 
-  canApprove_all = models.BooleanField(_('承認権限（全部）'), null=True, default=False)
-  canApprove_add = models.BooleanField(_('承認権限（参加）'), null=True, default=False)
+  canApproveAll = models.BooleanField(_('承認権限（全部）'), null=True, default=False)
+  canApproveAdd = models.BooleanField(_('承認権限（参加）'), null=True, default=False)
   # 各パートナー内、各ゲスト内においてユーザーを追加する際の権限
 
-  canApprove_qpay = models.BooleanField(_('承認権限（Qpay）'), null=True, default=False)
+  canApproveQpay = models.BooleanField(_('承認権限（Qpay）'), null=True, default=False)
   # ゲストであればQpayを申請内容を最終確認する権限
   # パートナーであればゲストからのQpayの申請を承認する権限 
 
   canReceive = models.BooleanField(_('メール受信'), null=True, default=True)
   # Qneeからのサービスの案内を受信可能か
 
-  joined_at = models.DateTimeField(_('登録日'), default=timezone.now,)
+  created_at = models.DateTimeField(_('作成日時'), default=timezone.now,)
+  joined_at = models.DateTimeField(_('加入日'), null=True, )
 
   objects = CustomUserManager()
 

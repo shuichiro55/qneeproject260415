@@ -2096,6 +2096,11 @@ ul.pattern .color6 {
   font-size: 0.85em;
 }
 
+.shadow-table {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 影の広がり・色 */
+    border-collapse: collapse; /* テーブルの枠線を重ねる */
+    width: 100%; /* 必要に応じて幅調整 */
+}
 /* 260310 追加 */
 /*
 .select_wrapper {

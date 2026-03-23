@@ -23,7 +23,9 @@
         <li class="breadcrumb-item text-primary"><a href="{% url 'accounts:mypage_seller' %}">
           {% bs_icon 'house' color='cornflowerblue' size='1.2em' %}
           マイページトップ</a></li>
-          <li class="breadcrumb-item" aria-current="page">前払い申請</li>
+        <li class="breadcrumb-item" aria-current="page">
+          {% bs_icon 'pencil-square' color='text-secondary' size='1.2em' %}
+          前払い申請</li>
       </ol>
     </nav>
 
@@ -44,10 +46,6 @@
         
             {% csrf_token %}
 
-            {% if form.evidence.errors %}
-              <div style="color:red;">{{ form.evidence.errors.as_text }}<br></div>
-            {% endif %}
-
             <div class="row justify-content-center">
               <input type="file" class="form-control"
                 name="{{form.evidence.name}}"
@@ -55,19 +53,9 @@
                 placeholder="報酬額を証明する資料アップロードしてください"
                 id="{{form.evidence.id_for_label}}" >
             </div>
-
-            <!--
-            <div class="form-group row justify-content-center pt-3">
-              <label class="col-11 col-md-3 col-lg-2 col-form-label" for='{{form.evidence.id_for_label}}' ></label>
-              <div class="col-md-8 col-lg-6">
-                <input type="file" class="form-control"
-                  name="{{form.evidence.name}}"
-                  value="{{form.evidence.value|default:''}}"
-                  placeholder="報酬額を証明する資料アップロードしてください"
-                  id="{{form.evidence.id_for_label}}" >
-              </div>
-            </div>
-          -->
+            {% if form.evidence.errors %}
+              <div style="color:red;">{{ form.evidence.errors.as_text }}<br></div>
+            {% endif %}
 
           <hr>
           

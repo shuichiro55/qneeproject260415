@@ -70,11 +70,12 @@ class TxEvidenceForm(forms.ModelForm):
             field.widget.attrs['class'] = 'form-control'
             # field.widget.attrs['placeholder'] = field.label
 
+  # modelsのvalidatorが優先されるので下記は通過しない
   def clean_evidence(self):
       evidence = self.cleaned_data.get('evidence')
       print(f'self.cleaned_data[entityName]={evidence} (in TxEvidenceForm)')
-      if evidence is None or "" :
-        raise forms.ValidationError('証明書ファイルを選択してください')   
+      if not evidence: #if evidence is None or "" :
+        raise forms.ValidationError('証明書類のファイルを選択してください')   
       return evidence
 
 

@@ -19,7 +19,7 @@ class AddList(models.Model):
     null=True, blank=True, default=None,
     on_delete=models.CASCADE)
 
-  created_at = models.DateTimeField(_('作成日時'), default=timezone.now, null=True)
+  created_at = models.DateTimeField(_('作成日時'), default=timezone.now)
 
 
 " アドレスリストの個別アドレス情報を格納 "
@@ -50,7 +50,8 @@ class InvitationLog(models.Model):
     verbose_name='適用アドレスリスト',
     null=False, default=None,
     on_delete=models.CASCADE)
-
+  
+  created_at = models.DateTimeField(_('作成日時'), default=timezone.now)
 
   #mailingList = models.OneToOneField(_('送信先'), null=True)
   #「 番号」「メールアドレス」「名前」の3つを保存する（3つ目はなくてもよい）
@@ -98,6 +99,9 @@ class InvitationSets(models.Model):
 
   #「登録済アドレス」を対象とする場合の除外するアドレスリスト
 
+  # 作成日時
+  created_at = models.DateTimeField(_('作成日時'), default=timezone.now)
+  
   # 更新日時
   updated_at = models.DateTimeField(_('更新日'), 
-    null=True, blank=True, auto_now=True)
+    null=True, auto_now=True)

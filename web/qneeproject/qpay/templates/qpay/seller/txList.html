@@ -44,7 +44,7 @@
         <div class="d-block d-lg-none">
 
           <table class="table table-sm table-bordered border-primary-subtle table-responsive">
-            <thead>
+            <thead style="font-size:0.9rem">
               <tr class="table-primary" style="text-align:center;">
                 <th rowspan="2" style="vertical-align:middle">#</th>
                 <th colspan="2" style="vertical-align:top">申請先</th>
@@ -57,8 +57,8 @@
               </tr>
             </thead>
 
-            <tbody>
-              {% for item in pageObj %}
+            <tbody style="font-size:0.9rem">
+              {% for item in page_obj %}
                 <tr>
                   <td rowspan="2" style="text-align:center; vertical-align:middle">
                     {{ forloop.counter }}</td>
@@ -66,7 +66,7 @@
                   <td rowspan="2" style="text-align:center; vertical-align:middle">
                     {{ item.txStatus_char|linebreaksbr }}</td>
                   <td rowspan="2" style="text-align:center; vertical-align:middle">
-                    <a href="{% url 'qpay:txDetail_seller' item.pk pageObj.number %}"
+                    <a href="{% url 'qpay:txDetail_seller' item.pk page_obj.number %}"
                       class="btn btn-outline-primary rounded-1">
                       表示</a>
                   </td>
@@ -106,7 +106,7 @@
             </thead>
 
             <tbody>
-              {% for item in pageObj %}
+              {% for item in page_obj %}
                 <tr>
                   <td rowspan="2" style="text-align:center; vertical-align:middle;">
                     {{ forloop.counter }}</td>
@@ -139,7 +139,7 @@
                   <td rowspan="2" style="text-align:center; vertical-align:middle;">
                     {{ item.txStatus_char|linebreaksbr }}</td>
                   <td rowspan="2" style="text-align:center; vertical-align:middle;">
-                    <a href="{% url 'qpay:txDetail_seller' item.pk pageObj.number %}"
+                    <a href="{% url 'qpay:txDetail_seller' item.pk page_obj.number %}"
                       class="btn btn-outline-primary rounded-1">
                       表示</a>
                   </td>

@@ -14,98 +14,213 @@
       {% endfor %}
     </div>
 
-    <div class="row justify-content-center my-auto">
+    <nav aria-label="breadcrumb" role="navigation">
+      <ol class="breadcrumb bg-light-subtle px-2 rounded-3 mt-1">
+        <li class="breadcrumb-item">
+          <a href="{% url 'accounts:mypage_seller' %}">
+          <i class="bi bi-house" style="font-size:1.2em; color:cornflowerblue;"></i>
+          マイページトップ</a>
+        </li>
+        <li class="breadcrumb-item" aria-current="page">
+          <i class="bi bi-person-check" style="font-size:1.5em; color:text-secondary;"></i>
+          承認処理
+        </li>
+      </ol>
+    </nav>
+
+    <div class="row justify-content-center my-auto mt-4">
       <div class="col-10 col-md-8 col-lg-6 col-xl-5">
 
         <div class="d-flex justify-content-center mt-4">
-          <h5 class="text-secondary me-3 mt-1"><b>ユーザーからの参加申請</b></h5>
-          <i class="bi bi-envelope-open" style="font-size:2.0em; color:hotpink;"></i>
+          <h5 class="text-secondary mt-1"><b>ユーザーからの参加申請</b></h5>
+          <i class="bi bi-envelope-open ms-3" style="font-size:2.0em; color:deeppink;"></i>
         </div> 
 
-        <form method="POST" action="{% url 'accounts:userAdd_seller' %}"
-          class="form-group px-3">
+        <!-- 承認者がメールからアプリに入る場合の処理 -->
+        {% if flag_userAdd == 1 %}
 
-          {% csrf_token %}         
-          {{ form.non_field_errors }}
+          <form method="POST" action="{% url 'accounts:userAdd_seller' %}"
+            class="form-group border border-top shadow-sm p-3 bg-light rounded mt-2">
 
-          <table class="table table-sm table-bordered border-primary-subtle table-responsive mt-3">
-            <tbody class="text-center">
-              <tr>
-                <th scope="col" width="33%" class="table-primary" style="text-align: left;">申請者</th>
-                <td style="text-align: right;">{{ applyUser.userName }}さん</td></tr>
-              <tr>
-                <th scope="col" width="33%" class="table-primary" style="text-align: left;">電話番号</th>
-                <td style="text-align: right;">{{ applyUser.tel_user }}</td></tr>
-              <tr>
-                <th scope="col" width="33%" class="table-primary" style="text-align: left;">所属部署</th>
-                <td style="text-align: right;">{{ applyUser.department }}</td></tr>
-              <tr>
-                <th scope="col" width="33%" class="table-primary" style="text-align: left;">役職</th>
-                <td style="text-align: right;">{{ applyUser.title }}</td></tr>
-            </tbody>
-          </table>
+            {% csrf_token %}         
+            {{ form.non_field_errors }}
 
-          <hr>
+            <table class="table table-sm table-bordered border-primary-subtle table-responsive mb-1">
+              <tbody class="text-center">
+                <tr>
+                  <th scope="col" width="33%" class="table-primary" style="text-align:left;">申請者</th>
+                  <td style="text-align: right;">{{ applyUser.userName }}さん</td></tr>
+                <tr>
+                  <th scope="col" width="33%" class="table-primary" style="text-align:left;">電話番号</th>
+                  <td style="text-align: right;">{{ applyUser.tel_user }}</td></tr>
+                  <tr>
+                  <th scope="col" width="33%" class="table-primary" style="text-align:left;">所属部署</th>
+                  <td style="text-align: right;">{{ applyUser.department }}</td></tr>
+                <tr>
+                  <th scope="col" width="33%" class="table-primary" style="text-align:left;">役職</th>
+                  <td style="text-align: right;">{{ applyUser.title }}</td></tr>
+              </tbody>
+            </table>
 
-          <table class="table table-sm table-bordered border-primary-subtle table-responsive">
-            <tbody class="text-center">
-              <tr>
-                <th scope="col" width="33%" class="table-primary" style="text-align: left;">各種権限</th>
-                <td style="text-align: left;">
+            <table class="table table-sm table-bordered border-primary-subtle table-responsive">
+              <tbody class="text-center">
+                <tr>
+                  <th scope="col" width="33%" class="table-primary" style="text-align:left;">各種権限</th>
+                  <td style="text-align:left;">
+                
+                    <div class="form-check form-switch ms-2">
+                      <input class="form-check-input col-xs-3 col-lg-2" type="checkbox"
+                        id="{{form.canApprove_all.id_for_label}}"
+                        name="{{form.canApprove_all.name}}"
+                        value="True">
+                      <label class="form-check-label col-xs-6 col-lg-6 ms-3"
+                        for="{{form.canApprove_all.id_for_label}}">
+                        すべて</label>
+                    </div>
 
-                  <div class="form-check form-switch ms-2">
-                    <input class="form-check-input col-xs-3 col-lg-2" type="checkbox"
-                      id="{{form.canApprove_all.id_for_label}}"
-                      name="{{form.canApprove_all.name}}"
-                      value="True">
-                    <label class="form-check-label col-xs-6 col-lg-6 ms-3" for="{{form.canApprove_all.id_for_label}}">
-                      すべて</label>
-                  </div>
-
-                  <div class="form-check form-switch ms-2">
-                    <input class="form-check-input col-xs-3 col-lg-2" type="checkbox"
-                      id="{{form.canApprove_add.id_for_label}}"
-                      name="{{form.canApprove_add.name}}"
-                      value="True">
-                   <label class="form-check-label col-xs-6 col-lg-6 ms-3" for="{{form.canApprove_add.id_for_label}}">
+                    <div class="form-check form-switch ms-2">
+                      <input class="form-check-input col-xs-3 col-lg-2" type="checkbox"
+                        id="{{form.canApprove_add.id_for_label}}"
+                        name="{{form.canApprove_add.name}}"
+                        value="True">
+                       <label class="form-check-label col-xs-6 col-lg-6 ms-3"
+                        for="{{form.canApprove_add.id_for_label}}">
                       ユーザー追加</label>
-                  </div>
+                    </div>
             
-                  <div class="form-check form-switch ms-2">
-                    <input class="form-check-input col-xs-3 col-lg-2" type="checkbox"
-                      id="{{form.canApprove_qpay.id_for_label}}"
-                      name="{{form.canApprove_qpay.name}}"
-                      value="True">
-                    <label class="form-check-label col-xs-6 col-lg-6 ms-3" for="{{form.canApprove_qpay.id_for_label}}">
-                      Ｑｐａｙ承認</label>
-                  </div>
+                    <div class="form-check form-switch ms-2">
+                      <input class="form-check-input col-xs-3 col-lg-2" type="checkbox"
+                        id="{{form.canApprove_qpay.id_for_label}}"
+                        name="{{form.canApprove_qpay.name}}"
+                        value="True">
+                      <label class="form-check-label col-xs-6 col-lg-6 ms-3"
+                        for="{{form.canApprove_qpay.id_for_label}}">
+                        Ｑｐａｙ承認</label>
+                    </div>
 
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
 
-          </hr>
-          <p></p>
+            <p></p>
           
-          <div class="d-flex justify-content-center pt-3">
-            <button type="submit" class="btn btn-outline-primary bg-light w-30 shadow me-1"
-              name="next", value="RefuseUser_{{applyUser.id}}_{{sellEntity.id}}" >
-              追加しない</button>  
+            <div class="d-flex justify-content-center">
+              <button type="submit" class="btn btn-primary w-30 shadow flex-grow-1 mes-1"
+                name="next"
+                value="ToApproveUser_{{applyUser.id}}" >
+                ユーザー追加</button>
 
-            <button type="submit" class="btn btn-primary w-30 shadow ms-1"
-              name="next", value="ApproveUser_{{applyUser.id}}_{{sellEntity.id}}" >
-              ユーザー追加</button>
-          </div>
+              <button type="submit" class="btn btn-outline-primary bg-light w-30 shadow flex-grow-1 ms-1"
+                name="next"
+                value="ToRefuseUser_{{applyUser.id}}" >
+                追加しない</button>  
 
-        </form>
+            </div>
+
+          </form>
+
+        {% endif %}
+
+
+        <!-- infoEdit.htmlから遷移して処理する場合 -->
+        {% if flag_userAdd == 2 %}
+
+          <form method="POST" action="{% url 'accounts:userAdd_seller' %}"
+            class="form-group border border-top shadow-sm bg-light rounded mt-3 pt-0 pb-3 px-3">
+
+            {% csrf_token %}         
+            {{ form.non_field_errors }}
+
+            {% for applyUser in applyUsers %}
+
+              {% if forloop.first %} <br>
+              {% else %} <hr class="">
+              {% endif %}
+
+              <table class="table table-sm table-bordered border-primary-subtle table-responsive mb-1">
+                <tbody class="text-center">
+                  <tr>
+                    <th scope="col" width="33%" class="table-primary" style="text-align:left;">申請者</th>
+                    <td style="text-align: right;">{{ applyUser.userName }}さん</td></tr>
+                  <tr>
+                    <th scope="col" width="33%" class="table-primary" style="text-align:left;">電話番号</th>
+                    <td style="text-align: right;">{{ applyUser.tel_user }}</td></tr>
+                    <tr>
+                    <th scope="col" width="33%" class="table-primary" style="text-align:left;">所属部署</th>
+                    <td style="text-align: right;">{{ applyUser.department }}</td></tr>
+                  <tr>
+                    <th scope="col" width="33%" class="table-primary" style="text-align:left;">役職</th>
+                    <td style="text-align: right;">{{ applyUser.title }}</td></tr>
+                </tbody>
+              </table>
+
+              <table class="table table-sm table-bordered border-primary-subtle table-responsive">
+                <tbody class="text-center">
+                  <tr>
+                    <th scope="col" width="33%" class="table-primary" style="text-align:left;">各種権限</th>
+                    <td style="text-align:left;">
+                
+                      <div class="form-check form-switch ms-2">
+                        <input class="form-check-input col-xs-3 col-lg-2" type="checkbox"
+                          id="{{form.canApprove_all.id_for_label}}"
+                          name="{{form.canApprove_all.name}}"
+                          value="True">
+                        <label class="form-check-label col-xs-6 col-lg-6 ms-3"
+                          for="{{form.canApprove_all.id_for_label}}">
+                          すべて</label>
+                      </div>
+
+                      <div class="form-check form-switch ms-2">
+                        <input class="form-check-input col-xs-3 col-lg-2" type="checkbox"
+                          id="{{form.canApprove_add.id_for_label}}"
+                          name="{{form.canApprove_add.name}}"
+                          value="True">
+                         <label class="form-check-label col-xs-6 col-lg-6 ms-3"
+                          for="{{form.canApprove_add.id_for_label}}">
+                        ユーザー追加</label>
+                      </div>
+            
+                      <div class="form-check form-switch ms-2">
+                        <input class="form-check-input col-xs-3 col-lg-2" type="checkbox"
+                          id="{{form.canApprove_qpay.id_for_label}}"
+                          name="{{form.canApprove_qpay.name}}"
+                          value="True">
+                        <label class="form-check-label col-xs-6 col-lg-6 ms-3"
+                          for="{{form.canApprove_qpay.id_for_label}}">
+                          Ｑｐａｙ承認</label>
+                      </div>
+
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+          
+              <div class="d-flex justify-content-center pb-3">
+                <button type="submit" class="btn btn-primary flex-grow-1 shadow me-1"
+                  name="next"
+                  value="ToApproveUser_{{applyUser.id}}" >
+                  ユーザー追加</button>
+
+                <button type="submit" class="btn btn-outline-primary bg-light flex-grow-1 shadow ms-1"
+                  name="next"
+                  value="ToRefuseUser_{{applyUser.id}}" >
+                  追加しない</button>  
+              </div>
+
+            {% empty %}
+              データがありません
+            {% endfor %}
+
+          </form>
+        {% endif %}
 
       </div>
     </div>
   </div>
 </div>  
 
-// ★★ 280915 工事開始 //
+// ★★ 250915 工事開始 //
 
 <style>
   .active-underline {

@@ -37,7 +37,7 @@
 
     <div class="d-flex justify-content-center mt-4">
       <h5 class="text-secondary mt-2 me-3"><b>Ｑｐａｙご案内メール</b></h5>
-      <i class="bi bi-mailbox" style="font-size:2.5em; color:hotpink;"></i>
+      <i class="bi bi-mailbox" style="font-size:2.5em; color:deeppink;"></i>
     </div>
 
     <!-- パートナー側は、１ユーザー・１パートナーの前提 -->
@@ -148,7 +148,7 @@
           <div class="form-group row justify-content-start">
             <label class="col-md-4 col-form-label pt-1"
               for="{{addListSelectForm.nameOfAppliedList.id_for_label}}" >
-              <i class="bi bi-record2-fill" style="font-size:1.4em; color:hotpink;"></i>
+              <i class="bi bi-record2-fill" style="font-size:1.5em; color:deeppink;"></i>
               <b class="text-secondary">適用中リスト</b>
             </label>
             <div class="col-md-8">
@@ -174,7 +174,7 @@
         <div class="col-md-8 col-lg-6">
           <hr>
           <form method="POST"
-            action="{% url 'send:servInfoMailSets' %}"
+            action="{% url 'send:invitationSets' %}"
             style="background-color: transparent !important; border-color:transparent !important;"
             enctype="multipart/form-data">
             <!-- style="background-color:transparent !important;border:none !important;"> -->
@@ -184,7 +184,7 @@
             <div class="form-group row justify-content-start mt-4">
 
               <label class="col-md-4 col-form-label">
-                <i class="bi bi-record2-fill" style="font-size:1.4em; color:hotpink;"></i>
+                <i class="bi bi-record2-fill" style="font-size:1.5em; color:deeppink;"></i>
                 <b class=" text-secondary">リスト選択</b>
               </label>
 
@@ -353,7 +353,7 @@
 
     <form method="POST"
       class="mb-0"
-      action="{% url 'send:servInfoMailSets' %}"
+      action="{% url 'send:invitationSets' %}"
       style="background-color: transparent !important; border-color:transparent !important;"
       enctype="multipart/form-data">
       <!-- style="background-color:transparent !important;border:none !important;"> -->
@@ -468,7 +468,7 @@
           <div class="col-md-8 col-lg-6">
 
             <div class="d-flex justify-content-start">
-              <i class="bi bi-record2-fill" style="font-size:1.4em; color:hotpink;"></i>
+              <i class="bi bi-record2-fill" style="font-size:1.5em; color:deeppink;"></i>
               <h6 class="text-secondary ms-1 me-2"><b>名前を付けてリストを保存</b></h6>
               <i class="bi bi-save-fill" style="font-size:1.3em; color:hsl(327, 98%, 65%);"></i>
             </div>
@@ -632,14 +632,14 @@
         <div class="col-md-8 col-lg-6">
 
           <div class="d-flex justify-content-start mt-4">
-            <i class="bi bi-record2-fill" style="font-size:1.4em; color:hotpink;"></i>
+            <i class="bi bi-record2-fill" style="font-size:1.5em; color:deeppink;"></i>
             <h6 class="text-secondary ms-1 me-2"><b>名前を付けてリストを保存</b></h5>
             <i class="bi bi-save-fill" style="font-size:1.3em; color:hsl(327, 98%, 65%);"></i>
           </div>
         </div>
       </div>
 
-      <form method="POST" action="{% url 'send:servInfoMailSets' %}">
+      <form method="POST" action="{% url 'send:invitationSets' %}">
 
         {% csrf_token %}
         <div class="row justify-content-center mt-3 mx-2">
@@ -831,7 +831,7 @@
             <div class="col-6">
 
               <div class="d-flex justify-content-start mt-3">
-                <i class="bi bi-record2-fill" style="font-size:1.4em; color:hotpink;"></i>
+                <i class="bi bi-record2-fill" style="font-size:1.5em; color:deeppink;"></i>
                 <h6 class="text-secondary ms-1 me-3"><b>いまだけ送信</b></h5>
               </div>
             </div>
@@ -855,7 +855,7 @@
           <hr class="mt-2">
 
           <div class="d-flex justify-content-start mt-4">
-            <i class="bi bi-record2-fill" style="font-size:1.4em; color:hotpink;"></i>
+            <i class="bi bi-record2-fill" style="font-size:1.5em; color:deeppink;"></i>
             <h6 class="text-secondary ms-1 me-3"><b>定期配信</b></h5>
             <i class="bi bi-repeat" style="font-size:1.7em; color:cornflowerblue;"></i>
           </div>

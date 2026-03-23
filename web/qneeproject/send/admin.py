@@ -1,7 +1,7 @@
 from django.contrib import admin
-from .models import ServInfoMailSets, ServInfoMailLog, AddList
+from .models import InvitationSets, InvitationLog, AddList
 
-class ServInfoMailSetsAdmin(admin.ModelAdmin):
+class InvitationSetsAdmin(admin.ModelAdmin):
   list_display = (
     'repeatOnOff',
     'startDate',
@@ -10,7 +10,7 @@ class ServInfoMailSetsAdmin(admin.ModelAdmin):
   )
 
 
-class ServInfoMailLogAdmin(admin.ModelAdmin):
+class InvitationLogAdmin(admin.ModelAdmin):
   list_display = (
     'buyEntity',
     'sendUser',
@@ -21,6 +21,6 @@ class AddListAdmin(admin.ModelAdmin):
     'listName',
   )
 
-admin.site.register(ServInfoMailSets, ServInfoMailSetsAdmin)
-admin.site.register(ServInfoMailLog, ServInfoMailLogAdmin)
+admin.site.register(InvitationSets, InvitationSetsAdmin)
+admin.site.register(InvitationLog, InvitationLogAdmin)
 admin.site.register(AddList, AddListAdmin)

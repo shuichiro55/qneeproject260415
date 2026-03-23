@@ -11,10 +11,10 @@ app_name = 'send'
 
 urlpatterns = [
 
-  path('servInfoMailSets/', views.ServInfoMailSetsView.as_view(), name='servInfoMailSets'),
-  path('<int:buyUser_id>/<int:buyEntity>/servInfoMailSets/', views.ServInfoMailSetsView.as_view(), name='servInfoMailSets'),
+  path('invitationSets/', views.InvitationSetsView.as_view(), name='invitationSets'),
+  path('<int:buyUser_id>/<int:buyEntity>/invitationSets/', views.InvitationSetsView.as_view(), name='invitationSets'),
 
-  path('taskAgent/', views.InvitationAgentView.as_view(), name='taskAgent'),
+  path('invitationAgt/', views.InvitationAgtView.as_view(), name='invitationAgt'),
 
   # 小原さんのコード
   path('register/', views.register, name='register'),

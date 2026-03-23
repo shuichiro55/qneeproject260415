@@ -24,7 +24,9 @@
         <li class="breadcrumb-item text-primary"><a href="{% url 'accounts:mypage_seller' %}">
           {% bs_icon 'house' color='cornflowerblue' size='1.2em' %}
           マイページトップ</a></li>
-        <li class="breadcrumb-item" aria-current="page">前払い申請</li>
+        <li class="breadcrumb-item" aria-current="page">
+          {% bs_icon 'pencil-square' color='text-secondary' size='1.2em' %}
+          前払い申請</li>
       </ol>
     </nav>
 
@@ -58,7 +60,7 @@
       <div class="d-flex justify-content-center">
         <h5 class="text-secondary">
           <b> 申請内容の入力　</b></h5>
-        {% bs_icon 'pencil-square' color='hotpink' size='1.8em' %}
+        {% bs_icon 'pencil-square' color='deeppink' size='1.8em' %}
       </div>
 
       <div class="row justify-content-center mt-1">

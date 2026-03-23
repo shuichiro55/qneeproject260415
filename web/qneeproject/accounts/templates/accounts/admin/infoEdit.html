@@ -21,15 +21,15 @@
         <li class="breadcrumb-item"><a href="{% url 'accounts:mypage_admin' %}">
           {% bs_icon 'house' color='cornflowerblue' size='1.2em' %}
           マイページトップ</a></li>
-        <li class="breadcrumb-item"><a href="#">
-          {% bs_icon 'gear' color='cornflowerblue' size='1.2em' %}
-          設定メニュー</a></li>
+        <li class="breadcrumb-item" aria-current="page">
+          {% bs_icon 'gear' color='text-secondary' size='1.2em' %}
+          設定メニュー</li>
       </ol>
     </nav>
 
     <div class="d-flex justify-content-center mt-5 mb-3">
       <h5 class="text-secondary"><b>設定メニュー　</b></h5>
-      {% bs_icon 'gear-fill' color='cornflowerblue' size='2.0em' %}
+      {% bs_icon 'gear-fill' color='deeppink' size='2.0em' %}
     </div>
 
     <div class="bg-light border border-success-subtle rounded p-5 mx-3">

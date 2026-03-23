@@ -8,7 +8,7 @@ from django.contrib.auth import get_user_model
 from django.views import generic
 from qpay.models import QpayTx
 from accounts.models import LegalEntity
-from send.models import ServInfoMailSets, ServInfoMailLog, AddList, IndvAdd
+from send.models import InvitationSets, InvitationLog, AddList, IndvAdd
 
 from django.urls import reverse, reverse_lazy
 from django.http import HttpResponse, HttpResponseBadRequest #, HttpResponseRedirect
@@ -35,7 +35,7 @@ from django.core.mail import EmailMessage
 #from django.core.paginator import Paginator
 #from django.core.mail import EmailMessage
 
-from .form import AddListSelectForm, UserEntryForm, ServInfoMailForm, RepeatSetForm
+from .form import AddListSelectForm, UserEntryForm, InvitationForm, RepeatSetForm
 from .form import CSVUploadForm, ImportExportForm #小原さん作成
 import datetime
 import calendar
@@ -43,7 +43,7 @@ import calendar
 UserModel = get_user_model()
 
 
-class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
+class InvitationSetsView(generic.UpdateView):
 
   # buyEntity_id = -1  get内で変更後、post内で値変わらず
    
@@ -53,7 +53,7 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
     buyEntity = LegalEntity.objects.get(pk=buyEntity_id)
 
     " 適用中のアドレスリストがあるかを判定。判断結果によりパートナー側の処理フローが変わる"
-    mailSets, created = ServInfoMailSets.objects.select_related('appliedList').get_or_create(buyEntity=buyEntity)   
+    mailSets, created = InvitationSets.objects.select_related('appliedList').get_or_create(buyEntity=buyEntity)   
     mailSets.save()
 
     appliedList = AddList.objects.get(pk=mailSets.appliedList_id)
@@ -94,7 +94,7 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
       str_startDate = mailSets.startDate.strftime('%Y/%m/%d')
     else:
       str_startDate = self.nearStartDate()
-    print(f'str_startDate={str_startDate} def get of ServInfoMailSetsView')
+    print(f'str_startDate={str_startDate} def get of InvitationSetsView')
     print(f'pass0-1 mailSets={mailSets} def get in SevInfoMailSetsView')
 
     request.session['flag_manualInput'] = 1 # テンプレートで入力画面を表示するフラグ
@@ -104,7 +104,7 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
       'interval':mailSets.interval,
       'dayOfMonth':mailSets.dayOfMonth
     }
-    print(f'init_data={init_data} def get of ServInfoMailSetsView')
+    print(f'init_data={init_data} def get of InvitationSetsView')
 
     context = {
       'addListSelectForm': AddListSelectForm(buyEntity_id=buyEntity_id),
@@ -114,11 +114,11 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
 
       'flag_manualInput': 1,
       'addListNameForm2': AddListNameForm(),
-      'mailForm': ServInfoMailForm(),
+      'mailForm': InvitationForm(),
       'repeatOnOff': mailSets.repeatOnOff,
       'RepeatSetForm': RepeatSetForm(initial=init_data),
     }
-    return TemplateResponse(request, 'send/servInfoMailSets.html', context)
+    return TemplateResponse(request, 'send/invitationSets.html', context)
 
 
   def nearStartDate(self):
@@ -173,7 +173,7 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
     sellEntitysUsers = UserModel.objects.select_related('entity').filter(
       entity__pk__in=sellEntitys_pkList).values('userName','email','entity__entityName')
 
-    mailSets = ServInfoMailSets.objects.get(buyEntity=buyEntity)
+    mailSets = InvitationSets.objects.get(buyEntity=buyEntity)
 
     print(f'pass post1')
     nextWho_fileInput = self.request.POST.get('nextWho_fileInput', None) # 誰に送るかの対応
@@ -251,7 +251,7 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
               rows = [row for row in reader if row]
               #（補足）空行を除外し、全データをリストの変数に格納する
 
-              print(f'rows={rows} def post if csv in ServInfoMailSetsView')
+              print(f'rows={rows} def post if csv in InvitationSetsView')
               #request.session['rows_data'] = rows
 
             except csv.Error as e:
@@ -314,7 +314,7 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
           'repeatOnOff': mailSets.repeatOnOff,
           'RepeatSetForm': RepeatSetForm(initial=init_data),
         }
-        return TemplateResponse(request, 'send/servInfoMailSets.html', context)
+        return TemplateResponse(request, 'send/invitationSets.html', context)
 
 
       " ファイル入力で作成したアドレスリストを保存 "
@@ -365,11 +365,11 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
           'addListSelectForm': AddListSelectForm(buyEntity_id=buyEntity_id),
           'flag_manualInput': 1,
           'addListNameForm2': AddListNameForm(),
-          'mailForm': ServInfoMailForm(),
+          'mailForm': InvitationForm(),
           'repeatOnOff': mailSets.repeatOnOff,
           'RepeatSetForm': RepeatSetForm(initial=init_data),
         }
-        return TemplateResponse(request, 'send/servInfoMailSets.html', context)
+        return TemplateResponse(request, 'send/invitationSets.html', context)
 
       print(f'pass fileup0 nextWho_fileInput={nextWho_fileInput}')
       if nextWho_fileInput.find("ToUploadAddListAgain") >= 0:
@@ -377,7 +377,7 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
 
         AddList.objects.filter(
           buyEntity=buyEntity).order_by('-created_at').first().delete()
-        # models.pyで「on_delete = CASCADE」と設定してServInfoMailLogを削除する選択も
+        # models.pyで「on_delete = CASCADE」と設定してInvitationLogを削除する選択も
 
         if mailSets.startDate is not None:
           str_startDate = mailSets.startDate.strftime('%Y/%m/%d')
@@ -404,11 +404,11 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
 
           'flag_manualInput': 1,
           'addListNameForm2': AddListNameForm(),
-          'mailForm': ServInfoMailForm(),
+          'mailForm': InvitationForm(),
           'repeatOnOff': mailSets.repeatOnOff,
           'RepeatSetForm': RepeatSetForm(initial=init_data),
         }
-        return TemplateResponse(request, 'send/servInfoMailSets.html', context)
+        return TemplateResponse(request, 'send/invitationSets.html', context)
 
 
     """ 個別入力されたアドレスについてアドレスリストを作成する """
@@ -471,11 +471,11 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
             initial={
               'listName':'addList_manual_' + datetime.datetime.now().strftime('%y%m%d%H%M%S'),}),
           'adds': adds,
-          'mailForm': ServInfoMailForm(),
+          'mailForm': InvitationForm(),
           'repeatOnOff': mailSets.repeatOnOff,
           'RepeatSetForm': RepeatSetForm(initial=init_data),
         }
-        return TemplateResponse(request, 'send/servInfoMailSets.html', context)
+        return TemplateResponse(request, 'send/invitationSets.html', context)
 
 
       " 手入力で作成したアドレスリストを保存 "
@@ -533,11 +533,11 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
           'addFileUpForm': AddFileUpForm(),
           'addListNameForm1': AddListNameForm(),
 
-          'mailForm': ServInfoMailForm(),
+          'mailForm': InvitationForm(),
           'repeatOnOff': mailSets.repeatOnOff,
           'RepeatSetForm': RepeatSetForm(initial=init_data),
         }
-        return TemplateResponse(request, 'send/servInfoMailSets.html', context)
+        return TemplateResponse(request, 'send/invitationSets.html', context)
 
 
       if nextWho_manualInput.find("ToInputAddListAgain") >= 0:
@@ -545,7 +545,7 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
         AddList.objects.filter(
           buyEntity=buyEntity
           ).order_by('-created_at').first().delete()
-        # models.pyで「on_delete = CASCADE」と設定してServInfoMailLogを削除する選択も
+        # models.pyで「on_delete = CASCADE」と設定してInvitationLogを削除する選択も
 
         if mailSets.startDate is not None:
           str_startDate = mailSets.startDate.strftime('%Y/%m/%d')
@@ -572,11 +572,11 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
 
           'flag_manualInput': 1,
           'addListNameForm2': AddListNameForm(),
-          'mailForm': ServInfoMailForm(),
+          'mailForm': InvitationForm(),
           'repeatOnOff': mailSets.repeatOnOff,
           'RepeatSetForm': RepeatSetForm(initial=init_data),
         }
-        return TemplateResponse(request, 'send/servInfoMailSets.html', context)
+        return TemplateResponse(request, 'send/invitationSets.html', context)
 
 
     if nextWhen != None:
@@ -602,8 +602,8 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
             'buyEntity_id': json.dumps(buyEntity.pk), # 処理者のentity.pkを維持する
           }
           print(f'buyUser.pk={buyUser.pk}, buyEntity.pk={buyEntity.pk}')
-          subject = render_to_string('send/mail/servInfoMail_subject.txt', context1)
-          message = render_to_string('send/mail/servInfoMail_message.txt', context1)
+          subject = render_to_string('send/mail/invitation_subject.txt', context1)
+          message = render_to_string('send/mail/invitation_message.txt', context1)
 
           from_email = 'shuichiro.tomihari.201604@gmail.com'
           recipient_list = [sellUser.email]
@@ -611,7 +611,7 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
           email = EmailMessage(subject, message, from_email, recipient_list)
           email.send()
   
-          print(f'pass1 sellUser.email={sellUser.email}（ServInfoMailSetsView, post)')
+          print(f'pass1 sellUser.email={sellUser.email}（InvitationSetsView, post)')
 
           context = {}
           return TemplateResponse(self.request, 'accounts/buyer/mypage.html', context)
@@ -622,7 +622,7 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
         print(f'pass2 def post if "ToSaveSendSets" in SevInfoMailSetsView')
 
         """  定期配信の設定を更新（EntityCreateViewで初期設定済み） """
-        #mailSets = ServInfoMailSets.objects.create(
+        #mailSets = InvitationSets.objects.create(
         #  startDate=startDate, interval=interval, dayOfMonth=dayOfMonth)
 
         repeatOnOff = self.request.POST.get("name_RepeatOnOff", None)
@@ -636,7 +636,7 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
           interval = int(self.request.POST.get("interval", None))
           dayOfMonth = int(self.request.POST.get("dayOfMonth", None))
 
-          print(f'str_startDate={str_startDate}, interval={interval} def post repeatOnOff="on" in ServInfoMailSetView')
+          print(f'str_startDate={str_startDate}, interval={interval} def post repeatOnOff="on" in InvitationSetView')
 
           mailSets.startDate = datetime.date(
             int(str_startDate.split('/')[0]),
@@ -648,7 +648,7 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
           month_startDate = int(str_startDate.split('/')[1])
           month_min = month_startDate % interval
 
-          print(f'month_startDate={month_startDate}, month_min={month_min} in ServInfoMailSetView')
+          print(f'month_startDate={month_startDate}, month_min={month_min} in InvitationSetView')
 
           x = 1
           while x <= 12:
@@ -668,7 +668,7 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
             else: mailSets.json_sendDay[str(x)] = '0'
             x += 1
 
-          print(f'mailSets.json_sendMonth={mailSets.json_sendMonth}, mailSets.json_sendDay={mailSets.json_sendDay} in ServInfoMailSetView')
+          print(f'mailSets.json_sendMonth={mailSets.json_sendMonth}, mailSets.json_sendDay={mailSets.json_sendDay} in InvitationSetView')
 
           mailSets.save()
 
@@ -702,12 +702,12 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
 
             'flag_manualInput': 1,
             'addListNameForm2': AddListNameForm(),
-            'mailForm': ServInfoMailForm(), 
+            'mailForm': InvitationForm(), 
 
             'repeatOnOff': repeatOnOff,
             'RepeatSetForm': RepeatSetForm(initial=init_data),
           }
-          return TemplateResponse(self.request, 'send/servInfoMailSets.html', context)
+          return TemplateResponse(self.request, 'send/invitationSets.html', context)
         
 
     if nextWhen != None:
@@ -733,8 +733,8 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
             'buyEntity_id': json.dumps(buyEntity.pk), # 処理者のentity.pkを維持する
           }
           print(f'buyUser.pk={buyUser.pk}, buyEntity.pk={buyEntity.pk}')
-          subject = render_to_string('send/mail/servInfoMail_subject.txt', context1)
-          message = render_to_string('send/mail/servInfoMail_message.txt', context1)
+          subject = render_to_string('send/mail/invitation_subject.txt', context1)
+          message = render_to_string('send/mail/invitation_message.txt', context1)
 
           from_email = 'shuichiro.tomihari.201604@gmail.com'
           recipient_list = [sellUser.email]
@@ -742,7 +742,7 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
           email = EmailMessage(subject, message, from_email, recipient_list)
           email.send()
   
-          print(f'pass1 sellUser.email={sellUser.email}（ServInfoMailSetsView, post)')
+          print(f'pass1 sellUser.email={sellUser.email}（InvitationSetsView, post)')
 
           context = {}
           return TemplateResponse(self.request, 'accounts/buyer/mypage.html', context)
@@ -797,11 +797,11 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
 
           'flag_manualInput': 1,
           'addListNameForm2': AddListNameForm(),
-          'mailForm': ServInfoMailForm(),
+          'mailForm': InvitationForm(),
           'repeatOnOff': mailSets.repeatOnOff,
           'RepeatSetForm': RepeatSetForm(initial=init_data),
         }
-        return TemplateResponse(request, 'send/servInfoMailSets.html', context)
+        return TemplateResponse(request, 'send/invitationSets.html', context)
 
 
       # ★★ 260305 指定されたリストを適用する
@@ -841,14 +841,14 @@ class ServInfoMailSetsView(LoginRequiredMixin, generic.UpdateView):
 
           'flag_manualInput': 1,
           'addListNameForm2': AddListNameForm(),
-          'mailForm': ServInfoMailForm(),
+          'mailForm': InvitationForm(),
           'repeatOnOff': mailSets.repeatOnOff,
           'RepeatSetForm': RepeatSetForm(initial=init_data),
         }
-        return TemplateResponse(request, 'send/servInfoMailSets.html', context)
+        return TemplateResponse(request, 'send/invitationSets.html', context)
 
 
-    return TemplateResponse(request, 'send/servInfoMailSets.html', {'addFileUpForm': AddFileUpForm()})
+    return TemplateResponse(request, 'send/invitationSets.html', {'addFileUpForm': AddFileUpForm()})
 
 
 
@@ -890,7 +890,7 @@ def register(request):
     form = UserEntryForm(request.POST)
     if form.is_valid():
       form.save()
-      return redirect('send/servInfoMailSets.html')
+      return redirect('send/invitationSets.html')
   else:
     form = UserEntryForm()
   return TemplateResponse(request, 'send/register.html', {'form': form})
@@ -913,7 +913,7 @@ def finalize_import(request):
   csv_data = request.session.pop('csv_data', [])
   for name, email in csv_data:
     LegalEntity.objects.get_or_create(personname=name, email=email)
-  return redirect(reverse('send:servInfoMailSets.html'))
+  return redirect(reverse('send:invitationSets.html'))
 
 def export_csv(self, request):
   response = HttpResponse(content_type='text/csv')
@@ -936,10 +936,10 @@ class TaskAgentView(LoginRequiredMixin, generic.UpdateView):
     if next.find("ToUploadFile") >= 0:
 
       context = {}
-      return render(request, 'send/admin/servInfoMailSets.html', context)  
+      return render(request, 'send/admin/invitationSets.html', context)  
 
     context = {}
-    return render(request, 'send/admin/servInfoMailSets.html', context)  
+    return render(request, 'send/admin/invitationSets.html', context)  
 
 
   def post(self, request, *args, **kwargs):
@@ -948,29 +948,30 @@ class TaskAgentView(LoginRequiredMixin, generic.UpdateView):
   
 
 """  """
-class TaskAgentView(LoginRequiredMixin, generic.UpdateView):
-  
+class InvitationAgtView(LoginRequiredMixin, generic.UpdateView):
+
+  login_url = '/accounts/login_admin/'
   def get(self, request, *args, **kwargs):
-
-    next = self.request.POST.get('next', None)
-
-    if next.find("ToStartTask") >= 0:
-
-      context = {}
-      return render(request, 'accounts/admin/mypage.html', context)  
-
-    if next.find("ToStopTask") >= 0:
-
-      context = {}
-      return render(request, 'accounts/admin/mypage.html', context)  
-
     context = {}
-    return render(request, 'send/taskAgent.html', context)  
+    return render(request, 'send/admin/invitationAgt.html', context)
 
 
   def post(self, request, *args, **kwargs):
+    next = self.request.POST.get('next', None)
+
+    if next.find("ToStartAgent") >= 0:
+
+      context = {}
+      return render(request, 'accounts/admin/mypage.html', context)  
+
+    if next.find("ToStopAgent") >= 0:
+
+      context = {}
+      return render(request, 'accounts/admin/mypage.html', context)  
+
     context = {}
-    return render(request, 'accounts/admin/SendAgent.html', context)  
+    return render(request, 'send/invitationAgt.html', context)  
+  
   
 
 """

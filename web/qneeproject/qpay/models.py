@@ -23,10 +23,11 @@ def user_directory_path(instance, filename):
 class TxStatus(models.IntegerChoices):
   """ 状態 """
   UNPROCESSED = 1 # 「未処理」：未処理
-  APPROVED = 2    # 「承認」：承認済み（前払い未了）
-  DISAPPROVED = 3 # 「否認」：否認済み
-  QNEE_PAYED = 4  # 「前払済」：前払い完了（Qnee⇒Seller）
-  BUYER_PAYED = 5 # 「完了」：Qnee受領（Buyer⇒Qnee）
+  BUYER_APPROVED = 2    # 「承認」：承認済み（前払い未了）
+  BUYER_DISAPPROVED = 3 # 「否認」：否認済み
+  QNEE_PAYED = 4  # 　「前払い済み」：前払い完了（Qnee⇒Seller）
+  QNEE_UNPAYED = 5  # 「前払い保留」：前払い保留（Qnee⇒Seller）
+  BUYER_PAYED = 6 # 　「完了」：Qnee受領（Buyer⇒Qnee）
   
 class QpayTx(models.Model):
 
@@ -70,13 +71,13 @@ class QpayTx(models.Model):
 
   requested_at = models.DateTimeField(_('ご申請時点'), null=True)
   requested_amount = models.IntegerField(_('ご申請金額（円）'), null=False)
-  exPayment_date = models.DateField(_('報酬日'), null=True)
+  exPayment_date = models.DateField(_('当初報酬日'), null=True)
 
 
   evidence = models.FileField(
     _('ご報酬の証明（請求書など）'),
     upload_to = user_directory_path , 
-    validators=[FileExtensionValidator(['jpg', 'png', 'jpeg', 'pdf', ])], null=False, default=None) 
+    validators=[FileExtensionValidator(['jpg', 'png', 'jpeg', 'pdf', ])], null=True, default=None) 
 
   txStatus_int = models.IntegerField(choices=TxStatus.choices, default=1, verbose_name='処理状況 No')
   txStatus_char = models.CharField(max_length=20, null=False, blank=False, default="未処理", verbose_name='処理状況')
@@ -87,21 +88,23 @@ class QpayTx(models.Model):
   # 4: QNEE_PAYED 前払い完了（Qnee⇒Seller）
   # 5: BUYER_PAYED Qnee受領（Buyer⇒Qnee）
 
-  created_at = models.DateTimeField(_('データ作成時点'), auto_now_add=True)
+  created_at = models.DateTimeField(_('データ作成時点'), default=timezone.now)
   approved_at = models.DateTimeField(_('承認時点'), null=True, blank=True)
   approved_amount = models.IntegerField(_('承認金額（円）'), null=True)
   advancePayment_date = models.DateField(_('前払日'), null=True)
 
   rejected_at = models.DateTimeField(_('否認時点'), null=True, blank=True)
-  updated_at = models.DateTimeField(_('更新時点'), auto_now=True)
+  updated_at = models.DateTimeField(_('更新時点'), auto_now_add=True)
 
-  advance_amount = models.IntegerField(_('立替金額'), null=False, default=0)
-  advance_fee =  models.IntegerField(_('立替手数料'), null=False, default=0)
+  advance_amount = models.IntegerField(_('前払予定額'), null=False, default=0)
+  advance_fee =  models.IntegerField(_('前払手数料'), null=False, default=0)
+  advanced_at = models.DateTimeField(_('前払時点'), null=True, blank=True)
+
   referral_fee =  models.IntegerField(_('ご報酬（紹介料）'), null=False, default=0)
   transfer_fee = models.IntegerField(_('振込手数料'), null=False, default=0)
   total_fee = models.IntegerField(_('合計手数料'), null=False, default=0)
 
-  to_seller_amount =  models.IntegerField(_('振込金額'), null=False, default=0)
+  #to_seller_amount =  models.IntegerField(_('振込金額'), null=False, default=0)
 
 
   def save(self, *args, **kwargs):

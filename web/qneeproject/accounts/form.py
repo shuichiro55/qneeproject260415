@@ -410,9 +410,9 @@ class AgreementConfirmForm_buyer(forms.Form):
 # 25/08/24 設定したモデルは6/17 
 class UserAddForm_buyer(forms.Form):
 
-  canApprove_all = forms.BooleanField(label='承認権限（全部）')
-  canApprove_add = forms.BooleanField(label='承認権限（参加）')
-  canApprove_qpay = forms.BooleanField(label='承認権限（Qpay）')
+  canApproveAll = forms.BooleanField(label='承認権限（全部）')
+  canApproveAdd = forms.BooleanField(label='承認権限（参加）')
+  canApproveQpay = forms.BooleanField(label='承認権限（Qpay）')
 
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
@@ -422,9 +422,9 @@ class UserAddForm_buyer(forms.Form):
 # 25/08/30追加 
 class PermissionUpdateForm_buyer(forms.Form):
  
-  canApprove_all = forms.BooleanField(label='承認権限（全部）')
-  canApprove_add = forms.BooleanField(label='承認権限（参加）')
-  canApprove_qpay = forms.BooleanField(label='承認権限（Qpay）')
+  canApproveAll = forms.BooleanField(label='承認権限（全部）')
+  canApproveAdd = forms.BooleanField(label='承認権限（参加）')
+  canApproveQpay = forms.BooleanField(label='承認権限（Qpay）')
 
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
@@ -689,9 +689,9 @@ class AgreementConfirmForm_seller(forms.Form):
 class UserAddForm_seller(forms.Form):
 
   #applyUser_id = forms.IntegerField(label='申請者ユーザーID')
-  canApprove_all = forms.BooleanField(label='承認権限（全部）')
-  canApprove_add = forms.BooleanField(label='承認権限（参加）')
-  canApprove_qpay = forms.BooleanField(label='承認権限（Qpay）')
+  canApproveAll = forms.BooleanField(label='承認権限（全部）')
+  canApproveAdd = forms.BooleanField(label='承認権限（参加）')
+  canApproveQpay = forms.BooleanField(label='承認権限（Qpay）')
 
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
@@ -702,9 +702,9 @@ class UserAddForm_seller(forms.Form):
 # 25/08/30追加 
 class PermissionUpdateForm_seller(forms.Form):
 
-  canApprove_all = forms.BooleanField(label='承認権限（全部）')
-  canApprove_add = forms.BooleanField(label='承認権限（参加）')
-  canApprove_qpay = forms.BooleanField(label='承認権限（Qpay）')
+  canApproveAll = forms.BooleanField(label='承認権限（全部）')
+  canApproveAdd = forms.BooleanField(label='承認権限（参加）')
+  canApproveQpay = forms.BooleanField(label='承認権限（Qpay）')
 
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)

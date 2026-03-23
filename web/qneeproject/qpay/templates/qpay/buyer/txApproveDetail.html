@@ -23,26 +23,31 @@
           <a href="{% url 'accounts:mypage_buyer' %}">
             {% bs_icon 'house' color='cornflowerblue' size='1.2em' %}
             マイページトップ</a>
-          </li>
-        <li class="breadcrumb-item" aria-current="page">前払い申請</li>
+        </li>
+        <li class="breadcrumb-item" aria-current="page">
+          {% bs_icon 'person-check' color='text-secondary' size='1.5em' %}
+          承認処理
+        </li>
       </ol>
     </nav>
 
     <div class="d-flex justify-content-center mt-4">
       <h5 class="text-secondary pt-1"><b>承認処理　</b></h5>
-      {% bs_icon 'person-check' color='hotpink' size='2.2em' %}
+      {% bs_icon 'person-check' color='deeppink' size='2.2em' %}
     </div>
 
-    <div class="row justify-content-center mx-1">
+    <div class="row justify-content-center mt-2 mx-1">
       <div class="col-md-9 col-lg-6">
 
         <form method="POST"
-          action="{% url 'qpay:txApproveDetail_buyer' tx.pk pageNum %}"
-          class="form-group bg-light border border-success-subtle rounded p-2">
+          action="{% url 'qpay:txApproveDetail_buyer' tx.pk %}"
+          class="form-group bg-light border border-success-subtle rounded p-2"
+          style="background-color: transparent !important; border-color:transparent !important;">
   
           {% csrf_token %}
 
           <div class="container">
+
             <table class="table table-sm table-bordered border-primary-subtle table-responsive mt-1">
               <tbody>
                 {% if tx.txStatus_int == 1 %}
@@ -99,7 +104,7 @@
               </tbody>
             </table>
 
-            <table class="table table-sm table-bordered border-primary-subtle table-responsive mt-0">
+            <table class="table table-sm table-bordered border-primary-subtle table-responsive m-0">
               <tbody>
                 <tr class="table-info">
                   <td width="45%" class="table-primary"><b>ゲスト受取り</b></td>
@@ -115,19 +120,22 @@
               </tbody>
             </table>
 
-            <hr>
-            
-            <div class="d-flex justify-content-center mb-2">
-              <button type="submit" class="btn btn-outline-primary" name="next" value="BackToList">
-                一覧</button>
-              <button type="submit" class="btn btn-primary ms-1" name="next" value="ApproveQpay">
+            <hr class="mt-3 mb-2">
+
+            <div class="d-flex justify-content-center">
+              <button type="submit" class="btn btn-primary flex-grow-1"
+                name="next" value="ApproveQpay">
                 <span>
                   <i class="bi bi-hand-thumbs-up-fill" style="font-size:1.5em; color:hotpink"></i>
                 </span>
                 承認
               </button>
-              <button type="submit" class="btn btn-primary ms-1" name="next" value="RejectQpay">
+              <button type="submit" class="btn btn-primary flex-grow-1 ms-1"
+                +sname="next" value="RejectQpay">
                 否認</button>
+              <button type="submit" class="btn btn-outline-primary flex-grow-1 ms-1"
+                name="next" value="BackToList">
+                一覧へ</button>
             </div>
 
           </div>

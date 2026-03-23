@@ -2,18 +2,20 @@
   <nav aria-label="Page navigation example">
     <ul class="pagination justify-content-center">
       {% if page_obj.has_previous %}
-        <li><a class="page-link text-primary d-inline-block" href="?page={{ page_obj.previous_page_number }}"></a></li>
+        <li>
+          <a class="page-link text-primary d-inline-block"
+            href="?page_number={{ page_obj.previous_page_number }}"><<</a></li>
         <!-- --> 
         <!-- 例:https://example.com/search というURLに対して、? を使うと -->
         <!-- https://example.com/search?word=test のようになり、word=testというパラメータを渡すことができます。 -->
-        {% endif %}
+      {% endif %}
 
-      {% for link_page in page_obj.paginator.page_range %}
-        {% if link_page %}
-          {% if link_page == page_obj.number %}
-            <li class="disabled"><div class="page-link text-secondary d-inline-block disabled" href="#">{{ link_page }}</div></li>
+      {% for linkPage in page_obj.paginator.page_range %}
+        {% if linkPage %}
+          {% if linkPage == page_obj.number %}
+            <li class="disabled"><div class="page-link text-secondary d-inline-block disabled" href="#">{{ linkPage }}</div></li>
           {% else %}
-            <li><a class="page-link text-primary d-inline-block" href="?page={{ link_page }}">{{ link_page }}</a></li>
+            <li><a class="page-link text-primary d-inline-block" href="?page_number={{ linkPage }}">{{ linkPage }}</a></li>
           {% endif %}
 
         {% else %}
@@ -23,7 +25,9 @@
       {% endfor %}
           
       {% if page_obj.has_next %}
-        <li><a class="page-link text-primary d-inline-block" href="?page={{ page_obj.next_page_number }}">>></a></li>
+        <li>
+          <a class="page-link text-primary d-inline-block" 
+            href="?page_number={{ page_obj.next_page_number }}">>></a></li>
       {% endif %}
     </ul>
   </nav>

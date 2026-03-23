@@ -10,10 +10,12 @@ app_name = 'accounts'   #23/12/29 動かないので加えてみた
 urlpatterns = [
 
   path('login_buyer/', views.MyLoginView_buyer.as_view(), name='login_buyer'),
-  path('login_buyer/<token>', views.MyLoginView_buyer.as_view(), name='login_buyer'),
+  path('login_buyer/<str:token>', views.MyLoginView_buyer.as_view(), name='login_buyer'),
+  path('login_buyer/<str:nextView>/<str:token>', views.MyLoginView_buyer.as_view(), name='login_buyer'),
 
   path('login_seller/', views.MyLoginView_seller.as_view(), name='login_seller'),
   path('login_seller/<token>', views.MyLoginView_seller.as_view(), name='login_seller'),
+  path('login_seller/<str:nextView>/<str:token>', views.MyLoginView_seller.as_view(), name='login_seller'),
 
   path('login_admin/', views.MyLoginView_admin.as_view(), name='login_admin'),
   path('login_admin/<token>', views.MyLoginView_admin.as_view(), name='login_admin'),
@@ -59,9 +61,14 @@ urlpatterns = [
   path('permissionSets_admin', views.PermissionSetsView_admin.as_view(), name='permissionSets_admin'),
 
   # ★★ 25/06/17追加 テストはこれから、 tokenは申請したユーザーのid
-  path('<str:token1>/<str:token2>/userAdd_buyer', views.UserAddView_buyer.as_view(), name='userAdd_buyer'),
-  path('<str:token1>/<str:token2>/userAdd_seller', views.UserAddView_seller.as_view(), name='userAdd_seller'),
+  path('<str:token>/userAddPre_buyer', views.UserAddPreView_buyer.as_view(), name='userAddPre_buyer'),
+  path('<str:token>/userAddPre_seller', views.UserAddPreView_seller.as_view(), name='userAddPre_seller'),
 
+  # userAddPreViewから呼ばれるView
+  path('<int:applyUser_id>/userAdd_buyer', views.UserAddView_buyer.as_view(), name='userAdd_buyer'),
+  path('<int:applyUser_id>/userAdd_seller', views.UserAddView_seller.as_view(), name='userAdd_seller'),
+
+  # InfoEdit.htmlから呼ばれるView
   path('userAdd_buyer', views.UserAddView_buyer.as_view(), name='userAdd_buyer'),
   path('userAdd_seller', views.UserAddView_seller.as_view(), name='userAdd_seller'),
 

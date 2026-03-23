@@ -35,19 +35,22 @@
     
     <div class="d-flex justify-content-center mt-4">
       <h5 class="text-secondary pt-1"><b>承認待ちボックス　</b></h5>
-      {% bs_icon 'inbox' color='cornflowerblue' size='2.2em' %}
+      {% bs_icon 'inbox' color='deeppink' size='2.2em' %}
     </div>
 
-    {% if objectList.count >= 1 %}
+    {% if object_list.count >= 1 %}
       <div class="row justify-content-center">
       
-        <form method="GET" class="bg-light-subtle rounded-1 p-3">
+        <form method="GET"
+          class="bg-light-subtle rounded-1 px-2 pt-2 pb-0"
+          style="background-color: transparent !important; border-color:transparent !important;">
+          
           {% csrf_token %}
 
             <div class="d-block d-lg-none">
 
               <table class="table table-sm table-bordered border-primary-subtle table-responsive">
-                <thead>
+                <thead style="font-size:0.9rem">
                   <tr class="table-primary" style="text-align:center;">
                     <th rowspan="2" style="vertical-align:middle; text-align:center">#</th>
                     <th colspan="2" style="vertical-align:top">申請者</th>
@@ -62,9 +65,9 @@
 
                 </thead>
 
-                <tbody>
+                <tbody style="font-size:0.9rem">
               
-                  {% for item in pageObj %}
+                  {% for item in page_obj %}
 
                     <!-- データ抽出時に「txStatus_int=1」としている為、念のための条件 -->
                     {% if item.txStatus_int == 1 %}
@@ -76,12 +79,12 @@
                           <img src="{{ item.evidence.url }}" class="img-evidence" style="width:50;height:auto" /></td> -->
                         <td rowspan="2" style="vertical-align:middle; text-align:center">{{ item.txStatus_char|linebreaksbr }}</td>
                         <td rowspan="2" style="vertical-align:middle; text-align:center">
-                          <a href="{% url 'qpay:txApproveDetail_buyer' item.id pageObj.number %}"
+                          <a href="{% url 'qpay:txApproveDetail_buyer' item.pk %}"
                             class="btn btn-outline-primary">移る</a>
                         </td>
                       </tr>
                       <tr>
-                        <td>{{ item.requested_amount|intcomma }}</td>
+                        <td style="text-align:center">{{ item.requested_amount|intcomma }}</td>
                         <td style="text-align:center">{{ item.requested_at|date:"y/n/j H:i" }}</td>
                       </tr>
 
@@ -99,7 +102,8 @@
             <div class="d-none d-lg-block">
               
               <table class="table table-sm table-bordered border-primary-subtle table-responsive">
-                <thead>
+
+                <thead style="font-size:0.9rem">
                   <tr class="table-primary" style="text-align:center;">
                     <th rowspan="2" style="vertical-align:middle; text-align:center">#</th>
                     <th colspan="2" style="vertical-align:top">申請者</th>
@@ -114,9 +118,9 @@
 
                 </thead>
 
-                <tbody>
+                <tbody style="font-size:0.9rem">
               
-                  {% for item in pageObj %}
+                  {% for item in page_obj %}
 
                     <!-- データ抽出時に「txStatus_int=1」としている為、念のための条件 -->
                     {% if item.txStatus_int == 1 %}
@@ -151,12 +155,12 @@
 
                         <td rowspan="2" style="vertical-align:middle; text-align:center;">{{ item.txStatus_char|linebreaksbr }}</td>
                         <td rowspan="2" style="vertical-align:middle; text-align:center;">
-                          <a href="{% url 'qpay:txApproveDetail_buyer' item.id pageObj.number %}"
+                          <a href="{% url 'qpay:txApproveDetail_buyer' item.pk %}"
                             class="btn btn-outline-primary">移る</a>
                         </td>
                       </tr>
                       <tr>
-                        <td>{{ item.requested_amount|intcomma }}</td>
+                        <td style="text-align:center">{{ item.requested_amount|intcomma }}</td>
                         <td style="text-align:center">{{ item.requested_at|date:"y/n/j H:i" }}</td>
                       </tr>
 
@@ -168,10 +172,10 @@
 
                 </tbody>
               </table>
-              
+             
             </div>
 
-              <input type="hidden" name="next" value="{{ next }}" />
+            <!-- <input type="hidden" name="next" value="{{ next }}" /> -->
 
           {% include "partials/pagination.html" %}
 

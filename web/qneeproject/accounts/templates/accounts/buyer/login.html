@@ -38,6 +38,7 @@
           <form method="POST"
             action="{% url 'accounts:login_buyer' %}"
             class="form-group bg-light border border-success-subtle rounded-2 p-3 mb-0">
+            {% csrf_token %}
 
             {{ form.non_field_errors }}
             {% for field in form %}
@@ -47,8 +48,10 @@
             {% endfor %}
 
             <button type="submit" class="btn btn-primary w-100 shadow" >ログインする</button>
-            <input type="hidden" name="next" value="{{ next }}" />
-            {% csrf_token %}
+            <input type="hidden" name="nextView" value="{{ nextView }}" />
+            <input type="hidden" name="token" value="{{ token }}" />
+            <input type="hidden" name="token2" value="{{ token2 }}" />
+
           </form>
 
           <div class="d-flex justify-content-end mt-1">

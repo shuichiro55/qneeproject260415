@@ -38,7 +38,7 @@
       <div class="col-md-9 col-lg-6">
 
         <form method="GET"
-          action="{% url 'qpay:txList_seller' tx.id page_num %}"
+          action="{% url 'qpay:txList_seller' tx.id pageNum %}"
           class="form-group bg-light border border-success-subtle p-3 rounded">
       
           {% csrf_token %}
