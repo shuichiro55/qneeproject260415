@@ -38,6 +38,10 @@ urlpatterns = [
     path('',include('contact.urls')),
 
     path('corporate_info', TemplateView.as_view(template_name="index/corporate_info.html"),name="corporate_info"),
+
+    path('base_qconnect_buyer', TemplateView.as_view(template_name="buyer/index/base_qconnect.html"),name="base_qconnect_buyer"),
+    path('base_qconnect_seller', TemplateView.as_view(template_name="seller/index/base_qconnect.html"),name="base_qconnect_seller"),
+
     path('index_qconnect_admin', TemplateView.as_view(template_name="admin/index/index_qconnect.html"),name="index_qconnect_admin"),
     path('index_qconnect_buyer', TemplateView.as_view(template_name="buyer/index/index_qconnect.html"),name="index_qconnect_buyer"),
     path('index_qconnect_seller', TemplateView.as_view(template_name="seller/index/index_qconnect.html"),name="index_qconnect_seller"),

@@ -58,69 +58,87 @@
   -->
   
   <!-- START NAVBAR -->
-  <nav id="navbar" class="navbar navbar-expand-lg fixed-top sticky">
-    <div class="container">
-      <a class="navbar-brand" href="/"><img src="{% static 'images/logo-qnee-yoko6.png' %}" alt="" height="23"></a>
+  <nav id="navbar" class="navbar navbar-expand-lg fixed-top sticky pt-0 pb-1">
+
+    <div class="container-fluid">
+
+      <a class="navbar-brand ms-3" href="/"><img src="{% static 'images/logo-qnee-yoko6.png' %}" alt="" height="23"></a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-        data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+        data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false"
         aria-label="Toggle navigation">
-        <i class="mdi mdi-menu text-muted"></i>
+        <i class="mdi mdi-menu text-secondary me-4" style="font-size:1.4em;"></i>
       </button>
 
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav ms-auto mb-2 mb-lg-0" id="navbar-navlist">
-          <li class="nav-item">
-            <a class="nav-link active" href="/?#home">HOME</a>
-          </li>
+      <div class="collapse navbar-collapse" id="navbarContent">
 
-          <li class="nav-item dropdown">
-            <a class="nav-link" href="#" id="navbarDropdown" role="button" 
-              data-bs-toggle="dropdown" aria-expanded="false">
-              私たちのサービス
-              <i class="mdi mdi-chevron-down"></i>
-            </a>
+        <div class="d-none d-lg-block ms-5">
+
+          <ul class="navbar-nav" id="navbar-navlist">
+            <li class="nav-item">
+              <a class="nav-link active" href="/?#home">HOME</a>
+            </li>
+
+            <li class="nav-item dropdown">
+              <a class="nav-link" href="#" id="navbarDropdown" role="button" 
+                data-bs-toggle="dropdown" aria-expanded="false">
+                サービス内容
+                <i class="mdi mdi-arrow-down-circle" style="font-size:1em"></i>
+              </a>
     
-            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <li><a class="nav-link" href="/?#features">主な特徴</a></li>
-              <li><a class="nav-link" href="/?#process">ご利用開始まで</a></li>
-              <li><a class="nav-link" href="/?#price">ご利用料金</a></li>
-              <li><a class="nav-link" href="/?#client">お客様の声</a></li>
-            </ul>
-          </li>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <li><a class="nav-link" href="/?#features">主な特徴</a></li>
+                <li><a class="nav-link" href="/?#process">ご利用開始まで</a></li>
+                <li><a class="nav-link" href="/?#price">ご利用料金</a></li>
+                <li><a class="nav-link" href="/?#client">お客様の声</a></li>
+              </ul>
+            </li>
 
-          <li class="nav-item dropdown">
-            <a class="nav-link" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
-              aria-expanded="false">
-              会社概要 <i class="mdi mdi-chevron-down"></i>
-            </a>
+            <li class="nav-item dropdown">
+              <a class="nav-link" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">
+                会社概要 <i class="mdi mdi-arrow-down-circle" style="font-size:1em"></i>
+              </a>
 
-            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <li><a class="nav-link" href="#vision">ミッション</a></li>
-              <li><a class="nav-link" href="#top-message">トップ・メッセージ</a></li>
-              <li><a class="nav-link" href="#overview">会社情報</a></li>
-            </ul>
-          </li>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <li><a class="nav-link" href="#vision">ミッション</a></li>
+                <li><a class="nav-link" href="#top-message">トップ・メッセージ</a></li>
+                <li><a class="nav-link" href="#overview">会社情報</a></li>
+              </ul>
+            </li>
                     
-          <li class="nav-item">
-            <a class="nav-link" href="/?#faq">FAQ</a>
-          </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/?#faq">FAQ</a>
+            </li>
 
-          <li class="nav-item">
-            <a class="nav-link" href="/#contact">お問い合わせ</a>
-          </li>
-        </ul><!--end navbar-nav-->
-                
-        <!--<ul class="list-inline mb-0 ps-lg-4 ms-2">
-          <li class="list-inline-item">
-            <a href="#" class="primary-link"><i class="mdi mdi-facebook"></i></a>
-          </li>
-          <li class="list-inline-item">
-            <a href="#" class="primary-link"><i class="mdi mdi-twitter"></i></a>
-          </li>
-          <li class="list-inline-item">
-            <a href="#" class="primary-link"><i class="mdi mdi-instagram"></i></a>
-          </li>
-        </ul> -->
+            <li class="nav-item">
+              <a class="nav-link" href="/#contact">お問い合わせ</a>
+            </li>
+          </ul> <!--end navbar-nav-->
+        </div> <!-- end d-none -->
+
+        <div
+          class="d-block d-lg-none ms-2 rounded-2"
+          style="background-color:rgba(241, 236, 236, 0.95) !important;">
+
+          <ul class="navbar-nav" id="navbar-navlist">
+            <div class="row">
+              <div class="col-3 ps-3 pe-0">
+                <li class="nav-item"><a class="nav-link active" href="/?#home">HOME</a> </li>
+              </div>
+              <div class="col-3 px-0">
+                <li class="nav-item"><a class="nav-link" href="#vision">ミッション</a></li>
+              </div>
+              <div class="col-3 px-0">
+                <li class="nav-item"><a class="nav-link" href="#top-message">メッセージ</a></li>
+              </div>
+              <div class="col-3 px-0">
+                <li class="nav-item"><a class="nav-link" href="#overview">会社情報</a></li>
+              </div>
+
+            </div>
+          </ul>
+            
+        </div>
 
       </div><!--end collapse-->
     </div><!--end container-->
@@ -136,7 +154,7 @@
         <div class="col-lg-8">
           <div class="text-center text-white">
             <h2 class="text-white fw-light">FIRST MISSION <span class="fw-semibold"> </span></h2>
-            <p class="home-desc pt-3">労働人口200万人のフリーランスとそれを支える企業のインフラとなる。</p>
+            <p class="home-desc pt-3">日本の創るを支えるフリーランスとそれを支える企業のインフラとなる。</p>
           </div>
         </div>
         <!--end col-->
@@ -155,8 +173,8 @@
       <div class="row gy-4">
         <div class="row justify-content-center">
             <div class="col-lg-8">
-              <div class="text-center mb-5">
-                <h3>トップ・メッセージ</h3>
+              <div class="text-center">
+                <h3 class="text-secondary"><b>わたしたちのメッセージ</b></h3>
                 <p class="text-muted"></p>
               </div>
             </div> <!--end col-->
@@ -167,13 +185,13 @@
           <a href="https://www.youtube.com/watch?v=Y7f98aduVJ8" class="glightbox pulsating-play-btn"></a>
         </div>
 
-        <div class="col-lg-7 content" data-aos="fade-up" data-aos-delay="100">
+        <div class="col-lg-7 content mt-4" data-aos="fade-up" data-aos-delay="100">
           <p>
             これまでの人生における出会い・経験・気づきの結晶が私たちのサービスであり、そのサービスを通じて皆さま・社会への貢献を図っていきます。
           </p>
           <ul>
             <li>
-              <i class="bi bi-people"></i>
+              <i class="bi bi-people" style="color:deeppink"></i>
               <div>
                 <h5>出会い</h5>
                 <p>きっかけは知ったことでした。映画制作の現場において制作会社とフリーランスとの関係で、
@@ -182,7 +200,7 @@
               </div>
             </li>
             <li>
-              <i class="bi bi-bookmarks"></i>
+              <i class="bi bi-bookmarks" style="color:deeppink"></i>
               <div>
                 <h5>経験</h5>
                 <p>金融分野においての得たノウハウ、スタートアップビジネスに触れた経験、親しんできたプログラミングを活かして、
@@ -190,7 +208,7 @@
               </div>
             </li>
             <li>
-              <i class="bi bi-stars"></i>
+              <i class="bi bi-stars" style="color:deeppink"></i>
               <div>
                 <h5>新たな創造へ</h5>
                 <p>SaaS（Software as a Service）でサービス提供することでデータからご利用者の行動が見えます。

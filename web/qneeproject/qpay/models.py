@@ -104,7 +104,7 @@ class QpayTx(models.Model):
   transfer_fee = models.IntegerField(_('振込手数料'), null=False, default=0)
   total_fee = models.IntegerField(_('合計手数料'), null=False, default=0)
 
-  #to_seller_amount =  models.IntegerField(_('振込金額'), null=False, default=0)
+  transfer_amount =  models.IntegerField(_('送金額'), null=False, default=0)
 
 
   def save(self, *args, **kwargs):

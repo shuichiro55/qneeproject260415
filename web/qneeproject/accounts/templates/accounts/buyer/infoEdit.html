@@ -8,7 +8,7 @@
 
   <div class="container">
 
-    <div class="row justify-content-center mt-1">
+    <div class="row justify-content-center mt-2">
       {% for message in messages %}
         <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
           <span>{{ message }}</span>
@@ -17,7 +17,7 @@
     </div>
 
     <nav aria-label="breadcrumb" role="navigation">
-      <ol class="breadcrumb bg-light-subtle px-2 rounded-3 mt-1">
+      <ol class="breadcrumb bg-light-subtle px-2 rounded-3 mt-2">
         <li class="breadcrumb-item"><a href="{% url 'accounts:mypage_buyer' %}">
           {% bs_icon 'house' color='cornflowerblue' size='1.2em' %}
           マイページトップ</a></li>
@@ -35,7 +35,6 @@
     <div class="shadow-sm bg-light border rounded p-5 mx-3">
 
       <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3" >
-
 
         {% if cnt_toBeApproved_add >= 1 %}
           <form method="GET" action="{% url 'accounts:userAdd_buyer' %}">

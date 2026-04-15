@@ -24,10 +24,12 @@ from django.template.loader import render_to_string
 from django.core.signing import dumps, loads, BadSignature, SignatureExpired
 from django.conf import settings
 
+#from datetime import date
+import datetime
 
 # 以下は2025/02/14時点で使われていない参照
-from accounts.models import CustomUser
-from django.db import models
+# from accounts.models import CustomUser
+# from django.db import models
 
 UserModel = get_user_model()
 
@@ -127,7 +129,7 @@ class TxCreateView(generic.CreateView):
         tx.advance_fee = (tx.requested_amount * buyEntity.advance_fee_rate) //1
         tx.referral_fee = (tx.requested_amount * buyEntity.referral_fee_rate) //1
         tx.transfer_fee = 110
-        tx.to_seller_amount = tx.advance_amount - tx.advance_fee - tx.transfer_fee
+        tx.transfer_amount = tx.advance_amount - tx.advance_fee - tx.transfer_fee
 
         tx.save()
         self.request.session['tx_id'] = tx.id
@@ -291,7 +293,7 @@ class TxCreateView(generic.CreateView):
           context = {
             'protocol': self.request.scheme,
             'domain': domain,
-            'nextView': 'qpayApproveApply',
+            'afterLogin': 'qpayApproveApply',
             'token': dumps(tx.pk),
             'tx': tx,
             'buyEntityApprover': eachUser,
@@ -339,7 +341,7 @@ class TxListView_buyer(LoginRequiredMixin, generic.UpdateView):
   form_class = TxListForm_buyer
   # context_object_name = 'qpaytxs'
 
-  paginateBy = 4 # 4で仮置き
+  paginate_by = 5 # 5で仮置き
 
   def get(self, request, *args, **kwargs):
 
@@ -353,14 +355,15 @@ class TxListView_buyer(LoginRequiredMixin, generic.UpdateView):
       messages.add_message(request, messages.INFO, "発注者としてログインして下さい") 
       return HttpResponseRedirect(reverse('accounts:logout'))
 
-    paginator = Paginator(object_list, self.paginateBy)
+    paginator = Paginator(object_list, self.paginate_by)
 
-    try:
-      page_number = self.kwargs['page_number']
-    except:
-      page_number = 1
+    # URLからページネーション経由でページ番号を取得する場合
+    page_number = self.request.GET.get('page_number', None)
+    if page_number is None:
+      # viewを呼ぶときにページ番号が指定されている場合  
+      page_number = self.kwargs.get('page_number', 1)
+    print(f'pass1 page_number={page_number} in TxListView_buyer')
 
-    print(f'page_number={page_number}s in get of TxListView_buyer')
     page_obj = paginator.page(page_number)
     context = {
       'object_list': object_list,
@@ -377,33 +380,32 @@ class TxListView_seller(LoginRequiredMixin, generic.UpdateView):
   template_name = "qpay/seller/txList.html"
   form_class = TxListForm_seller
   context_object_name = 'qpaytxs'
-  paginateBy = 4 # 4で仮置き
+  paginate_by = 5 # 5で仮置き
 
   def get(self, request, *args, **kwargs):
 
     sellUser = UserModel.objects.get(email=self.request.user)
-    objectList = QpayTx.objects.filter(sellEntity = sellUser.entity).order_by('-requested_at')
+    object_list = QpayTx.objects.filter(
+      sellEntity = sellUser.entity).order_by('-requested_at')
 
     if sellUser.type1 == 1:
     # 次のメッセージは確認できなかったので、要調整（トップページで出るようにする？）
       messages.add_message(request, messages.WARNING, "受注者としてログインして下さい") 
       return HttpResponseRedirect(reverse('accounts:logout'))
 
-    paginator = Paginator(objectList, self.paginateBy)
+    paginator = Paginator(object_list, self.paginate_by)
 
-    try:
-      pageNum = self.kwargs['pageNum']
-    except: # 該当値がない場合は1を返す
-      pageNum = 1
+    # URLからページネーション経由でページ番号を取得する場合
+    page_number = self.request.GET.get('page_number', None)
+    if page_number is None:
+      # viewを呼ぶときにページ番号が指定されている場合  
+      page_number = self.kwargs.get('page_number', 1)
+    print(f'pass1 page_number={page_number} in TxListView_seller')
 
-    page_obj = paginator.page(pageNum)
-    page1 = request.GET.get('page', 0)
-    print(f'self.kwargs[pageNum]={pageNum} TxListV, get')
-    print(f'page_obj.number={page_obj.number} TxListV, get')
-    print(f'request.GET.get(page)={page1} TxListV, get')
+    page_obj = paginator.page(page_number)
 
     context = {
-      'objectList': objectList,
+      'object_list': object_list,
       'page_obj': page_obj,
     }
     return render(request, 'qpay/seller/txList.html', context)
@@ -420,37 +422,41 @@ class TxApproveView_buyer(LoginRequiredMixin, generic.UpdateView):
   login_url = '/accounts/login_buyer/'
   model = QpayTx
   form_class = TxApproveForm_buyer
-  paginateBy = 4 # 4で仮置き
+  paginate_by = 4 # 4で仮置き
   #template_name = "qpay/buyer/txApprove.html"
   #context_object_name = 'qpaytxs'
 
   def get(self, request, *args, **kwargs):
 
-    user = UserModel.objects.get(email=self.request.user)
+    loginUser = UserModel.objects.get(email=self.request.user)
 
-    # 承認待ちの取引を抽出する
-    cnt = QpayTx.objects.filter(
-      buyEntity=user.entity, txStatus_int=1).order_by('-requested_at').count()
+    OneWeekAgo = datetime.datetime.now() - datetime.timedelta(days=7)
+
+    # 承認待ちの取引を抽出する   
+    object_list = QpayTx.objects.select_related('buyUser').filter(
+      Q(buyEntity=loginUser.entity)
+      & (Q(txStatus_int=1) | Q(txStatus_int=3))
+      & Q(created_at__gte=OneWeekAgo)).order_by('-requested_at')
+
+    # 確認用
+    cnt = QpayTx.objects.select_related('buyUser').filter(
+      Q(buyEntity=loginUser.entity)
+      & Q(txStatus_int__lte=3)
+      & Q(created_at__gte=OneWeekAgo)).order_by('txStatus_int', '-requested_at').count()
     
-    object_list = QpayTx.objects.filter(
-      buyEntity=user.entity, txStatus_int=1).order_by('-requested_at')
+    paginator = Paginator(object_list, self.paginate_by)
 
-    paginator = Paginator(object_list, self.paginateBy)
-
-    if self.request.GET.get('page_number') is not None:
-      page_number = self.request.GET.get('page_number')
-    else:
-      page_number = 1
+    # URLからページネーション経由でページ番号を取得する場合
+    page_number = self.request.GET.get('page_number', None)
+    if page_number is None:
+      # viewを呼ぶときにページ番号が指定されている場合  
+      page_number = self.kwargs.get('page_number', 1)
+    print(f'pass1 page_number={page_number} in TxApproveView_buyer')
 
     page_obj = paginator.page(page_number)
 
-    print(f'data count={cnt} in get of TxApproveView_buyer')
-    print(f'self.request.user={self.request.user} in get of TxApproveView_buyer')
-    print(f'user.entity={user.entity} in get of TxApproveView_buyer')
-    print(f'page_number={page_number} in get of TxApproveView_buyer')
-    print(f'page_obj.count={page_obj.count} in get of TxApproveView_buyer')
-
     context = {
+      'loginUser': loginUser,
       'object_list': object_list,
       'page_obj': page_obj,
     }
@@ -487,7 +493,7 @@ class TxApproveDetailView_buyer(LoginRequiredMixin, generic.UpdateView):
 
   login_url = '/accounts/login_buyer/'
   model = QpayTx
-  paginateBy = 4 # 4で仮置き
+  paginate_by = 5 # 5で仮置き
 
   def get(self, request, *args, **kwargs):
 
@@ -502,17 +508,19 @@ class TxApproveDetailView_buyer(LoginRequiredMixin, generic.UpdateView):
 
   def post(self, request, *args, **kwargs):
 
+    print(f'before ToRejectQpay in post of TxApproceDetailView_buyer')
+
     tx_id = self.kwargs['tx_id']
-    print(f'tx_id={tx_id} in post of TxApproveDetailView_buyer')
     tx =QpayTx.objects.select_related('sellEntity').get(pk=tx_id)
 
     next = self.request.POST.get('next', None) 
-    if next == "ApproveQpay":
+    print(f'pass0 next=={next} def post of TxApproDetailView_buyer')
 
-      print("「承認する」が押下された post in TxApproveDetailView_buyer")
+    if next == "ToApproveQpay":
+ 
       # 承認された場合の処理（処理状況の更新、Qneeへの連絡等）を行う
       tx.txStatus_int = 2
-      tx.txStatus_char = "承認済み・支払前"
+      tx.txStatus_char = "承認済・前払い前"
       tx.approved_at = timezone.now()
 
       ## 一旦、リスクエスト金額を承認された金額にする 24/07/25
@@ -560,24 +568,22 @@ class TxApproveDetailView_buyer(LoginRequiredMixin, generic.UpdateView):
 
       #del self.request.session['tx_id']
       return TemplateResponse(request, "qpay/buyer/txApproveDetail.html", {'tx': tx,})
+    
 
+    elif next == "ToRejectQpay":
 
-    elif next == "RejectQpay":
-
+      print(f'after ToRejectQpay in post of TxApproceDetailView_buyer')
       # 否認された場合の処理（処理状況の更新、受注者への連絡等）を行う
       tx.txStatus_int = 3
       tx.txStatus_char = "否認済み"
       tx.rejected_at = timezone.now()
       tx.save()
 
-      context = {
-        'tx': tx,
-        'pageNum': self.kwargs['pageNum']
-      }
+      context = {'tx': tx,}
       return TemplateResponse(request, "qpay/buyer/txApproveDetail.html", context)
 
-
-    elif next == "BackToList":
+    # これ使ってないのでは？（一覧に戻るときはGETで行くようにしている）
+    # elif next == "ToBackToList":
 
       #buyEntity_id = self.request.session.get('buyEntity_id')
       #
@@ -585,7 +591,7 @@ class TxApproveDetailView_buyer(LoginRequiredMixin, generic.UpdateView):
       #object_list = QpayTx.objects.filter(
       #  buyEntity=buyEntity, txStatus_int=1).order_by('-requested_at')
       #
-      #paginator = Paginator(object_list, self.paginateBy)
+      #paginator = Paginator(object_list, self.paginate_by)
       #
       #context = {
       #  'tx_id': tx_id,
@@ -596,6 +602,8 @@ class TxApproveDetailView_buyer(LoginRequiredMixin, generic.UpdateView):
       #return TemplateResponse(request, "qpay/buyer/txApprove.html", context)
       return HttpResponseRedirect(
         reverse('qpay:txApprove_buyer', kwargs={'tx_id': tx_id}))
+
+    print(f'pass3 other')
     
     return HttpResponseBadRequest()
 
@@ -613,14 +621,14 @@ class TxDetailView_buyer(generic.UpdateView):
     #vle = LegalEntity.objects.get(entityName=tx.buyEntityName)
 
     try:
-      pageNum = int(self.kwargs['pageNum'])
+      page_number = int(self.kwargs['page_number'])
     except:
-      pageNum = 1
+      page_number = 1
 
-    print(f'pageNum={pageNum} in TxHDetailView_buyer, get')
+    print(f'page_number={page_number} in TxHDetailView_buyer, get')
     context = {
       'tx': tx,
-      'pageNum': pageNum
+      'page_number': page_number
     }
     return TemplateResponse(request, "qpay/buyer/txDetail.html", context) 
 
@@ -637,13 +645,13 @@ class TxDetailView_seller(generic.UpdateView):
     le = LegalEntity.objects.get(entityName=tx.buyEntityName)
 
     try:
-      pageNum = int(self.kwargs['pageNum'])
-      print(f'pageNum={pageNum} in TxDetailV, get')
+      page_number = int(self.kwargs['page_number'])
+      print(f'page_number={page_number} in TxDetailV, get')
     except:
-      pageNum = 1
+      page_number = 1
 
-    print(f'pageNum={pageNum} def get in TxDetailView_seller')
-    return TemplateResponse(request, "qpay/seller/txDetail.html", { "tx": tx, 'pageNum': pageNum }) 
+    print(f'page_number={page_number} def get in TxDetailView_seller')
+    return TemplateResponse(request, "qpay/seller/txDetail.html", { "tx": tx, 'page_number': page_number }) 
 
   def post(self, request, *args, **kwargs):
     tx =QpayTx.objects.get(pk=self.kwargs['tx_id'])
@@ -653,50 +661,91 @@ class TxDetailView_seller(generic.UpdateView):
     return reverse_lazy('qpay:txList_seller')
 
 
+class TxListView_admin(LoginRequiredMixin, generic.UpdateView):
+
+  login_url = '/accounts/login_admin/'
+  model = QpayTx
+  template_name = "qpay/admin/txList.html"
+  # context_object_name = 'qpaytxs'
+
+  paginate_by = 5 # 5で仮置き
+
+  def get(self, request, *args, **kwargs):
+
+    user = UserModel.objects.get(email=self.request.user)
+    object_list = QpayTx.objects.all().order_by('-created_at')
+    print(f'request.user={request.user} def get in TxListView_admin')
+
+    paginator = Paginator(object_list, self.paginate_by)
+
+    # URLからページネーション経由でページ番号を取得する場合
+    page_number = self.request.GET.get('page_number', None)
+    if page_number is None:
+      # viewを呼ぶときにページ番号が指定されている場合  
+      page_number = self.kwargs.get('page_number', 1)
+    print(f'pass1 page_number={page_number} in TxListView_admin')
+
+    page_obj = paginator.page(page_number)
+    context = {
+      'object_list': object_list,
+      'page_obj': page_obj,
+    }
+    return render(request, 'qpay/admin/txList.html', context)
+
+
 # 発注者が申請状況を確認するためのView   
-class AdminInboxView(generic.UpdateView):
+class TxInboxView(generic.UpdateView):
 
   model = QpayTx
-  template_name = "qpay/admin/adminInbox.html"
-  paginateBy = 4 # 4で仮置き
+  template_name = "qpay/admin/txInbox.html"
+  paginate_by = 5 # 5で仮置き
 
   def get(self, request, *args, **kwargs):
 
     # パートナーに承認されたデータを抽出する
-    objectList = QpayTx.objects.select_related('sellEntity').filter(
-      txStatus_int=2).order_by('-requested_at')
+    object_list = QpayTx.objects.select_related('sellEntity').filter(
+      Q(txStatus_int=1) | Q(txStatus_int=2)).order_by('-requested_at')
+    
+    # 確認用
+    cnt = QpayTx.objects.select_related('sellEntity').filter(
+      Q(txStatus_int=1) | Q(txStatus_int=2)).order_by('-requested_at').count()
+    print(f'cnt={cnt} in def get of TxInboxView')
 
-    paginator = Paginator(objectList, self.paginateBy)
-    try:
-      pageNum = self.kwargs['pageNum']
-    except:  # 該当値がない場合は1を返す
-      pageNum = 1
+    paginator = Paginator(object_list, self.paginate_by)
 
-    page_obj = paginator.page(pageNum)
+    # URLからページネーション経由でページ番号を取得する場合
+    page_number = self.request.GET.get('page_number', None)
+    if page_number is None:
+      # viewを呼ぶときにページ番号が指定されている場合  
+      page_number = self.kwargs.get('page_number', 1)
+    print(f'pass1 page_number={page_number} in TxInboxView')
+
+    print(f'page_numnber={page_number} in TxInboxView')
+    page_obj = paginator.page(page_number)
 
     context = {
-      'objectList': objectList,
+      'object_list': object_list,
       'page_obj': page_obj,
     }
-    return render(request, 'qpay/admin/adminInbox.html', context)
+    return render(request, 'qpay/admin/txInbox.html', context)
 
 
 " 案内されたメールからアプリに入って振り込みを行う場合の処理 "
-" tokenをtx_idに変換して、AdminInboxDetailView_buyerを呼ぶ "
-class AdminInboxDetailPreView(LoginRequiredMixin, generic.TemplateView):
+" tokenをtx_idに変換して、TxInboxDetailView_buyerを呼ぶ "
+class TxInboxDetailPreView(LoginRequiredMixin, generic.TemplateView):
 
   login_url = '/accounts/login_buyer/'
-  template_name = 'qpay/admin/AdminInboxDetailPreView.html'
+  template_name = 'qpay/admin/TxInboxDetailPreView.html'
   timeout_seconds = getattr(settings,  'ACTIVATION_TIMEOUT_SECONDS', 60*60*24)
 
   def get(self, request, *args, **kwargs):
       
     token = self.kwargs.get('token')  #kwargsはdict型
-    print(f'token={token} def get in class AdminInboxDetailPreView')
+    print(f'token={token} def get in class TxInboxDetailPreView')
     
     try:
       tx_id = loads(token, max_age=self.timeout_seconds)
-      print(f'tx_id={tx_id} def get in class AdminInboxDetailPreView')
+      print(f'tx_id={tx_id} def get in class TxInboxDetailPreView')
 
     except SignatureExpired:
       return HttpResponseBadRequest()
@@ -705,16 +754,15 @@ class AdminInboxDetailPreView(LoginRequiredMixin, generic.TemplateView):
     except BadSignature:
       return HttpResponseBadRequest()
 
-    return HttpResponseRedirect(reverse('qpay:adminInboxDetail', kwargs={'tx_id': tx_id}))
+    return HttpResponseRedirect(reverse('qpay:txInboxDetail', kwargs={'tx_id': tx_id}))
 
 
 # 発注者が前払いの承認するためのView（一覧又はメール内URLから遷移）  
-class AdminInboxDetailView(LoginRequiredMixin, generic.UpdateView):
+class TxInboxDetailView(LoginRequiredMixin, generic.UpdateView):
 
   login_url = '/accounts/login_admin/'
   model = QpayTx
-  #template_name = "qpay/admin/adminInboxDetail.html"
-  paginateBy = 4 # 4で仮置き
+  #template_name = "qpay/admin/txInboxDetail.html"
 
   def get(self, request, *args, **kwargs):
 
@@ -722,15 +770,15 @@ class AdminInboxDetailView(LoginRequiredMixin, generic.UpdateView):
     buyEntity = LegalEntity.objects.get(pk=tx.buyEntity_id)
     sellEntity = LegalEntity.objects.get(pk=tx.sellEntity_id)
 
-    print(f'buyEntity.id={buyEntity.id} in get of AdminInboxDetailView')
-    print(f'sellEntity.bankAccount={sellEntity.bankAccount} in get of AdminInboxDetailView')
-    print(f'sellEntity.bankAccount_id={sellEntity.bankAccount_id} in get of AdminInboxDetailView')
+    print(f'buyEntity.id={buyEntity.id} in get of TxInboxDetailView')
+    print(f'sellEntity.bankAccount={sellEntity.bankAccount} in get of TxInboxDetailView')
+    print(f'sellEntity.bankAccount_id={sellEntity.bankAccount_id} in get of TxInboxDetailView')
 
     if BankAccount.objects.filter(pk=sellEntity.bankAccount_id).exists():
 
       bankAccount = BankAccount.objects.get(pk=sellEntity.bankAccount_id)
       return TemplateResponse(request,
-        "qpay/admin/adminInboxDetail.html", {'tx': tx, 'ba': bankAccount,}) 
+        "qpay/admin/txInboxDetail.html", {'tx': tx, 'ba': bankAccount,}) 
 
     else:
       messages.add_message(request, messages.WARNING, "ゲスト側で受取口座が未設定です。メールにて設定依頼をしました") 
@@ -757,7 +805,7 @@ class AdminInboxDetailView(LoginRequiredMixin, generic.UpdateView):
       email.send()
       
       return TemplateResponse(request,
-        "qpay/admin/adminInboxDetail.html",  {'tx': tx }) 
+        "qpay/admin/txInboxDetail.html",  {'tx': tx }) 
 
 
   def post(self, request, *args, **kwargs):
@@ -765,13 +813,13 @@ class AdminInboxDetailView(LoginRequiredMixin, generic.UpdateView):
     tx =QpayTx.objects.get(pk=self.kwargs['tx_id'])
 
     next = self.request.POST.get('next', None) 
-    if next == "ApproveQpay":
+    if next == "ToTransferMoney":
 
-      print("「承認する」が押下された post in AdminInboxDetailView")
+      print("「振込処理する」が押下された post in TxInboxDetailView")
       # 承認された場合の処理（処理状況の更新、Qneeへの連絡等）を行う
-      tx.txStatus_int = 2
-      tx.txStatus_char = "承認済み・支払前" 
-      tx.approved_at = timezone.now()
+      tx.txStatus_int = 4
+      tx.txStatus_char = "承認済み・前払い済み" 
+      tx.payed_at = timezone.now()
       
       ## 一旦、リスクエスト金額を承認された金額にする 24/07/25
       tx.approved_amount = tx.requested_amount
@@ -809,7 +857,7 @@ class AdminInboxDetailView(LoginRequiredMixin, generic.UpdateView):
         email.send()
 
       return TemplateResponse(request,
-        "qpay/admin/adminInboxDetail.html", { 'tx': tx, })
+        "qpay/admin/txInboxDetail.html", { 'tx': tx, })
       #return HttpResponseRedirect(self.get_success_url())
 
     elif next == "RejectRemittance":
@@ -823,40 +871,40 @@ class AdminInboxDetailView(LoginRequiredMixin, generic.UpdateView):
       context = {
         'tx': tx,
       }  
-      return TemplateResponse(request, "qpay/admin/adminInboxDetail.html", context)
+      return TemplateResponse(request, "qpay/admin/txInboxDetail.html", context)
 
 
-    elif next == "BackToList":
-
-      objectList = QpayTx.objects.filter(
-        txStatus_int=2).order_by('-requested_at')
-
-      paginator = Paginator(objectList, self.paginateBy)
-
-      context = {
-        'objectList': objectList,
-        'page_obj': paginator.page(1),
-      }
-      return TemplateResponse(request, "qpay/admin/adminInbox.html", context)
+    #elif next == "BackToList":
+    #
+    #  object_list = QpayTx.objects.filter(
+    #    txStatus_int=2).order_by('-requested_at')
+    #
+    #  paginator = Paginator(object_list, self.paginate_by)
+    #
+    #  context = {
+    #    'object_list': object_list,
+    #    'page_obj': paginator.page(1),
+    #  }
+    #  return TemplateResponse(request, "qpay/admin/txInbox.html", context)
 
     return HttpResponseBadRequest()
 
 
 " 案内されたメールから遷移して振り込みをする場合"
 " tokenをtx_idに変換して、TxApproveDetailView_buyerを呼ぶ "
-class AdminInboxDetailPreView(generic.TemplateView):
+class TxInboxDetailPreView(generic.TemplateView):
 
-  #template_name = 'qpay/admin/adminInboxDetailPre.html'
+  #template_name = 'qpay/admin/txInboxDetailPre.html'
   timeout_seconds = getattr(settings,  'ACTIVATION_TIMEOUT_SECONDS', 60*60*24)
 
   def get(self, request, *args, **kwargs):
       
     token = self.kwargs.get('token')  #kwargsはdict型
-    print(f'token={token} def get in class AdminInboxDetailPreView')
+    print(f'token={token} def get in class TxInboxDetailPreView')
     
     try:
       tx_id = loads(token, max_age=self.timeout_seconds)
-      print(f'tx_id={tx_id} def get in class AdminInboxDetailPreView')
+      print(f'tx_id={tx_id} def get in class TxInboxDetailPreView')
 
     except SignatureExpired:
       return HttpResponseBadRequest()
@@ -865,4 +913,4 @@ class AdminInboxDetailPreView(generic.TemplateView):
     except BadSignature:
       return HttpResponseBadRequest()
 
-    return HttpResponseRedirect(reverse('qpay:adminInboxDetail', kwargs={'tx_id': tx_id}))
+    return HttpResponseRedirect(reverse('qpay:txInboxDetail', kwargs={'tx_id': tx_id}))

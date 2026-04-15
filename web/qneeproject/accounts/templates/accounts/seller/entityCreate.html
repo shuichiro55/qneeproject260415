@@ -10,7 +10,7 @@
 
   <div class="container">
 
-    <div class="row justify-content-center mt-1">
+    <div class="row justify-content-center mt-2">
       {% for message in messages %}
         <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
           <span>{{ message }}</span>
@@ -19,7 +19,7 @@
     </div>
 
     <nav aria-label="breadcrumb" role="navigation">
-      <ol class="breadcrumb bg-light-subtle px-2 rounded-3 mt-1">
+      <ol class="breadcrumb bg-light-subtle px-2 rounded-3 mt-2">
         <li class="breadcrumb-item"><a href="{% url 'accounts:mypage_seller' user.id %}">
           {% bs_icon 'house' color='cornflowerblue' size='1.2em' %}
           マイページトップ</a></li>
@@ -66,7 +66,7 @@
 
         <div class="d-flex justify-content-center mt-4">
           <h5 class="text-secondary"><b>本登録（ご入力）</b></h5>
-          <i class="bi bi-pencil-square ps-1" style="font-size:2.0em; color:hotpink;"></i>
+          <i class="bi bi-pencil-square ps-1" style="font-size:2.0em; color:deeppink;"></i>
         </div> 
 
         <form method="POST" class="h-adr"> <!--「class="adr"」は郵便番号から住所を自動入力するため -->>
@@ -277,7 +277,7 @@
 
         <div class="d-flex justify-content-center mt-4">
           <h5 class="text-secondary mt-1"><b>本登録（内容ご確認）</b></h5>
-          <i class="bi bi-list-check ms-1" style="font-size:2.4em; color:hotpink;"></i>
+          <i class="bi bi-list-check ms-1" style="font-size:2.4em; color:deeppink;"></i>
         </div>
 
         <div class ="row justify-content-center mt-2 px-4">
@@ -337,7 +337,7 @@
 
         <div class="d-flex justify-content-center mt-4">
           <h5 class="text-secondary"><b>本登録（ご入力）</b></h5>
-          <i class="bi bi-pencil-square ms-1" style="font-size:1.8em; color:hotpink;"></i>
+          <i class="bi bi-pencil-square ms-1" style="font-size:1.8em; color:deeppink;"></i>
         </div> 
 
         <form method="POST" class="mx-2 h-adr"> <!--「class="adr"」は郵便番号から住所を自動入力するため -->>
@@ -653,7 +653,7 @@
 
         <div class="d-flex justify-content-center mt-4">
           <h5 class="text-secondary pt-1"><b>本登録（内容ご確認）</b></h5>
-          <i class="bi bi-list-check ps-1" style="font-size:2.4em; color:hotpink;"></i>
+          <i class="bi bi-list-check ps-1" style="font-size:2.4em; color:deeppink;"></i>
         </div> 
 
         <div class ="row justify-content-center pt-2 px-4">

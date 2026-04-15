@@ -1,0 +1,234 @@
+{% extends "buyer/index/base_qconnect.html" %}
+
+{% load bootstrap_icons %}
+{% load humanize %}
+
+{% block content %}
+{% csrf_token %}
+
+<div class="authentication-bg min-vh-100 min-vw-100 align-items-start">
+
+  <div class="container">
+
+    <div class="row justify-content-center mt-2">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
+          <span>{{ message }}</span>
+        </div>
+      {% endfor %}
+    </div>
+
+    <nav aria-label="breadcrumb" role="navigation">
+      <ol class="breadcrumb bg-light-subtle px-2 rounded-3 mt-2">
+        <li class="breadcrumb-item">
+          <a href="{% url 'accounts:mypage_admin' %}">
+            <i class="bi bi-house" style="font-size:1.2em; color:cornflowerblue"></i>
+            マイページトップ</a>
+        </li>
+        <li class="breadcrumb-item" aria-current="page">
+          <i class="bi bi-inbox" style="font-size:1.2em; color:text-secondary"></i>
+          インボックス
+        </li>
+      </ol>
+    </nav>
+
+    
+    <div class="d-flex justify-content-center mt-4">
+      <h5 class="text-secondary pt-1"><b>インボックス　</b></h5>
+      {% bs_icon 'inbox' color='deeppink' size='2.2em' %}
+    </div>
+
+    {% if object_list.count >= 1 %}
+      <div class="row justify-content-center">
+      
+        <form method="GET"
+          class="rounded-1 px-2 pt-1 pb-0"
+          style="background-color: transparent !important; border-color:transparent !important;">
+          {% csrf_token %}
+
+          <div class="d-block d-lg-none">
+        
+            {% for item in page_obj %}
+
+              <table class="table table-sm table-bordered border-primary-subtle table-responsive mb-3">
+                <tbody style="font-size:0.9rem">
+
+                  <tr class="table-primary" style="text-align:center;">
+                    <td rowspan="5" style="vertical-align:middle; text-align:center">
+                      {{ page_obj.start_index|add:forloop.counter0 }}</td>
+                    <td style="vertical-align:top"></td>
+                    <td style="vertical-align:top">名前</td>
+                    <td style="vertical-align:top">金額</td>
+                    <td style="vertical-align:top">処理日時</td>
+                    <td style="vertical-align:top">証明書類</td>
+                  </tr>
+
+                  <tr>
+                    <td class="table-primary" style="vertical-align:middle; text-align:start">申請情報</td>
+                    <td style="vertical-align:middle; text-align:start">
+                      {{ item.sellEntityName }}</td>
+                    <td style="vertical-align:middle; text-align:center">
+                      {{ item.requested_amount|intcomma }}</td>
+                    <td style="vertical-align:middle; text-align:center">
+                      {{ item.requested_at|date:"n/j H:i" }}</td>
+                    <td rowspan="2" style="text-align:center; vertical-align:middle;">
+                      <img src="{{ item.evidence.url }}"
+                        class="img-fluid"
+                        style="width:50;height:auto; cursor:zoom-in;"
+                        data-bs-toggle="modal"
+                        data-bs-target="#imageModal1_{{ forloop.counter }}"/>
+                    </td>
+                  </tr>
+                  <!-- モーダルウィンドウ外枠 -->
+                  <div class="modal fade"
+                    id="imageModal1_{{ forloop.counter }}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-sm"> <!-- 大きさ指定なしは「Medium」 -->
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h6 class="modal-title">証明書類</h6>
+                          <!-- 閉じるボタン: data-bs-dismiss="modal" が重要 -->
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          <img src="{{ item.evidence.url }}" class="img-fluid" alt="拡大画像">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+
+
+                  <tr>
+                    <td class="table-primary" style="vertical-align:middle; text-align:start">承認情報</td>
+                    <td style="text-align:start">{{ item.buyEntityName }}</td>
+                    <td style="vertical-align:middle; text-align:center">
+                      {{ item.approved_amount|default:'-'|intcomma }}</td>
+                    <td style="vertical-align:middle; text-align:center">
+                      {{ item.approved_at|default:'-'|date:"n/j H:i" }}</td>
+                  </tr>
+                  <tr>
+                    <td colspan="2" class="table-primary" style="text-align:center;">状況</td>
+                    <td colspan="3" class="table-primary" style="text-align:center">送金処理</td>
+                  </tr>
+                  <tr>
+                    <td colspan="2" style="vertical-align:middle; text-align:left;">
+                      {% if item.txStatus_int == 1 %}パートナー承認前{% endif %}
+                      {% if item.txStatus_int == 2 %}パートナー承認済<br>Qnee前払い前</td>{% endif %}
+                    <td colspan="3" style="vertical-align:middle; text-align:center">
+                      <a href="{% url 'qpay:adminInboxDetail' item.id %}"
+                        class="btn btn-outline-primary w-100">処理に移る</a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+
+            {% empty %}
+              <p>承認待ちのデータはありません。</p>
+            {% endfor %}
+
+          </div>
+
+          <div class="d-none d-lg-block">
+             
+            <table class="table table-sm table-bordered border-primary-subtle table-responsive">
+              <thead style="font-size:0.9rem">
+                <tr class="table-primary" style="text-align:center;">
+                  <th rowspan="2" style="vertical-align:middle; text-align:center">#</th>
+                  <th colspan="2" style="vertical-align:top">申請（ゲスト）</th>
+                  <th colspan="2" style="vertical-align:top">承認（パートナー）</th>
+                  <th rowspan="2" style="vertical-align:top">証明<br>書類</th>
+                  <th rowspan="2" style="vertical-align:top">送金処理</th>
+                </tr>
+                <tr class="table-primary" style="text-align:center;">
+                  <th style="vertical-align:top">金額</th>
+                  <th style="vertical-align:top">時点</th>
+                  <th style="vertical-align:top">金額</th>
+                  <th style="vertical-align:top">時点</th>
+                </tr>
+
+              </thead>
+
+              <tbody style="font-size:0.9rem">
+              
+                {% for item in page_obj %}
+
+                  <tr>
+                    <td rowspan="2" style="vertical-align:middle; text-align:center">
+                      {{ page_obj.start_index|add:forloop.counter0 }}</td>
+                    <td colspan="2" style="text-align:center">
+                      {{ item.sellEntityName }}</td>
+                    <td colspan="2" style="text-align:center">
+                      {{ item.buyEntityName }}</td>
+                    <td rowspan="2" style="text-align:center; vertical-align:middle;">
+                      <img src="{{ item.evidence.url }}"
+                        class="img-fluid"
+                        style="width:50;height:auto; cursor:zoom-in;"
+                        data-bs-toggle="modal"
+                        data-bs-target="#imageModal2_{{ forloop.counter }}"/>
+                    </td>
+                    <!-- モーダルウィンドウ外枠 -->
+                    <div class="modal fade"
+                      id="imageModal2_{{ forloop.counter }}" tabindex="-1" aria-hidden="true">
+                      <div class="modal-dialog modal-sm"> <!-- 大きさ指定なしは「Medium」 -->
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h6 class="modal-title">証明書類</h6>
+                            <!-- 閉じるボタン: data-bs-dismiss="modal" が重要 -->
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">
+                            <img src="{{ item.evidence.url }}" class="img-fluid" alt="拡大画像">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <td rowspan="2" class="p-1" style="vertical-align:middle; text-align:center;">
+                      <a href="{% url 'qpay:adminInboxDetail' item.id %}"
+                        class="btn btn-outline-primary w-100 px-2">処理に移る</a>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td style="text-align:center">{{ item.requested_amount|intcomma }}</td>
+                    <td style="text-align:center">
+                      {% if item.txStatus_int == 1 %} 未了 {% endif %}
+                      {% if item.txStatus_int == 2 %}{{ item.requested_at|date:"n/j H:i" }}{% endif %}
+                      {% if item.txStatus_int == 3 %} 否認 {% endif %}
+                    </td>
+                    <td style="text-align:center">{{ item.approved_amount|default:'-'|intcomma }}</td>
+
+                    <td style="text-align:center">
+                      {% if item.txStatus_int == 1 %} 未了 {% endif %}
+                      {% if item.txStatus_int == 2 %}{{ item.approved_at|default:'-'|date:"n/j H:i" }}{% endif %}
+                    </td>
+                  </tr>
+
+                {% empty %}
+                  <p>インボックスにデータがありません。</p>
+                {% endfor %}
+
+              </tbody>
+            </table>
+              
+          </div>
+
+          <input type="hidden" name="next" value="{{ next }}" />
+
+          {% include "partials/pagination.html" %}
+
+        </form>
+      </div>
+
+    {% else %}
+
+      <div class="row justify-content-center mt-5">
+        承認待ちのデータはありません。
+      </div>
+
+    {% endif %}
+    
+  </div>
+</div>
+
+{% endblock %}

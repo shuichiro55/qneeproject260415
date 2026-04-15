@@ -9,7 +9,7 @@
 
   <div class="container">
 
-    <div class="row justify-content-center mt-1">
+    <div class="row justify-content-center mt-2">
       {% for message in messages %}
         <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
           <span>{{ message }}</span>
@@ -18,7 +18,7 @@
     </div>
 
     <nav aria-label="breadcrumb" role="navigation">
-      <ol class="breadcrumb bg-light-subtle px-2 rounded-3 mt-1">
+      <ol class="breadcrumb bg-light-subtle px-2 rounded-3 mt-2">
         <li class="breadcrumb-item"><a href="{% url 'accounts:mypage_seller' %}">
           {% bs_icon 'house' color='cornflowerblue' size='1.2em' %}
           マイページトップ</a></li>
@@ -69,7 +69,7 @@
 
         <div class="d-flex text-left mt-4">
           <h5 class="text-secondary"><b>本登録（個人ゲスト用）</b></h5>
-          <i class="bi bi-pencil-square" style="font-size:1.8em; color:hotpink;"></i>
+          <i class="bi bi-pencil-square" style="font-size:1.8em; color:deeppink;"></i>
         </div> 
 
         <form method="POST" class="form-group">
@@ -202,7 +202,7 @@
 
         <div class="d-flex justify-content-center mt-4">
           <h5 class="text-secondary"><b>本登録内容（個人ゲスト用）</b></h5>
-          <i class="bi bi-pencil-square" style="font-size:1.8em; color:hotpink;"></i>
+          <i class="bi bi-pencil-square" style="font-size:1.8em; color:deeppink;"></i>
         </div> 
 
         <div class="row justify-content-center px-4">
@@ -261,7 +261,7 @@
 
         <div class="d-flex justify-content-center mt-4">
           <h5 class="text-secondary"><b>本登録（ご入力）</b></h5>
-          <i class="bi bi-pencil-square" style="font-size:1.8em; color:hotpink;"></i>
+          <i class="bi bi-pencil-square" style="font-size:1.8em; color:deeppink;"></i>
         </div> 
 
         <div class="row justify-content-center mt-4 px-4">
@@ -532,7 +532,7 @@
 
         <div class="d-flex justify-content-center mt-4">
           <h5 class="text-secondary"><b>本登録（内容ご確認）</b></h5>
-          <i class="bi bi-check-list ms-1" style="font-size:2.4em; color:hotpink;"></i>
+          <i class="bi bi-check-list ms-1" style="font-size:2.4em; color:deeppink;"></i>
         </div> 
 
         <div class="row justify-content-center mt-4 px-4">

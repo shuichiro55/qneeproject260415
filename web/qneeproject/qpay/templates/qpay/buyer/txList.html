@@ -11,7 +11,7 @@
 
   <div class="container">
 
-    <div class="row justify-content-center mt-1">
+    <div class="row justify-content-center mt-2">
       {% for message in messages %}
         <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
           <span>{{ message }}</span>
@@ -19,41 +19,49 @@
       {% endfor %}
     </div>
 
-    <nav aria-label="breadcrumb" role="navigation">
-      <ol class="breadcrumb bg-light-subtle px-2 rounded-1 mt-1">
-        <li class="breadcrumb-item">
-          <a href="{% url 'accounts:mypage_buyer' %}">
-            {% bs_icon 'house' color='cornflowerblue' size='1.2em' %}
-            マイページトップ</a></li>
-        <li class="breadcrumb-item" aria-current="page">取引一覧</li>
-      </ol>
-    </nav>
+      <nav aria-label="breadcrumb" role="navigation">
+        <ol class="breadcrumb bg-light-subtle px-2 rounded-1 mt-2">
+          <li class="breadcrumb-item">
+            <a href="{% url 'accounts:mypage_buyer' %}">
+              <i class="bi bi-house" style="font-size:1.2em; color:cornflowerblue"></i>
+              マイページトップ</a></li>
+          <li class="breadcrumb-item" aria-current="page">
+            {% bs_icon 'list-ol' color='text-secondary' size='1.1em' %}
+            取引一覧</li>
+        </ol>
+      </nav>
 
     <div class="d-flex justify-content-center mt-4">
       <h5 class="text-secondary pt-1"><b>取引一覧　</b></h5>
-      {% bs_icon 'receipt-cutoff' color='hotpink' size='2.2em' %}
+      {% bs_icon 'receipt-cutoff' color='deeppink' size='2.2em' %}
     </div>
 
 
-    {% if objectList.count >= 1 %}
-      <div class="row justify-content-center">
+    {% if object_list.count >= 1 %}
+
+      <div class="row justify-content-center mt-2">
  
-        <form method="POST" class="bg-light rounded-1 p-3">
+        <form method="POST" class="p-0"
+          style="background-color: transparent !important; border-color:transparent !important;">
+          
           {% csrf_token %}
 
-            <div class="d-block d-lg-none">
-            <table class="table table-sm table-bordered border-primary-subtle table-responsive">
+          <div class="d-block d-lg-none mx-4">
+            <table class="table table-sm table-bordered border-primary-subtle table-responsive mx-2">
               <thead style="font-size:0.9rem">
                 <tr class="table-primary" style="text-align:center;">
                   <th rowspan="2"style="vertical-align:top">#</th>
-                  <th colspan="2" style="vertical-align:top">申請ゲスト</th>
-                  <th rowspan="2" style="vertical-align:top">取引<br>状況</th>
+                  <th colspan="2" style="vertical-align:top">申請法人</th>
+                  <th colspan="2" style="vertical-align:top">承認ユーザー</th>
+                  <th rowspan="2" style="vertical-align:top">Qnee<br>送金</th>
                   <th rowspan="2" style="vertical-align:top">詳細</th>
                 </tr>
 
                 <tr class="table-primary" style="text-align:center;">
                   <th style="vertical-align:top">申請額</th>
                   <th style="vertical-align:top">申請時</th>
+                  <th style="vertical-align:top">状況</th>
+                  <th style="vertical-align:top">承認時</th>
                 </tr>
 
               </thead>
@@ -64,23 +72,36 @@
 
                   <tr>
                     <td rowspan="2" style="vertical-align:middle; text-align:center;">
-                      {{ forloop.counter }}</td>
+                      {{ page_obj.start_index|add:forloop.counter0 }}</td>
                     <td colspan="2" style="text-align:center">
-                      {{ item.sellEntityName }}</td>
-                    {% if item.txStatus_int == 1 %}
-                      <td rowspan="2" class="table-danger" style="vertical-align:middle; text-align:center">
-                    {% else %}
-                      <td rowspan="2"style="vertical-align:middle; text-align:center">
-                    {% endif %}
-                      {{ item.txStatus_char|linebreaksbr }}</td>
+                      {{ item.sellEntityName }}
+                    </td>
+                    <td colspan="2" style="vertical-align:middle; text-align:center">
+                      {{ item.buyUser_userName |default:'-' }}
+                    </td>
                     <td rowspan="2" style="vertical-align:middle; text-align:center">
+                      {{ item.payed_at |date:"y.n.j<br>H:i" |default:'-' }}
+                    </td>
+                    <td rowspan="2" class="p-1" style="vertical-align:middle; text-align:center">
                       <a href="{% url 'qpay:txDetail_buyer' item.id page_obj.number %}"
-                        class="btn btn-outline-primary">表示</a>
+                        class="btn btn-outline-primary w-100 h-100 px-1">表示</a>
                     </td>
                   </tr>
                   <tr>
                     <td style="text-align:center">{{ item.requested_amount|intcomma }}</td>
-                    <td style="text-align:center">{{ item.requested_at|date:"y.n.j H:i" }}</td>
+                    <td style="text-align:center">{{ item.requested_at |date:"y.n.j H:i" }}</td>
+                    <td style="vertical-align:middle; text-align:center">
+                      {% if item.txStatus_int == 1 %}まだ{% endif %}
+                      {% if item.txStatus_int == 2 %}承認{% endif %}
+                      {% if item.txStatus_int == 3 %}否認{% endif %}
+                      {% if item.txStatus_int == 4 %}承認{% endif %}
+                    </td>
+                    <td style="vertical-align:middle; text-align:center">
+                      {% if item.txStatus_int == 1 %}-{% endif %}
+                      {% if item.txStatus_int == 2 %}{{ item.approved_at |date:"y/n/j H:i" |default:'-' }}{% endif %}
+                      {% if item.txStatus_int == 3 %}{{ item.rejected_at |date:"y/n/j H:i" |default:'-' }}{% endif %}
+                      {% if item.txStatus_int == 4 %}{{ item.approved_at |date:"y/n/j H:i" |default:'-' }}{% endif %}
+                    </td>
                   </tr>
 
                 {% empty %}
@@ -92,41 +113,38 @@
             </table>
           </div>        
 
-          <div class="d-block d-lg-none">
+          <div class="d-none d-lg-block mx-4">
 
-            <table class="table table-sm table-bordered border-primary-subtle table-responsive">
-              <thead>
+            <table class="table table-sm table-bordered border-primary-subtle table-responsive mx-2">
+              <thead style="font-size:0.9rem">
                 <tr class="table-primary" style="text-align:center;">
                   <th rowspan="2"style="vertical-align:top">#</th>
-                  <th colspan="2" style="vertical-align:top">申請ゲスト</th>
+                  <th colspan="2" style="vertical-align:top">申請法人</th>
                   <th rowspan="2" style="vertical-align:top">証明<br>書類</th>
-                  <th rowspan="2" style="vertical-align:top">取引<br>状況</th>
+                  <th colspan="2" style="vertical-align:top">承認ユーザー</th>
+                  <th rowspan="2" style="vertical-align:top">Qnee<br>送金</th>
                   <th rowspan="2" style="vertical-align:top">詳細</th>
                 </tr>
 
                 <tr class="table-primary" style="text-align:center;">
                   <th style="vertical-align:top">申請額</th>
                   <th style="vertical-align:top">申請時</th>
+                  <th style="vertical-align:top">状況</th>
+                  <th style="vertical-align:top">承認時</th>
                 </tr>
 
               </thead>
           
-              <tbody>
+              <tbody style="font-size:0.9rem">
 
                 {% for item in page_obj %}
 
                   <tr>
                     <td rowspan="2" style="vertical-align:middle; text-align:center;">
-                      {{ forloop.counter }}</td>
+                      {{ page_obj.start_index|add:forloop.counter0 }}</td>
                     <td colspan="2" style="text-align:center">
-                      {{ item.sellEntityName }}</td>
-
-                    {% if item.txStatus_int == 1 %}
-                      <td rowspan="2" class="table-danger" style="vertical-align:middle; text-align:center">
-                    {% else %}
-                      <td rowspan="2"style="vertical-align:middle; text-align:center">
-                    {% endif %}
-                      {{ item.txStatus_char|linebreaksbr }}</td>
+                      {{ item.sellEntityName }}
+                    </td>
 
                     <td rowspan="2" style="text-align:center; vertical-align:middle;">
                       <img src="{{ item.evidence.url }}"
@@ -135,6 +153,7 @@
                         data-bs-toggle="modal"
                         data-bs-target="#imageModal{{ forloop.counter }}"/>
                     </td>
+
                     <!-- モーダル・ダイアログ -->
                     <div class="modal fade"
                       id="imageModal{{ forloop.counter }}" tabindex="-1" aria-hidden="true">
@@ -151,15 +170,32 @@
                         </div>
                       </div>
                     </div> 
-
+                    <td colspan="2" style="vertical-align:middle; text-align:center">
+                      {{ item.buyUser_userName |default:'-' }}
+                    </td>
                     <td rowspan="2" style="vertical-align:middle; text-align:center">
+                      {{ item.payed_at |date:"y.n.j H:i" |default:'-' }}
+                    </td>
+                    <td rowspan="2" class="p-1" style="vertical-align:middle; text-align:center">
                       <a href="{% url 'qpay:txDetail_buyer' item.id page_obj.number %}"
-                        class="btn btn-outline-primary">表示</a>
+                        class="btn btn-outline-primary w-100 px-2">表示</a>
                     </td>
                   </tr>
                   <tr>
                     <td style="text-align:center">{{ item.requested_amount|intcomma }}</td>
                     <td style="text-align:center">{{ item.requested_at|date:"y.n.j H:i" }}</td>
+                    <td style="vertical-align:middle; text-align:center">
+                        {% if item.txStatus_int == 1 %}まだ{% endif %}
+                        {% if item.txStatus_int == 2 %}承認{% endif %}
+                        {% if item.txStatus_int == 3 %}否認{% endif %}
+                        {% if item.txStatus_int == 4 %}承認{% endif %}
+                    </td>
+                    <td style="vertical-align:middle; text-align:center">
+                      {% if item.txStatus_int == 1 %}-{% endif %}
+                      {% if item.txStatus_int == 2 %}{{ item.approved_at|date:"y/n/j H:i"|default:'-' }}{% endif %}
+                      {% if item.txStatus_int == 3 %}{{ item.rejected_at|date:"y/n/j H:i"|default:'-' }}{% endif %}
+                      {% if item.txStatus_int == 4 %}{{ item.approved_at|date:"y/n/j H:i"|default:'-' }}{% endif %}
+                    </td>
                   </tr>
 
                 {% empty %}
@@ -192,7 +228,7 @@
 {% endblock %}
 
 <!--
- {% for item in objectList %}
+ {% for item in object_list %}
 <div class="p-4 m-4 bg-light border border-success rounded">
   <h2 class="text-success">{{ item.title }}</h2>
     <h6>物件名：{{ item.article_name }}</h6>

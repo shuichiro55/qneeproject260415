@@ -10,7 +10,7 @@
   
   <div class="container">
 
-    <div class="row justify-content-center mt-1">
+    <div class="row justify-content-center mt-2">
       {% for message in messages %}
         <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
           <span>{{ message }}</span>
@@ -21,9 +21,10 @@
     <!-- message.tagsはsettings.pyのMESSAGE_TAGSで定義できる  25/01/10 -->
     <!-- extra_tagはsettings.pyのMESSAGE_TAGSで定義できる  25/01/10 -->
 
+    <!--
     <div class="row">
       <nav aria-label="breadcrumb" role="navigation">
-        <ol class="breadcrumb bg-light-subtle px-2 rounded-3 mt-1">
+        <ol class="breadcrumb bg-light-subtle px-2 rounded-3 mt-2">
           <li class="breadcrumb-item"><a href="{% url 'accounts:mypage_seller' %}">
             {% bs_icon 'house' color='cornflowerblue' size='1.2em' %}
             マイページトップ</a></li>
@@ -31,8 +32,19 @@
         </ol>
       </nav>
     </div>
+    -->
 
-    <div class ="row justify-content-center">
+
+    <div id="loading">
+      <div class="spinner-border text-primary"
+        style="width: 3rem; height: 3rem;"
+        role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-5">処理中です... しばらくお待ちください</p>
+    </div>
+
+    <div class ="row justify-content-center mt-2">
       <div class="col-11 col-sm-10 col-md-9">
         <div class="progress mt-1 mb-1" style="height: 12px" >
           <div class="progress-bar bg-secondary" role="progressbar"
@@ -67,8 +79,9 @@
       <div class ="row justify-content-center mx-4">
         <div class="col-sm-10 col-md-9">
 
-          <div class="row justify-content-center mt-3">
-            <h4 class="text-black text-center">＜利用規約ご確認＞</h4>
+          <div class="d-flex justify-content-center align-items-center mt-5 gap-2">
+            <h5 class="text-secondary text-center"><b>利用規約のご確認</b></h5>
+            <i class="bi bi-check-all mb-2" style="font-size:2.4em; color:deeppink;"></i>
           </div>
 
           <div class="iframe-wrapper d-flex justify-content-center mt-3">
@@ -81,7 +94,10 @@
       <div class="row justify-content-center mt-3 mx-4">
         <div class="col-sm-10 col-md-9">
 
-          <form method="POST" action="{% url 'accounts:agreementConfirm_seller' %}">
+          <form method="POST"
+            action="{% url 'accounts:agreementConfirm_seller' %}"
+            id="id_PostForm">
+            
             {% csrf_token %}
           
             <div class="btn-group btn-group-vertical d-flex justify-content-center" data-toggle="buttons">
@@ -157,6 +173,10 @@
       }   
     });
 
+    document.getElementById('id_PostForm').addEventListener('submit', function() {
+      document.getElementById('loading').style.display = 'block';
+    });
+  
   </script>
 
 {% endblock %}

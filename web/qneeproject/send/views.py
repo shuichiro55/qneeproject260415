@@ -27,10 +27,6 @@ from django.http import JsonResponse
 #from dateutil.relativedelta import relativedelta
 import json
 
-from django.contrib.sites.shortcuts import get_current_site
-from django.template.loader import render_to_string
-from django.core.mail import EmailMessage
-
 #from django.contrib import messages
 #from django.core.paginator import Paginator
 #from django.core.mail import EmailMessage
@@ -56,13 +52,12 @@ class InvitationSetsView(generic.UpdateView):
     mailSets, created = InvitationSets.objects.select_related('appliedList').get_or_create(buyEntity=buyEntity)   
     mailSets.save()
 
-    appliedList = AddList.objects.get(pk=mailSets.appliedList_id)
-    request.session['nameOfAppliedList'] = appliedList.listName
-
-    if mailSets.appliedList is None:
-      request.session['flag_appliedList'] = 0
-    else:
+    if mailSets.appliedList is not None:
       request.session['flag_appliedList'] = 1
+      appliedList = AddList.objects.get(pk=mailSets.appliedList_id)
+      request.session['nameOfAppliedList'] = appliedList.listName
+    else:
+      request.session['flag_appliedList'] = 0
 
 
     " 関係しているゲスト抽出（テンプレートに渡すため） "
@@ -108,7 +103,7 @@ class InvitationSetsView(generic.UpdateView):
 
     context = {
       'addListSelectForm': AddListSelectForm(buyEntity_id=buyEntity_id),
-      'flag_fileUp': 1,
+      'step_fileUp': 1,
       'addFileUpForm': AddFileUpForm(),
       'addListNameForm1': AddListNameForm(),
 
@@ -118,7 +113,7 @@ class InvitationSetsView(generic.UpdateView):
       'repeatOnOff': mailSets.repeatOnOff,
       'RepeatSetForm': RepeatSetForm(initial=init_data),
     }
-    return TemplateResponse(request, 'send/invitationSets.html', context)
+    return TemplateResponse(request, 'send/buyer/invitationSets.html', context)
 
 
   def nearStartDate(self):
@@ -295,13 +290,13 @@ class InvitationSetsView(generic.UpdateView):
 
         context = {
           'WhoWhenWhat':'who',
-          'MakeOrSelect':'make',
-          'InputOrSelect':'input',
+          'MakeOrSelect': 'make',          
+          #'InputOrSelect':'input',
           'FileOrManual':'file',
           'FileType':fileType,
 
           'addListSelectForm': AddListSelectForm(buyEntity_id=buyEntity_id),
-          'flag_fileUp': 2,
+          'step_fileUp': 2,
           'adds':adds,
           'addFileUpForm': form,
           'addListNameForm1': AddListNameForm(
@@ -314,7 +309,7 @@ class InvitationSetsView(generic.UpdateView):
           'repeatOnOff': mailSets.repeatOnOff,
           'RepeatSetForm': RepeatSetForm(initial=init_data),
         }
-        return TemplateResponse(request, 'send/invitationSets.html', context)
+        return TemplateResponse(request, 'send/buyer/invitationSets.html', context)
 
 
       " ファイル入力で作成したアドレスリストを保存 "
@@ -352,15 +347,16 @@ class InvitationSetsView(generic.UpdateView):
           'dayOfMonth':mailSets.dayOfMonth}
 
         context = {
-          'flag_fileUp': 1 if formError==0 else 2,
-          'WhoWhenWhat':'who',
-          'MakeOrSelect':'' if formError==0 else 'make',
-          'InputOrSelect':'' if formError==0 else 'input',
-          'FileOrManual':'' if formError==0 else 'file',
+          'step_fileUp': 1 if formError==0 else 2,
+          'WhoWhenWhat': 'who',
+          'MakeOrSelect': 'make' if formError==0 else 'make',
+          #'InputOrSelect':'' if formError==0 else 'input',
+          'FileOrManual':'file' if formError==0 else 'file',
           'FileType':'' if formError==0 else self.request.POST.get('fileType'),
           'addListNameForm1': AddListNameForm() if formError==0 else form,
           'adds': '' if formError==0 else adds,
 
+          'step_fileUp': 3,
           'addFileUpForm': AddFileUpForm(),
           'addListSelectForm': AddListSelectForm(buyEntity_id=buyEntity_id),
           'flag_manualInput': 1,
@@ -369,7 +365,8 @@ class InvitationSetsView(generic.UpdateView):
           'repeatOnOff': mailSets.repeatOnOff,
           'RepeatSetForm': RepeatSetForm(initial=init_data),
         }
-        return TemplateResponse(request, 'send/invitationSets.html', context)
+        return TemplateResponse(request, 'send/buyer/invitationSets.html', context)
+
 
       print(f'pass fileup0 nextWho_fileInput={nextWho_fileInput}')
       if nextWho_fileInput.find("ToUploadAddListAgain") >= 0:
@@ -391,10 +388,10 @@ class InvitationSetsView(generic.UpdateView):
         print(f'init_data={init_data}')
 
         context = {
-          'flag_fileUp': 1,
+          'step_fileUp': 1,
           'WhoWhenWhat':'who',
-          'MakeOrSelect':'make',
-          'InputOrSelect':'input',
+          'MakeOrSelect': 'make',
+          #'InputOrSelect':'input',
           'FileOrManual':'file',
           'FileType':self.request.POST.get('fileType'),
 
@@ -408,7 +405,7 @@ class InvitationSetsView(generic.UpdateView):
           'repeatOnOff': mailSets.repeatOnOff,
           'RepeatSetForm': RepeatSetForm(initial=init_data),
         }
-        return TemplateResponse(request, 'send/invitationSets.html', context)
+        return TemplateResponse(request, 'send/buyer/invitationSets.html', context)
 
 
     """ 個別入力されたアドレスについてアドレスリストを作成する """
@@ -457,12 +454,12 @@ class InvitationSetsView(generic.UpdateView):
 
         context = {
           'WhoWhenWhat':'who',
-          'MakeOrSelect':'make',
-          'InputOrSelect':'input',
+          'MakeOrSelect': 'make',
+          #'InputOrSelect':'input',
           'FileOrManual': 'manual',
 
           'addListSelectForm': AddListSelectForm(buyEntity_id=buyEntity_id),
-          'flag_fileUp': 1,
+          'step_fileUp': 1,
           'addFileUpForm': AddFileUpForm(),
           'addListNameForm1': AddListNameForm(),
 
@@ -475,7 +472,7 @@ class InvitationSetsView(generic.UpdateView):
           'repeatOnOff': mailSets.repeatOnOff,
           'RepeatSetForm': RepeatSetForm(initial=init_data),
         }
-        return TemplateResponse(request, 'send/invitationSets.html', context)
+        return TemplateResponse(request, 'send/buyer/invitationSets.html', context)
 
 
       " 手入力で作成したアドレスリストを保存 "
@@ -521,7 +518,7 @@ class InvitationSetsView(generic.UpdateView):
         context = {
           'WhoWhenWhat':'who',
           'MakeOrSelect': '' if formError==0 else 'make',
-          'InputOrSelect': '' if formError==0 else 'input',
+          #'InputOrSelect': '' if formError==0 else 'input',
           'FileOrManual': '' if formError==0 else 'manual', 
           'flag_manualInput': 1 if formError==0 else 2,
           'addListNameForm2': AddListNameForm()  if formError==0 else form,
@@ -529,7 +526,7 @@ class InvitationSetsView(generic.UpdateView):
 
           'FileType':'',
           'addListSelectForm': AddListSelectForm(buyEntity_id=buyEntity_id),
-          'flag_fileUp': 1,
+          'step_fileUp': 1,
           'addFileUpForm': AddFileUpForm(),
           'addListNameForm1': AddListNameForm(),
 
@@ -537,14 +534,14 @@ class InvitationSetsView(generic.UpdateView):
           'repeatOnOff': mailSets.repeatOnOff,
           'RepeatSetForm': RepeatSetForm(initial=init_data),
         }
-        return TemplateResponse(request, 'send/invitationSets.html', context)
+        return TemplateResponse(request, 'send/buyer/invitationSets.html', context)
 
 
       if nextWho_manualInput.find("ToInputAddListAgain") >= 0:
 
-        AddList.objects.filter(
-          buyEntity=buyEntity
-          ).order_by('-created_at').first().delete()
+        if AddList.objects.filter(buyEntity=buyEntity, listName=None).exists():
+          AddList.objects.filter(
+            buyEntity=buyEntity, listName=None).delete()
         # models.pyで「on_delete = CASCADE」と設定してInvitationLogを削除する選択も
 
         if mailSets.startDate is not None:
@@ -560,13 +557,13 @@ class InvitationSetsView(generic.UpdateView):
 
         context = {
           'WhoWhenWhat':'who',
-          'MakeOrSelect':'make',
-          'InputOrSelect':'input',
+          'MakeOrSelect': 'make',
+          #'InputOrSelect':'input',
           'FileOrManual':'manual',
           'FileType':'',
 
           'addListSelectForm': AddListSelectForm(buyEntity_id=buyEntity_id),
-          'flag_fileUp': 1,
+          'step_fileUp': 1,
           'addFileUpForm': AddFileUpForm(),
           'addListNameForm1': AddListNameForm(),
 
@@ -576,45 +573,36 @@ class InvitationSetsView(generic.UpdateView):
           'repeatOnOff': mailSets.repeatOnOff,
           'RepeatSetForm': RepeatSetForm(initial=init_data),
         }
-        return TemplateResponse(request, 'send/invitationSets.html', context)
+        return TemplateResponse(request, 'send/buyer/invitationSets.html', context)
 
 
     if nextWhen != None:
 
-      if nextWhen.find("ToSendNow") >= 0:
+      # ★★ 260410 適用中のリストのアドレスで送るように調整が必要
+      # 今はDBに登録されているゲスト宛に送るだけ
+      if nextWhen.find("ToSendToListMembersNow") >= 0:
 
-        print(f'pass1 def post if "ToSendNow" in SevInfoMailSetsView')
+        print(f'pass1 def post if "ToSendToListMembersNow" in SevInfoMailSetsView')
 
-        current_site = get_current_site(self.request)
-        domain = current_site.domain
+        InvitationAgtView.sendNow()
+        return TemplateResponse(self.request, 'accounts/buyer/mypage.html', {})
 
-        # ★★ 260305 選択されているアドレスリストのアドレスに送るようにする
+
+      if nextWhen.find("ToSendToGuestsNow") >= 0:
+
         for sellUser in sellEntitysUsers:
 
-          #★★ 251214 除外リストに該当するものは外す
-          #★★ 251214 未登録ユーザー or 登録済みユーザーのどちらに送るか
-          #★★ 251214 送信日について休日調整するか選択する機能を入れるか
-
-          context1 = {
-            'protocol': self.request.scheme,
-            'domain': domain,
-            'buUser_id': json.dumps(buyUser.pk),      # 処理者のuser.pkを維持する
-            'buyEntity_id': json.dumps(buyEntity.pk), # 処理者のentity.pkを維持する
+          context = {
+            'sellUser': sellUser,
+            'buyEntity': buyEntity,
           }
-          print(f'buyUser.pk={buyUser.pk}, buyEntity.pk={buyEntity.pk}')
-          subject = render_to_string('send/mail/invitation_subject.txt', context1)
-          message = render_to_string('send/mail/invitation_message.txt', context1)
-
-          from_email = 'shuichiro.tomihari.201604@gmail.com'
-          recipient_list = [sellUser.email]
-          #bcc =  ["toritoritorina@gmail.com"]  # BCCリスト
-          email = EmailMessage(subject, message, from_email, recipient_list)
-          email.send()
+          utils.sendEmail_common(
+            'send/buyer/mail/invitation', '', [sellUser['email']], context)
   
-          print(f'pass1 sellUser.email={sellUser.email}（InvitationSetsView, post)')
+          email = sellUser['email']
+          print(f'pass1 sellUser.email={email}（InvitationSetsView, post)')
 
-          context = {}
-          return TemplateResponse(self.request, 'accounts/buyer/mypage.html', context)
+          return TemplateResponse(self.request, 'accounts/buyer/mypage.html', {})
 
 
       if nextWhen.find("ToSaveSendSets") >= 0:
@@ -672,8 +660,28 @@ class InvitationSetsView(generic.UpdateView):
 
           mailSets.save()
 
-          context = {}
-          return TemplateResponse(self.request, 'accounts/buyer/mypage.html', context)
+          init_data = {
+            'startDate': str_startDate,
+            'interval': interval,
+            'dayOfMonth': dayOfMonth,
+          }
+
+          context = {
+            'sellEntitysUsers': sellEntitysUsers,
+
+            'addListSelectForm': AddListSelectForm(buyEntity_id=buyEntity_id),
+            'step_fileUp': 1,   
+            'addFileUpForm': AddFileUpForm(),
+            'addListNameForm1': AddListNameForm(),
+
+            'flag_manualInput': 1,
+            'addListNameForm2': AddListNameForm(),
+            'mailForm': InvitationForm(), 
+
+            'repeatOnOff': repeatOnOff,
+            'RepeatSetForm': RepeatSetForm(initial=init_data),
+          }
+          return TemplateResponse(self.request, 'send/buyer/invitationSets.html', context)
 
 
         if repeatOnOff == 'off':
@@ -696,7 +704,7 @@ class InvitationSetsView(generic.UpdateView):
             'sellEntitysUsers': sellEntitysUsers,
 
             'addListSelectForm': AddListSelectForm(buyEntity_id=buyEntity_id),
-            'flag_fileUp': 1,   
+            'step_fileUp': 1,   
             'addFileUpForm': AddFileUpForm(),
             'addListNameForm1': AddListNameForm(),
 
@@ -707,17 +715,14 @@ class InvitationSetsView(generic.UpdateView):
             'repeatOnOff': repeatOnOff,
             'RepeatSetForm': RepeatSetForm(initial=init_data),
           }
-          return TemplateResponse(self.request, 'send/invitationSets.html', context)
+          return TemplateResponse(self.request, 'send/buyer/invitationSets.html', context)
         
-
+    """
     if nextWhen != None:
 
       if nextWhen.find("ToSendNow") >= 0:
 
         print(f'pass1 def post if "ToSendNow" in SevInfoMailSetsView')
-
-        current_site = get_current_site(self.request)
-        domain = current_site.domain
 
         # ★★ 260305 選択されているアドレスリストのアドレスに送るようにする
         for sellUser in sellEntitysUsers:
@@ -726,27 +731,12 @@ class InvitationSetsView(generic.UpdateView):
           #★★ 251214 未登録ユーザー or 登録済みユーザーのどちらに送るか
           #★★ 251214 送信日について休日調整するか選択する機能を入れるか
 
-          context1 = {
-            'protocol': self.request.scheme,
-            'domain': domain,
-            'buUser_id': json.dumps(buyUser.pk),      # 処理者のuser.pkを維持する
-            'buyEntity_id': json.dumps(buyEntity.pk), # 処理者のentity.pkを維持する
-          }
-          print(f'buyUser.pk={buyUser.pk}, buyEntity.pk={buyEntity.pk}')
-          subject = render_to_string('send/mail/invitation_subject.txt', context1)
-          message = render_to_string('send/mail/invitation_message.txt', context1)
-
-          from_email = 'shuichiro.tomihari.201604@gmail.com'
-          recipient_list = [sellUser.email]
-          #bcc =  ["toritoritorina@gmail.com"]  # BCCリスト
-          email = EmailMessage(subject, message, from_email, recipient_list)
-          email.send()
-  
-          print(f'pass1 sellUser.email={sellUser.email}（InvitationSetsView, post)')
+          utils.sendEmail_common(
+            'send/buyer/invitation', '', [sellUser.email], {})
 
           context = {}
           return TemplateResponse(self.request, 'accounts/buyer/mypage.html', context)
-
+    """
 
     if nextWho_listApply != None:
 
@@ -791,7 +781,7 @@ class InvitationSetsView(generic.UpdateView):
 
           'addListSelectForm': AddListSelectForm(
             buyEntity_id=buyEntity_id),
-          'flag_fileUp': 1,
+          'step_fileUp': 1,
           'addFileUpForm': AddFileUpForm(),
           'addListNameForm1': AddListNameForm(),
 
@@ -801,7 +791,7 @@ class InvitationSetsView(generic.UpdateView):
           'repeatOnOff': mailSets.repeatOnOff,
           'RepeatSetForm': RepeatSetForm(initial=init_data),
         }
-        return TemplateResponse(request, 'send/invitationSets.html', context)
+        return TemplateResponse(request, 'send/buyer/invitationSets.html', context)
 
 
       # ★★ 260305 指定されたリストを適用する
@@ -835,7 +825,7 @@ class InvitationSetsView(generic.UpdateView):
           'MakeOrSelect':'select',
 
           'addListSelectForm': AddListSelectForm(buyEntity_id=buyEntity_id),
-          'flag_fileUp': 1,
+          'step_fileUp': 1,
           'addFileUpForm': AddFileUpForm(),
           'addListNameForm1': AddListNameForm(),
 
@@ -845,10 +835,10 @@ class InvitationSetsView(generic.UpdateView):
           'repeatOnOff': mailSets.repeatOnOff,
           'RepeatSetForm': RepeatSetForm(initial=init_data),
         }
-        return TemplateResponse(request, 'send/invitationSets.html', context)
+        return TemplateResponse(request, 'send/buyer/invitationSets.html', context)
 
 
-    return TemplateResponse(request, 'send/invitationSets.html', {'addFileUpForm': AddFileUpForm()})
+    return TemplateResponse(request, 'send/buyer/invitationSets.html', {'addFileUpForm': AddFileUpForm()})
 
 
 
@@ -890,10 +880,10 @@ def register(request):
     form = UserEntryForm(request.POST)
     if form.is_valid():
       form.save()
-      return redirect('send/invitationSets.html')
+      return redirect('send/buyer/invitationSets.html')
   else:
     form = UserEntryForm()
-  return TemplateResponse(request, 'send/register.html', {'form': form})
+  return TemplateResponse(request, 'send/buyer/register.html', {'form': form})
 
 
 def import_csv(request):
@@ -904,16 +894,16 @@ def import_csv(request):
       reader = csv.reader(io.StringIO(data))
       preview_data = [row for row in reader if row]
       request.session['csv_data'] = preview_data
-      return TemplateResponse(request, 'send/import_preview.html', {'rows': preview_data})
+      return TemplateResponse(request, 'send/buyer/import_preview.html', {'rows': preview_data})
   else:
       form = CSVUploadForm()
-  return TemplateResponse(request, 'send/import_csv.html', {'form': form})
+  return TemplateResponse(request, 'send/buyer/import_csv.html', {'form': form})
 
 def finalize_import(request):
   csv_data = request.session.pop('csv_data', [])
   for name, email in csv_data:
     LegalEntity.objects.get_or_create(personname=name, email=email)
-  return redirect(reverse('send:invitationSets.html'))
+  return redirect(reverse('send:invitationSets'))
 
 def export_csv(self, request):
   response = HttpResponse(content_type='text/csv')
@@ -926,26 +916,8 @@ def export_csv(self, request):
   return response
 
 
-"""  """
-class TaskAgentView(LoginRequiredMixin, generic.UpdateView):
-  
-  def get(self, request, *args, **kwargs):
-
-    next = self.request.POST.get('next', None)
-
-    if next.find("ToUploadFile") >= 0:
-
-      context = {}
-      return render(request, 'send/admin/invitationSets.html', context)  
-
-    context = {}
-    return render(request, 'send/admin/invitationSets.html', context)  
-
-
-  def post(self, request, *args, **kwargs):
-    context = {}
-    return render(request, 'accounts/admin/mypage.html', context)  
-  
+#from django.utils import timezone
+from datetime import date
 
 """  """
 class InvitationAgtView(LoginRequiredMixin, generic.UpdateView):
@@ -955,14 +927,41 @@ class InvitationAgtView(LoginRequiredMixin, generic.UpdateView):
     context = {}
     return render(request, 'send/admin/invitationAgt.html', context)
 
+  def applicableSendDate(self):
+    return True
+
+  def sendNow(request=None):
+    " 260402 今日、いまから送る場合に呼ばれるメソッド "
+    " 260402 このメソッドを呼ぶ時間を別の場所で管理する "
+
+    invitationSets = InvitationSets.objects.select_related('appliedList').all()
+
+    today = date.today
+    addList  = []
+
+    for eachSets in invitationSets:
+      if today >= eachSets.startDate:
+
+        if eachSets.json_sendMonth[today.month] == 1 and \
+          eachSets.json_sendDay[today.day] == 1:
+
+          addList = list(IndvAdd.objects.filter(addList=eachSets.appliedList))
+          utils.sendEmail_common('send/admin/mail/servInfo', '', addList, {})
+    
+    messages.add_message(request,
+      messages.SUCCESS, "ゲストにサービス内容を案内するメールを送信しました。")
+  
 
   def post(self, request, *args, **kwargs):
+
     next = self.request.POST.get('next', None)
 
-    if next.find("ToStartAgent") >= 0:
 
-      context = {}
-      return render(request, 'accounts/admin/mypage.html', context)  
+    if next.find("ToExecuteForToday") >= 0:
+      
+      context2 = {}
+      return render(request, 'send/admin/invitationAgt.html', context2)
+
 
     if next.find("ToStopAgent") >= 0:
 
@@ -971,34 +970,33 @@ class InvitationAgtView(LoginRequiredMixin, generic.UpdateView):
 
     context = {}
     return render(request, 'send/invitationAgt.html', context)  
-  
-  
 
-"""
-class TxListView_buyer_settings(LoginRequiredMixin, generic.UpdateView):
 
-  def get(self, request, *args, **kwargs):
+from django.conf import settings
+from django.template.loader import render_to_string
+from django.core.mail import EmailMessage
 
-    user =usermodel.objects.get(email=self.request.user)
-    object_list = QpayTx.objects.filter(buyEntity = user.entity).order_by('-created_at')
+class utils:
 
-    if user.type1 == 2:
-      messages.add_message(request, messages.INFO, "発注者としてログインして下さい") 
-      return HttpResponseRedirect(reverse('accounts:logout'))
+  def sendEmail_common(path, from_email, addList, context=None):
 
-    paginate_by = 4 # 4で仮置き
+    #辞書型のデータにprotorolとdomainの情報を加える
+    if context == None: context={}
+    context['protocol'] = settings.PROTOCOL
+    context['domain'] = settings.DOMAIN
 
-    paginator = Paginator(object_list, paginate_by)
+    print(f'path={path}')
+    subject = render_to_string(path + '_subject.txt', context)
+    message = render_to_string(path + '_message.txt', context)
 
-    try:
-      pageNum = self.kwargs['pageNum']
-    except:
-      pageNum = 1
+    # .email_user(subject, message)
+    if from_email is None or from_email == '':
+      from_email = settings.DEFAULT_FROM_EMAIL
 
-    page_obj = paginator.page(pageNum)
-    context = {
-      'object_list': object_list,
-      'page_obj': page_obj,
-    }
-    return TemplateResponse(request, 'send/txlist_buyer_settings.html', context)
-"""
+    recipient_list = addList
+    #bcc =  ["toritoritorina@gmail.com"]  # BCCリスト
+    email = EmailMessage(subject, message, from_email, recipient_list)
+    email.send()
+
+    return True
+

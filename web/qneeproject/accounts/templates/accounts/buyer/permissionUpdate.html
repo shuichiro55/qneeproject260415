@@ -11,7 +11,7 @@
 
   <div class="container">
 
-    <div class="row justify-content-center mt-1">
+    <div class="row justify-content-center mt-2">
       {% for message in messages %}
         <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
           <span>{{ message }}</span>
@@ -20,7 +20,7 @@
     </div>
 
     <nav aria-label="breadcrumb" role="navigation">
-      <ol class="breadcrumb bg-light-subtle px-2 rounded-3 mt-1">
+      <ol class="breadcrumb bg-light-subtle px-2 rounded-3 mt-2">
         <li class="breadcrumb-item"><a href="{% url 'accounts:mypage_buyer' %}">
           <i class="bi bi-house" style="font-size:1.2em; color:cornflowerblue;"></i>
           マイページトップ</a></li>
@@ -62,7 +62,9 @@
             </tbody>
           </table>
 
-          <hr>
+          <!--
+          <hr class="m-0">
+          -->
 
           <table class="table table-bordered border-primary-subtle table-responsive">
             <tbody class="text-center">
@@ -99,14 +101,17 @@
               </tr>
             </tbody>
           </table>
-
-          </hr>
-          <p></p>
-          
-          <div class="d-flex justify-content-center pt-2">
-            <button type="submit" class="btn btn-primary w-100 shadow ms-1"
-              name="next2", value="PermissionSet_{{editedUser.id}}" >
-              編集終わり</button>
+      
+          <div class="d-flex justify-content-center">
+            {% if flag_scene != 'whenJoining' %}
+              <button type="submit" class="btn btn-primary w-100 shadow ms-1"
+                name="next2", value="PermissionSet_{{editedUser.id}}" >
+                編集終わり</button>
+            {% else %}
+              <button type="submit" class="btn btn-primary w-100 shadow ms-1"
+                name="next2", value="PermissionSetWhenJoining_{{editedUser.id}}" >
+                編集終わり</button>
+            {% endif %}
           </div>
 
         </form>

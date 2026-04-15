@@ -11,11 +11,11 @@ urlpatterns = [
 
   path('login_buyer/', views.MyLoginView_buyer.as_view(), name='login_buyer'),
   path('login_buyer/<str:token>', views.MyLoginView_buyer.as_view(), name='login_buyer'),
-  path('login_buyer/<str:nextView>/<str:token>', views.MyLoginView_buyer.as_view(), name='login_buyer'),
+  path('login_buyer/<str:afterLogin>/<str:token>', views.MyLoginView_buyer.as_view(), name='login_buyer'),
 
   path('login_seller/', views.MyLoginView_seller.as_view(), name='login_seller'),
   path('login_seller/<token>', views.MyLoginView_seller.as_view(), name='login_seller'),
-  path('login_seller/<str:nextView>/<str:token>', views.MyLoginView_seller.as_view(), name='login_seller'),
+  path('login_seller/<str:afterLogin>/<str:token>', views.MyLoginView_seller.as_view(), name='login_seller'),
 
   path('login_admin/', views.MyLoginView_admin.as_view(), name='login_admin'),
   path('login_admin/<token>', views.MyLoginView_admin.as_view(), name='login_admin'),

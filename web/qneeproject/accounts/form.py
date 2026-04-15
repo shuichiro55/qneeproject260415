@@ -407,17 +407,18 @@ class AgreementConfirmForm_buyer(forms.Form):
     fields = ('membershipConsent_boolean')
 
 
-# 25/08/24 設定したモデルは6/17 
-class UserAddForm_buyer(forms.Form):
-
-  canApproveAll = forms.BooleanField(label='承認権限（全部）')
-  canApproveAdd = forms.BooleanField(label='承認権限（参加）')
-  canApproveQpay = forms.BooleanField(label='承認権限（Qpay）')
-
-  def __init__(self, *args, **kwargs):
-    super().__init__(*args, **kwargs)
-    #for field in self.fields.values():
-    #  field.widget.attrs['class'] = 'form-check form-switch'
+# 25/08/24 設定したモデルは6/17
+# 260325 利用しなくて済む形に変更
+#class UserAddForm_buyer(forms.Form):
+#
+#  canApproveAll = forms.BooleanField(label='承認権限（全部）')
+#  canApproveAdd = forms.BooleanField(label='承認権限（参加）')
+#  canApproveQpay = forms.BooleanField(label='承認権限（Qpay）')
+#
+#  def __init__(self, *args, **kwargs):
+#    super().__init__(*args, **kwargs)
+#    #for field in self.fields.values():
+#    #  field.widget.attrs['class'] = 'form-check form-switch'
 
 # 25/08/30追加 
 class PermissionUpdateForm_buyer(forms.Form):
@@ -686,17 +687,18 @@ class AgreementConfirmForm_seller(forms.Form):
     fields = ('membershipConsent_boolean')
 
 
-class UserAddForm_seller(forms.Form):
+# 260325 利用しなくて済む形に変更
+#class UserAddForm_seller(forms.Form):
 
-  #applyUser_id = forms.IntegerField(label='申請者ユーザーID')
-  canApproveAll = forms.BooleanField(label='承認権限（全部）')
-  canApproveAdd = forms.BooleanField(label='承認権限（参加）')
-  canApproveQpay = forms.BooleanField(label='承認権限（Qpay）')
-
-  def __init__(self, *args, **kwargs):
-    super().__init__(*args, **kwargs)
-    #for field in self.fields.values():
-    #  field.widget.attrs['class'] = 'form-check form-switch'
+#  #applyUser_id = forms.IntegerField(label='申請者ユーザーID')
+#  canApproveAll = forms.BooleanField(label='承認権限（全部）')
+#  canApproveAdd = forms.BooleanField(label='承認権限（参加）')
+#  canApproveQpay = forms.BooleanField(label='承認権限（Qpay）')
+#
+#  def __init__(self, *args, **kwargs):
+#    super().__init__(*args, **kwargs)
+#    #for field in self.fields.values():
+#    #  field.widget.attrs['class'] = 'form-check form-switch'
 
 
 # 25/08/30追加 

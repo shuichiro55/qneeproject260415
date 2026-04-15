@@ -5,6 +5,6 @@
 下記URLよりサイトにアクセスの上、お手続きをお願いいたします。
 
 お手続き用URL
-{{ protocol}}://{{ domain }}{% url 'accounts:login_buyer' nextView token %}
+{{ protocol}}://{{ domain }}{% url 'accounts:login_buyer' afterLogin token %}
 
 株式会社Qnee（キユーニー）

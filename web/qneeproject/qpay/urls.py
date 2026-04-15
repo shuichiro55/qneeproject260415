@@ -18,13 +18,17 @@ urlpatterns = [
   #path('txlist_buyer_approve_before/<token>/', views.TxListView_buyer_approve_before.as_view(), name='txlist_buyer_approve_before'),
 
   path('txList_buyer/', views.TxListView_buyer.as_view(), name='txList_buyer'),
-  path('<int:pageNum>/txList_buyer/', views.TxListView_buyer.as_view(), name='txList_buyer'),
-  path('<int:tx_id>/<int:pageNum>/txList_buyer/', views.TxListView_buyer.as_view(), name='txList_buyer'),
-  # 「int:pageNum」は承認後、TxList（一覧）において結果を確認するときに使う
+  path('<int:page_number>/txList_buyer/', views.TxListView_buyer.as_view(), name='txList_buyer'),
+  path('<int:tx_id>/<int:page_number>/txList_buyer/', views.TxListView_buyer.as_view(), name='txList_buyer'),
+  # 「int:page_number」は承認後、TxList（一覧）において結果を確認するときに使う
 
   path('txList_seller/', views.TxListView_seller.as_view(), name='txList_seller'),
-  path('<int:pageNum>/txList_seller/', views.TxListView_seller.as_view(), name='txList_seller'),
-  path('<int:tx_id>/<int:pageNum>/txList_seller/', views.TxListView_seller.as_view(), name='txList_seller'),
+  path('<int:page_number>/txList_seller/', views.TxListView_seller.as_view(), name='txList_seller'),
+  path('<int:tx_id>/<int:page_number>/txList_seller/', views.TxListView_seller.as_view(), name='txList_seller'),
+
+  path('txList_admin/', views.TxListView_buyer.as_view(), name='txList_admin'),
+  path('<int:page_number>/txList_admin/', views.TxListView_buyer.as_view(), name='txList_admin'),
+  path('<int:tx_id>/<int:page_number>/txList_admin/', views.TxListView_buyer.as_view(), name='txList_admin'),
 
   path('txApprove_buyer/', views.TxApproveView_buyer.as_view(), name='txApprove_buyer'),
   path('<int:page_number>/txApprove_buyer/', views.TxApproveView_buyer.as_view(), name='txApprove_buyer'),
@@ -34,15 +38,17 @@ urlpatterns = [
   path('<int:tx_id>/txApproveDetail_buyer/', views.TxApproveDetailView_buyer.as_view(), name='txApproveDetail_buyer'),
 
   path('<int:tx_id>/txDetail_buyer/', views.TxDetailView_buyer.as_view(), name='txDetail_buyer'),
-  path('<int:tx_id>/<int:pageNum>/txDetail_buyer/', views.TxDetailView_buyer.as_view(), name='txDetail_buyer'),
+  path('<int:tx_id>/<int:page_number>/txDetail_buyer/', views.TxDetailView_buyer.as_view(), name='txDetail_buyer'),
 
-  path('<int:tx_id>/<int:pageNum>/txDetail_seller/', views.TxDetailView_seller.as_view(), name='txDetail_seller'),
+  path('<int:tx_id>/<int:page_number>/txDetail_seller/', views.TxDetailView_seller.as_view(), name='txDetail_seller'),
 
-  path('adminInbox/', views.AdminInboxView.as_view(), name='adminInbox'),
-  path('<int:tx_id>/adminInboxDetail/', views.AdminInboxDetailView.as_view(), name='adminInboxDetail'),
-  path('<int:tx_id>/<int:pageNum>/adminInboxDetail/', views.AdminInboxDetailView.as_view(), name='adminInboxDetail'),
-  # 「int:pageNum」は承認後、adminInboxにおいて結果を確認するときに使う
+  path('txInbox/', views.TxInboxView.as_view(), name='txInbox'),
+  #path('<int:page_number>/txInbox/', views.TxInboxView.as_view(), name='txInbox'),
 
-  path('adminInboxDetailPre/<token>/', views.AdminInboxDetailPreView.as_view(), name='adminInboxDetailPre'),
+  path('<int:tx_id>/txInboxDetail/', views.TxInboxDetailView.as_view(), name='txInboxDetail'),
+  path('<int:tx_id>/<int:page_number>/txInboxDetail/', views.TxInboxDetailView.as_view(), name='txInboxDetail'),
+  # 「int:page_number」は承認後、txInboxにおいて結果を確認するときに使う
+
+  path('txInboxDetailPre/<token>/', views.TxInboxDetailPreView.as_view(), name='txInboxDetailPre'),
 
 ]

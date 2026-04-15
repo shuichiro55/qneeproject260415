@@ -38,5 +38,5 @@ services:          # dbサービスとdjango、2つのコンテナ起動
     # 左はホストのポート、右は転送先コンテナのポート
     # 右のポートは、上記のrunserverで指定したもの
 
-     depends_on: # 先にdbサービスを起動
+    depends_on: # 先にdbサービスを起動
       - mysql

@@ -103,8 +103,8 @@ class LegalEntity(models.Model):
   sourcingConsent_boolean = models.BooleanField(_('契約合意'),default=False)  
   sourcingConsent_at = models.DateTimeField(
     _('契約合意の日時'), null=True, blank=True,)
-
-  # 会員登録した日時
+  
+  # 会員登録した日時 規約に同意したタイミングで管理するので不要
   #joined_at = models.DateTimeField(_('登録日'), null=True, blank=True)
 
   def __str__(self):

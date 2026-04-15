@@ -24,6 +24,11 @@ print(f'ALLOWED_HOSTS={ALLOWED_HOSTS}')
 #  }
 #}
 
+# 本番環境でのPROTOCOL, DOMAIN, SITE_URLを設定
+PROTOCOL = os.environ.get('SITE_PROTOCOL', 'https')
+DOMAIN = os.environ.get('SITE_DOMAIN', 'localhost:8000')
+SITE_URL = f"{PROTOCOL}://{DOMAIN}"
+
 DATABASES = {
   'default': {
     'ENGINE': 'django.db.backends.mysql',

@@ -1,0 +1,201 @@
+{% extends "buyer/index/base_qconnect.html" %}
+
+{% load bootstrap_icons %}
+{% load humanize %}
+
+{% block content %}
+
+<div class="authentication-bg min-vh-100 min-vw-100 align-items-start">
+
+  <div class="container">
+
+    <div class="row justify-content-center mt-2">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
+          <span>{{ message }}</span>
+        </div>
+      {% endfor %}
+    </div>
+
+    <nav aria-label="breadcrumb" role="navigation">
+      <ol class="breadcrumb bg-light-subtle px-2 rounded-3 mt-2">
+        <li class="breadcrumb-item">
+          <a href="{% url 'accounts:mypage_admin' %}">
+            <i class="bi bi-house" style="font-size:1.2em; color:cornflowerblue"></i>
+            マイページトップ</a>
+        </li>
+        <li class="breadcrumb-item">
+          <a href="{% url 'qpay:txInbox' %}">
+            <i class="bi bi-inbox" style="font-size:1.2em; color:cornflowerblue"></i>
+            インボックス
+          </a>
+        </li>
+        <li class="breadcrumb-item" aria-current="page">
+          <i class="bi bi-cash-stack" style="font-size:1.2em; color:text-primary"></i>
+          送金処理
+        </li>
+      </ol>
+    </nav>
+
+    <div class="d-flex justify-content-center mt-4">
+      <h5 class="text-secondary pt-1"><b>送金処理　</b></h5>
+      {% bs_icon 'person-check' color='deeppink' size='2.2em' %}
+    </div>
+
+    <div class="row justify-content-center">
+      <div class="col-md-9 col-lg-6">
+
+        <div class="row justify-content-center mt-4 mb-0">
+          <div class="col-6 pe-0">
+            <form method="POST"
+              class="p-0 m-1"
+              action="{% url 'qpay:txInboxDetail' tx.pk %}"
+              style="background-color: transparent !important; border-color:transparent !important;">
+  
+              {% csrf_token %}
+
+              <button type="submit" class="btn btn-primary w-100 p-2"
+                name="next"
+                value="ToTransferMoney" 
+                {% if tx.txStatus_int != 2 %} disabled {% endif %}>
+                <span>
+                  <i class="bi bi-cash-stack" style="font-size:1.4em; color:rgb(248, 168, 208)"></i>
+                </span>
+                <span class="ms-1">送金する</span>
+              </button>
+            </form>
+          </div>
+
+          <div class="col-6 ps-0">
+            <form method="GET"
+              class="p-0 m-1"
+              action="{% url 'qpay:txInbox' %}"
+              style="background-color: transparent !important; border-color:transparent !important;">
+
+              <button type="submit" class="btn btn-outline-primary w-100 p-2">
+                一覧に行く
+              </button>
+            </form>
+          </div>
+        </div>
+
+      
+        <hr class="my-0 py-0">
+
+            <table class="table table-sm table-bordered border-primary-subtle table-responsive mt-1 mb-0">
+              <tbody>
+                <tr class="table-info">
+                  <td width="40%" class="table-primary"><b>取引状況</b></td>
+                  <td style="text-align:right;">
+                    {% if tx.txStatus_int == 1 %}パートナ承認前{% endif %}
+                    {% if tx.txStatus_int == 2 %}パートナ承認済<br>Qnee支払い前{% endif %}
+                    {% if tx.txStatus_int == 3 %}パートナ否認{% endif %}
+                    {% if tx.txStatus_int == 4 %}パートナ承認済<br>Qnee支払い済{% endif %}
+                  </td>
+                </tr>
+
+                <tr>
+                  <td width="40%" class="table-primary"><b>申請者</b></td>
+                  <td style="text-align:right;">{{ tx.sellEntityName }}</td></tr>
+                <tr>
+                  <td width="40%" class="table-primary"><b>申請ユーザー</b></td>
+                  <td style="text-align:right;">{{ tx.sellUser_userName }}</td></tr>
+                <tr>
+                  <td width="40%" class="table-primary"><b>申請額</b></td>
+                  <td style="text-align:right;">{{ tx.requested_amount|intcomma }}</td></tr>
+                <tr>
+                  <td width="40%" class="table-primary"><b>証明書類</b></td>
+                  <td style="text-align:center;">
+                    <div style="text-align:center">
+                      <img src="{{ tx.evidence.url }}"
+                        class="img-fluid"
+                        style="width:50;height:auto; cursor:zoom-in;"
+                        data-bs-toggle="modal"
+                        data-bs-target="#imageModal"/>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- モーダルウィンドウ外枠 -->
+                <div class="modal fade"
+                  id="imageModal" 
+                  tabindex="-1" aria-hidden="true"> 
+                  <!-- 「id」を上記「data-bs-target」に合わせる。「tabindex」は「Esc」で閉じる -->
+                  <div class="modal-dialog"> <!-- 大きさ指定なしは「Medium」 -->
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h6 class="modal-title">証明書類</h6>
+                        <!-- 閉じるボタン: data-bs-dismiss="modal" が重要 -->
+                        <button type="button"
+                          class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        <img src="{{ tx.evidence.url }}" class="img-fluid" alt="拡大画像">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </tbody>
+            </table>
+
+            <table class="table table-sm table-bordered border-primary-subtle table-responsive mt-1">
+              <tbody>
+                <tr>
+                  <td width="40%" class="table-primary"><b>承認者</b></td>
+                  <td style="text-align:right;">{{ tx.buyEntityName }}</td></tr>
+                <tr>
+                  <td width="40%" class="table-primary"><b>承認ユーザー</b></td>
+                  <td style="text-align:right;">{{ tx.buyUser_userName|default:'-' }}</td></tr>
+                <tr class="table-info">
+                  <td width="40%" class="table-primary"><b>承認額</b></td>
+                  <td style="text-align:right;">{{ tx.approved_amount|default:'-'|intcomma }}</td></tr>
+
+                  <tr>
+              </tbody>
+            </table>
+
+            {% if tx.txStatus_int >= 2 %}
+              <table class="table table-sm table-bordered border-primary-subtle table-responsive mt-0">
+                <tbody>
+                  <tr class="table-info">
+                    <td width="40%" class="table-primary"><b>申請者受取り</b></td>
+                    <td style="text-align:right;">{{ tx.transfer_amount|default:'-'|intcomma }}</td></tr>
+                  <tr>
+                    <td width="40%" class="table-primary" >＋Qnee前払額</td>
+                    <td style="text-align:right;">{{ tx.advance_amount|intcomma }}</td></tr>
+                  <tr>
+                    <td width="40%" class="table-primary" >－前払手数料</td>
+                    <td style="text-align:right;">{{ tx.advance_fee|intcomma }}</td></tr>
+                  <tr>
+                    <td width="40%" class="table-primary" >－振込手数料</td><td style="text-align:right;">{{ tx.transfer_fee|intcomma }}</td></tr>
+                </tbody>
+              </table>
+            {% endif %}
+
+            <h6>
+              <i class="bi bi-bank2" style="font-size:1.3em; color:deeppink;"></i>
+              <b class="ms-1">申請者の設定口座</b></h6>
+            <table class="table table-sm table-bordered border-primary-subtle table-responsive mt-0 mb-0">
+              <tbody>
+                <tr>
+                  <td width="40%" class="table-primary"><b>金融機関・支店</b></td>
+                  <td style="text-align:right;">{{ ba.bankName }}・{{ ba.branchName }}</td></tr>
+                <tr class="text-secondary" >
+                  <td width="40%" class="table-primary" ><b>口座名義</b></td>
+                  <td style="text-align:right;">{{ ba.holderName }}</td></tr>
+                <tr>
+                  <td width="40%" class="table-primary" ><b>口座番号</b></td>
+                  <td style="text-align:right;">{{ ba.accountNumber }}</td></tr>
+              </tbody>
+            </table>
+
+          </div>
+
+
+      </div>
+    </div>
+
+</div>
+
+{% endblock %}

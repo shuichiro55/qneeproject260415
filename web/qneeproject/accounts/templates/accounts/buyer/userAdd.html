@@ -6,7 +6,7 @@
 
   <div class="container">
 
-    <div class="row justify-content-center mt-1">
+    <div class="row justify-content-center mt-2">
       {% for message in messages %}
         <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
           <span>{{ message }}</span>
@@ -15,7 +15,7 @@
     </div>
 
     <nav aria-label="breadcrumb" role="navigation">
-      <ol class="breadcrumb bg-light-subtle px-2 rounded-3 mt-1">
+      <ol class="breadcrumb bg-light-subtle px-2 rounded-3 mt-2">
         <li class="breadcrumb-item">
           <a href="{% url 'accounts:mypage_buyer' %}">
           <i class="bi bi-house" style="font-size:1.2em; color:cornflowerblue;"></i>
@@ -40,121 +40,31 @@
           <i class="bi bi-envelope-open ms-3" style="font-size:2.0em; color:deeppink;"></i>
         </div> 
 
-        <!-- 承認者がメールからアプリに入る場合の処理 -->
-        {% if flag_userAdd == 1 %}
+        {% if loginUser.canApproveAll == True or loginUser.canApproveAdd == True %}
 
-          <form method="POST" action="{% url 'accounts:userAdd_buyer' %}"
-            class="form-group border border-top shadow-sm p-3 bg-light rounded mt-2">
+          <!-- 承認者がメールからアプリに入る場合の処理 -->
+          {% if request.session.flag_frWhere == 1 %}
 
-            {% csrf_token %}         
-            {{ form.non_field_errors }}
+            <form method="POST" action="{% url 'accounts:userAdd_buyer' %}"
+              class="form-group border border-top shadow-sm p-3 bg-light rounded mt-2">
 
-            <table class="table table-sm table-bordered border-primary-subtle table-responsive">
-              <tbody class="text-center">
-                <tr>
-                  <th scope="col" width="33%" class="table-primary" style="text-align:left;">申請者</th>
-                  <td style="text-align: right;">{{ applyUser.userName }}さん</td></tr>
-                <tr>
-                  <th scope="col" width="33%" class="table-primary" style="text-align:left;">電話番号</th>
-                  <td style="text-align: right;">{{ applyUser.tel_user }}</td></tr>
-                  <tr>
-                  <th scope="col" width="33%" class="table-primary" style="text-align:left;">所属部署</th>
-                  <td style="text-align: right;">{{ applyUser.department }}</td></tr>
-                <tr>
-                  <th scope="col" width="33%" class="table-primary" style="text-align:left;">役職</th>
-                  <td style="text-align: right;">{{ applyUser.title }}</td></tr>
-              </tbody>
-            </table>
+              {% csrf_token %}         
+              {{ form.non_field_errors }}
 
-            <table class="table table-sm table-bordered border-primary-subtle table-responsive">
-              <tbody class="text-center">
-                <tr>
-                  <th scope="col" width="33%" class="table-primary" style="text-align:left;">各種権限</th>
-                  <td style="text-align:left;">
-                
-                    <div class="form-check form-switch ms-2">
-                      <input class="form-check-input col-xs-3 col-lg-2" type="checkbox"
-                        id="{{form.canApprove_all.id_for_label}}"
-                        name="{{form.canApprove_all.name}}"
-                        value="True">
-                      <label class="form-check-label col-xs-6 col-lg-6 ms-3"
-                        for="{{form.canApprove_all.id_for_label}}">
-                        すべて</label>
-                    </div>
-
-                    <div class="form-check form-switch ms-2">
-                      <input class="form-check-input col-xs-3 col-lg-2" type="checkbox"
-                        id="{{form.canApprove_add.id_for_label}}"
-                        name="{{form.canApprove_add.name}}"
-                        value="True">
-                       <label class="form-check-label col-xs-6 col-lg-6 ms-3"
-                        for="{{form.canApprove_add.id_for_label}}">
-                        ユーザー追加</label>
-                    </div>
-            
-                    <div class="form-check form-switch ms-2">
-                      <input class="form-check-input col-xs-3 col-lg-2" type="checkbox"
-                        id="{{form.canApprove_qpay.id_for_label}}"
-                        name="{{form.canApprove_qpay.name}}"
-                        value="True">
-                      <label class="form-check-label col-xs-6 col-lg-6 ms-3"
-                        for="{{form.canApprove_qpay.id_for_label}}">
-                        Ｑｐａｙ承認</label>
-                    </div>
-
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-
-            <p></p>
-          
-            <div class="d-flex justify-content-center">
-              <button type="submit" class="btn btn-primary w-30 shadow flex-grow-1 mes-1"
-                name="next"
-                value="ToApproveUser_{{applyUser.id}}" >
-                参加を承認</button>
-
-              <button type="submit" class="btn btn-outline-primary bg-light w-30 shadow flex-grow-1 ms-1"
-                name="next"
-                value="ToRefuseUser_{{applyUser.id}}" >
-                承認しない</button>  
-
-            </div>
-
-          </form>
-
-        {% endif %}
-
-
-        <!-- infoEdit.htmlから遷移して処理する場合 -->
-        {% if flag_userAdd == 2 %}
-
-          <form method="POST" action="{% url 'accounts:userAdd_buyer' %}"
-            class="form-group border border-top shadow-sm bg-light rounded mt-3 pt-0 pb-3 px-3">
-
-            {% csrf_token %}         
-            {{ form.non_field_errors }}
-
-            {% for applyUser in applyUsers %}
-
-              {% if forloop.first %} <br>
-              {% else %} <hr class="">
-              {% endif %}
-
-              <table class="table table-sm table-bordered border-primary-subtle table-responsive mb-1">
+              <table class="table table-sm table-bordered border-primary-subtle table-responsive">
                 <tbody class="text-center">
-                  <tr>
-                    <th scope="col" width="33%" class="table-primary" style="text-align:left;">申請者</th>
+                  {% if applyUser.approvedStatus_int == 1 %}<tr class="table-info"> {% endif %}
+                  {% if applyUser.approvedStatus_int == 3 %}<tr class="table-danger"> {% endif %}
+                    <th scope="col" width="36%" class="table-primary" style="text-align:left;">申請者</th>
                     <td style="text-align: right;">{{ applyUser.userName }}さん</td></tr>
                   <tr>
-                    <th scope="col" width="33%" class="table-primary" style="text-align:left;">電話番号</th>
+                    <th scope="col" width="36%" class="table-primary" style="text-align:left;">電話番号</th>
                     <td style="text-align: right;">{{ applyUser.tel_user }}</td></tr>
                     <tr>
-                    <th scope="col" width="33%" class="table-primary" style="text-align:left;">所属部署</th>
+                    <th scope="col" width="36%" class="table-primary" style="text-align:left;">所属部署</th>
                     <td style="text-align: right;">{{ applyUser.department }}</td></tr>
                   <tr>
-                    <th scope="col" width="33%" class="table-primary" style="text-align:left;">役職</th>
+                    <th scope="col" width="36%" class="table-primary" style="text-align:left;">役職</th>
                     <td style="text-align: right;">{{ applyUser.title }}</td></tr>
                 </tbody>
               </table>
@@ -162,61 +72,142 @@
               <table class="table table-sm table-bordered border-primary-subtle table-responsive">
                 <tbody class="text-center">
                   <tr>
-                    <th scope="col" width="33%" class="table-primary" style="text-align:left;">各種権限</th>
-                    <td style="text-align:left;">
-                
-                      <div class="form-check form-switch ms-2">
-                        <input class="form-check-input col-xs-3 col-lg-2" type="checkbox"
-                          id="{{form.canApprove_all.id_for_label}}"
-                          name="{{form.canApprove_all.name}}"
-                          value="True">
-                        <label class="form-check-label col-xs-6 col-lg-6 ms-3"
-                          for="{{form.canApprove_all.id_for_label}}">
-                          すべて</label>
-                      </div>
-
-                      <div class="form-check form-switch ms-2">
-                        <input class="form-check-input col-xs-3 col-lg-2" type="checkbox"
-                          id="{{form.canApprove_add.id_for_label}}"
-                          name="{{form.canApprove_add.name}}"
-                          value="True">
-                         <label class="form-check-label col-xs-6 col-lg-6 ms-3"
-                          for="{{form.canApprove_add.id_for_label}}">
-                        ユーザー追加</label>
-                      </div>
-            
-                      <div class="form-check form-switch ms-2">
-                        <input class="form-check-input col-xs-3 col-lg-2" type="checkbox"
-                          id="{{form.canApprove_qpay.id_for_label}}"
-                          name="{{form.canApprove_qpay.name}}"
-                          value="True">
-                        <label class="form-check-label col-xs-6 col-lg-6 ms-3"
-                          for="{{form.canApprove_qpay.id_for_label}}">
-                          Ｑｐａｙ承認</label>
-                      </div>
-
+                    <th scope="col" td width="12%" rowspan="3" class="table-primary" style="text-align: left;">
+                      権限</th>
+                    <th width="24%" class="table-primary" style="text-align: left;">すべて</td>
+                    <td style="text-align: right;">
+                      {% if applyUser.canApproveAll %} 権限あり {% else %} 権限なし {% endif %}
+                    </td></tr>
+                  <tr>
+                    <th width="24%" class="table-primary" style="text-align: left;">参加承認</th>
+                    <td style="text-align: right;">
+                      {% if applyUser.canApproveAdd %} 権限あり {% else %} 権限なし {% endif %}
+                    </td></tr>
+                  <tr>
+                    <th width="24%" class="table-primary" style="text-align: left;">Ｑｐａｙ</th>                  
+                    <td style="text-align: right;">
+                      {% if applyUser.canApproveQpay %} 権限あり {% else %} 権限なし {% endif %}
                     </td>
                   </tr>
+
                 </tbody>
               </table>
+
+              <p></p>
           
-              <div class="d-flex justify-content-center pb-3">
-                <button type="submit" class="btn btn-primary flex-grow-1 shadow me-1"
+              <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-primary flex-grow-1 shadow"
+                  name="next"
+                  value="ToEditPermission_{{applyUser.id}}" >
+                  ① 権限編集</button>
+
+                <button type="submit" class="btn btn-primary shadow flex-grow-1 ms-1"
                   name="next"
                   value="ToApproveUser_{{applyUser.id}}" >
-                  参加を承認</button>
+                  ② 承認　　</button>
 
-                <button type="submit" class="btn btn-outline-primary bg-light flex-grow-1 shadow ms-1"
+                <button type="submit" class="btn btn-outline-primary bg-light shadow flex-grow-1 ms-1"
                   name="next"
                   value="ToRefuseUser_{{applyUser.id}}" >
-                  承認しない</button>  
+                  否認　　</button>  
               </div>
 
-            {% empty %}
-              データがありません
-            {% endfor %}
+            </form>
 
-          </form>
+          {% endif %}
+
+
+          <!-- infoEdit.htmlから遷移して処理する場合 -->
+          {% if request.session.flag_frWhere == 2 %}
+
+            <form method="POST" action="{% url 'accounts:userAdd_buyer' %}"
+              class="form-group border border-top shadow-sm bg-light rounded mt-3 pt-0 pb-3 px-3">
+
+              {% csrf_token %}         
+              {{ form.non_field_errors }}
+
+              {% for applyUser in applyUsers %}
+
+                {% if forloop.first %} <br>
+                {% else %} <hr class="">
+                {% endif %}
+
+                <table class="table table-sm table-bordered border-primary-subtle table-responsive mb-1">
+                  <tbody class="text-center">
+                    {% if applyUser.approvedStatus_int == 1 %}<tr class="table-info"> {% endif %}
+                    {% if applyUser.approvedStatus_int == 3 %}<tr class="table-danger"> {% endif %}
+                      <th scope="col" width="36%" class="table-primary" style="text-align:left;">承認状況</th>
+                      <td style="text-align: right;">{{ applyUser.approvedStatus_char }}</td></tr>
+                    <tr>
+                      <th scope="col" width="36%" class="table-primary" style="text-align:left;">申請者</th>
+                      <td style="text-align: right;">{{ applyUser.userName }}さん</td></tr>
+                    <tr>
+                      <th scope="col" width="36%" class="table-primary" style="text-align:left;">電話番号</th>
+                      <td style="text-align: right;">{{ applyUser.tel_user }}</td></tr>
+                      <tr>
+                      <th scope="col" width="36%" class="table-primary" style="text-align:left;">所属部署</th>
+                      <td style="text-align: right;">{{ applyUser.department }}</td></tr>
+                    <tr>
+                      <th scope="col" width="36%" class="table-primary" style="text-align:left;">役職</th>
+                      <td style="text-align: right;">{{ applyUser.title }}</td></tr>
+                  </tbody>
+                </table>
+
+                <table class="table table-sm table-bordered border-primary-subtle table-responsive">
+                  <tbody class="text-center">
+                    <tr>
+                      <th scope="col" td width="12%" rowspan="3" class="table-primary" style="text-align: left;">
+                        権限</th>
+                      <th width="24%" class="table-primary" style="text-align: left;">すべて</td>
+                      <td style="text-align: right;">
+                        {% if applyUser.canApproveAll %} 権限あり {% else %} 権限なし {% endif %}
+                      </td></tr>
+                    <tr>
+                      <th width="24%" class="table-primary" style="text-align: left;">参加承認</th>
+                      <td style="text-align: right;">
+                        {% if applyUser.canApproveAdd %} 権限あり {% else %} 権限なし {% endif %}
+                      </td></tr>
+                    <tr>
+                      <th width="24%" class="table-primary" style="text-align: left;">Ｑｐａｙ</th>                  
+                      <td style="text-align: right;">
+                        {% if applyUser.canApproveQpay %} 権限あり {% else %} 権限なし {% endif %}
+                      </td>
+                    </tr>
+
+                  </tbody>
+                </table>
+
+
+                <div class="d-flex justify-content-center pb-3">
+                  <button type="submit" class="btn btn-primary flex-grow-1 shadow"
+                    name="next"
+                    value="ToEditPermission_{{applyUser.id}}" >
+                    ① 権限編集</button>
+
+                  <button type="submit" class="btn btn-primary flex-grow-1 shadow ms-1"
+                    name="next"
+                    value="ToApproveUser_{{applyUser.id}}" >
+                    ② 承認　　</button>
+
+                  <button type="submit" class="btn btn-outline-primary bg-light flex-grow-1 shadow ms-1"
+                    name="next"
+                    value="ToRefuseUser_{{applyUser.id}}" >
+                    否認　　</button>  
+                </div>
+
+              {% empty %}
+                <div class="row justify-content-center mt-5">
+                  対象データがありません。
+                </div>
+              {% endfor %}
+
+            </form>
+          {% endif %}
+        
+        {% else %}
+          <div class="row justify-content-center text-secondary mt-5">
+            あなたは承認権限者ではありません。
+          </div>
         {% endif %}
 
       </div>

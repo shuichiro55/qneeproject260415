@@ -12,7 +12,7 @@
 
   <div class="container">
 
-    <div class="row justify-content-center mt-1">
+    <div class="row justify-content-center mt-2">
       {% for message in messages %}
         <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
           <span>{{ message }}</span>
@@ -21,7 +21,7 @@
     </div>
 
     <nav aria-label="breadcrumb" role="navigation">
-      <ol class="breadcrumb bg-light-subtle px-2 rounded-3 mt-1">
+      <ol class="breadcrumb bg-light-subtle px-2 rounded-3 mt-2">
         <li class="breadcrumb-item">
           <a href="{% url 'accounts:mypage_buyer' %}">
             {% bs_icon 'house' color='cornflowerblue' size='1.2em' %}
@@ -59,7 +59,7 @@
 
     <div class="row justify-content-center mt-3 mx-2">
       <div class="col-md-8 col-lg-6">
-          <h6 class="control-label text-secondary"><b>ご案内設定</b></h6>
+          <h6 class="control-label text-secondary"><b>ご案内の設定</b></h6>
       </div>
     </div>
 
@@ -93,7 +93,7 @@
             name="name_WhoWhenWhat"
             {% if WhoWhenWhat == 'what' %}checked{% endif %}
             autocomplete="off">
-          どんな
+          内容
         </label>
       </div> <!-- end of btn-group -->
     </div> <!-- end row -->
@@ -131,7 +131,7 @@
           </label>
         </div>
       </div>
-
+      
     </span>
 
 
@@ -142,7 +142,7 @@
         <div class="triangle triangle-bottom"></div>
       </div>
 
-      <div class="row justify-content-center mt-3 mx-2">
+      <div class="row justify-content-center mt-4 mx-2">
         <div class="col-md-8 col-lg-6">
 
           <div class="form-group row justify-content-start">
@@ -153,7 +153,7 @@
             </label>
             <div class="col-md-8">
               <input type="{{addListSelectForm.nameOfAppliedList.widget.input_type}}"
-                class='form-control pt-1 text-secondary'
+                class='form-control pt-1 ms-2 text-secondary'
                 name="{{addListSelectForm.nameOfAppliedList.name}}"
                 value="{{addListSelectForm.nameOfAppliedList.value|default:'ありません'}}"
                 placeholder=""
@@ -172,7 +172,7 @@
       <div class="row justify-content-center mt-3 mx-2">
 
         <div class="col-md-8 col-lg-6">
-          <hr>
+          <hr class="m-0">
           <form method="POST"
             action="{% url 'send:invitationSets' %}"
             style="background-color: transparent !important; border-color:transparent !important;"
@@ -190,7 +190,7 @@
 
               <div class="col-md-8 pb-0">
 
-                <select class="form-select"
+                <select class="form-select ms-2"
                   id="id_ListOfListName"
                   name="name_ListOfListName">
                   {% if request.session.nameOfAppliedList != None %}
@@ -227,36 +227,62 @@
                 </button>
               </div>
             </div>
-
-
-
          
             <div class="bg-light rounded-1 ms-3 p-1">
 
               <div class="table-responsive">
                 {% for listName, indivDatas in request.session.listsData.items %}
-                  {% if listName == request.session.nameOfAppliedList %}
-                    <table class="table table-sm table-bordered border-primary-subtle mb-0">
-                      <thead>
-                        <tr class="table-primary" style="font-size:13px">
-                          <th style="text-align:center">メール</th>
-                          <th style="text-align:center">宛先名</th>
-                        </tr>
-                      </thead>
-                      <tbody id="id_SelectedListTableBody" style="font-size:13px">
-                        {% for indivData in indivDatas %}
-                          <tr style="font-size:13px">
-                            <td style="text-align:left">{{ indivData.address }}</td>
-                            <td style="text-align:left">{{ indivData.name }}</td>
+
+                  {% if request.session.nameOfAppliedList %}
+                    {% if listName == request.session.nameOfAppliedList %}
+                      <table class="table table-sm table-bordered border-primary-subtle mb-0">
+                        <thead>
+                          <tr class="table-primary" style="font-size:13px">
+                            <th style="text-align:center">メール</th>
+                            <th style="text-align:center">宛先名</th>
                           </tr>
-                        {% empty %}
-                          <div class="text-scondary">対象がありません。</div>
-                        {% endfor %}
+                        </thead>
+                        <tbody id="id_SelectedListTableBody" style="font-size:13px">
+                          {% for indivData in indivDatas %}
+                            <tr style="font-size:13px">
+                              <td style="text-align:left">{{ indivData.address }}</td>
+                              <td style="text-align:left">{{ indivData.name }}</td>
+                            </tr>
+                          {% empty %}
+                            <div class="text-scondary">対象がありません。</div>
+                          {% endfor %}
 
-                      </tbody>
-                    </table>
-                  {% endif %}
+                        </tbody>
+                      </table>
 
+                    {% endif %}
+
+
+                  {% else %}
+  
+                    {% if forloop.counter == 1 %}
+                      <table class="table table-sm table-bordered border-primary-subtle mb-0">
+                        <thead>
+                          <tr class="table-primary" style="font-size:13px">
+                            <th style="text-align:center">メール</th>
+                            <th style="text-align:center">宛先名</th>
+                          </tr>
+                        </thead>
+                        <tbody id="id_SelectedListTableBody" style="font-size:13px">
+                          {% for indivData in indivDatas %}
+                            <tr style="font-size:13px">
+                              <td style="text-align:left">{{ indivData.address }}</td>
+                              <td style="text-align:left">{{ indivData.name }}</td>
+                            </tr>
+                          {% empty %}
+                            <div class="text-scondary">対象がありません。</div>
+                          {% endfor %}
+
+                        </tbody>
+                      </table>
+                    {% endif %}
+
+                  {% endif  %}
                 {% endfor %}
               </div> <!-- end of table-reaponsive -->
             </div>
@@ -268,8 +294,8 @@
     </span>
 
 
-    <!-- 「登録済みユーザー」か「未登録ユーザー」かを選択 -->
-    <span id="id_addition_Who3" style="display:none;" data-bs-target="#recipientsModal">
+    <!-- 「送信先＝未登録ユーザー」選択後、入力方法（手入力／ファイル）を選ぶパート -->
+    <span id="id_addition_Who4" style="display: none;">
 
       <div class="row justify-content-center mt-1">
         <div class="triangle triangle-bottom"></div>
@@ -280,49 +306,6 @@
           <h6 class="control-label text-secondary"><b>アドレスリスト作成</b></h6>
         </div>
       </div>
-
-      <div class="row justify-content-center mx-2">
-        <div class="btn-group btn-group-toggle col-md-8 col-lg-6"
-          data-toggle="buttons"
-          id="id_InputOrSelect">
-
-          <label class="btn btn-secondary p-1" for="id_InputOrSelect_A">
-            <input type="radio"
-              id="id_InputOrSelect_A"
-              name="name_InputOrSelect"
-              {% if InputOrSelect == 'input' %}checked{% endif %}
-              autocomplete="off">
-            アドレス入力
-          </label>
-
-          <!-- autocompleteは過去の入力情報を自動的に補完する機能-->        
-          <label class="btn btn-secondary p-1" for="id_InputOrSelect_B">
-            <input type="radio"
-              id="id_InputOrSelect_B"
-              name="name_InputOrSelect"
-              {% if InputOrSelect == 'select' %}checked{% endif %}
-              autocomplete="off">
-            ご利用者から
-          </label>
-        </div>
-      </div>
-    </span>
-
-
-    <!-- 「送信先＝未登録ユーザー」選択後、入力方法（手入力／ファイル）を選ぶパート -->
-    <span id="id_addition_Who4" style="display: none;">
-
-      <div class="row justify-content-center mt-1">
-        <div class="triangle triangle-bottom"></div>
-      </div>
-
-      <!--
-      <div class="row justify-content-center mx-2">
-        <div class="col-md-8 col-lg-6">
-            <h6 class="control-label text-secondary"><b>入力の方法</b></h6>
-        </div>
-      </div>
-      -->
 
       <div class="row justify-content-center mt-1 mx-2">
         <div class="btn-group btn-group-toggle col-md-8 col-lg-6"
@@ -360,7 +343,6 @@
 
       {% csrf_token %}
 
-
     <!-- 未登録ユーザーのファイル入力を選択後、ファイルタイプを選択するパーツ -->
     <span id="id_addition_Who5" style="display: none;">
 
@@ -369,7 +351,7 @@
         </div>
       </div>
 
-      {% if flag_fileUp == 1 %}
+      {% if step_fileUp == 1 %}
 
         <div class="row justify-content-center mt-1 mx-2">
           <div class="col-md-8 col-lg-6">
@@ -424,7 +406,7 @@
       </div>
       -->
 
-      {% if flag_fileUp == 1 %}
+      {% if step_fileUp == 1 %}
 
         <div class="row justify-content-center mt-2 mx-2">
           <div class="col-md-8 col-lg-6">
@@ -454,7 +436,7 @@
               <button type="submit" class="btn btn-primary ms-1"
                 name="nextWho_fileInput"
                 value="ToUploadAddFile">
-                内容を確認 ⇒ アップロード
+                内容を確認したうえで保存します
               </button>
             </div> <!-- end of d-flex -->
           </div> <!-- end of col -->
@@ -462,7 +444,7 @@
 
       {% endif %}  
 
-      {% if flag_fileUp == 2 %}
+      {% if step_fileUp == 2 %}
 
         <div class="row justify-content-center mt-3 mx-2">
           <div class="col-md-8 col-lg-6">
@@ -545,14 +527,19 @@
 
       {% endif %}
 
-      {% if flag_fileUp == 3 %}
+      {% if step_fileUp == 3 %}
 
-        <div class="row justify-content-center text-secondary">
-          <br>
-          アドレスリストのデータを保存しました。
-          <br>
-          保存されたアドレスに対して配信が行われます。
+        <div class="row justify-content-center mx-2">
+          <div class="col-md-8 col-lg-6">
+            <div class="text-center text-secondary">
+              <br>
+              アドレスリストのデータを保存しました。
+              <br>
+              「リストを選ぶ」で選択すると適用されます。
+            </div>
+          </div>
         </div>
+
       {% endif %}
     </span>
 
@@ -570,9 +557,15 @@
 
 
       <div class="row justify-content-center mt-3 mx-4">
-        <div class="col-md-8 col-lg-6 bg-light rounded-1">
+        <div class="col-md-8 col-lg-6 bg-light rounded-1"
+          style="background-color: transparent !important; border-color:transparent !important;">
 
-          <h6 class="mb-1 text-secondary"><b>アドレスを入力して追加</b></h6>
+          <div class="d-flex justify-content-start">
+            <h6 class="text-secondary"><b>アドレスを入力して「</b></h6>
+              <i class="bi bi-person-plus me-1" style="font-size:1.6em; color:deeppink;"></i>
+            <h6 class="text-secondary"><b>ボタン」</b></h6>
+          </div>
+
           <div class="input-group">
             <input type="MailInput" class="form-control"
               id="id_NewItemInput"
@@ -582,38 +575,50 @@
             <button class="btn btn-primary rounded-1 shadow"
               id="id_NewItemAddBtn"
               name="name_NewItemAddBtn">
-              追加
+              <span>
+                <i class="bi bi-person-plus" style="font-size:1.6em; color:rgb(255, 255, 255)"></i>
+              </span>
             </button>
           </div>
 
           <hr>
 
-          <form method="post" class="bg-light">
+          <form method="post"
+            style="background-color: transparent !important; border-color:transparent !important;">
+
             {% csrf_token %}
 
-            <div class="row align-items-center mt-4 mb-4 mx-1">
-              <div class="col-4">
+            <div class="row align-items-center mt-2">
+
+              <div class="col-12">
                 <div class="row justify-content-start">
-                  <h6 class="mb-1 ps-0 text-secondary"><b>送信先の確定</b></h6>
+                  <h6 class="mb-2 text-secondary">
+                    <b>追加対象アドレス
+                    </b>
+                  </h6>
                 </div>
-              </div>
-              <div class="col-8">
-                <button type="submit"
-                  class="btn btn-primary rounded-1 shadow ms-2"
-                  name="nextWho_manualInput"
-                  value="ToReadAddList">
-                  入力データの読み込み
-                </button>
               </div>
             </div> <!-- end of row -->
             
-            <div class="row justify-content-center mt-4 mx-2 pb-3"
+            <div class="row justify-content-center bg-light mx-1 pt-2 pb-2"
               id="id_FormList"
               class="formList">
             </div>
             <!-- 下記のページを参考に作成 -->
             <!-- JavaScriptで上記「追加」ボタンでメールアドレスが入力されたフォームを追加する -->
             <!-- https://blog.take-it-easy.site/web-develop/add-remove-elements-dynamic-with-javascript/ -->
+
+            <div class="row justify-content-center mt-2 ">
+
+              <div class="col-12">
+                <button type="submit"
+                  class="btn btn-primary rounded-1 shadow w-100"
+                  name="nextWho_manualInput"
+                  value="ToReadAddList">
+                  入力したデータを読み込み
+                </button>
+              </div>
+            </div> <!-- end of row -->
 
           </form>
         </div>
@@ -628,10 +633,10 @@
         <div class="triangle triangle-bottom"></div>
       </div>
 
-      <div class="row justify-content-center mt-1 mx-2">
+      <div class="row justify-content-center mt-4 mx-2">
         <div class="col-md-8 col-lg-6">
 
-          <div class="d-flex justify-content-start mt-4">
+          <div class="d-flex justify-content-start">
             <i class="bi bi-record2-fill" style="font-size:1.5em; color:deeppink;"></i>
             <h6 class="text-secondary ms-1 me-2"><b>名前を付けてリストを保存</b></h5>
             <i class="bi bi-save-fill" style="font-size:1.3em; color:hsl(327, 98%, 65%);"></i>
@@ -642,7 +647,8 @@
       <form method="POST" action="{% url 'send:invitationSets' %}">
 
         {% csrf_token %}
-        <div class="row justify-content-center mt-3 mx-2">
+
+        <div class="row justify-content-center mt-4 mx-2">
           <div class="col-md-8 col-lg-6">
 
             <div class="form-group row justify-content-start ms-2">
@@ -669,7 +675,7 @@
           </div>
         </div>
 
-        <div class="row justify-content-center mt-3 mx-2">
+        <div class="row justify-content-center mt-4 mx-2">
           <div class="col-md-8 col-lg-6">
 
             <div class="row justify-content-end ms-2">
@@ -735,6 +741,7 @@
 
 
     <!-- 登録済みユーザーへの案内（「送信先＝登録ユーザー」選択後、DBデータから送信先抽出） -->
+    <!-- 260411 DBからのゲストデータ読み込みはしない方針 -->
     <span id="id_addition_Who8" style="display:none;" data-bs-target="#recipientsModal">
 
       <div class="row justify-content-center mt-2 mx-4">
@@ -845,7 +852,7 @@
                   <button
                     class="btn btn-primary shadow"
                     name="nextWhen"
-                    value="ToSendNow">
+                    value="ToSendToListMembersNow">
                     送信を始めます</button>
                 </form>
               </div> <!-- end of d-flex -->
@@ -933,7 +940,6 @@
         </div> <!-- endo of col -->
       </div> <!-- end of row -->
     </span>
-
 
     <!-- 送信する内容を編集する -->
     <span id="id_addition_What1" style="display:none;" data-bs-target="#recipientsModal">
@@ -1025,6 +1031,48 @@
       </div> <!-- end of modal-fade -->
     </span>
 
+    <!-- 「登録済みユーザー」か「未登録ユーザー」かを選択 -->
+    <!-- 260410 使わない仕様に変更 -->
+    <!--
+    <span id="id_addition_Who3" style="display:none;" data-bs-target="#recipientsModal">
+
+      <div class="row justify-content-center mt-1">
+        <div class="triangle triangle-bottom"></div>
+      </div>
+
+      <div class="row justify-content-center mx-2">
+        <div class="col-md-8 col-lg-6">
+          <h6 class="control-label text-secondary"><b>アドレスリスト作成</b></h6>
+        </div>
+      </div>
+
+      <div class="row justify-content-center mx-2">
+        <div class="btn-group btn-group-toggle col-md-8 col-lg-6"
+          data-toggle="buttons"
+          id="id_InputOrSelect">
+
+          <label class="btn btn-secondary p-1" for="id_InputOrSelect_A">
+            <input type="radio"
+              id="id_InputOrSelect_A"
+              name="name_InputOrSelect"
+              {% if InputOrSelect == 'input' %}checked{% endif %}
+              autocomplete="off">
+            アドレス入力
+          </label>
+
+          <label class="btn btn-secondary p-1" for="id_InputOrSelect_B">
+            <input type="radio"
+              id="id_InputOrSelect_B"
+              name="name_InputOrSelect"
+              {% if InputOrSelect == 'select' %}checked{% endif %}
+              autocomplete="off">
+            ご利用者から
+          </label>
+        </div>
+      </div>
+    </span>
+    -->
+
   </div> <!-- end of container -->
 </div>
 
@@ -1046,7 +1094,7 @@
     var WhoWhenWhat = document.getElementById('id_WhoWhenWhat');
 
     var MakeOrSelect = document.getElementById('id_MakeOrSelect');
-    var InputOrSelect = document.getElementById('id_InputOrSelect');
+    //var InputOrSelect = document.getElementById('id_InputOrSelect');
     var FileOrManual = document.getElementById('id_FileOrManual');
     var FileType = document.getElementById('id_FileType');
     var ToUploadAgain = document.getElementById('id_ToUploadAgain');
@@ -1066,7 +1114,6 @@
 
     var addition_Who1 = document.getElementById('id_addition_Who1'); /* 適用中のリストの表示 */
     var addition_Who2 = document.getElementById('id_addition_Who2'); /* 「登録ユーザー」選択後⇒データから取得 */
-    var addition_Who3 = document.getElementById('id_addition_Who3'); /* 「登録ユーザー」選択後⇒データから取得 */
     var addition_Who4 = document.getElementById('id_addition_Who4'); /* 「未登録ユーザー」選択後⇒「手入力／ファイル入力」選択 */
     var addition_Who5 = document.getElementById('id_addition_Who5'); /* 「手入力」選択後⇒「手入力画面」 */
     var addition_Who6 = document.getElementById('id_addition_Who6'); /* 「ファイル入力」選択後⇒「エクセル／CSV」選択 */
@@ -1081,7 +1128,6 @@
     function hideAllDisplay() {
       addition_Who1.style.display = "none";
       addition_Who2.style.display = "none";
-      addition_Who3.style.display = "none";
       addition_Who4.style.display = "none";
       addition_Who5.style.display = "none";
       addition_Who6.style.display = "none"; 
@@ -1100,20 +1146,33 @@
     if (id_WhoWhenWhat_B.checked) { addition_When1.style.display = "block";}
     if (id_WhoWhenWhat_C.checked) { addition_What1.style.display = "block";}
 
-    if (id_MakeOrSelect_A.checked) { addition_Who3.style.display = "block";}
+    if (id_MakeOrSelect_A.checked) { addition_Who4.style.display = "block";}
     if (id_MakeOrSelect_B.checked) { addition_Who2.style.display = "block";}
 
-    if (id_InputOrSelect_A.checked) { addition_Who4.style.display = "block";}
-    if (id_FileOrManual_A.checked) { addition_Who5.style.display = "block";}
+    /*
+    if (id_InputOrSelect_A.checked) {
+      console.log('pass id_InuputOrSelect_A.checked')
+      addition_Who4.style.display = "block";
+    }*/
 
-    if ("{{flag_fileUp}}" == 1) { addition_Who5.style.display = "block";}
-    if ("{{flag_fileUp}}" == 2) { addition_Who6.style.display = "block";}
+    if (id_FileOrManual_A.checked) {
+      console.log('pass id_FileOrManual_A.checked')
+      if ("{{step_fileUp}}" == 1) { addition_Who5.style.display = "block";}
+      if ("{{step_fileUp}}" == 2) { 
+        addition_Who5.style.display = "block";
+        addition_Who6.style.display = "block";}
+      if ("{{step_fileUp}}" == 3) { 
+        addition_Who5.style.display = "block";
+        addition_Who6.style.display = "block";}
+    } else {
+      console.log('pass id_FileOrManual_A.checkedは該当しない')      
+    }
 
     if (id_FileOrManual_B.checked) {
       if (flag_manualInput == 1) {addition_Who7_1.style.display = "block";}
       if (flag_manualInput == 2) {addition_Who7_2.style.display = "block";}}
 
-      if (id_InputOrSelect_B.checked) { addition_Who8.style.display = "block";}
+    //if (id_InputOrSelect_B.checked) { addition_Who8.style.display = "block";}
     if (id_RepeatOnOff_A.checked) { addition_When2.style.display = "block";}
 
     const json_listsData = JSON.parse('{{request.session.json_listsData|safe}}' || 'null');
@@ -1177,33 +1236,13 @@
       console.log('MakeOrSelect.addEventListenerのclickが認識されました');
       hideAllDisplay();
 
-      if (id_MakeOrSelect_A.checked) { /* アドレスリスト作成 */
+      if (id_MakeOrSelect_A.checked) { /*アドレスリスト作成*/
         addition_Who1.style.display = "block";
-        addition_Who3.style.display = "block";
-      }
-      if (id_MakeOrSelect_B.checked) { /* アドレスリストを選択 */
-        addition_Who1.style.display = "block";
-        addition_Who2.style.display = "block";
-      }
-    });
-
-    InputOrSelect.addEventListener('click', function(){
-
-      console.log('InputOrSelect.addEventListenerのclickが認識されました');
-      hideAllDisplay();
-
-      if (id_InputOrSelect_A.checked) { /* 送信先＝未登録先 */
-        console.log('id_InputOrSelect_Aが認識されました');
-        addition_Who1.style.display = "block";
-        addition_Who3.style.display = "block";
         addition_Who4.style.display = "block";
       }
-
-      if (id_InputOrSelect_B.checked) { /* 送信先＝登録者 */
-        console.log('id_InputOrSelect_Bが認識されました');
+      if (id_MakeOrSelect_B.checked) { /*アドレスリストを選択*/
         addition_Who1.style.display = "block";
-        addition_Who3.style.display = "block";
-        addition_Who8.style.display = "block";
+        addition_Who2.style.display = "block";
       }
     });
 
@@ -1248,19 +1287,30 @@
       console.log('FileOrManual.addEventListenerのclickが認識されました');
       hideAllDisplay();
 
-      if (id_FileOrManual_A.checked) { /* 未登録⇒ファイル入力 */
+      if (id_FileOrManual_A.checked) {
         console.log('id_FileOrManual_Aが認識されました');
         addition_Who1.style.display = "block";
-        addition_Who3.style.display = "block";
         addition_Who4.style.display = "block";
         addition_Who5.style.display = "block";
-        addition_Who6.style.display = "block";
       }
+
+      /*
+      if (id_FileOrManual_A.checked) {
+        console.log('id_FileOrManual_Aが認識されました');
+        addition_Who1.style.display = "block";
+        addition_Who4.style.display = "block";
+        if ("{{step_fileUp}}" == 1) {
+          addition_Who5.style.display = "block";}
+        if ("{{step_fileUp}}" == 2) {
+          addition_Who5.style.display = "block";
+          addition_Who6.style.display = "block";}
+        if ("{{step_fileUp}}" == 3) {
+          addition_Who5.style.display = "block";
+          addition_Who6.style.display = "block";}*/
 
       if (id_FileOrManual_B.checked) { /* 未登録⇒手入力 */
         console.log('id_FileOrManual_Bが認識されました');
         addition_Who1.style.display = "block";
-        addition_Who3.style.display = "block";
         addition_Who4.style.display = "block";
         addition_Who7_1.style.display = "block";
       }
@@ -1274,7 +1324,7 @@
       if (id_FileType_A.checked) { /* 未登録⇒ファイル入力⇒エクセル取り込み */
         console.log('id_FileType_Aが認識されました');
         addition_Who1.style.display = "block";
-        addition_Who3.style.display = "block";
+        /*addition_Who3.style.display = "block";*/
         addition_Who4.style.display = "block";
         addition_Who5.style.display = "block";
         addition_Who6.style.display = "block";
@@ -1283,7 +1333,7 @@
       if (id_FileType_B.checked) { /* 未登録⇒ファイル入力⇒CSV取り込み */      
         console.log('id_FileType_Bが認識されました');
         addition_Who1.style.display = "block";
-        addition_Who3.style.display = "block";
+        /*addition_Who3.style.display = "block";*/
         addition_Who4.style.display = "block";
         addition_Who5.style.display = "block";
         addition_Who6.style.display = "block";
@@ -1315,13 +1365,34 @@
       console.log('id_ToUploadAgainが認識されました');
       hideAllDisplay();
 
-      addition_Who3.style.display = "block";
+      /*addition_Who3.style.display = "block";*/
       addition_Who4.style.display = "block";
       addition_Who5.style.display = "block";
       addition_Who6.style.display = "block";
     });
 
 
+    /*
+    InputOrSelect.addEventListener('click', function(){
+
+      console.log('InputOrSelect.addEventListenerのclickが認識されました');
+      hideAllDisplay();
+
+      if (id_InputOrSelect_A.checked) {
+        console.log('id_InputOrSelect_Aが認識されました');
+        addition_Who1.style.display = "block";
+        addition_Who3.style.display = "block";
+        addition_Who4.style.display = "block";
+      }
+
+      if (id_InputOrSelect_B.checked) { 
+        console.log('id_InputOrSelect_Bが認識されました');
+        addition_Who1.style.display = "block";
+        addition_Who3.style.display = "block";
+        addition_Who8.style.display = "block";
+      }
+    }); */
+    
   });
 
   function deleteEachItem(name) {

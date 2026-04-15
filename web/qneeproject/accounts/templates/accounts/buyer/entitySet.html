@@ -9,7 +9,7 @@
 
   <div class="container">
 
-    <div class="row justify-content-center mt-1">
+    <div class="row justify-content-center mt-2">
       {% for message in messages %}
         <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
           <span>{{ message }}</span>
@@ -17,16 +17,18 @@
       {% endfor %}
     </div>
   
+    <!--
     <nav aria-label="breadcrumb" role="navigation">
-      <ol class="breadcrumb bg-light-subtle px-2 rounded-3 mt-1">
+      <ol class="breadcrumb bg-light-subtle px-2 rounded-3 mt-2">
         <li class="breadcrumb-item"><a href="{% url 'accounts:mypage_buyer' %}">
           {% bs_icon 'house' color='cornflowerblue' size='1.2em' %}
           マイページトップ</a></li>
         <li class="breadcrumb-item" aria-current="page">本登録（入力）</li>
       </ol>
     </nav>
+    -->
 
-    <div class ="row justify-content-center">
+    <div class ="row justify-content-center mt-2">
 
       <div class="col-10">
         <div class="progress mt-1 mb-1" style="height: 12px" >
@@ -65,12 +67,12 @@
       <!-- flag_step == 1：入力内容の確認 -->
       {% if flag_step == 1 %}
 
-        <div class="row justify-content-center mt-4">
-          <h5 class="text-secondary text-center">
-            <b>パートナー登録</b></h5>
+        <div class="d-flex justify-content-center align-items-center mt-5 gap-2">
+          <h5 class="text-secondary text-center"><b>パートナー登録</b></h5>
+            <i class="bi bi-person-add ms-2 mb-2" style="font-size:2.2em; color:deeppink;"></i>
         </div>
 
-        <div class="row justify-content-center mt-5 px-4">
+        <div class="row justify-content-center mt-4 px-4">
           <div class="btn-group btn-group-toggle col-md-10 col-lg-8 col-xl-6"
             id="id_NewOrNot" data-toggle="buttons">
 
@@ -106,20 +108,21 @@
           <form method="POST">
             {% csrf_token %}
 
-          <div class="row justify-content-center mt-1">
-            <div class="col-md-10 col-lg-8 col-xl-6">
-              <hr class="mb-2">
+            <div class="row justify-content-center mt-1">
+              <div class="col-md-10 col-lg-8 col-xl-6">
+                <hr class="mb-2">
+              </div>
             </div>
-          </div>
 
-          <!-- パートナーの企業情報を選択するセレクトボックス -->
-          <div class="row justify-content-center mt-3">
-            <div class="d-flex col-md-10 col-lg-8 col-xl-6 text-left">
+            <!-- パートナーの企業情報を選択するセレクトボックス -->
+            <div class="row justify-content-center mt-3">
+              <div class="d-flex col-md-10 col-lg-8 col-xl-6 text-left">
 
-              <i class="bi bi-building" style="font-size:1.5em; color:darkred;"></i>
-              <h6 class="text-secondary"><b>　パートナー選択</b></h6>
+                <i class="bi bi-building" style="font-size:1.5em; color:darkred;"></i>
+                <h6 class="text-secondary"><b>　パートナー選択</b></h6>
+              </div>
             </div>
-          </div>  
+              
             <div class="row justify-content-center mt-2 px-4">
               <div class="col-md-10 col-lg-8 col-xl-6">
                 <!-- <label class="form-label" for="id_SearchInput">
@@ -179,7 +182,7 @@
             <!-- ゲスト企業の担当者情報を入力するフォーム -->
             <div class="row justify-content-center mt-2">
               <div class="d-flex col-md-10 col-lg-8 col-xl-6 text-left mt-1">
-                <i class="bi bi-person" style="font-size:1.5em; color:darkred;"></i>
+                <i class="bi bi-file-person" style="font-size:1.5em; color:darkred;"></i>
                 <h6 class="text-secondary"><b>　お申込者の情報</b></h6>
               </div>
             </div>
@@ -290,7 +293,6 @@
               </div>
             {% endif %}
 
- 
             <div class="form-group row justify-content-center px-4">
               <label class="col-md-3 col-lg-2 col-form-label"
                 for="{{form.title.id_for_label}}" >
@@ -300,20 +302,26 @@
                   name="{{form.title.name}}"
                   value="{{form.title.value| default:''}}"
                   id="{{form.title.id_for_label}}" >
+                </div>
               </div>
-            </div>
-            {% if form.title.errors %}
-              <div class="row justify-content-center px-4">
-                <div class="col-md-10 col-lg-8 col-xl-6 text-left" style="color:red;">
-                  {{ form.title.errors.as_text }}</div>
-              </div>
-            {% endif %}
+              {% if form.title.errors %}
+                <div class="row justify-content-center px-4">
+                  <div class="col-md-10 col-lg-8 col-xl-6 text-left" style="color:red;">
+                    {{ form.title.errors.as_text }}</div>
+                </div>
+              {% endif %}
 
-            <div class= "d-flex justify-content-center mt-5">
-              <button type="submit" class="btn btn-primary shadow"
-                name="next2"
-                value="ToConfirm_{{user.id}}">
-                選んだパートナーにユーザー追加申請する</button>
+            <div class= "row justify-content-center mt-5 px-4">
+              <div class="col-md-10 col-lg-8 col-xl-6">
+                <button type="submit" class="btn btn-primary w-100 shadow"
+                  name="next2"
+                  value="ToConfirm_{{user.id}}">
+                  選んだパートナーにユーザー申請する
+                  <span class="ms-1">
+                    <i class="bi bi-send" style="font-size:1.0em; color:rgb(250, 139, 194)"></i>
+                  </span>
+                </button>
+              </div>
             </div>
           </form>
         </span>
@@ -323,23 +331,23 @@
       <!-- 入力した内容を確認 -->
       {% if flag_step == 2 %}
 
-        <div class="row justify-content-center mt-4">
-          <h5 class="text-black text-center">
-            <b>ユーザー登録（ご申請内容）</b></h5>
+        <div class="d-flex justify-content-center align-items-center mt-5 gap-2">
+          <h5 class="text-secondary text-center"><b>ユーザー登録（ご申請内容）</b></h5>
+          <i class="bi bi-person-add mb-2" style="font-size:2.2em; color:deeppink;"></i>
         </div>
 
         <div class="row justify-content-center mt-2 px-4">
           <div class="col-md-9 col-lg-6">
         
             <form method="POST"
-              class="p-4 m-2 bg-light border border-primary-subtle rounded form-group">
+              class="form-group bg-light border border-top rounded shadow p-4 m-2">
 
               {% csrf_token %}
 
               <table class="table table-sm table-bordered border-primary-subtle table-responsive">
                 <tbody> <!-- 郵便番号のところは住所にする -->
                   <tr>
-                    <th scope="col" width="40%" class="table-primary">お取引者</th>
+                    <th scope="col" width="40%" class="table-primary">パートナー</th>
                     <td style="text-align: right;">{{ entity.entityName }}</td></tr>
                   <tr>
                     <th scope="col" width="40%" class="table-primary">代表者</th>
@@ -359,9 +367,7 @@
                     <th scope="col" width="40%" class="table-primary" style="text-align:left;">
                       あなたのお名前</th>
                     <td style="text-align: right;">
-                      {% if form.userName.value != "" and form.userName.value != None %}
-                        {{ form.userName.value }}さん
-                      {% endif %}
+                      {{ form.lastName.value }}　{{ form.firstName.value }}さん
                     </td>
                   </tr>
                   <tr>
@@ -382,15 +388,16 @@
               <hr>
 
               <div class="d-flex justify-content-center">
-                <button type="submit" class="btn btn-outline-primary  flex-grow-1"
-                  name="next2"
-                  value="BackToInput_{{user.id}}_{{entity.id}}">
-                  戻る</button>
-
-                <button type="submit" class="btn btn-primary flex-grow-1 ms-2"
+                <button type="submit" class="btn btn-primary flex-grow-1"
                   name="next2"
                   value="ToSave&Apply_{{user.id}}_{{entity.id}}">
-                  パートナー企業に参加申請</button>
+                  パートナーに参加申請</button>
+
+                <button type="submit" class="btn btn-outline-primary  flex-grow-1 ms-2"
+                  name="next2"
+                  value="BackToInput_{{user.id}}_{{entity.id}}">
+                  戻る　　</button>
+
               </div>
 
               {% for field in form %}

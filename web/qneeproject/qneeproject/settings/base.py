@@ -45,7 +45,7 @@ INSTALLED_APPS = [
   'django_bootstrap_icons',
   'django.contrib.humanize',
   'contact',
-
+  'django_celery_beat', # 260328に追加（celery, django-celery-beat, redisをinstall）
   #'django.contrib.sites',
   #'allauth',
   #'allauth.account',
@@ -196,3 +196,26 @@ DATETIME_INPUT_FORMATS += [
   '%Y/%m/%d',
   '%Y/%m/%d %H:%M:%S',
 ]
+
+# Celeryの設定
+CELERY_BROKER_URL = 'redis://localhost:6379/0' # RedisのURL
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Tokyo' # タイムゾーン
+
+from celery.schedules import crontab
+
+# 定期タスクのスケジュールを設定 (beat)
+# 260329 完成したらProductionにもコピーすｒ
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+#CELERY_BEAT_SCHEDULE = {
+#    'sayHello': {
+#        'task': 'send.tasks.add',
+#        'schedule': crontab(),  # execute every minute
+#        'args': (1, 1),     
+#    }
+#}
+
+# CELERYD_LOG_FILE = "./celeryd.log"

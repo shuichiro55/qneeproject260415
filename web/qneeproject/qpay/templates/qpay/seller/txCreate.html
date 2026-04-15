@@ -10,8 +10,7 @@
 
   <div class="container mt-2">
 
-    <div class="row justify-content-center mt-1">
-
+    <div class="row justify-content-center mt-2">
       {% for message in messages %}
         <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
           <span>{{ message }}</span>
@@ -20,7 +19,7 @@
     </div>
 
     <nav aria-label="breadcrumb" role="navigation">
-      <ol class="breadcrumb bg-light-subtle px-2 rounded-3 mt-1">
+      <ol class="breadcrumb bg-light-subtle px-2 rounded-3 mt-2">
         <li class="breadcrumb-item text-primary"><a href="{% url 'accounts:mypage_seller' %}">
           {% bs_icon 'house' color='cornflowerblue' size='1.2em' %}
           マイページトップ</a></li>
@@ -251,7 +250,7 @@
               <tbody>
                 <tr class="table-info">
                   <th scope="col" width="45%" class="table-primary">受け取り金額</th>
-                  <td style="text-align: right;">{{ tx.to_seller_amount|intcomma }}</td></tr>
+                  <td style="text-align: right;">{{ tx.transfer_amount|intcomma }}</td></tr>
                 <tr>
                   <th scope="col" width="45%" class="table-primary">＋前払額</th>
                   <td style="text-align: right;">{{ tx.advance_amount|intcomma }}</td></tr>

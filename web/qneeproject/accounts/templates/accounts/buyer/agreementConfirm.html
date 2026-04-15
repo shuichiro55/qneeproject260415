@@ -10,7 +10,7 @@
   
   <div class="container">
 
-    <div class="row justify-content-center mt-1">
+    <div class="row justify-content-center mt-2">
       {% for message in messages %}
         <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
           <span>{{ message }}</span>
@@ -21,12 +21,12 @@
     <!-- message.tagsはsettings.pyのMESSAGE_TAGSで定義できる  25/01/10 -->
     <!-- extra_tagはsettings.pyのMESSAGE_TAGSで定義できる  25/01/10 -->
 
+    <!-- マイページはユーザー情報が必要となるため削除
     <div class="row">
       <nav aria-label="breadcrumb" role="navigation">
-        <ol class="breadcrumb bg-light-subtle px-2 rounded-3 mt-1">
+        <ol class="breadcrumb bg-light-subtle px-2 rounded-3 mt-2">
           <li class="breadcrumb-item"><a href="{% url 'accounts:mypage_buyer' %}">
             <i class="bi bi-house" style="font-size:1.2em; color:cornflowerblue;"></i>
-            <!-- {% bs_icon 'house' color='cornflowerblue' size='1.2em' %} -->
             マイページトップ</a></li>
           <li class="breadcrumb-item active" aria-current="page">
             <i class="bi bi-card-checklist" style="font-size:1.2em; color:text-secondary;"></i>
@@ -34,8 +34,18 @@
         </ol>
       </nav>  
     </div>
+    -->
 
-    <div class ="row justify-content-center">
+    <div id="loading">
+      <div class="spinner-border text-primary"
+        style="width: 3rem; height: 3rem;"
+        role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-5">処理中です... しばらくお待ちください</p>
+    </div>
+    
+    <div class ="row justify-content-center mt-2">
       <div class="col-11 col-sm-10 col-md-9">
         <div class="progress mt-1 mb-1" style="height: 12px" >
           <div class="progress-bar bg-secondary" role="progressbar"
@@ -70,8 +80,9 @@
       <div class ="row justify-content-center mx-4">
         <div class="col-sm-10 col-md-9">
 
-          <div class="row justify-content-center mt-3">
-            <h4 class="text-black text-center">＜利用規約ご確認＞</h4>
+          <div class="d-flex justify-content-center align-items-center mt-5 gap-2">
+            <h5 class="text-secondary text-center"><b>利用規約のご確認</b></h5>
+            <i class="bi bi-check-all mb-2" style="font-size:2.4em; color:deeppink;"></i>
           </div>
 
           <div class="iframe-wrapper d-flex justify-content-center mt-3">
@@ -82,7 +93,9 @@
 
       <div class="row justify-content-center mt-3">
         <div class="col-11 col-sm-10 col-md-9">
-          <form method="POST" action="{% url 'accounts:agreementConfirm_buyer' %}">
+          <form method="POST"
+            action="{% url 'accounts:agreementConfirm_buyer' %}"
+            id="id_PostForm">
             {% csrf_token %}
 
             <div class="btn-group btn-group-vertical d-flex justify-content-center" data-toggle="buttons">
@@ -94,7 +107,6 @@
               </label>
             </div>
 
-                      <div class="d-flex justify-content-center mt-3">
             <div class="d-flex justify-content-center mt-3">
               <button id="next1" type="submit" class="btn btn-outline-primary me-2"
                 name="next"
@@ -104,12 +116,13 @@
                 title="">同意しない
               </button>
             
-              <button id="next2" type="submit" class="btn btn-primary ms-2 shadow"
+              <button id="next2" type="submit" class="btn btn-primary ms-1 shadow"
                 name="next"
                 value="ToAgree_{{user.id}}_{{entity.id}}"
                 data-bs-toggle="tooltip"
                 data-bs-placement="bottom"
-                title="上記「利用規約に同意します」にチェックしたうえクリック">同意します
+                title="上記「利用規約に同意します」にチェックしたうえクリック">
+                規約に同意します
               </button> 
             </div>
 
@@ -125,7 +138,7 @@
     {% if flag_step == 2 %}
 
       <!--<div class="authentication-bg min-vh-100 min-vw-100 d-flex align-items-center justify-content-center" style="background-color: #def5f9;"> -->
-      <div class="row justify-content-center mt-4 text-secondary">
+      <div class="row justify-content-center mt-5 text-secondary">
         申請手続きが終了し、パートナー企業に参加申請しました。<br>
         パートナー企業の承認の結果をメールでご連絡いたします。
       </div>
@@ -152,6 +165,11 @@
         btn.disabled = true;
       }
     });
+
+    document.getElementById('id_PostForm').addEventListener('submit', function() {
+      document.getElementById('loading').style.display = 'block';
+    });
+
 
 </script>
 

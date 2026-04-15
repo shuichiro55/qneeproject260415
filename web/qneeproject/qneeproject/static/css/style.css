@@ -25,11 +25,14 @@
 
 *****************************************/
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+
 body {
   font-family: "Sawarabi Gothic","Noto Sans","Inter", sans-serif;
   color: #25272b;
   font-size: 15px;
   margin: 0;
+  padding-top: 64px;
 }
 
 body.modal-open {
@@ -761,7 +764,7 @@ ul.pattern .color6 {
   padding: 24px 8px;
   font-weight: 600;
   letter-spacing: 0.6px;
-  text-transform: uppercase;
+  /*text-transform: uppercase;*/
   background-color: transparent;
   margin: 0 6px;
   -webkit-transition: all 0.3s ease;
@@ -776,7 +779,7 @@ ul.pattern .color6 {
 .navbar .navbar-nav .nav-item.dropdown .dropdown-menu {
   font-size: 12px;
   font-weight: 600;
-  text-transform: uppercase;
+  /*text-transform: uppercase;*/
   padding-left: 8px;
   padding-right: 8px;
   border-color: rgba(0, 0, 0, 0.04);
@@ -2101,6 +2104,17 @@ ul.pattern .color6 {
     border-collapse: collapse; /* テーブルの枠線を重ねる */
     width: 100%; /* 必要に応じて幅調整 */
 }
+
+#loading {
+  display: none; /* 初期は非表示 */
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(255, 255, 255, 0.8);
+  z-index: 9999;
+  text-align: center;
+  padding-top: 20%;
+}
+
 /* 260310 追加 */
 /*
 .select_wrapper {
