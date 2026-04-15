@@ -1,1 +1,0 @@
-Qnee　－　承認完了通知 {% if flag_bankAccountUnset == 1 %}【口座設定のお願い】{% endif %}
