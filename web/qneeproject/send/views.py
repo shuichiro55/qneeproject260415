@@ -178,6 +178,46 @@ class InvitationSetsView(generic.UpdateView):
     nextWhen = self.request.POST.get('nextWhen', None) # 送信タイミングに係る対応
     nextWhat = self.request.POST.get('nextWhat', None) # 何を送るかの対応
 
+    nextWho_MakeOrSelect = self.request.POST.get('nextWho_MakeOrSelect', None)
+
+    if nextWho_MakeOrSelect != None:
+
+      if nextWho_MakeOrSelect.find("make") >= 0:
+        mailSets, created = InvitationSets.objects.select_related('appliedList').get_or_create(buyEntity=buyEntity)   
+        mailSets.save()
+
+        " フォームの「startDate」の初期値セット（保存しない） "
+        if mailSets.startDate is not None:
+          str_startDate = mailSets.startDate.strftime('%Y/%m/%d')
+        else:
+          str_startDate = self.nearStartDate()
+
+        init_data = {
+          'startDate':str_startDate,
+          'interval':mailSets.interval,
+          'dayOfMonth':mailSets.dayOfMonth
+        }
+        print(f'init_data={init_data} def get of InvitationSetsView')
+
+        context = {
+          'WhoWhenWhat':'who',
+          'MakeOrSelect': 'make',          
+          'FileOrManual':'',
+          'FileType': '',
+
+          'addListSelectForm': AddListSelectForm(buyEntity_id=buyEntity_id),
+          'step_fileUp': 1,
+          'addFileUpForm': AddFileUpForm(),
+          'addListNameForm1': AddListNameForm(),
+
+          'flag_manualInput': 1,
+          'addListNameForm2': AddListNameForm(),
+          'mailForm': InvitationForm(),
+          'repeatOnOff': mailSets.repeatOnOff,
+          'RepeatSetForm': RepeatSetForm(initial=init_data),
+        }
+        return TemplateResponse(request, 'send/buyer/invitationSets.html', context)
+
 
     if nextWho_fileInput != None:
 

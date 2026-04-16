@@ -106,15 +106,24 @@
       <div class="row justify-content-center mt-1">
         <div class="triangle triangle-bottom"></div>
       </div>
-      <div class="row justify-content-center mt-1 mx-2">
-        <div class="btn-group btn-group-toggle col-md-8 col-lg-6"
+
+      <form method="POST" class="p-0 m-0"
+        action="{% url 'send:invitationSets' %}"
+        style="background-color: transparent !important; border-color:transparent !important;"
+        id="id_MakeOrSelectForm">
+        {% csrf_token %}
+
+        <div class="row justify-content-center mt-1 mx-2">
+
+        <div class="btn-group btn-group-toggle col-md-8 col-lg-6 "
           data-toggle="buttons"
           id="id_MakeOrSelect">
-
+  
           <label class="btn btn-secondary p-1" for="id_MakeOrSelect_A">
             <input type="radio"
               id="id_MakeOrSelect_A"
-              name="name_MakeOrSelect"
+              name="nextWho_MakeOrSelect"
+              value="make"
               {% if MakeOrSelect == 'make' %}checked{% endif %}
               autocomplete="off">
             リストを作る
@@ -124,13 +133,15 @@
           <label class="btn btn-secondary p-1" for="id_MakeOrSelect_B">
             <input type="radio"
               id="id_MakeOrSelect_B"
-              name="name_MakeOrSelect"
+              name="nextWho_MakeOrSelect"
+              value="select"
               {% if MakeOrSelect == 'select' %}checked{% endif %}
               autocomplete="off">
             リストを選ぶ
           </label>
         </div>
       </div>
+      </form>
       
     </span>
 
@@ -352,7 +363,6 @@
       </div>
 
       {% if step_fileUp == 1 %}
-
         <div class="row justify-content-center mt-1 mx-2">
           <div class="col-md-8 col-lg-6">
 
@@ -393,18 +403,11 @@
             </div>
           </div> <!-- end of col -->
         </div> <!-- end of row -->
-
       {% endif %}
     </span>
 
 
     <span id="id_addition_Who6" style="display: none;">
-
-      <!--
-      <div class="row justify-content-center">
-        <div class="triangle triangle-bottom"></div>
-      </div>
-      -->
 
       {% if step_fileUp == 1 %}
 
@@ -1157,13 +1160,8 @@
 
     if (id_FileOrManual_A.checked) {
       console.log('pass id_FileOrManual_A.checked')
-      if ("{{step_fileUp}}" == 1) { addition_Who5.style.display = "block";}
-      if ("{{step_fileUp}}" == 2) { 
-        addition_Who5.style.display = "block";
-        addition_Who6.style.display = "block";}
-      if ("{{step_fileUp}}" == 3) { 
-        addition_Who5.style.display = "block";
-        addition_Who6.style.display = "block";}
+      addition_Who5.style.display = "block";
+      addition_Who6.style.display = "block";
     } else {
       console.log('pass id_FileOrManual_A.checkedは該当しない')      
     }
@@ -1179,7 +1177,7 @@
     //「safe」はエスケープを無効化する.HTML上で''がない状態で認識する
     //https://se-memorandum.com/django-safe/
 
-    ListOfListName.addEventListener('change', (e) => {
+    ListOfListName.addEventListener('click', (e) => {
 
       console.log('ListOfListName.addEventListenerのclickが認識されました');
       console.log('pass1 e.target.value='+e.target.value)
@@ -1217,8 +1215,10 @@
       console.log('WhoWhenWhat.addEventListenerのclickが認識されました');
       hideAllDisplay();
 
-      if (id_WhoWhenWhat_A.checked) { /* 宛先を設定 */
+      if (id_WhoWhenWhat_A.checked) { /* 送り先を設定 */
         addition_Who1.style.display = "block";
+        document.getElementById('id_MakeOrSelect_A').checked = false;
+        document.getElementById('id_MakeOrSelect_B').checked = false;
       }
       if (id_WhoWhenWhat_B.checked) { /* いつ送信するかを設定 */
         addition_When1.style.display = "block";
@@ -1231,21 +1231,31 @@
       }        
     });
 
-    MakeOrSelect.addEventListener('click', function(){
+    //「リストを作る」が選択されたときの対応
+    id_MakeOrSelect_A.addEventListener('click', function(){
 
-      console.log('MakeOrSelect.addEventListenerのclickが認識されました');
+      console.log('id_MakeOrSelect_A.addEventListenerのclickが認識されました');
       hideAllDisplay();
 
-      if (id_MakeOrSelect_A.checked) { /*アドレスリスト作成*/
-        addition_Who1.style.display = "block";
-        addition_Who4.style.display = "block";
-      }
-      if (id_MakeOrSelect_B.checked) { /*アドレスリストを選択*/
-        addition_Who1.style.display = "block";
-        addition_Who2.style.display = "block";
-      }
+      console.log('id_MakeOrSelect_A.checkedが認識されました');
+      document.getElementById('id_MakeOrSelectForm').submit();
+      //addition_Who1.style.display = "block";
+      //addition_Who4.style.display = "block";
     });
 
+    //「リストを選ぶ」が選択されたときの対応
+    //Aとは分けた。AとBを纏めると、A選択時にsubmit()が２回発行
+    // （label経由＋input経由）され、Bでもsubmit()が自動的に送付されたため
+    id_MakeOrSelect_B.addEventListener('click', function(){
+
+      console.log('id_MakeOrSelect_B.addEventListenerのclickが認識されました');
+      hideAllDisplay();
+
+      console.log('id_MakeOrSelect_B.checkedが認識されました');
+      addition_Who1.style.display = "block";
+      addition_Who2.style.display = "block";
+    });
+  
     var itemNum = 0;
 
     NewItemAddBtn.addEventListener('click', function(){
@@ -1292,6 +1302,8 @@
         addition_Who1.style.display = "block";
         addition_Who4.style.display = "block";
         addition_Who5.style.display = "block";
+        document.getElementById('id_FileType_A').checked = false;
+        document.getElementById('id_FileType_B').checked = false;
       }
 
       /*
@@ -1299,12 +1311,12 @@
         console.log('id_FileOrManual_Aが認識されました');
         addition_Who1.style.display = "block";
         addition_Who4.style.display = "block";
-        if ("{{step_fileUp}}" == 1) {
-          addition_Who5.style.display = "block";}
         if ("{{step_fileUp}}" == 2) {
+          addition_Who5.style.display = "block";}
+        if ("{{step_fileUp}}" == 3) {
           addition_Who5.style.display = "block";
           addition_Who6.style.display = "block";}
-        if ("{{step_fileUp}}" == 3) {
+        if ("{{step_fileUp}}" == 4) {
           addition_Who5.style.display = "block";
           addition_Who6.style.display = "block";}*/
 
@@ -1341,7 +1353,6 @@
 
     });
 
-
     RepeatOnOff.addEventListener('click', function(){
 
       console.log('RepeatOnOff.addEventListenerのclickが認識されました');
@@ -1371,27 +1382,6 @@
       addition_Who6.style.display = "block";
     });
 
-
-    /*
-    InputOrSelect.addEventListener('click', function(){
-
-      console.log('InputOrSelect.addEventListenerのclickが認識されました');
-      hideAllDisplay();
-
-      if (id_InputOrSelect_A.checked) {
-        console.log('id_InputOrSelect_Aが認識されました');
-        addition_Who1.style.display = "block";
-        addition_Who3.style.display = "block";
-        addition_Who4.style.display = "block";
-      }
-
-      if (id_InputOrSelect_B.checked) { 
-        console.log('id_InputOrSelect_Bが認識されました');
-        addition_Who1.style.display = "block";
-        addition_Who3.style.display = "block";
-        addition_Who8.style.display = "block";
-      }
-    }); */
     
   });
 
