@@ -834,7 +834,7 @@
  1859  ls -la media
  1860  ls -la upload
  1861  ls -la media/upload
- 1862  rm -r media/upload/*
+ 1862  rm -r media/upload/*p
  1863  rm -r /var/www/qneeproject/media/upload/*
  1864  rm  /var/www/qneeproject/media/upload/*
  1865  rm -r /var/www/qneeproject/media/upload/*
