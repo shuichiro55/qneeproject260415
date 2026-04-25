@@ -32,7 +32,7 @@ body {
   color: #25272b;
   font-size: 15px;
   margin: 0;
-  padding-top: 64px;
+  padding-top: 70px;
 }
 
 body.modal-open {
@@ -350,6 +350,15 @@ ul.pattern .color6 {
   z-index: 1;
 }
 
+/* ★★試験的に追加 260423*/
+.custom-toggle:has(input:checked) {
+  background-color: #fd86b2 !important; /* お好みの色に */
+  border-color: #fd86b2 !important;
+  color: white;
+}
+.toggleBtn_NoneDisplay {
+  display: none;
+}
 .btn:hover:after {
   left: 110%;
 }
@@ -749,6 +758,7 @@ ul.pattern .color6 {
   transition: all 0.5s ease;
   padding: 0px;
   background-color: #ffffff;
+  /*min-height: 65px; /* 任意の高さ */
 }
 
 .navbar .navbar-brand {
@@ -925,11 +935,20 @@ ul.pattern .color6 {
 }
 
 .home-slider {
+
+
+  /* margin: 0; /* 260419 */
+  /*padding: 0; /* 260419 */
   position: relative;
 }
 
 .home-slider .swiper-slide {
+
+  /*margin: 0; /* 260419 */
   padding: 250px 0 180px 0;
+
+   
+
 }
 
 .swiper-button-next,
@@ -1598,6 +1617,9 @@ ul.pattern .color6 {
   background-attachment: fixed; /*スクロール時に固定*/
   background-size: cover;
   
+  min-height: 100vh; /* bootstrapのmin-vh-100 の代わり */
+  min-width: 10vw; /* bootstrapのmin-vw-100 の代わり */
+
   background-image: -moz-linear-gradient(top, #ddecfd, #ddecfd 13%, #fff 20%, #d5dbfa 80%, #fbc2eb);
   background-image: -webkit-linear-gradient(top, #ddecfd, #ddecfd 13%, #fff 20%, #d7d5fa 80%, #fbc2eb);
   background-image: linear-gradient(to bottom, #ddecfd, #ddecfd 13%, #fff 20%, #d7d5fa 80%, #fbc2eb);
@@ -1660,6 +1682,103 @@ ul.pattern .color6 {
 
 /* ★25/03/02 動画を背景とするために試験的に追加*/
 
+@media (min-width: 1200px) {
+  .ParaImage-left {
+	  width: 100%;
+	  height: 100vh;
+    /* background-color: #000; */
+	  background-attachment: fixed;
+	  /*background-size: auto 100%;*/
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: #2399CB;
+
+    /*position: relative;*/
+	  /*padding: 100% 0px;*/
+  }
+}
+@media (max-width: 1200px) {
+  .ParaImage-left {
+	  width: 100%;
+	  height: 100.05vh;
+    /* background-color: #000; */
+	  background-attachment: fixed;
+	  /*background-size: 100vw 100vh;*/
+    background-size: cover;
+    background-position: left;
+    background-repeat: no-repeat;
+    background-color: #2399CB;
+
+    position: relative;
+
+	  /*padding: 100% 0px;*/
+  }
+}
+
+
+@media (max-width: 1200px) {
+  .ParaVideo {
+	  width: 100vw;
+	  height:100vh;
+    /* padding: 15px 0px; */
+  }
+  
+  .ParaVideo > video {
+    position: absolute;
+
+    width: 100vw;
+    height: 33.3333333334%;
+
+    top: 50%;
+    left: 50%;
+    object-fit: cover;
+    transform: translate(-50%, -50%);
+    margin-block: 0;
+    display: block;
+  }
+}
+
+@media (min-width: 1200px) {
+  .ParaVideo {
+	  width: 100%;
+    height: 100vh; /*56.25vw;*/
+    /*padding: 15px 15px;*/
+  }
+
+  /* ParaVideo直下の<video>タグを指します。*/
+  .ParaVideo > video {
+    position: absolute;
+
+    width: 100%;
+    height: 100dvh; /* 56.25vw; */
+
+    overflow: hidden; /* はみ出た部分を隠す */
+    top: 50%; /*49.6666666667%;*/
+    left: 50%;
+    object-fit: cover;
+    transform: translate(-50%, -50%);
+  }
+}
+
+
+.ParaImage-center {
+	width: 100vw;
+	height: 100vh;
+  /* background-color: #000; */
+	background-attachment: fixed;
+	background-size: auto 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: #2399CB;
+
+  position: relative;
+
+
+	/*padding: 100% 0px;*/
+}
+
 .copy-wrapper {
   height: 100vh;
   display: flex;
@@ -1686,7 +1805,7 @@ ul.pattern .color6 {
 .copy-body-m {
   color: #fff;
   /* font-size: 20px; */
-  font-size: clamp(0.9rem, 0.7rem + 1vw, 1.2rem);
+  font-size: clamp(1.2rem, 0.7rem + 1vw, 1.2rem);
   text-shadow: 1px 1px 20px #000;
   text-align: center;
 }
@@ -1705,185 +1824,6 @@ ul.pattern .color6 {
 .ParaContent {
   background-color: #404040;
 	padding: 0px 0px;
-}
-
-@media (max-width: 1200px) {
-  .ParaVideo {
-	  width: 100%;
-	  height:100vh;
-    /* padding: 15px 0px; */
-  }
-  
-  .ParaVideo > video {
-    position: absolute;
-
-    width: 100%;
-    height: 33.3333333334%;
-
-    top: 50%;
-    left: 50%;
-    object-fit: cover;
-    transform: translate(-50%, -50%);
-    margin-block: 0;
-    display: block;
-  }
-}
-
-@media (min-width: 1200px) {
-  .ParaVideo {
-	  width: 100vw;
-    height: 56.25vw;
-    /*padding: 15px 15px;*/
-  }
-
-  .ParaVideo > video {
-    position: absolute;
-
-    width: 100vw;
-    height: 100%;
-
-    top: 49.6666666667%;
-    left: 50%;
-    /*object-fit: cover;*/
-    transform: translate(-50%, -50%);
-  }
-}
-
-/*
-@media (max-width: 900px) {
-  .ParaVideo2 {
-	  width: 100vw;
-    height: 100%;
-  }
-  
-  .ParaVideo2 > video {
-    position: absolute;
-
-    width: auto;
-    height: 100%;
-
-    top: 50%;
-    left: 50%;
-    object-fit: cover;
-    transform: translate(-50%, -50%);
-    position: fixed;
-    z-index: -999;
-    margin-block: 0;
-    display: block;
-  }
-}
-
-@media (min-width: 900px) {
-  .ParaVideo2 {
-	  width: 100vw;
-	  height: 100%;
-  }
-
-  .ParaVideo2 > video {
-    position: absolute;
-  
-    width: 100vw;
-    height: 100%;
-
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    position: fixed;
-    z-index: -999;
-    margin-block: 0;
-    display: block;
-  }
-}
-*/
-/*
-.ParaVideo > video::after{
-  position: absolute;
-  height: 100%;
-	width: 100%;
-  background-color: rgba(184, 169, 252, 0.2);
-  background-repeat: no-repeat;
-  z-index: -999;
-}
-*/
-/*
-.ParaContent h1, .ParaContent h2, .ParaContent h3, .ParaContent p {
-	color: #fff;
-	text-shadow: 0 5px 10px #000;
-	text-align: center;
-}
-
-.ParaVideo h1, .ParaVideo h2, .ParaVideo h3 {
-	color-interpolation-filters: #fff;
-	text-shadow: 0 5px 10px #000;
-	text-align: center;
-}
-.ParaVideo h1, .ParaContent h1 {
-	font-size: 60px;
-}
-.ParaVideo h2, .ParaContent h2 {
-	font-size: 50px;
-}
-.ParaVideo h3, .ParaContent h3 {
-	font-size: 40px;
-}
-
-.ParaVideo .p, .ParaContent .p {
-	color: #fff;
-	text-align: center;
-	font-size: 18px;
-}
-*/
-
-@media (min-width: 1200px) {
-  .ParaImage-left {
-	  width: 100vw;
-	  height: 100%;
-    /* background-color: #000; */
-	  background-attachment: fixed;
-	  background-size: auto 100%;
-    background-size: cover;
-    background-position: left;
-    background-repeat: no-repeat;
-    background-color: #2399CB;
-
-    position: relative;
-
-	  /*padding: 100% 0px;*/
-  }
-}
-@media (max-width: 1200px) {
-  .ParaImage-left {
-	  width: 100%;
-	  height: 100vh;
-    /* background-color: #000; */
-	  background-attachment: fixed;
-	  background-size: 100% 100%;
-    background-size: cover;
-    background-position: left;
-    background-repeat: no-repeat;
-    background-color: #2399CB;
-
-    position: relative;
-
-	  /*padding: 100% 0px;*/
-  }
-}
-
-.ParaImage-center {
-	width: 100vw;
-	height: 100vh;
-  /* background-color: #000; */
-	background-attachment: fixed;
-	/*background-size: auto 100%;*/
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-color: #2399CB;
-
-  position: relative;
-
-
-	/*padding: 100% 0px;*/
 }
 
 .bg1 {
@@ -2140,3 +2080,10 @@ select {
 .select_wrapper::after {
     pointer-events: none;
 }*/
+
+.fixedButton {
+  position: fixed;
+  right: 0;
+  z-index: 1;
+  bottom: 200px;
+}

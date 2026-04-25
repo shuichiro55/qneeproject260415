@@ -9,12 +9,12 @@
     <div class="container-fluid">
 
       <a class="navbar-brand ms-4" href="/">
-        <img src="{% static 'images/logo-qnee-yoko7.png' %}" alt="" height="30"></a>
+        <img src="{% static 'images/logo-qnee-yoko7.png' %}" alt="" height="35"></a>
 
-        <button class="navbar-toggler py-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
+        <button class="navbar-toggler pt-3 pb-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
         aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
         <!-- area-expanded="false"は、関連する要素（下記のnavbar）が閉じていることを意味する？-->
-        <i class="mdi mdi-menu text-secondary me-5" style="font-size:1.3em;"></i>
+        <i class="mdi mdi-menu text-secondary me-5" style="font-size:1.55em;"></i>
       </button>
 
       <!-- 「navbar-expand-lg」によりlg以上の場合は、初めから表示される-->
@@ -24,11 +24,8 @@
         <div class="d-none d-lg-block">
 
           <ul class="navbar-nav" id="navbar-navlist">
-            <li class="nav-item">
-              <a class="nav-link active" href="#home">キユーニーコネクトとは</a>
-            </li>
             <li class="nav-item dropdown">
-              <a class="nav-link" href="#" id="navbarDropdown" role="button"
+              <a class="nav-link pt-4 pb-4" href="#" id="navbarDropdown" role="button"
                 data-bs-toggle="dropdown" aria-expanded="false">
                 ログイン・ログアウト
                 <i class="mdi mdi-arrow-down-circle" style="font-size:1em"></i>
@@ -41,11 +38,11 @@
             </li>
 
             <li class="nav-item">
-              <a class="nav-link" href="#faq">FAQ</a>
+              <a class="nav-link pt-4 pb-4" href="#faq">FAQ</a>
             </li>
 
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'accounts:contact_seller' %}">お問い合わせ</a>
+              <a class="nav-link pt-4 pb-4" href="{% url 'accounts:contact_seller' %}">お問い合わせ</a>
             </li>
           </ul> <!--end of ul navbar-nav-->
         </div> <!-- endo of d-none -->

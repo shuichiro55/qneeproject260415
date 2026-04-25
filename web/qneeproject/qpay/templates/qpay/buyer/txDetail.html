@@ -6,20 +6,22 @@
 {% block content %}
 
 
-<div class="authentication-bg min-vh-100 min-vw-100 align-items-start">
+<div class="authentication-bg align-items-start">
 
   <div class="container">
 
-    <div class="row justify-content-center mt-2">
-      {% for message in messages %}
-        <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
-          <span>{{ message }}</span>
-        </div>
-      {% endfor %}
-    </div>
+    {% if messages %}
+      <div class="row justify-content-center mt-2 mx-2">
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
+            <span>{{ message }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
 
-    <nav aria-label="breadcrumb" role="navigation">
-      <ol class="breadcrumb bg-light-subtle px-2 rounded-3 mt-2">
+    <nav class="mt-2" aria-label="breadcrumb" role="navigation">
+      <ol class="breadcrumb bg-light-subtle px-2 rounded-3">
         <li class="breadcrumb-item">
           <a href="{% url 'accounts:mypage_buyer' %}">
             {% bs_icon 'house' color='cornflowerblue' size='1.2em' %}
@@ -35,7 +37,7 @@
       </ol>
     </nav>
 
-    <div class="d-flex justify-content-center mt-4">
+    <div class="d-flex justify-content-center mt-5">
       <h5 class="text-secondary pt-1"><b>取引詳細　</b></h5>
       {% bs_icon 'receipt-cutoff' color='deeppink' size='2.2em' %}
     </div>
@@ -44,7 +46,7 @@
       <div class="col-11 col-md-9 col-lg-6">
 
         <form method="GET"
-          class="form-group bg-light border border-success-subtle rounded mt-2 p-0 mx-2"
+          class="form-group bg-light border border-success-subtle rounded mt-3 p-0 mx-2"
           style="background-color: transparent !important; border-color:transparent !important;">
 
           {% csrf_token %}

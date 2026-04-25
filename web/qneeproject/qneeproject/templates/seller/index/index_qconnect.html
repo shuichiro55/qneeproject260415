@@ -4,30 +4,266 @@
 
 {% block content %}
 
-<div class="authentication-bg min-vh-100 min-vw-100">
-
-  <div class="container">
-
-    <div class="d-grid gap-5 d-md-flex justify-content-md-center mt-4 pt-3 mx-5">
-      <a href="#" class="btn btn-primary" role="button" 
-        data-bs-toggle="tooltip" data-bs-placement="bottom" title="">他のサービスとは違うの？</a>
-      <a href="{% url 'accounts:login_seller' %}" class="btn btn-primary" role="button"
-        data-bs-toggle="tooltip" data-bs-placement="bottom" title="">キユーニコネクトご利用</a>
-    </div>
-  </div>
+<div class="position-fixed bottom-0 start-50 translate-middle-x mb-2 d-flex gap-3"
+  style="z-index: 1000; width: max-content;">
+  <a href="{% url 'accounts:login_seller' %}"
+    class="btn btn-primary btn-lg rounded-1"
+    style="font-size:1.2em;">他のサービスと違うの？</a>
+  <a href="{% url 'accounts:login_seller' %}"
+    class="btn btn-primary btn-lg rounded-1"
+    style="font-size:1.2em;">キユーニーを利用してみる</a>
 </div>
 
-<!--START HOME-->
-<section class="home-slider" id="home">
+<div class="container-fluid m-0 p-0"
+  style="position:relative">
 
-</section> <!--end home-->
+<!-- <section class="home-slider" id="home"> -->
+  
+  <div class="ParaImage-left bg1">
+
+    <div class="bg-overlay2"></div>
+    <div class="copy-wrapper align-items-start pt-5 px-0">
+      <div class="row justify-content-center mt-5">
+        <div class="container text-center">
+
+          <p class="copy-head mt-4"
+            id="page1-copy-head"
+            style="color: #fff;
+              display:inline-block;
+              background-image: linear-gradient(90deg, rgb(150, 127, 195), rgb(147, 171, 226) 50%, #fff 50%, #fff);
+              background-size:200% 100%;
+              padding:.5rem 1rem;
+              line-height: 1.6;">
+            お取引先のご依頼により<br>
+            あなたは報酬を前倒しできます
+          </p>
+        </div>
+
+        <p class="copy-body-m mt-4" id="page1-copy-body1">
+          報酬がもっと早くほしい！ <br>
+          そのような状況に陥ることはありませんか？<br>
+          <br>
+          フリーランスはカードや銀行の審査が厳しい、<br>
+          ファクタリングは手数料が高かったりするため<br>
+          会社勤めの方と比べて多くの不安があります <br>
+          <br>
+          こういう環境下、お取引先はキユーニーと連携し、<br>
+          あなたが報酬を手にする手段を提供しております
+          <br>
+        </p>
+        <p class="copy-body-l" id="page1-copy-body2" >
+
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="ParaContent">
+    <div class="container">
+      <!-- <h3>Lorem ipsum dolor sit amet</h3>
+      <p>Sed ut perspiciatis unde omnis iste natus error sit volupt</p>
+      -->
+    </div>
+  </div>
+
+  <div class="ParaVideo">
+    <video id="paravideo" autoplay muted loop>
+      <source 
+        src="static/images/qconnect/bg-productLP-buyer2_2.mp4"
+        type="video/mp4">
+    </video>
+    <!-- <h2>Vedio Background Parallax</h2>-->
+
+    <div class="row justify-content-center text-white">
+      <div class="copy-wrapper px-0 ">
+
+        <div class="copy">
+          <div class="container text-center">
+            <p class="copy-head"
+              id="page2-copy-head1" 
+              style="color: #fff;
+                display:inline-block;
+                background-image: linear-gradient(90deg, rgb(150, 127, 195), rgb(147, 171, 226) 50%, #fff 50%, #fff);
+                background-size:200% 100%;
+                padding:.5rem 1rem;">
+              お取引先に弱みを握られるんじゃないの？
+            </p>
+          </div>
+  
+          <!-- <p class="copy-head" id="page2-copy-head" style="line-height:45px;" >
+            皆さまへのお願い
+          </p> -->
+
+          <p class="copy-body-m" id="page2-copy-body1">
+            <br>
+            いえいえ、そうではありません。<br>
+            <br>
+            お取引先はキユーニーとあなたの働く環境を整え、<br>
+            あなたとのよい関係を築きたいと思っています<br>
+            <br>
+          </p>
+
+          <div class="container text-center">
+            <p class="copy-head"
+              id="page2-copy-head2" 
+              style="color: #fff;
+                display:inline-block;
+                background-image: linear-gradient(90deg, rgb(150, 127, 195), rgb(147, 171, 226) 50%, #fff 50%, #fff);
+                background-size:200% 100%;
+                padding:.5rem 1rem;">
+              あなたは報酬があることを示すだけ
+            </p>
+          </div>
+
+          <!-- <p class="copy-head" id="page2-copy-head2">
+            Qneeが報酬を立て替えます
+          </p> -->
+
+          <p class="copy-body-m" id="page2-copy-body2">
+            <br>
+            あなたはゲスト登録し、報酬が存在することを<br>
+            示すだけで報酬を前倒して手にすることができます<br>
+            <br><br><br><br>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ParaContent">
+    <div class="container">
+      <!--
+      <h3>Lorem ipsum dolor sit amet</h3>
+      <p>Sed ut perspiciatis unde omnis iste natus error sit volupt</p>
+      -->
+    </div>
+  </div>
+
+  <div class="ParaImage-center bg2"  id="bg2">
+    <div class="bg-overlay2"></div>
+
+    <div class="copy-wrapper align-items-start pt-5">
+
+      <div class="container">
+        <div class="row justify-content-center mt-5">
+          <div class="col mt-5">
+            <p class="copy-head"
+              id="page3-copy-head"
+              style="line-height:50px;">ご利用にかかる手数料</p>
+            <p class="copy-body-m" id="page3-copy-body1">
+              <br>
+              ご利用にあたら次の手数料を設定しておりますが、<br>
+              初回は優待特典として手数料はかかりません<br>
+            </p>
+            <p class="copy-body-m" id="page3-copy-body2">
+              よりよいサービスとして磨きをかけるために<br>
+              試運転期間を設けており、手数料を下げております<br>
+            </p>
+            <p class="copy-body-m" id="page3-copy-body3">
+            </p>
+          </div>
+        </div>
+
+        <div class="row justify-content-center mt-4">
+          <div class="col-11 col-md-8 col-lg-8 col-xl-6">
+            <table class="table table-striped table-bordered table-responsive bg-light">
+
+              <tbody class="text-center">
+                <thead>
+                  <tr class="table-primary" style="text-align:center">
+                    <th width="30%"></th>
+                    <th width="37%" style="text-align:center; vertical-align:middle;">利用手数料</th>
+                    <th width="38%" style="text-align:center; vertical-align:middle;">基本料金</th>
+                  </tr>
+                </thead>
+                <tr class="table-danger">
+                  <td width="25%" style="vertical-align:middle;">はじめの1回</td>
+                  <td width="37%" style="text-align:center; vertical-align:middle;">なし</td>
+                  <td width="38%" style="text-align:center; vertical-align:middle;">なし</td>
+                </tr>
+                <tr>
+                  <td width="25%" style="vertical-align:middle;">試運転期間<br>(～2027年)</td>
+                  <td width="37%" style="text-align:center; vertical-align:middle;">前払い額の3.0%</td>
+                  <td width="38%" style="text-align:center; vertical-align:middle;">なし</td>
+                </tr>
+                <tr>
+                  <td width="25%" style="vertical-align:middle;">通常価格</td>
+                  <td width="37%" style="text-align:center; vertical-align:middle;">前払い額の5.0%</td>
+                  <td width="38%" style="text-align:center; vertical-align:middle;">なし</td>
+                </tr>
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
 
 <script>
+
+  const page1_head = document.querySelector('#page1-copy-head');
+  const page1_body1 = document.querySelector('#page1-copy-body1');
+  const page1_body2 = document.querySelector('#page1-copy-body2');
+
+  const keyframes = {
+    color:['transparent', '#fff'], backgroundPosition: ['100% 0', '0 0'],
+  }
+  const options = {
+    duration: 1000, easing: 'ease',
+  }
+  const options2 = {
+    duration: 1000, delay: 1000, easing: 'ease-in',
+  }
+
+  page1_head.animate(keyframes, options);
+  page1_body1.animate({opacity: [0, 1], translate: ['0 30px',0]}, 2000);
+  page1_body2.animate({opacity: [0, 1], translate: ['0 25px',0]}, 2000);
+
+
+  const page2_head1 = document.querySelector('#page2-copy-head1');
+  const page2_head2 = document.querySelector('#page2-copy-head2');
+  const page2_body1 = document.querySelector('#page2-copy-body1');
+  const page2_body2 = document.querySelector('#page2-copy-body2');
+
+  const showPage2 = () => {
+
+    page2_head1.animate(keyframes, options);  
+    page2_body1.animate({opacity:[0, 1], translate:['0 30px',0], }, 2000);
+
+    page2_head2.animate(keyframes, options2);
+    page2_body2.animate({opacity:[0, 1], translate:['0 30px',0], }, 3000);
+  };
+
+  const page2_Observer = new IntersectionObserver(showPage2);
+  page2_Observer.observe(document.querySelector('#page2-copy-body1'));
+
+
+  const page3_body1 = document.querySelector('#page3-copy-body1');
+  const page3_body2 = document.querySelector('#page3-copy-body2');
+  const page3_body3 = document.querySelector('#page3-copy-body3');
+
+  const showPage3 = () => {
+
+    page3_body1.animate({opacity:[0, 1], translate:['0 30px',0], }, 2000);
+    page3_body2.animate({opacity:[0, 1], translate:['0 30px',0], }, 2000);
+    page3_body3.animate({opacity:[0, 1], translate:['0 30px',0], }, 3000);
+
+    console.log('見出しの背景を伸ばす');
+  };
+
+  const bg2_Observer = new IntersectionObserver(showPage3);
+  bg2_Observer.observe(document.querySelector('#bg2'));
+
   let tooltipTriggerList = [].slice.call(document.querySelectorAll('{data-bs-toggle="tooltip"}'));
   let tooltipList = tooltipTriggerList.map(function (tooltipTriggerElem){
     return new bootstrap.Tooltip(tooltipTriggerElem)
   });
 
-</script>  
+</script>
 
 {% endblock %}

@@ -36,17 +36,19 @@
   {% block extraheader %}{% endblock %}
 </head>
 
-<body style="background-color:#edf9ff;">
+<body
+  data-bs-spy="scroll" data-bs-target="#navbar-navlist" data-bs-offset="60"
+  style="background-color:hsl(216, 88%, 97%);">
 
   {% block navbar %}
     {% include 'seller/partials/navbar.html' %}
   {% endblock %}
 
   <main>
-    {% block content %}{% endblock %}
-    {% block extrajs %}{% endblock %}
+  {% block content %}{% endblock %}
+  {% block extrajs %}{% endblock %}
   </main>
-  
+
   <!-- Optional JavaScript -->
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>

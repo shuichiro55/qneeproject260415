@@ -11,6 +11,25 @@ import unicodedata, re
 
 UserModel = get_user_model()
 
+
+period_CHOICES = [
+  ("0", "日付で指定"),
+  ("3D", "3日以内の申請"),
+  ("1W", "1週間以内の申請"), ("2W", "2週間以内の申請"),
+  ("1M", "1ヶ月以内の申請"), ("3M", "3ヶ月以内の申請"),
+  ("6M", "6ヶ月以内の申請"), ("1Y", "1年以内の申請"),
+]
+
+class TxPeriodSetForm(forms.Form):
+   
+  applyPeriod = forms.ChoiceField(label="申請時点",
+    choices=period_CHOICES,
+    required=False,
+    widget=forms.RadioSelect)
+  
+  applyPeriod_start = forms.DateField(label="開始日", required=False)
+  applyPeriod_end = forms.DateField(label="終了日", required=False)
+
 class TxCreateForm(forms.ModelForm):
 
   class Meta:

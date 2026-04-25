@@ -8,20 +8,22 @@
 
 {% block content %}
 
-<div class="authentication-bg min-vh-100 min-vw-100 align-items-start">
+<div class="authentication-bg align-items-start">
 
   <div class="container">
 
-    <div class="row justify-content-center mt-2">
-      {% for message in messages %}
-        <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
-          <span>{{ message }}</span>
-        </div>
-      {% endfor %}
-    </div>
+    {% if messages %}
+      <div class="row justify-content-center mt-2 mx-2">
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
+            <span>{{ message }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
 
-    <nav aria-label="breadcrumb" role="navigation">
-      <ol class="breadcrumb bg-light-subtle px-2 rounded-3 mt-2">
+    <nav class="mt-2" aria-label="breadcrumb" role="navigation">
+      <ol class="breadcrumb bg-light-subtle px-2 rounded-3">
         <li class="breadcrumb-item">
           <a href="{% url 'accounts:mypage_buyer' %}">
             {% bs_icon 'house' color='cornflowerblue' size='1.2em' %}
@@ -68,8 +70,9 @@
         data-toggle="buttons"
         id="id_WhoWhenWhat">
 
-        <label class="btn btn-secondary p-1" for="id_WhoWhenWhat_A">
+        <label class="btn btn-outline-primary custom-toggle p-1" for="id_WhoWhenWhat_A">
           <input type="radio"
+            class="toggle_button"
             id="id_WhoWhenWhat_A"
             name="name_WhoWhenWhat"
             {% if WhoWhenWhat == 'who' %}checked{% endif %}
@@ -78,7 +81,7 @@
         </label>
 
         <!-- autocompleteは過去の入力情報を自動的に補完する機能-->
-        <label class="btn btn-secondary p-1" for="id_WhoWhenWhat_B">
+        <label class="btn btn-outline-primary custom-toggle p-1" for="id_WhoWhenWhat_B">
           <input type="radio"
             id="id_WhoWhenWhat_B"
             name="name_WhoWhenWhat"
@@ -87,7 +90,7 @@
           いつ
         </label>
         
-        <label class="btn btn-secondary p-1" for="id_WhoWhenWhat_C">
+        <label class="btn btn-outline-primary custom-toggle p-1" for="id_WhoWhenWhat_C">
           <input type="radio"
             id="id_WhoWhenWhat_C"
             name="name_WhoWhenWhat"
@@ -119,7 +122,7 @@
           data-toggle="buttons"
           id="id_MakeOrSelect">
   
-          <label class="btn btn-secondary p-1" for="id_MakeOrSelect_A">
+          <label class=" btn btn-outline-primary custom-toggle p-1" for="id_MakeOrSelect_A">
             <input type="radio"
               id="id_MakeOrSelect_A"
               name="nextWho_MakeOrSelect"
@@ -130,7 +133,7 @@
           </label>
 
           <!-- autocompleteは過去の入力情報を自動的に補完する機能-->        
-          <label class="btn btn-secondary p-1" for="id_MakeOrSelect_B">
+          <label class=" btn btn-outline-primary custom-toggle p-1" for="id_MakeOrSelect_B">
             <input type="radio"
               id="id_MakeOrSelect_B"
               name="nextWho_MakeOrSelect"
@@ -153,7 +156,7 @@
         <div class="triangle triangle-bottom"></div>
       </div>
 
-      <div class="row justify-content-center mt-4 mx-2">
+      <div class="row justify-content-center mt-5 mx-2">
         <div class="col-md-8 col-lg-6">
 
           <div class="form-group row justify-content-start">
@@ -323,7 +326,7 @@
           data-bs-toggle="buttons"
           id="id_FileOrManual">
 
-          <label class="btn btn-secondary p-1" for="id_FileOrManual_A">
+          <label class=" btn btn-outline-primary custom-toggle p-1" for="id_FileOrManual_A">
             <input type="radio"
               id="id_FileOrManual_A"
               name="name_FileOrManual"
@@ -332,7 +335,7 @@
             ファイルから
           </label> 
 
-          <label class="btn btn-secondary p-1" for="id_FileOrManual_B">
+          <label class="btn btn-outline-primary custom-toggle p-1" for="id_FileOrManual_B">
             <input type="radio"
               id="id_FileOrManual_B"
               name="name_FileOrManual"

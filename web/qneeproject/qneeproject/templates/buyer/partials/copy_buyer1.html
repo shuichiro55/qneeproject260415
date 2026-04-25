@@ -1,9 +1,19 @@
 {% load static %}
 
-{% block copy_buyer1 %}
+{% block content %}
 
 <section class="home-slider" id="home">
+
   <div class="ParaImage-left bg1">
+
+      <div class="d-grid gap-5 d-md-flex justify-content-md-center mt-4 mx-5">
+      <a href="#" class="btn btn-primary" role="button" 
+        data-bs-toggle="tooltip" data-bs-placement="bottom" title="">他のサービスとは違うの？</a>
+      <a href="{% url 'accounts:login_buyer' %}" class="btn btn-primary" role="button"
+        data-bs-toggle="tooltip" data-bs-placement="bottom" title="">キユーニコネクトご利用</a>
+    </div>    
+
+
 
     <div class="bg-overlay2"></div>
 
@@ -36,7 +46,6 @@
         </p>
         <p class="copy-body-l" id="page1-copy-body2" >
           そんな中、Qneeが報酬のお立て替えします
-          <br><br><br><br>
         </p>
       </div> 
     </div>

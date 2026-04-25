@@ -4,20 +4,22 @@
 
 {% block content %}
 
-<div class="authentication-bg min-vh-100 min-vw-100 align-items-start">
+<div class="authentication-bg align-items-start">
 
   <div class="container">
 
-    <div class="row justify-content-center mt-2">
-      {% for message in messages %}
-        <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
-          <span>{{ message }}</span>
-        </div>
-      {% endfor %}
-    </div>
+    {% if messages %}
+      <div class="row justify-content-center mt-2 mx-2">
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
+            <span>{{ message }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
 
-    <nav aria-label="breadcrumb" role="navigation">
-      <ol class="breadcrumb bg-light-subtle px-2 rounded-3 mt-2">
+    <nav class="mt-2" aria-label="breadcrumb" role="navigation">
+      <ol class="breadcrumb bg-light-subtle px-2 rounded-3">
         <li class="breadcrumb-item"><a href="{% url 'accounts:mypage_buyer' %}">
           {% bs_icon 'house' color='cornflowerblue' size='1.2em' %}
           マイページトップ</a></li>
@@ -27,12 +29,12 @@
       </ol>
     </nav>
 
-    <div class="d-flex justify-content-center mt-5 mb-3">
+    <div class="d-flex justify-content-center mt-5">
       <h5 class="text-secondary"><b>設定メニュー　</b></h5>
       {% bs_icon 'gear-fill' color='deeppink' size='2.0em' %}
     </div>
 
-    <div class="shadow-sm bg-light border rounded p-5 mx-3">
+    <div class="bg-light border border-top shadow rounded mt-3 p-5 mx-3">
 
       <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3" >
 
@@ -61,7 +63,8 @@
 
             </button>
           </form> <!-- end col -->
-          {% endif %}
+        {% endif %}
+        
         <form method="GET" action="{% url 'accounts:passwordChange_buyer' %}">
           {% csrf_token %}
 

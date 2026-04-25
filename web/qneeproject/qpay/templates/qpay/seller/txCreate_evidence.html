@@ -6,20 +6,22 @@
 {% block content %}
 {% csrf_token %}
 
-<div class="authentication-bg min-vh-100 min-vw-100 align-items-start">
+<div class="authentication-bg align-items-start">
 
-  <div class="container mt-2">
+  <div class="container">
 
-    <div class="row justify-content-center mt-2">
+    {% if messages %}
+      <div class="row justify-content-center mt-2">
       {% for message in messages %}
         <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
           <span>{{ message }}</span>
         </div>
       {% endfor %}
     </div>
+    {% endif %}
 
-    <nav aria-label="breadcrumb" role="navigation">
-      <ol class="breadcrumb bg-light-subtle px-2 rounded-3 mt-2">
+    <nav class="mt-2" aria-label="breadcrumb" role="navigation">
+      <ol class="breadcrumb bg-light-subtle px-2 rounded-3">
         <li class="breadcrumb-item text-primary"><a href="{% url 'accounts:mypage_seller' %}">
           {% bs_icon 'house' color='cornflowerblue' size='1.2em' %}
           マイページトップ</a></li>
@@ -29,24 +31,34 @@
       </ol>
     </nav>
 
+    <div id="loading">
+      <div class="spinner-border text-primary"
+        style="width: 3rem; height: 3rem;"
+        role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-5">処理中です... しばらくお待ちください</p>
+    </div>
 
     {% if flag_step == 1 %}
 
-      <div class="d-flex justify-content-center mt-4">
-        <h5><b>証明書のアップロード</b></h5>
+      <div class="d-flex justify-content-center mt-5">
+        <h5 class="text-secondary">
+          <b>証明書のアップロード</b></h5>
+        <i class="bi bi-file-arrow-up ms-2" style="font-size:1.8em; color:deeppink;"></i>
       </div>
 
-      <div class="row justify-content-center px-3">
+      <div class="row justify-content-center mt-3 px-3">
         <div class="col-md-8 col-lg-6">
 
           <form method="POST"
             action="{% url 'qpay:txCreate' %}"
-            class="form-group bg-light border border-success-subtle rounded p-4 m-4 "
+            class="form-group bg-light border border-top shadow rounded-1 p-2 mt-2"
             enctype="multipart/form-data">
         
             {% csrf_token %}
 
-            <div class="row justify-content-center">
+            <div class="row justify-content-center pt-2 mx-2">
               <input type="file" class="form-control"
                 name="{{form.evidence.name}}"
                 value="{{form.evidence.value|default:''}}"
@@ -56,11 +68,9 @@
             {% if form.evidence.errors %}
               <div style="color:red;">{{ form.evidence.errors.as_text }}<br></div>
             {% endif %}
-
-          <hr>
           
-            <div class="d-flex justify-content-center pt-3">         
-              <button type="submit" class="btn btn-primary"
+            <div class="d-flex justify-content-center pt-2 mx-2">
+              <button type="submit" class="btn btn-primary w-100"
                 name="next"
                 value="ToEvidenceConfirm_{{sellUser.id}}_{{sellEntity.id}}_{{tx.id}}">
                 アップロード・ファイルの確認へ</button>
@@ -73,34 +83,37 @@
 
         {% if flag_step == 2 %}
 
-          <div class="d-flex justify-content-center mt-2">
-            <h5>アップロード・ファイルの確認</h5>
+          <div class="d-flex justify-content-center mt-5">
+            <h5 class="text-secondary">
+              <b>アップロード・ファイルの確認</b></h5>
+            <i class="bi bi-list-check ms-3" style="font-size:2.2em; color:deeppink;"></i>
           </div>
 
-          <div class="row justify-content-center px-4">
+          <div class="row justify-content-center mt-3 px-4">
             <div class="col-md-8 col-lg-6">
               <form method="POST"
                 action="{% url 'qpay:txCreate' %}"
-                class="form-group bg-light border border-success-subtle rounded p-3"
-                enctype="multipart/form-data">
+                class="form-group bg-light border border-top shadow rounded-1 p-2"
+                enctype="multipart/form-data"
+                id="id_PostForm">
         
                 {% csrf_token %}
                 
            
-                <div class="d-flex justify-content-center pt-3">
-                  <button type="submit" class="btn btn-outline-primary me-1"
+                <div class="d-flex justify-content-center py-1">
+                  <button type="submit" class="btn btn-outline-primary w-50"
                     name="next"
                     value="ToEvidenceSelect_{{sellUser.id}}_{{sellEntity.id}}_{{tx.id}}">
                     再アップロード</button>
-                  <button type="submit" class="btn btn-primary"
+                  <button type="submit" class="btn btn-primary w-50 ms-2"
                     name="next"
                     value="Complete_{{sellUser.id}}_{{sellEntity.id}}_{{tx.id}}">
                     パートナーに申請</button>
                 </div>
 
-                <hr>
+                <hr class="mt-1">
 
-                <div class="row justify-content-center">
+                <div class="row justify-content-center mx-1">
                   <img src="{{ tx.evidence.url}}" class="img-thumbnail">
                 </div>
 
@@ -118,5 +131,18 @@
 
   </div>
 </div>
+
+{% endblock %}
+
+{% block extrajs %}
+
+  <script defer>
+    console.log('スクリプトは認識しているようです。')
+
+    document.getElementById('id_PostForm').addEventListener('submit', function() {
+      document.getElementById('loading').style.display = 'block';
+    });
+  
+  </script>
 
 {% endblock %}

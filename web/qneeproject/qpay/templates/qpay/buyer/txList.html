@@ -7,20 +7,22 @@
 {% csrf_token %}
 
 
-<div class="authentication-bg min-vh-100 min-vw-100 align-items-start">
+<div class="authentication-bg align-items-start">
 
   <div class="container">
 
-    <div class="row justify-content-center mt-2">
-      {% for message in messages %}
-        <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
-          <span>{{ message }}</span>
-        </div>
-      {% endfor %}
-    </div>
+    {% if messages %}
+      <div class="row justify-content-center mt-2 mx-2">
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
+            <span>{{ message }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
 
-      <nav aria-label="breadcrumb" role="navigation">
-        <ol class="breadcrumb bg-light-subtle px-2 rounded-1 mt-2">
+      <nav class="mt-2" aria-label="breadcrumb" role="navigation">
+        <ol class="breadcrumb bg-light-subtle px-2 rounded-1">
           <li class="breadcrumb-item">
             <a href="{% url 'accounts:mypage_buyer' %}">
               <i class="bi bi-house" style="font-size:1.2em; color:cornflowerblue"></i>
@@ -31,15 +33,106 @@
         </ol>
       </nav>
 
-    <div class="d-flex justify-content-center mt-4">
-      <h5 class="text-secondary pt-1"><b>取引一覧　</b></h5>
-      {% bs_icon 'receipt-cutoff' color='deeppink' size='2.2em' %}
+    <div class="row justify-content-center mx-2">
+
+      <div class="col-4 px-0">
+
+        <form method="GET" class="p-0 m-0"
+          action="{% url 'qpay:txList_buyer' %}"
+          style="background-color: transparent !important; border-color:transparent !important;"
+          id="id_IndivOrAggreg">
+          {% csrf_token %}
+
+          <div class="btn-group btn-group-toggle col-md-8 col-lg-6"
+            data-toggle="buttons"
+            id="id_IndivOrAggreg">
+  
+            <label class=" btn btn-outline-primary custom-toggle p-1" for="id_IndivOrAggreg_A">
+              <input type="radio" class="toggleBtn_NoneDisplay"
+                id="id_IndivOrAggreg_A"
+                name="name_IndivOrAggreg"
+                value="indiv"
+                {% if IndivOrAggreg == 'indiv' %}checked{% endif %}
+                autocomplete="off">
+              個別取引
+            </label>
+
+            <!-- autocompleteは過去の入力情報を自動的に補完する機能-->        
+            <label class=" btn btn-outline-primary custom-toggle p-1" for="id_IndivOrAggreg_B">
+              <input type="radio" class="toggleBtn_NoneDisplay"
+                id="id_IndivOrAggreg_B"
+                name="name_IndivOrAggreg"
+                value="aggreg"
+                {% if IndivOrAggreg == 'aggreg' %}checked{% endif %}
+                autocomplete="off">
+              月次集計
+            </label>
+          </div>
+        </form>
+      </div>
+
+      <div class="col-4">
+        <div class="d-flex justify-content-center mt-5">
+          <h5 class="text-secondary pt-1"><b>取引一覧　</b></h5>
+          {% bs_icon 'receipt-cutoff' color='deeppink' size='2.2em' %}
+        </div>
+      </div>
+
+      <div class="col-4">
+      </div>
     </div>
 
-
     {% if object_list.count >= 1 %}
+ 
 
-      <div class="row justify-content-center mt-2">
+        <div class="row justify-content-center mt-2">
+
+          <div class="col-10 col-lg-7 col-xl-6 bg-light border border-top shadow-sm mx-5 py-2">
+
+            <div class="form-group row justify-content-center mx-1">
+              <label class="col-3 col-form-label text-secondary"
+                style="text-align:left"
+                for='{{form.applyPeriod.id_for_label}}'>
+                <b>申請時点</b></label>
+              <div class="col-9 px-0">
+                <input type="select" class='form-control ps-5 pe-2'
+                  style="font-size:0.9rem"
+                  name="{{form.applyPeriod.name}}"
+                  value="{{form.applyPeriod.value|default:''}}"
+                  placeholder=""
+                  id="{{form.applyPeriod.id_for_label}}" >
+              </div>
+            </div>
+
+            <div class="form-group row justify-content-center mt-1 mx-1">
+              <label class="col-3 col-form-label text-secondary"
+                style="text-align:left">
+                <b>開始・終了</b></label>
+              <div class="col-4 px-0">
+                <input type="date" class='form-control ps-4 pe-2'
+                  style="font-size:0.9rem"
+                  name="{{form.applyPeriod_start.name}}"
+                  value="{{form.applyPeriod_start.value|default:''}}"
+                  placeholder=""
+                  id="{{form.applyPeriod_start.id_for_label}}" >
+              </div>
+              <div class="col-1 pe-0"
+                style="align-content:center; text-align:center">～</div>
+              <div class="col-4">
+                <input type="date" class='form-control ps-4 pe-2'
+                  style="font-size:0.9rem"
+                  name="{{form.applyPeriod_end.name}}"
+                  value="{{form.applyPeriod_end.value|default:''}}"
+                  placeholder=""
+                  id="{{form.applyPeriod_end.id_for_label}}" >
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+
+      <div class="row justify-content-center mt-3">
  
         <form method="POST" class="p-0"
           style="background-color: transparent !important; border-color:transparent !important;">
@@ -53,7 +146,7 @@
                   <th rowspan="2"style="vertical-align:top">#</th>
                   <th colspan="2" style="vertical-align:top">申請法人</th>
                   <th colspan="2" style="vertical-align:top">承認ユーザー</th>
-                  <th rowspan="2" style="vertical-align:top">Qnee<br>送金</th>
+                  <th rowspan="2" style="vertical-align:top">Qnee<br>送金時</th>
                   <th rowspan="2" style="vertical-align:top">詳細</th>
                 </tr>
 
@@ -149,7 +242,7 @@
                     <td rowspan="2" style="text-align:center; vertical-align:middle;">
                       <img src="{{ item.evidence.url }}"
                         class="img-fluid"
-                        style="width:50;height:auto; cursor:zoom-in;"
+                        style="max-height:55; width:auto; cursor:zoom-in;"
                         data-bs-toggle="modal"
                         data-bs-target="#imageModal{{ forloop.counter }}"/>
                     </td>

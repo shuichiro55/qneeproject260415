@@ -5,7 +5,7 @@ from django.views import generic
 from .models import QpayTx
 from accounts.models import LegalEntity, BankAccount
 from qpay.form import TxCreateForm, TxEvidenceForm, \
-      TxApproveForm_buyer, TxListForm_buyer, \
+      TxApproveForm_buyer, TxPeriodSetForm, \
       TxListForm_seller
 
 from django.urls import reverse, reverse_lazy
@@ -338,7 +338,7 @@ class TxListView_buyer(LoginRequiredMixin, generic.UpdateView):
   login_url = '/accounts/login_buyer/'
   model = QpayTx
   template_name = "qpay/buyer/txList.html"
-  form_class = TxListForm_buyer
+  #form_class = TxListForm_buyer
   # context_object_name = 'qpaytxs'
 
   paginate_by = 5 # 5で仮置き
@@ -349,12 +349,9 @@ class TxListView_buyer(LoginRequiredMixin, generic.UpdateView):
     object_list = QpayTx.objects.filter(buyEntity = user.entity).order_by('-created_at')
     print(f'request.user={request.user} def get in TxListView_buyer')
 
-    # ログイン後にすぐに呼ばれることはなくなった中、必要か検討 24/07/02
-    if user.type1 == 2:
-    # 次のメッセージは確認できなかったので、要調整（トップページで出るようにする？）
-      messages.add_message(request, messages.INFO, "発注者としてログインして下さい") 
-      return HttpResponseRedirect(reverse('accounts:logout'))
-
+    IndivOrAggreg = self.request.GET.get('name_IndivOrAggreg', None)
+    if IndivOrAggreg == None: IndivOrAggreg = 'indiv'
+      
     paginator = Paginator(object_list, self.paginate_by)
 
     # URLからページネーション経由でページ番号を取得する場合
@@ -366,6 +363,8 @@ class TxListView_buyer(LoginRequiredMixin, generic.UpdateView):
 
     page_obj = paginator.page(page_number)
     context = {
+      'form': TxPeriodSetForm(),
+      'IndivOrAggreg': IndivOrAggreg,
       'object_list': object_list,
       'page_obj': page_obj,
     }
@@ -422,7 +421,7 @@ class TxApproveView_buyer(LoginRequiredMixin, generic.UpdateView):
   login_url = '/accounts/login_buyer/'
   model = QpayTx
   form_class = TxApproveForm_buyer
-  paginate_by = 4 # 4で仮置き
+  paginate_by = 5 # 4で仮置き
   #template_name = "qpay/buyer/txApprove.html"
   #context_object_name = 'qpaytxs'
 
