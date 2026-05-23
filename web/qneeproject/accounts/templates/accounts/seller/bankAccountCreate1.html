@@ -41,7 +41,7 @@
     <div class="row justify-content-center">
 
       <form method="POST"
-        class="form-group col-11 col-md-9 col-lg-7 bg-light border border-success-subtle rounded p-4 m-2">
+        class="form-group col-11 col-md-9 col-lg-7 bg-light border border-top rounded p-4 m-2 shadow">
         {% csrf_token %}
 
         <table class="table table-sm table-bordered border-primary-subtle table-responsive bg-light">
@@ -68,12 +68,12 @@
         <hr>
 
         <div class="d-flex justify-content-center pt-3">
-          <button type="submit" class="btn btn-primary shadow me-2"
+          <button type="submit" class="btn btn-outline-primary w-50 shadow me-1"
             name="WhichAccount"
             value="ThisAccount_{{sellUser.id}}_{{sellEntity.id}}">
-            　この口座を使う　</button>
+            この口座を使う</button>
 
-        <button type="submit" class="btn btn-primary shadow ms-2"
+        <button type="submit" class="btn btn-primary w-50 shadow ms-1"
           name="WhichAccount"
           value="NewAccount_{{sellUser.id}}_{{sellEntity.id}}">
           別の口座を登録する</button>

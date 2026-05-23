@@ -19,6 +19,7 @@ urlpatterns = [
 
   path('login_admin/', views.MyLoginView_admin.as_view(), name='login_admin'),
   path('login_admin/<token>', views.MyLoginView_admin.as_view(), name='login_admin'),
+  path('login_admin/<str:afterLogin>/<str:token>', views.MyLoginView_admin.as_view(), name='login_admin'),
 
   path('login_redirect/', views.MyLoginRedirect, name='login_redirect'),
 
@@ -43,7 +44,7 @@ urlpatterns = [
   path('entityCreate_buyer/', views.EntityCreateView_buyer.as_view(), name='entityCreate_buyer'),
   path('entityCreate_seller/', views.EntityCreateView_seller.as_view(), name='entityCreate_seller'),
 
-  # 開発段階だけ設定
+  # テスト用（開発段階だけ）
   path('<int:user_id>/entityCreate_buyer/', views.EntityCreateView_buyer.as_view(), name='entityCreate_buyer'),
   path('<int:user_id>/entityCreate_seller/', views.EntityCreateView_seller.as_view(), name='entityCreate_seller'),
 
@@ -63,14 +64,21 @@ urlpatterns = [
   # ★★ 25/06/17追加 テストはこれから、 tokenは申請したユーザーのid
   path('<str:token>/userAddPre_buyer', views.UserAddPreView_buyer.as_view(), name='userAddPre_buyer'),
   path('<str:token>/userAddPre_seller', views.UserAddPreView_seller.as_view(), name='userAddPre_seller'),
+  path('<str:token>/buyUserAddPre_admin', views.BuyUserAddPreView_admin.as_view(), name='buyUserAddPre_admin'),
 
   # userAddPreViewから呼ばれるView
   path('<int:applyUser_id>/userAdd_buyer', views.UserAddView_buyer.as_view(), name='userAdd_buyer'),
   path('<int:applyUser_id>/userAdd_seller', views.UserAddView_seller.as_view(), name='userAdd_seller'),
+  path('<int:applyUser_id>/buyUserAdd_admin', views.BuyUserAddView_admin.as_view(), name='buyUserAdd_admin'),
 
   # InfoEdit.htmlから呼ばれるView
   path('userAdd_buyer', views.UserAddView_buyer.as_view(), name='userAdd_buyer'),
   path('userAdd_seller', views.UserAddView_seller.as_view(), name='userAdd_seller'),
+  path('buyUserAdd_admin', views.BuyUserAddView_admin.as_view(), name='buyUserAdd_admin'),
+
+  path('<str:token>/corpInfoUpdatePre_admin', views.CorpInfoUpdatePreView_admin.as_view(), name='corpInfoUpdatePre_admin'),
+  path('<int:corpInfo_id>/corpInfoUpdate_admin', views.CorpInfoUpdateView_admin.as_view(), name='corpInfoUpdate_admin'),
+  path('corpInfoUpdate_admin', views.CorpInfoUpdateView_admin.as_view(), name='corpInfoUpdate_admin'),
 
   path('passwordChange_buyer/', views.MyPasswordChangeView_buyer.as_view(), name='passwordChange_buyer'),
   #path('passwordChange2_buyer/', views.MyPasswordChange2View_buyer.as_view(), name='passwordChange2_buyer'),
@@ -81,27 +89,29 @@ urlpatterns = [
   path('passwordChange_admin/', views.MyPasswordChangeView_admin.as_view(), name='passwordChange_admin'),
   #path('passwordChange2_admin/', views.MyPasswordChange2View_admin.as_view(), name='passwordChange2_admin'),
 
-  # 25/04/27 <int:user_id>は要否検討
-  # path('<int:user_id>/mypage_admin/', views.MyPageView_admin.as_view(), name='mypage_admin'),
-  path('<int:user_id>/mypage_admin/', views.MyPageView_admin.as_view(), name='mypage_admin'),
-  path('mypage_admin/', views.MyPageView_admin.as_view(), name='mypage_admin'),
-
   path('<int:user_id>/mypage_seller/', views.MyPageView_seller.as_view(), name='mypage_seller'),
   path('mypage_seller/', views.MyPageView_seller.as_view(), name='mypage_seller'),
 
   path('<int:user_id>/mypage_buyer/', views.MyPageView_buyer.as_view(), name='mypage_buyer'),
   path('mypage_buyer/', views.MyPageView_buyer.as_view(), name='mypage_buyer'),
 
+  # 25/04/27 <int:user_id>は要否検討
+  # path('<int:user_id>/mypage_admin/', views.MyPageView_admin.as_view(), name='mypage_admin'),
+  path('<int:user_id>/mypage_admin/', views.MyPageView_admin.as_view(), name='mypage_admin'),
+  path('mypage_admin/', views.MyPageView_admin.as_view(), name='mypage_admin'),
+
+
   path('contact_buyer/', views.ContactView_buyer.as_view(), name='contact_buyer'),  # 24/06/30追加
   path('contact_seller/', views.ContactView_seller.as_view(), name='contact_seller'),  # 24/06/30追加
 
-  path('<int:user_id>/infoEdit_buyer/', views.InfoEditView_buyer.as_view(), name='infoEdit_buyer'),  # 24/08/21追加
+  # ★★ 260502 使っているのか確認して削除
+  #path('<int:user_id>/infoEdit_buyer/', views.InfoEditView_buyer.as_view(), name='infoEdit_buyer'),  # 24/08/21追加
   path('infoEdit_buyer/', views.InfoEditView_buyer.as_view(), name='infoEdit_buyer'),  # 24/08/21追加
 
-  path('<int:user_id>/infoEdit_seller/', views.InfoEditView_seller.as_view(), name='infoEdit_seller'),  # 24/08/21追加
+  #path('<int:user_id>/infoEdit_seller/', views.InfoEditView_seller.as_view(), name='infoEdit_seller'),  # 24/08/21追加
   path('infoEdit_seller/', views.InfoEditView_seller.as_view(), name='infoEdit_seller'),  # 24/08/21追加
 
-  path('<int:user_id>/infoEdit_admin/', views.InfoEditView_admin.as_view(), name='infoEdit_admin'),  # 24/08/21追加
+  #path('<int:user_id>/infoEdit_admin/', views.InfoEditView_admin.as_view(), name='infoEdit_admin'),  # 24/08/21追加
   path('infoEdit_admin/', views.InfoEditView_admin.as_view(), name='infoEdit_admin'),  # 26/2/20追加
 
   #path('<int:user_id>/<int:entity_id>/infoEdit_buyer/', views.InfoEditView_buyer.as_view(), name='info_buyer_seller'),  # 25/05/15追加
@@ -124,5 +134,8 @@ urlpatterns = [
   path('passwordReset_admin/', views.MyPasswordResetView_admin.as_view(), name='passwordReset_admin'),
   path('accounts/passwordResetDone_admin/', views.MyPasswordResetDoneView_admin.as_view(), name='passwordResetDone_admin'),
   path('passwordReset_admin/<uidb64>/<token>/', views.MyPasswordResetConfirmView_admin.as_view(), name='passwordResetConfirm_admin'),
+
+  path('profileEdit_buyer/', views.ProfileEditView_buyer.as_view(), name='profileEdit_buyer'),  # 24/08/21追加
+  path('profileEdit_seller/', views.ProfileEditView_seller.as_view(), name='profileEdit_seller'),  # 24/08/21追加
 
 ]

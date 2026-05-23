@@ -5,12 +5,13 @@
 
   <!-- START NAVBAR -->
   <nav id="navbar"
-    class="navbar navbar-expand-lg fixed-top sticky pt-0 pb-1"> <!-- min-vw-100 -->
+    class="navbar navbar-expand-lg fixed-top sticky pt-0 pb-1 shadow-sm"> <!-- min-vw-100 -->
  
     <div class="container-fluid">
 
-      <a class="navbar-brand ms-4" href="/">
-        <img src="{% static 'images/logo-qnee-yoko7.png' %}" alt="" height="35"></a>
+      <a class="navbar-brand mt-1 ms-3" href="/">
+        <img src="{% static 'images/logo_text_lovebird.png' %}" alt="" height="60">
+      </a>
 
       <button class="navbar-toggler pt-3 pb-3" type="button"
         data-bs-toggle="collapse"
@@ -18,15 +19,67 @@
         aria-controls="navbarContent"
         aria-expanded="false"
         aria-label="Toggle navigation">
+
         <!-- area-expanded="false"は、関連する要素（下記のnavbar）が閉じていることを意味する？-->
         <i class="mdi mdi-menu text-secondary py-0 me-5" style="font-size:1.55em;"></i>
       </button>
 
       <!-- 「navbar-expand-lg」によりlg以上の場合は、初めから表示される-->
       <!-- これが表示されるとボタンは表示されない-->
-      <div class="collapse navbar-collapse" id="navbarContent">
+      <div class="collapse navbar-collapse justify-content-start" id="navbarContent">
 
-        <div class="d-none d-lg-block ms-5">
+        <div
+          class="d-block d-lg-none rounded-2 mt-2 mx-2"
+          style="background-color:rgba(241, 236, 236, 0.95) !important;">
+
+          <ul class="navbar-nav" id="navbar-navlist">
+         
+            <div class="row">
+              <div class="col-6 col-sm-3">
+                <div class="d-flex justify-content-center">
+                <li class="nav-item">
+                  <a class="nav-link px-0"
+                    href="{% url 'accounts:login_buyer' %}">
+                    ログイン</a>
+                </li>
+                </div>
+              </div>
+
+              <div class="col-6 col-sm-3">
+                <div class="d-flex justify-content-center">
+                <li class="nav-item">
+                  <a class="nav-link px-0" href="{% url 'accounts:logout_buyer' %}">
+                    ログアウト</a>
+                </li>
+                </div>
+              </div>
+
+              <div class="col-6 col-sm-3">
+                <div class="d-flex justify-content-center">
+                <li class="nav-item">
+                  <a class="nav-link" href="#faq">
+                    FAQ</a>
+                </li>
+                </div>
+              </div>
+
+              <div class="col-6 col-sm-3">
+                <div class="d-flex justify-content-center">
+                <li class="nav-item">
+                  <a class="nav-link px-0"
+                    href="{% url 'accounts:contact_buyer' %}">
+                    問い合わせ</a>
+                </li>
+                </div>
+              </div>
+
+
+            </div> <!-- end row -->
+          </ul> <!--end ul navbar-nav-->
+        </div>
+
+
+        <div class="d-none d-lg-block w-100 ms-5 ps-5">
 
           <ul class="navbar-nav" id="navbar-navlist">
 
@@ -35,7 +88,8 @@
                 data-bs-toggle="dropdown" aria-expanded="false">
                 ログイン・ログアウト
                 <i class="mdi mdi-arrow-down-circle" style="font-size:1em"></i>
-              </a> 
+              </a>
+              
               <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                 <li><a class="nav-link" href="{% url 'accounts:login_buyer' %}">ログイン</a></li>
                 <li><a class="nav-link" href="{% url 'accounts:logout_buyer' %}">ログアウト</a></li>
@@ -53,51 +107,7 @@
 
           </ul> <!--end ul navbar-nav-->
 
-        </div>
-
-        <div
-          class="d-block d-lg-none rounded-2 mt-2 mx-2"
-          style="background-color:rgba(241, 236, 236, 0.95) !important;">
-
-          <ul class="navbar-nav" id="navbar-navlist">
-         
-            <div class="row">
-
-              <div class="col-3">
-                <div class="d-flex justify-content-center">
-                <li class="nav-item">
-                  <a class="nav-link" href="#faq">FAQ</a>
-                </li>
-                </div>
-              </div>
-
-              <div class="col-3">
-                <div class="d-flex justify-content-center">
-                <li class="nav-item">
-                  <a class="nav-link px-0" href="{% url 'accounts:contact_buyer' %}">問い合わせ</a>
-                </li>
-                </div>
-              </div>
-
-              <div class="col-3">
-                <div class="d-flex justify-content-center">
-                <li class="nav-item">
-                  <a class="nav-link" href="{% url 'accounts:login_buyer' %}">ログイン</a>
-                </li>
-                </div>
-              </div>
-
-              <div class="col-3">
-                <div class="d-flex justify-content-center">
-                <li class="nav-item">
-                  <a class="nav-link px-0" href="{% url 'accounts:logout_buyer' %}">ログアウト</a>
-                </li>
-                </div>
-              </div>
-
-            </div>
-          </ul> <!--end ul navbar-nav-->
-        </div>
+        </div> <!-- end d-none -->
 
       </div> <!--end collapse-->
 

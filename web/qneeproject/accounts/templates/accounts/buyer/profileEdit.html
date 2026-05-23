@@ -1,0 +1,836 @@
+{% extends "buyer/index/base_qconnect.html" %}
+
+{% load bootstrap_icons %}
+{% block content %}
+
+<!-- 260216 郵便番号から住所を自動入力するためのスクリプト -->
+<script src="https://yubinbango.github.io/yubinbango/yubinbango.js" charset="UTF-8"></script>
+
+<div class="authentication-bg align-items-start">
+
+  <div class="container">
+
+    {% if messages %}
+      <div class="row justify-content-center mt-2 mx-2">
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
+            <span>{{ message }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <nav class="mt-2 border-top shadow-sm fixed" aria-label="breadcrumb" role="navigation">
+      <ol class="breadcrumb bg-light-subtle px-2 rounded-3">
+        <li class="breadcrumb-item"><a href="{% url 'accounts:mypage_buyer' %}">
+          {% bs_icon 'house' color='cornflowerblue' size='1.2em' %}
+          マイページトップ</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'accounts:infoEdit_buyer' %}">
+          {% bs_icon 'gear' color='cornflowerblue' size='1.2em' %}
+          設定メニュー</a></li>
+        <li class="breadcrumb-item">
+          {% bs_icon 'pencil-square' color='text-secondary' size='1.2em' %}
+          登録情報編集</li>
+      </ol>
+    </nav>
+
+    <!-- パートナーの場合は法人のみ（個人での登録なし） -->
+    {% if user.type2 == 2 %}
+
+
+      <!-- 必要項目の入力 -->
+      {% if step_edit == 1 %}
+
+        <div class="d-flex justify-content-center mt-5">
+          <h5 class="text-secondary"><b>登録情報のご編集</b></h5>
+          <span class="ms-3 mb-1">{% bs_icon 'pencil-square' color='deeppink' size='1.8em' %}</span>
+        </div> 
+
+        {% if flag_pending == 1 %}
+
+          <!-- パートナーの企業情報を入力するフォーム -->
+          <div class="row justify-content-center mt-3 mb-2">
+            <div class="d-flex col-md-10 col-lg-8 col-xl-6 text-left">
+              <i class="bi bi-building" style="font-size:1.5em; color:darkred;"></i>
+              <h6 class="text-secondary ms-3"><b>会社情報</b></h6>
+                <span class="text-danger ms-3" style="font-size:0.9em">
+                  <b>※更新申請中</b>
+                </span>
+            </div>
+          </div>  
+
+          <div class="d-block d-md-none mx-4">
+
+            <div class="row justify-content-center">
+
+              <div class="col-md-10 col-lg-8 col-xl-6">
+
+                <form method="POST" class="p-0 m-0 rounded-1"
+                  style="background-color: transparent !important; border-color:transparent !important;">
+                  <!-- style="background-color: transparent !important; border-color:transparent !important;" -->
+                  {% csrf_token %}
+
+                  <div class="d-flex gap-1 justify-content-end">
+
+                    <button type="submit" class="btn btn-outline-primary rounded-3 shadow-sm py-1"
+                      style="width: 120px; font-size:0.9rem"
+                      name="btnAction"
+                      value="ToDropUpdate_{{corpInfo.id}}"
+                      {% if user.canApproveAll == False and user.canApproveChg == False %}disabled{% endif %}>                       
+                      取り下げ</button>
+                  </div>
+
+                  <table 
+                    class="table table-sm
+                    table-bordered
+                    border-primary-subtle
+                    table-responsive mt-2 mb-0">
+
+                    <thead style="font-size:0.8rem">
+                    </thead>
+
+                    <tbody style="font-size:0.8rem">
+
+                      <tr class="table-primary mt-2" style="text-align:center;">
+                        <td colspan="2" style="vertical-align:top; background-color: #254d74; color: white;">
+                          <b>現在</b></td>
+
+                      </tr>
+  
+                      <tr style="text-align:center;">
+                        <td colspan="1" class="table-primary" style="text-align:left; vertical-align:top">
+                          申請法人</td>
+                        <td colspan="1" style="text-align:right">
+                          {{ corpInfo.applyEntity.entityName }}</td>
+
+                      </tr>
+  
+                      <tr style="text-align:center;">
+                        <td class="table-primary" colspan="1" style="text-align:left; vertical-align:top">
+                          代表者</td>
+                        <td colspan="1" style="text-align:right">
+                          {{ corpInfo.applyEntity.representitive }}</td>            
+                      </tr>
+
+                      <tr>
+                        <td  class="table-primary" colspan="1" style="text-align:left">
+                          住所</td>
+                        <td colspan="1" style="text-align:right">
+                          {{ corpInfo.applyEntity.zip_entity }}　
+                          {{ corpInfo.applyEntity.address1 }}<br>
+                          {{ corpInfo.applyEntity.address2 }}　
+                          {{ corpInfo.applyEntity.address3 }}</td>
+                      </tr>
+
+                      <tr class="table-primary" style="text-align:center;">
+                        <td colspan="2" style="vertical-align:top; background-color: #254d74; color: white;">
+                          <b>更新予定</b></td>
+                      </tr>
+                      <tr>
+                        <td class="table-primary" colspan="1" style="text-align:left; vertical-align:top">
+                          申請法人</td>
+                        <td colspan="1" style="text-align:right">
+                          {{ corpInfo.entityName }}</td>
+                      </tr>
+
+                      <tr>
+                        <td class="table-primary" colspan="1" style="text-align:left; vertical-align:top">
+                          代表者</td>
+                        <td colspan="1" style="text-align:right">
+                          {{ corpInfo.representitive }}</td>
+                      </tr>
+                      <tr>
+                        <td class="table-primary" colspan="1" style="text-align:left; vertical-align:top">
+                          住所</td>
+                        <td colspan="1" style="text-align:right">
+                          {{ corpInfo.zip_entity }}　
+                          {{ corpInfo.address1 }}<br>
+                          {{ corpInfo.address2 }}　
+                          {{ corpInfo.address3 }}</td>
+                      </tr>
+                      <tr>
+                        <td rowspan="1" class="table-primary" style="vertical-align:top;">
+                          証明書類</td>
+                        <td rowspan="1" style="text-align:center; vertical-align:middle;">
+                          <img src="{{ corpInfo.evidence.url }}"
+                            class="img-fluid p-0"
+                            style="max-height:60px; width:auto; cursor:zoom-in;"
+                            data-bs-toggle="modal"
+                            data-bs-target="#imageModal{{ forloop.counter }}"/>
+                        </td>
+                      </tr>
+                      <!-- モーダル・ダイアログ -->
+                      <div class="modal fade"
+                        id="imageModal{{ forloop.counter }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog"> <!-- modal-sm/lg/xl/xxl 指定なしは「medium」 -->
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h6 class="modal-title">証明書類</h6>
+                              <!-- 閉じるボタン: data-bs-dismiss="modal" が重要 -->
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                              <img src="{{ corpInfo.evidence.url }}" class="img-fluid" alt="拡大画像">
+                            </div>
+                          </div>
+                        </div>
+                      </div> 
+
+                    </tbody>
+                  </table>
+                </form>
+
+              </div> <!-- end col -->
+            </div> <!-- end row -->
+          </div> <!-- end d-block -->
+
+          <div class="d-none d-md-block mx-4">
+
+            <div class="row justify-content-center">
+
+              <div class="col-md-10 col-lg-8 col-xl-6">
+
+                <form method="POST" class="p-0 m-0 rounded-1"
+                  style="background-color: transparent !important; border-color:transparent !important;">
+                  <!-- style="background-color: transparent !important; border-color:transparent !important;" -->
+                  {% csrf_token %}
+
+                  <div class="d-flex gap-1 justify-content-end">
+
+                    <button type="submit" class="btn btn-outline-primary rounded-3 shadow-sm py-1"
+                      style="width: 120px; font-size:0.9rem"
+                      name="btnAction"
+                      value="ToDropUpdate_{{corpInfo.id}}"
+                      {% if user.canApproveAll == False and user.canApproveChg == False %}disabled{% endif %}>                       
+                      取り下げ</button>
+                  </div>
+
+                  <table 
+                    class="table table-sm
+                    table-bordered
+                    border-primary-subtle
+                    table-responsive mt-2 mb-0">
+
+                    <thead style="font-size:0.9rem">
+                    </thead>
+
+                    <tbody style="font-size:0.9rem">
+
+                      <tr class="table-primary mt-2" style="text-align:center;">
+                        <td colspan="2" style="vertical-align:top; background-color: #254d74; color: white;">
+                          <b>現在</b></td>
+                        <td rowspan="1" style="vertical-align:top; background-color: #254d74; color: white;">
+                          証明書類</td>
+                      </tr>
+  
+                      <tr style="text-align:center;">
+                        <td colspan="1" class="table-primary" style="vertical-align:top">
+                          申請法人</td>
+                        <td colspan="1" style="text-align:right">
+                          {{ corpInfo.applyEntity.entityName }}</td>
+                        <td rowspan="7" style="text-align:center; vertical-align:middle;">
+                          <img src="{{ corpInfo.evidence.url }}"
+                            class="img-fluid p-0"
+                            style="max-width:85px; height:auto; cursor:zoom-in;"
+                            data-bs-toggle="modal"
+                            data-bs-target="#imageModal{{ forloop.counter }}"/>
+                        </td>
+                      </tr>
+  
+                      <!-- モーダル・ダイアログ -->
+                      <div class="modal fade"
+                        id="imageModal{{ forloop.counter }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog"> <!-- modal-sm/lg/xl/xxl 指定なしは「medium」 -->
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h6 class="modal-title">証明書類</h6>
+                              <!-- 閉じるボタン: data-bs-dismiss="modal" が重要 -->
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                              <img src="{{ corpInfo.evidence.url }}" class="img-fluid" alt="拡大画像">
+                            </div>
+                          </div>
+                        </div>
+                      </div> 
+
+                      <tr style="text-align:center;">
+                        <td class="table-primary" colspan="1" class="table-primary" style="vertical-align:top">
+                          代表者</td>
+                        <td colspan="1" style="text-align:right">
+                          {{ corpInfo.applyEntity.representitive }}</td>            
+                      </tr>
+
+                      <tr>
+                        <td  class="table-primary" colspan="1" style="text-align:center">
+                          住所</td>
+                        <td colspan="1" style="text-align:right">
+                          {{ corpInfo.applyEntity.zip_entity }}　
+                          {{ corpInfo.applyEntity.address1 }}<br>
+                          {{ corpInfo.applyEntity.address2 }}　
+                          {{ corpInfo.applyEntity.address3 }}</td>
+                      </tr>
+
+                      <tr class="table-primary" style="text-align:center;">
+                        <td colspan="2" style="vertical-align:top; background-color: #254d74; color: white;">
+                          <b>更新予定</b></td>
+                      </tr>
+                      <tr>
+                        <td class="table-primary" colspan="1" style="text-align:center; vertical-align:top">
+                          申請法人</td>
+                        <td colspan="1" style="text-align:right">
+                          {{ corpInfo.entityName }}</td>
+                      </tr>
+
+                      <tr>
+                        <td class="table-primary" colspan="1" style="text-align:center; vertical-align:top">
+                          代表者</td>
+                        <td colspan="1" style="text-align:right">
+                          {{ corpInfo.representitive }}</td>
+                      </tr>
+                      <tr>
+                        <td class="table-primary" colspan="1" style="text-align:center; vertical-align:top">
+                          住所</td>
+                        <td colspan="1" style="text-align:right">
+                          {{ corpInfo.zip_entity }}　
+                          {{ corpInfo.address1 }}<br>
+                          {{ corpInfo.address2 }}　
+                          {{ corpInfo.address3 }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </form>
+
+              </div> <!-- end col -->
+            </div> <!-- end row -->
+          </div> <!-- end d-none -->
+
+        {% else %} <!-- 申請中のものがない場合（flag_pending != 1） -->
+
+          <form method="POST" class="h-adr"> <!--「class="adr"」は郵便番号から住所を自動入力するため -->
+            {% csrf_token %}
+
+            {{ form.non_field_errors }}
+
+            <!-- パートナーの企業情報を入力するフォーム -->
+            <div class="row justify-content-center mt-3 mb-2">
+              <div class="d-flex col-md-10 col-lg-8 col-xl-6 text-left">
+                <i class="bi bi-building" style="font-size:1.5em; color:darkred;"></i>
+                <h6 class="text-secondary ms-3"><b>会社情報</b></h6>
+                  <span class="text-danger ms-3" style="font-size:0.9rem">
+                    ※会社情報更新は証明画像を添付
+                  </span>
+              </div>
+            </div>  
+
+            <div class="form-group row justify-content-center px-4">
+              <label class="col-md-3 col-lg-2 col-form-label pb-0"
+                style="font-size:0.9rem"
+                for="{{form.entityName.id_for_label}}">
+                企業名
+              </label>
+              <div class="col-md-7 col-lg-6 col-xl-4 ms-1 pb-1">
+                <input type="{{form.entityName.widget.input_type}};"
+                  style="font-size:0.9rem"
+                  class='form-control'
+                  name='{{form.entityName.name}}'
+                  value="{{form.entityName.value|default:''}}"
+                  id='{{form.entityName.id_for_label}}'
+                  {% if user.canApproveAll != True and user.canApproveChg != True %} disable {% endif %}>
+              </div>
+            </div>
+            {% if form.entityName.errors %}
+              <div class="row justify-content-center px-4">
+                <div class="col-md-10 col-lg-8 col-xl-6 text-left" style="color:red;">
+                  {{ form.entityName.errors.as_text }}</div>
+              </div>
+            {% endif %}
+  
+            <div class="form-group row justify-content-center px-4">
+              <label class="col-md-3 col-lg-2 col-form-label pb-0"
+                style="font-size:0.9rem"
+                for="{{form.representitive.id_for_label}}">
+                代表者名
+              </label>
+              <div class="col-md-7 col-lg-6 col-xl-4 ms-1 pb-1">
+                <input type="{{form.representitive.widget.input_type}}"
+                  style="font-size:0.9rem"
+                  class='form-control'
+                  name="{{form.representitive.name}}"
+                  value="{{form.representitive.value|default:''}}"
+                  placeholder="記入例：窮仁 太郎"
+                  id="{{form.representitive.id_for_label}}"
+                  {% if user.canApproveAll != True and user.canApproveChg != True %} disable {% endif %}>
+              </div>
+            </div>
+            {% if form.representitive.errors %}
+              <div class="row justify-content-center px-4">
+                <div class="col-md-10 col-lg-8 col-xl-6 text-left" style="color:red;">
+                  {{ form.representitive.errors.as_text }}</div>
+              </div>
+            {% endif %}
+
+            <div class="form-group row justify-content-center px-4">
+              <label class="col-md-3 col-lg-2 col-form-label pb-0"
+                style="font-size:0.9rem"
+                for="{{form.tel_entity.id_for_label}}" >
+                電話番号（代表）
+              </label>
+              <div class="col-md-7 col-lg-6 col-xl-4 ms-1 pb-1">
+                <input type="{{form.tel_entity.widget.input_type}}"
+                  style="font-size:0.9rem"
+                  class='form-control'
+                  name="{{form.tel_entity.name}}"
+                  value="{{form.tel_entity.value|default:''}}"
+                  placeholder="数字のみご記載ください。"
+                  id="{{form.tel_entity.id_for_label}}"
+                  {% if user.canApproveAll != True and user.canApproveChg != True %} disable {% endif %}>
+              </div>
+            </div>
+            {% if form.tel_entity.errors %}
+              <div class="row justify-content-center px-4">
+                <div class="col-md-10 col-lg-8 col-xl-6 text-left" style="color:red;">
+                  {{ form.tel_entity.errors.as_text }}</div>
+              </div>
+            {% endif %}
+            <br>
+
+            <!-- 260216 郵便番号から住所を自動入力する機能を追加 -->
+            <!-- ①スクリプト「yubinbango.js」の追加、②<form>内に「class="adr"」を追加 -->
+            <span class="p-country-name" style="display:none;">Japan</span>
+              
+            <div class="form-group row justify-content-center px-4">
+              <label class="col-md-3 col-lg-2 col-form-label pb-0"
+                style="font-size:0.9rem"
+                for="{{form.zip_entity.id_for_label}}" >
+                郵便番号〒
+              </label>
+              <div class="col-md-7 col-lg-6 col-xl-4 ms-1 pb-1">
+                <input type="{{form.zip_entity.widget.input_type}}"
+                  style="font-size:0.9rem"
+                  class="form-control p-postal-code"
+                  size="8" maxlength="8"
+                  name="{{form.zip_entity.name}}"
+                  value="{{form.zip_entity.value|default:''}}"
+                  placeholder="数字のみご記載ください。"
+                  id="{{form.zip_entity.id_for_label}}"
+                  {% if user.canApproveAll != True and user.canApproveChg != True %} disable {% endif %}>
+              </div>
+            </div>
+            {% if form.zip_entity.errors %}
+              <div class="row justify-content-center px-4">
+                <div class="col-md-10 col-lg-8 col-xl-6 text-left" style="color:red;">
+                  {{ form.zip_entity.errors.as_text }}</div>
+              </div>
+            {% endif %}
+
+            <div class="form-group row justify-content-center px-4">
+              <label
+                class="col-md-3 col-lg-2 col-form-label pb-0"
+                style="font-size:0.9rem"
+                for="{{form.address1.id_for_label}}" >
+                住所
+              </label>
+              <div class="col-md-7 col-lg-6 col-xl-4 ms-1 pb-0">
+                <input type="{{form.address1.widget.input_type}}"
+                  style="font-size:0.9rem"
+                  class='p-region p-locality p-street-address p-extended-address form-control'
+                  name="{{form.address1.name}}"
+                  value="{{form.address1.value|default:''}}"
+                  placeholder="都道府県・市町村・町"
+                  id="{{form.address1.id_for_label}}"
+                  {% if user.canApproveAll != True and user.canApproveChg != True %} disable {% endif %}>
+              </div>
+            </div>
+            {% if form.address1.errors %}
+              <div class="row justify-content-center px-4">
+                <div class="col-md-10 col-lg-8 col-xl-6 text-left" style="color:red;">
+                  {{ form.address1.errors.as_text }}</div>
+              </div>
+            {% endif %}
+
+            <div class="form-group row justify-content-center px-4">
+              <label class="col-md-3 col-lg-2 col-form-label py-0"
+                style="font-size:0.9rem"
+                for="{{form.address2.id_for_label}}" >
+              </label>
+              <div class="col-md-7 col-lg-6 col-xl-4 ms-1 py-0">
+                <input type="{{form.address2.widget.input_type}}"
+                  style="font-size:0.9rem"
+                  class='form-control'
+                  name="{{form.address2.name}}"
+                  value="{{form.address2.value|default:''}}"
+                  placeholder="〇丁目〇番〇号、〇-〇-〇"
+                  id="{{form.address2.id_for_label}}"
+                  {% if user.canApproveAll != True and user.canApproveChg != True %} disable {% endif %}>
+              </div>
+            </div>
+            {% if form.address2.errors %}
+              <div class="row justify-content-center px-4">
+                <div class="col-md-10 col-lg-8 col-xl-6 text-left" style="color:red;">
+                  {{ form.address2.errors.as_text }}</div>
+              </div>
+            {% endif %}
+
+            <div class="form-group row justify-content-center px-4">
+              <label class="col-md-3 col-lg-2 col-form-label py-0"
+                style="font-size:0.9rem"
+                for="{{form.address3.id_for_label}}" >
+              </label>
+              <div class="col-md-7 col-lg-6 col-xl-4 ms-1 py-0">
+                <input type="{{form.address3.widget.input_type}}"
+                  style="font-size:0.9rem"
+                  class='form-control'
+                  name="{{form.address3.name}}"
+                  value="{{form.address3.value|default:''}}"
+                  placeholder="建物・マンション名　フロア・号室"
+                  id="{{form.address3.id_for_label}}"
+                  {% if user.canApproveAll != True and user.canApproveChg != True %} disable {% endif %}>
+              </div>
+            </div>
+            {% if form.address3.errors %}
+              <div class="row justify-content-center px-4">
+                <div class="col-md-10 col-lg-8 col-xl-6 text-left" style="color:red;">
+                  {{ form.address3.errors.as_text }}
+                </div>
+             </div>
+            {% endif %}
+
+            <div class="row justify-content-center mt-3 px-4">
+              <div class="col-md-10 col-lg-8 col-xl-6">
+                <div class="d-flex">
+                  <a type="button" href="{% url 'accounts:infoEdit_buyer' %}"
+                    class="btn btn-outline-primary w-50 shadow"
+                    style="font-size:0.9rem">
+                    戻る
+                  </a>
+                  <button type="submit" class="btn btn-primary w-50 ms-1 px-2 shadow"
+                    style="font-size:0.9rem"
+                    name="btnAction"
+                    value="ToConfirm_corp">
+                    会社情報の更新へ
+                </div>
+              </div>
+            </div>
+
+            {% endif %}
+
+            <hr class="mt-4">
+        
+            <!-- パートナー企業の担当者情報を入力するフォーム -->
+            <div class="row justify-content-center mt-4 mb-2">
+              <div class="d-flex col-md-10 col-lg-8 col-xl-6 text-left">
+                <i class="bi bi-person-circle" style="font-size:1.5em; color:darkred;"></i>
+                <h6 class="text-secondary ms-3"><b>ユーザー情報</b></h6>
+              </div>
+            </div>  
+
+            <div class="row justify-content-center px-4">
+              <div class="col-6 col-md-5 col-lg-4 col-xl-3 pe-1">
+                <label for="{{form.lastName.id_for_label}}"
+                  style="font-size:0.9rem"
+                  class="form-label mt-1 mb-0">
+                  姓</label>
+                <input type="{{form.lastName.widget.input_type}}"
+                  style="font-size:0.9rem"
+                  class="form-control my-0"
+                  name="{{form.lastName.name}}"
+                  value="{{form.lastName.value|default:''}}"
+                  id="{{form.lastName.id_for_label}}"
+                  placeholder="例：山田">
+              </div>
+
+              <div class="col-6 col-md-5 col-lg-4 col-xl-3 ps-0">
+                <label for="{{form.firstName.id_for_label}}"
+                  style="font-size:0.9rem"
+                  class="form-label mt-1 mb-0">
+                  名</label>
+                <input type="{{form.firstName.widget.input_type}}"
+                  style="font-size:0.9rem"
+                  class="form-control my-0"
+                  name="{{form.firstName.name}}"
+                  value="{{form.firstName.value|default:''}}"
+                  id="{{form.firstName.id_for_label}}"
+                  placeholder="例：次郎">
+              </div>
+            </div> <!-- end of row -->
+
+            {% if form.lastName.errors or form.firstName.errors %}
+              <div class="row justify-content-center px-4">
+                <div class="col-6 col-md-5 col-lg-4 col-xl-3 pe-1 text-left" style="color:red;">
+                  {{ form.lastName.errors.as_text }}</div>
+                <div class="col-6 col-md-5 col-lg-4 col-xl-3 ps-0 text-left" style="color:red;">
+                  {{ form.firstName.errors.as_text }}</div>
+              </div>
+            {% endif %}
+
+            <div class="row justify-content-center px-4">
+              <div class="col-6 col-md-5 col-lg-4 col-xl-3 pe-1">
+                <label for="{{form.lastName_kana.id_for_label}}"
+                  style="font-size:0.9rem"
+                  class="form-label mt-1 mb-0">
+                  姓（フリガナ）</label>
+                <input type="{{form.lastName_kana.widget.input_type}}"
+                  style="font-size:0.9rem"
+                  class="form-control"
+                  name="{{form.lastName_kana.name}}"
+                  value="{{form.lastName_kana.value|default:''}}"
+                  id="{{form.lastName_kana.id_for_label}}"
+                  placeholder="例：ヤマダ">
+              </div>
+
+              <div class="col-6 col-md-5 col-lg-4 col-xl-3 ps-0">
+                <label for="{{form.firstName_kana.id_for_label}}"
+                  style="font-size:0.9rem"
+                  class="form-label mt-1 mb-0">
+                  名（フリガナ）</label>
+                <input type="{{form.firstName_kana.widget.input_type}}"
+                  style="font-size:0.9rem"
+                  class="form-control"
+                  name="{{form.firstName_kana.name}}"
+                  value="{{form.firstName_kana.value|default:''}}"
+                  id="{{form.firstName_kana.id_for_label}}"
+                  placeholder="例：ジロウ">
+              </div>
+            </div>
+
+            {% if form.lastName_kana.errors or form.firstName_kana.errors %}
+              <div class="row justify-content-center px-4">
+                <div class="col-6 col-md-5 col-lg-4 col-xl-3 pe-1 text-left" style="color:red;">
+                  {{ form.lastName_kana.errors.as_text }}</div>
+                <div class="col-6 col-md-5 col-lg-4 col-xl-3 ps-0 text-left" style="color:red;">
+                  {{ form.firstName_kana.errors.as_text }}</div>
+              </div>
+            {% endif %}
+
+            <div class="row justify-content-center px-4">
+              <div class="col-md-10 col-lg-8 col-xl-6">
+                <hr>
+              </div>
+            </div>
+
+            <div class="form-group row justify-content-center px-4">
+              <label class="col-md-3 col-lg-2 col-form-label pb-0"
+                style="font-size:0.9rem"
+                for="{{form.tel_user.id_for_label}}" >
+                あなたの電話番号</label>
+              <div class="col-md-7 col-lg-6 col-xl-4 ms-1">
+                <input type="{{form.tel_user.widget.input_type}}"
+                  style="font-size:0.9rem"
+                  class='form-control'
+                  name="{{form.tel_user.name}}"
+                  value="{{form.tel_user.value|default:''}}"
+                  placeholder="数字のみご記載ください"
+                  id="{{form.tel_user.id_for_label}}" >
+              </div>
+            </div>
+            {% if form.tel_user.errors %}
+              <div class="row justify-content-center px-4">
+                <div class="col-md-10 col-lg-8 col-xl-6 text-left" style="color:red;">
+                  {{ form.tel_user.errors.as_text }}</div>
+              </div>
+            {% endif %}
+
+            <div class="form-group row justify-content-center px-4">
+              <label class="col-md-3 col-lg-2 col-form-label pb-0"
+                style="font-size:0.9rem"
+                for='{{form.department.id_for_label}}'>
+                部署</label>
+              <div class="col-md-7 col-lg-6 col-xl-4 ms-1">
+                <input type='{{form.department.widget.input_type}}'
+                  style="font-size:0.9rem"
+                  class='form-control'
+                  name="{{form.department.name}}"
+                  value="{{form.department.value|default:''}}"
+                  placeholder=""
+                  id="{{form.department.id_for_label}}" >
+              </div>
+            </div>
+            {% if form.department.errors %}
+              <div class="row justify-content-center px-4">
+                <div class="col-md-10 col-lg-8 col-xl-6 text-left" style="color:red;">
+                  {{ form.department.errors.as_text }}</div>
+              </div>
+            {% endif %}
+
+            <div class="form-group row justify-content-center px-4">
+              <label class="col-md-3 col-lg-2 col-form-label pb-0"
+                style="font-size:0.9rem"
+                for="{{form.title.id_for_label}}" >
+                役職</label>
+              <div class="col-md-7 col-lg-6 col-xl-4 ms-1">
+                <input type="{{form.title.widget.input_type}}"
+                  style="font-size:0.9rem"
+                  class='form-control'
+                  name="{{form.title.name}}"
+                  value="{{form.title.value|default:''}}"
+                  placeholder=""
+                  id="{{form.title.id_for_label}}" >
+              </div>
+            </div>
+            {% if form.title.errors %}
+              <div class="row justify-content-center px-4">
+                <div class="col-md-10 col-lg-8 col-xl-6 text-left" style="color:red;">
+                  {{ form.title.errors.as_text }}</div>
+              </div>
+            {% endif %}
+
+            <div class="row justify-content-center mt-3 px-4">
+              <div class="col-md-10 col-lg-8 col-xl-6">
+                <div class="d-flex">
+                  <a type="button" href="{% url 'accounts:infoEdit_buyer' %}"
+                    class="btn btn-outline-primary w-50 shadow"
+                    style="font-size:0.9rem">
+                    戻る
+                  </a>
+                  <button type="submit" class="btn btn-primary w-50 ms-1 px-2 shadow"
+                    style="font-size:0.9rem"
+                    name="btnAction"
+                    value="ToConfirm_user">
+                    ユーザー情報の更新
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </form>
+
+        {% endif %} <!-- end of 「if step_edit == 1」-->
+      {% endif %} <!-- end of 「if user.type1 == 2」-->
+
+
+    <!-- 入力内容の確認 -->
+    {% if step_edit == 2 %}
+
+      <div class="d-flex justify-content-center mt-4">
+        <h5 class="text-secondary pt-1"><b>編集内容ご確認</b></h5>
+        <i class="bi bi-list-check ps-1" style="font-size:2.4em; color:deeppink;"></i>
+      </div> 
+
+      <div class ="row justify-content-center px-4">
+        <div class="col-md-9 col-lg-6">
+
+          <div class="d-flex justify-content-start mt-3">
+            <i class="bi bi-building" style="font-size:1.5em; color:darkred;"></i>
+            <h6 class="text-secondary"><b>　会社情報</b></h6>
+          </div>  
+
+          <table class="table table-sm table-bordered border-primary-subtle bg-light shadow-sm"
+            style="font-size:0.9rem">
+            <tbody class="text-center">
+              <tr>
+                <th scope="col" width="30%" class="table-primary">
+                  会社名</th>
+                <td>{{ form.entityName.value }}</td></tr>
+              <tr>
+                <th scope="col" width="30%" class="table-primary">
+                  代表者</th>
+                <td>{{ form.representitive.value }}</td></tr>
+              <tr>
+                <th scope="col" width="30%" class="table-primary">
+                  〒</th>
+                <td>{{ form.zip_entity.value }}</td></tr>
+              <tr>
+                <th scope="col" width="30%" class="table-primary px-0">
+                  住所</th>
+                <td>
+                  {{ form.address1.value }}
+                  {{ form.address2.value }}<br>
+                  {{ form.address3.value }}
+                </td>
+              </tr>
+
+              <tr>
+                <th scope="col" width="30%" class="table-primary">電話番号</th>
+                <td>{{ form.tel_entity.value }}</td></tr>
+            </tbody>
+          </table>
+          <hr>
+          
+          <div class="d-flex justify-content-start mt-3">
+            <i class="bi bi-person" style="font-size:1.5em; color:darkred;"></i>
+            <h6 class="text-secondary"><b>　お申込者の情報</b></h6>
+          </div>  
+          
+          <table class="table table-sm table-bordered border-primary-subtle table-responsive bg-light shadow-sm"
+            style="font-size:0.9rem">
+            <tbody class="text-center">
+              <tr>
+                <th scope="col" width="30%" class="table-primary">お名前</th>
+                <td>{{ form.lastName.value }}　{{ form.firstName.value }}</td></tr>
+              <tr>
+                <th scope="col" width="30%" class="table-primary">電話番号</th>
+                <td>{{ form.tel_user.value }}</td></tr>
+              <tr>
+                <th scope="col" width="30%" class="table-primary">部署</th>
+                <td>{{ form.department.value }}</td></tr>
+              <tr>
+                <th scope="col" width="30%" class="table-primary">役職</th>
+
+                <td>{{ form.title.value }}</td></tr>
+            </tbody>
+          </table>
+
+          <hr>
+
+          <form method="POST">
+            {% csrf_token %}
+
+
+            <div class="d-flex justify-content-center mt-2">
+
+              <button type="submit" class="btn btn-outline-primary text-primary w-50 shadow"
+                style="font-size:0.9rem"
+                name="btnAction"
+                value="BackToInput_{{user.id}}">
+                ご入力に戻る</button>
+
+              {% if whatUpdate == 'corpInfo' %}
+
+                {% if flag_needEvidence == 1 %}
+
+                  <button type="submit" class="btn btn-primary w-50 ms-1 shadow"
+                    style="font-size:0.9rem"
+                    name="btnAction"
+                    value="ToSelectEvidence_corp_{{user.id}}">
+                    証明書のアップロードへ</button>
+
+                {% else %}
+                
+                  <button type="submit" class="btn btn-primary ms-1 w-50 shadow"
+                    style="font-size:0.9rem"
+                    name="btnAction"
+                    value="ToSave_corp_{{user.id}}">
+                    この内容を登録</button>
+
+                {% endif %}
+
+              {% endif %}
+
+              {% if whatUpdate == 'userInfo' %}
+
+                <button type="submit" class="btn btn-primary ms-1 w-50 shadow"
+                  style="font-size:0.9rem"
+                  name="btnAction"
+                  value="ToSave_user_{{user.id}}">
+                  ご入力内容を登録します</button>
+
+              {% endif %}
+
+            </div>
+
+            {% for field in form %}
+              {{field.as_hidden}}
+            {% endfor %}
+
+          </form>
+        </div> <!-- end col -->
+      </div> <!-- end row -->
+      
+    {% endif %}
+
+  </div> <!-- end container -->
+</div>
+
+
+{% endblock %}

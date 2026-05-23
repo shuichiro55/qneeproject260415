@@ -36,20 +36,21 @@
 
     {% if flag_step == 1 %}
 
-      <div class="d-flex justify-content-center mt-4">
+      <div class="d-flex justify-content-center mt-5">
         <h5 class="text-secondary me-2"><b>銀行口座の登録</b></h5>
-        <i class="bi bi-bank" style="font-size:1.5em; color:deeppink;"></i>
+        <span class="ms-2">{% bs_icon 'bank' color='deeppink' size='1.6em' %}</span>
       </div>
 
-      <div class="row justify-content-center mt-2">
+      <div class="row justify-content-center mt-3 mx-2">
         <form method="POST"
-          class="form-group col-md-9 col-lg-7 bg-light border border-success-subtle rounded p-4 mx-2">
+          class="form-group col-md-9 col-lg-7 bg-light border border-top shadow rounded p-4">
           {% csrf_token %}
 
-          <div class="d-flex justify-content-start mt-4">
+          <div class="d-flex justify-content-start mt-2">
             <i class="bi bi-1-square" style="font-size:1.4em; color:deeppink;"></i>
             <h6 class="text-secondary ms-2"><b>金融機関の選択</b></h6>
           </div>
+
 
           <div class="input-group">
             <input id="id_bankSearchInput"
@@ -57,9 +58,12 @@
               value="{{bankSearchInput}}" 
               type="text" class="form-control"
               placeholder="キーワード入力 （ex. 0001 or みずほ or ミズホ）">
-            <button type="submit" class="btn btn-primary shadow"
+            <button type="submit" class="btn btn-outline-primary py-0 px-2"
               name="name_Search"
-              value="BankSearch_{{sellUser.id}}_{{sellEntity.id}}">検索</button>
+              value="BankSearch_{{sellUser.id}}_{{sellEntity.id}}">
+              <span>{% bs_icon 'search' color='cornflowerblue' size='1.2em' %}</span>
+              <span>検索</span>
+            </button>
             <!-- <button type="submit" class="btn btn-outline-primary" name="select" value="select_bank">選択</button> -->
           </div>
 
@@ -111,10 +115,12 @@
               name="name_branchSearchInput"
               value="{{branchSearchInput}}"
               placeholder="キーワード入力 （ex. 001, ぎんざ, ginza, 銀座">
-            <button type="submit" class="btn btn-primary shadow"
+            <button type="submit" class="btn btn-outline-primary py-0 px-2"
               name="name_Search"
               value="BranchSearch_{{sellUser.id}}_{{sellEntity.id}}">
-              検索</button>
+              <span>{% bs_icon 'search' color='cornflowerblue' size='1.2em' %}</span>
+              <span>検索</span>
+            </button>
             <!-- <button type="submit" class="btn btn-outline-primary" name="select" value="select_branch">選択</button> -->
           </div>
 
@@ -148,9 +154,13 @@
           <hr>
   
           <div class="d-flex justify-content-center pt-3">
-            <button type="submit" class="btn btn-primary shadow ms-2"
+            <a type="button" href="{% url 'accounts:infoEdit_seller' %}"
+              class="btn btn-outline-primary shadow w-50 me-1">
+              設定をやめる</a>
+
+            <button type="submit" class="btn btn-primary shadow w-50 ms-1"
               name="next"
-              value="ToInput_{{sellUser.id}}_{{sellEntity.id}}">　口座登録へ進む　</button>
+              value="ToInput_{{sellUser.id}}_{{sellEntity.id}}">口座登録へ進む</button>
           </div>
 
         </form>
@@ -250,7 +260,6 @@
 
     <div class="row justify-content-center px-4">
       <form method="POST" class="form-group col-md-9 col-lg-7 bg-light border border-success-subtle rounded p-4 mt-2">
-
         {% csrf_token %}
 
         <table  width="200px" class="table table-sm table-bordered border-primary-subtle table-responsive">

@@ -21,33 +21,35 @@
       </div>
     {% endif %}
 
-      <nav class="mt-2" aria-label="breadcrumb" role="navigation">
-        <ol class="breadcrumb bg-light-subtle px-2 rounded-1">
-          <li class="breadcrumb-item">
-            <a href="{% url 'accounts:mypage_buyer' %}">
-              <i class="bi bi-house" style="font-size:1.2em; color:cornflowerblue"></i>
-              マイページトップ</a></li>
-          <li class="breadcrumb-item" aria-current="page">
-            {% bs_icon 'list-ol' color='text-secondary' size='1.1em' %}
-            取引一覧</li>
-        </ol>
-      </nav>
+    <nav class="mt-2" aria-label="breadcrumb" role="navigation">
+      <ol class="breadcrumb bg-light-subtle px-2 rounded-1">
+        <li class="breadcrumb-item">
+          <a href="{% url 'accounts:mypage_buyer' %}">
+            <i class="bi bi-house" style="font-size:1.2em; color:cornflowerblue"></i>
+            マイページトップ</a></li>
+        <li class="breadcrumb-item" aria-current="page">
+          {% bs_icon 'list-ol' color='text-secondary' size='1.1em' %}
+          取引一覧</li>
+      </ol>
+    </nav>
 
-    <div class="row justify-content-center mx-2">
+    <div class="row justify-content-start mx-2 py-0">
 
-      <div class="col-4 px-0">
-
-        <form method="GET" class="p-0 m-0"
+      <div class="col-6">
+        <form method="GET"
+          id="id_IndivOrAggregForm"
+          class="m-0 p-0"
           action="{% url 'qpay:txList_buyer' %}"
-          style="background-color: transparent !important; border-color:transparent !important;"
-          id="id_IndivOrAggreg">
+          style="background-color: transparent !important; border-color:transparent !important;">
+
           {% csrf_token %}
 
-          <div class="btn-group btn-group-toggle col-md-8 col-lg-6"
-            data-toggle="buttons"
-            id="id_IndivOrAggreg">
+          <div class="btn-group btn-group-toggle col-md-8 col-lg-5"
+            data-toggle="buttons">
   
-            <label class=" btn btn-outline-primary custom-toggle p-1" for="id_IndivOrAggreg_A">
+            <label class=" btn btn-outline-primary custom-toggle p-1" 
+                style="width: max-content; min-width: 55px;"
+                for="id_IndivOrAggreg_A">
               <input type="radio" class="toggleBtn_NoneDisplay"
                 id="id_IndivOrAggreg_A"
                 name="name_IndivOrAggreg"
@@ -58,8 +60,12 @@
             </label>
 
             <!-- autocompleteは過去の入力情報を自動的に補完する機能-->        
-            <label class=" btn btn-outline-primary custom-toggle p-1" for="id_IndivOrAggreg_B">
+            <label class=" btn btn-outline-primary custom-toggle p-1"
+              style="width: max-content; min-width: 55px;"
+              for="id_IndivOrAggreg_B">
+              
               <input type="radio" class="toggleBtn_NoneDisplay"
+                style="width: max-content; min-width: 50px;"
                 id="id_IndivOrAggreg_B"
                 name="name_IndivOrAggreg"
                 value="aggreg"
@@ -70,247 +76,318 @@
           </div>
         </form>
       </div>
-
-      <div class="col-4">
-        <div class="d-flex justify-content-center mt-5">
-          <h5 class="text-secondary pt-1"><b>取引一覧　</b></h5>
-          {% bs_icon 'receipt-cutoff' color='deeppink' size='2.2em' %}
-        </div>
-      </div>
-
-      <div class="col-4">
-      </div>
     </div>
 
-    {% if object_list.count >= 1 %}
- 
+    {% if IndivOrAggreg == 'indiv' %}
 
-        <div class="row justify-content-center mt-2">
+      <div class="d-flex justify-content-center mt-2">
+        <h5 class="text-secondary pt-1"><b>取引一覧</b></h5>
+        <span class="ms-2">
+          {% bs_icon 'receipt-cutoff' color='deeppink' size='2.2em' %}
+        </span>
+      </div>
 
-          <div class="col-10 col-lg-7 col-xl-6 bg-light border border-top shadow-sm mx-5 py-2">
 
-            <div class="form-group row justify-content-center mx-1">
-              <label class="col-3 col-form-label text-secondary"
-                style="text-align:left"
+      <div class="row justify-content-center mt-2 mx-2">
+
+        <div class="col-lg-7 col-xl-6 bg-light border border-top shadow-sm mx-5 py-2">
+
+          <form method="GET"
+            id="id_applyPeriodForm"
+            class="m-0 p-0"
+            action="{% url 'qpay:txList_buyer' %}"
+            style="background-color: transparent !important; border-color:transparent !important;">
+  
+            <div class="form-group row justify-content-center mx-0">
+              <label class="col-3 col-form-label text-secondary px-0"
+                style="text-align:center"
                 for='{{form.applyPeriod.id_for_label}}'>
-                <b>申請時点</b></label>
+                <b>対象</b></label>
               <div class="col-9 px-0">
-                <input type="select" class='form-control ps-5 pe-2'
-                  style="font-size:0.9rem"
-                  name="{{form.applyPeriod.name}}"
-                  value="{{form.applyPeriod.value|default:''}}"
-                  placeholder=""
-                  id="{{form.applyPeriod.id_for_label}}" >
+                {{ form.applyPeriod }}
               </div>
             </div>
 
-            <div class="form-group row justify-content-center mt-1 mx-1">
-              <label class="col-3 col-form-label text-secondary"
-                style="text-align:left">
-                <b>開始・終了</b></label>
+            <div class="form-group row mt-1 mx-0">
+              <label class="col-3 col-form-label text-secondary px-0"
+                style="text-align:center">
+                <b>日付</b></label>
               <div class="col-4 px-0">
-                <input type="date" class='form-control ps-4 pe-2'
-                  style="font-size:0.9rem"
+                <input type="date" class='form-control text-center px-0'
+                  style="font-size:0.9rem;"
                   name="{{form.applyPeriod_start.name}}"
                   value="{{form.applyPeriod_start.value|default:''}}"
                   placeholder=""
-                  id="{{form.applyPeriod_start.id_for_label}}" >
+                  id="{{form.applyPeriod_start.id_for_label}}"
+                  disabled>
               </div>
-              <div class="col-1 pe-0"
-                style="align-content:center; text-align:center">～</div>
-              <div class="col-4">
-                <input type="date" class='form-control ps-4 pe-2'
+              <div class="col-1 px-0 mx-0 text-center"
+                style="align-content:center;">～</div>
+              <div class="col-4 px-0">
+                <input type="date"
+                  class='form-control text-center px-0'
                   style="font-size:0.9rem"
                   name="{{form.applyPeriod_end.name}}"
                   value="{{form.applyPeriod_end.value|default:''}}"
                   placeholder=""
-                  id="{{form.applyPeriod_end.id_for_label}}" >
+                  id="{{form.applyPeriod_end.id_for_label}}"
+                  disabled>
               </div>
             </div>
+          </form>
 
-          </div>
         </div>
+      </div>
 
+      {% if object_list.count >= 1 %}
 
-      <div class="row justify-content-center mt-3">
+        <div class="row justify-content-center mt-3 mx-1 px-0">
  
-        <form method="POST" class="p-0"
-          style="background-color: transparent !important; border-color:transparent !important;">
+          <form method="POST" class="p-0"
+            style="background-color: transparent !important; border-color:transparent !important;">
           
-          {% csrf_token %}
+            {% csrf_token %}
 
-          <div class="d-block d-lg-none mx-4">
-            <table class="table table-sm table-bordered border-primary-subtle table-responsive mx-2">
-              <thead style="font-size:0.9rem">
-                <tr class="table-primary" style="text-align:center;">
-                  <th rowspan="2"style="vertical-align:top">#</th>
-                  <th colspan="2" style="vertical-align:top">申請法人</th>
-                  <th colspan="2" style="vertical-align:top">承認ユーザー</th>
-                  <th rowspan="2" style="vertical-align:top">Qnee<br>送金時</th>
-                  <th rowspan="2" style="vertical-align:top">詳細</th>
-                </tr>
+            <div class="d-block d-lg-none">
 
-                <tr class="table-primary" style="text-align:center;">
-                  <th style="vertical-align:top">申請額</th>
-                  <th style="vertical-align:top">申請時</th>
-                  <th style="vertical-align:top">状況</th>
-                  <th style="vertical-align:top">承認時</th>
-                </tr>
-
-              </thead>
-          
-              <tbody style="font-size:0.9rem">
-
-                {% for item in page_obj %}
-
-                  <tr>
-                    <td rowspan="2" style="vertical-align:middle; text-align:center;">
-                      {{ page_obj.start_index|add:forloop.counter0 }}</td>
-                    <td colspan="2" style="text-align:center">
-                      {{ item.sellEntityName }}
-                    </td>
-                    <td colspan="2" style="vertical-align:middle; text-align:center">
-                      {{ item.buyUser_userName |default:'-' }}
-                    </td>
-                    <td rowspan="2" style="vertical-align:middle; text-align:center">
-                      {{ item.payed_at |date:"y.n.j<br>H:i" |default:'-' }}
-                    </td>
-                    <td rowspan="2" class="p-1" style="vertical-align:middle; text-align:center">
-                      <a href="{% url 'qpay:txDetail_buyer' item.id page_obj.number %}"
-                        class="btn btn-outline-primary w-100 h-100 px-1">表示</a>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="text-align:center">{{ item.requested_amount|intcomma }}</td>
-                    <td style="text-align:center">{{ item.requested_at |date:"y.n.j H:i" }}</td>
-                    <td style="vertical-align:middle; text-align:center">
-                      {% if item.txStatus_int == 1 %}まだ{% endif %}
-                      {% if item.txStatus_int == 2 %}承認{% endif %}
-                      {% if item.txStatus_int == 3 %}否認{% endif %}
-                      {% if item.txStatus_int == 4 %}承認{% endif %}
-                    </td>
-                    <td style="vertical-align:middle; text-align:center">
-                      {% if item.txStatus_int == 1 %}-{% endif %}
-                      {% if item.txStatus_int == 2 %}{{ item.approved_at |date:"y/n/j H:i" |default:'-' }}{% endif %}
-                      {% if item.txStatus_int == 3 %}{{ item.rejected_at |date:"y/n/j H:i" |default:'-' }}{% endif %}
-                      {% if item.txStatus_int == 4 %}{{ item.approved_at |date:"y/n/j H:i" |default:'-' }}{% endif %}
-                    </td>
+              <table class="table table-sm table-bordered border-primary-subtle table-responsive">
+                <thead style="font-size:0.8em">
+                  <tr class="table-primary" style="text-align:center;">
+                    <th rowspan="2"style="vertical-align:top" class="px-0">#</th>
+                    <th rowspan="1" style="vertical-align:top"></th>
+                    <th rowspan="1" style="vertical-align:top">申請額</th>
+                    <th colspan="1" style="vertical-align:top">関係者</th>
+                    <th rowspan="1" style="vertical-align:top">対応状況</th>
+                    <th rowspan="1" style="vertical-align:top">詳細</th>
                   </tr>
 
-                {% empty %}
-                  取引データはありません。
+                </thead>
+          
+                <tbody style="font-size:0.8em">
+
+                  {% for item in page_obj %}
+
+                    <tr>
+                      <td rowspan="3" style="vertical-align:middle; text-align:center;" class="table-primary px-0">
+                        {{ page_obj.start_index|add:forloop.counter0 }}</td>
+                      <td colspan="1" style="text-align:center" class="table-primary">
+                        申請</td>
+                      <td rowspan="3" style="text-align:center">
+                        {{ item.requested_amount|intcomma }}</td>
+                      <td colspan="1" style="text-align:center">
+                        {{ item.sellEntityName }}</td>
+                      <td colspan="1" style="text-align:center">
+                        {{ item.requested_at| date:"y.n.j H:i" |default:'-' }}</td>
+                      <td rowspan="3" class="p-1" style="vertical-align:middle; text-align:center">
+                        <a href="{% url 'qpay:txListDetail_buyer' item.id page_obj.number %}"
+                          class="btn btn-outline-primary w-100 h-100 px-1"
+                          style="font-size:0.9em">表示</a>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td colspan="1" style="text-align:center" class="table-primary">
+                        承認</td>
+                      <td colspan="1" style="vertical-align:middle; text-align:center" class="px-0">
+                        {{ item.buyUser_userName |default:'-' }}</td>
+                      <td colspan="1" style="text-align:center" class="px-0">
+                        {% if item.txStatus_int == 1 %}未了{% endif %}
+                        {% if item.txStatus_int == 2 or item.txStatus_int == 4 %}
+                          {{ item.approved_at| date:"y.n.j H:i" |default:'-' }}{% endif %}
+                        {% if item.txStatus_int == 3 %}否認{% endif %}
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td colspan="1" style="text-align:center" class="table-primary">
+                        送金</td>
+                      <td colspan="1" style="vertical-align:middle; text-align:center">
+                        Qnee</td>
+                      <td rowspan="1" style="vertical-align:middle; text-align:center" class="px-0">
+                        {% if item.txStatus_int == 1 %}未了{% endif %}
+                        {% if item.txStatus_int == 2 %}未了{% endif %}
+                        {% if item.txStatus_int == 3 %}不可{% endif %}
+                        {% if item.txStatus_int == 4 %}
+                          {{ item.advanced_at |date:"y.n.j H:i" |default:'-' }}{% endif %}</td>
+                    </tr>
+
+                  {% empty %}
+                    該当する取引データはありません。
               
-                {% endfor %}
-              </tbody>
+                  {% endfor %}
+                </tbody>
 
-            </table>
-          </div>        
+              </table>
+            </div>
 
-          <div class="d-none d-lg-block mx-4">
+            <div class="d-none d-lg-block">
 
-            <table class="table table-sm table-bordered border-primary-subtle table-responsive mx-2">
-              <thead style="font-size:0.9rem">
-                <tr class="table-primary" style="text-align:center;">
-                  <th rowspan="2"style="vertical-align:top">#</th>
-                  <th colspan="2" style="vertical-align:top">申請法人</th>
-                  <th rowspan="2" style="vertical-align:top">証明<br>書類</th>
-                  <th colspan="2" style="vertical-align:top">承認ユーザー</th>
-                  <th rowspan="2" style="vertical-align:top">Qnee<br>送金</th>
-                  <th rowspan="2" style="vertical-align:top">詳細</th>
-                </tr>
+              <table class="table table-sm table-bordered border-primary-subtle table-responsive mx-2">
+                <thead style="font-size:0.9rem">
+                  <tr class="table-primary" style="text-align:center;">
+                    <th rowspan="2"style="vertical-align:top">#</th>
+                    <th colspan="2" style="vertical-align:top">申請法人</th>
+                    <th rowspan="2" style="vertical-align:top">証明<br>書類</th>
+                    <th colspan="2" style="vertical-align:top">承認ユーザー</th>
+                    <th rowspan="2" style="vertical-align:top">Qnee<br>送金</th>
+                    <th rowspan="2" style="vertical-align:top">詳細</th>
+                  </tr>
 
-                <tr class="table-primary" style="text-align:center;">
-                  <th style="vertical-align:top">申請額</th>
-                  <th style="vertical-align:top">申請時</th>
-                  <th style="vertical-align:top">状況</th>
-                  <th style="vertical-align:top">承認時</th>
-                </tr>
+                  <tr class="table-primary" style="text-align:center;">
+                    <th style="vertical-align:top">申請額</th>
+                    <th style="vertical-align:top">申請時</th>
+                    <th style="vertical-align:top">状況</th>
+                    <th style="vertical-align:top">承認時</th>
+                  </tr>
 
-              </thead>
+                </thead>
           
-              <tbody style="font-size:0.9rem">
+                <tbody style="font-size:0.9rem">
 
-                {% for item in page_obj %}
+                  {% for item in page_obj %}
 
-                  <tr>
-                    <td rowspan="2" style="vertical-align:middle; text-align:center;">
-                      {{ page_obj.start_index|add:forloop.counter0 }}</td>
-                    <td colspan="2" style="text-align:center">
-                      {{ item.sellEntityName }}
-                    </td>
+                    <tr>
+                      <td rowspan="2" style="vertical-align:middle; text-align:center;">
+                        {{ page_obj.start_index|add:forloop.counter0 }}</td>
+                      <td colspan="2" style="text-align:center">
+                        {{ item.sellEntityName }}
+                      </td>
 
-                    <td rowspan="2" style="text-align:center; vertical-align:middle;">
-                      <img src="{{ item.evidence.url }}"
-                        class="img-fluid"
-                        style="max-height:55; width:auto; cursor:zoom-in;"
-                        data-bs-toggle="modal"
-                        data-bs-target="#imageModal{{ forloop.counter }}"/>
-                    </td>
+                      <td rowspan="2" style="text-align:center; vertical-align:middle;">
+                        <img src="{{ item.evidence.url }}"
+                          class="img-fluid"
+                          style="max-height:49; width:auto; cursor:zoom-in;"
+                          data-bs-toggle="modal"
+                          data-bs-target="#imageModal{{ forloop.counter }}"/>
+                      </td>
 
-                    <!-- モーダル・ダイアログ -->
-                    <div class="modal fade"
-                      id="imageModal{{ forloop.counter }}" tabindex="-1" aria-hidden="true">
-                      <div class="modal-dialog modal-sm"> <!-- 大きさ指定なしは「Medium」 -->
-                        <div class="modal-content">
-                          <div class="modal-header">
-                            <h6 class="modal-title">証明書類</h6>
-                            <!-- 閉じるボタン: data-bs-dismiss="modal" が重要 -->
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                          </div>
-                          <div class="modal-body">
-                            <img src="{{ item.evidence.url }}" class="img-fluid" alt="拡大画像">
+                      <!-- モーダル・ダイアログ -->
+                      <div class="modal fade"
+                        id="imageModal{{ forloop.counter }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog"> <!-- modal-sm/lg/xl/xxl 指定なしは「medium」 -->
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h6 class="modal-title">証明書類</h6>
+                              <!-- 閉じるボタン: data-bs-dismiss="modal" が重要 -->
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                              <img src="{{ item.evidence.url }}" class="img-fluid" alt="拡大画像">
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </div> 
-                    <td colspan="2" style="vertical-align:middle; text-align:center">
-                      {{ item.buyUser_userName |default:'-' }}
-                    </td>
-                    <td rowspan="2" style="vertical-align:middle; text-align:center">
-                      {{ item.payed_at |date:"y.n.j H:i" |default:'-' }}
-                    </td>
-                    <td rowspan="2" class="p-1" style="vertical-align:middle; text-align:center">
-                      <a href="{% url 'qpay:txDetail_buyer' item.id page_obj.number %}"
-                        class="btn btn-outline-primary w-100 px-2">表示</a>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="text-align:center">{{ item.requested_amount|intcomma }}</td>
+                      </div> 
+                      <td colspan="2" style="vertical-align:middle; text-align:center">
+                        {{ item.buyUser_userName |default:'-' }}
+                      </td>
+                      <td rowspan="2" style="vertical-align:middle; text-align:center">
+                        {{ item.payed_at |date:"y.n.j H:i" |default:'-' }}
+                      </td>
+                      <td rowspan="2" class="p-1" style="vertical-align:middle; text-align:center">
+                        <a href="{% url 'qpay:txListDetail_buyer' item.id page_obj.number %}"
+                          class="btn btn-outline-primary w-100 px-2">表示</a>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="text-align:center">{{ item.requested_amount|intcomma }}</td>
                     <td style="text-align:center">{{ item.requested_at|date:"y.n.j H:i" }}</td>
-                    <td style="vertical-align:middle; text-align:center">
-                        {% if item.txStatus_int == 1 %}まだ{% endif %}
-                        {% if item.txStatus_int == 2 %}承認{% endif %}
-                        {% if item.txStatus_int == 3 %}否認{% endif %}
-                        {% if item.txStatus_int == 4 %}承認{% endif %}
-                    </td>
-                    <td style="vertical-align:middle; text-align:center">
-                      {% if item.txStatus_int == 1 %}-{% endif %}
-                      {% if item.txStatus_int == 2 %}{{ item.approved_at|date:"y/n/j H:i"|default:'-' }}{% endif %}
-                      {% if item.txStatus_int == 3 %}{{ item.rejected_at|date:"y/n/j H:i"|default:'-' }}{% endif %}
-                      {% if item.txStatus_int == 4 %}{{ item.approved_at|date:"y/n/j H:i"|default:'-' }}{% endif %}
-                    </td>
-                  </tr>
+                      <td style="vertical-align:middle; text-align:center">
+                          {% if item.txStatus_int == 1 %}まだ{% endif %}
+                          {% if item.txStatus_int == 2 %}承認{% endif %}
+                          {% if item.txStatus_int == 3 %}否認{% endif %}
+                          {% if item.txStatus_int == 4 %}承認{% endif %}
+                      </td>
+                      <td style="vertical-align:middle; text-align:center">
+                        {% if item.txStatus_int == 1 %}-{% endif %}
+                        {% if item.txStatus_int == 2 %}{{ item.approved_at|date:"y/n/j H:i"|default:'-' }}{% endif %}
+                        {% if item.txStatus_int == 3 %}{{ item.rejected_at|date:"y/n/j H:i"|default:'-' }}{% endif %}
+                        {% if item.txStatus_int == 4 %}{{ item.approved_at|date:"y/n/j H:i"|default:'-' }}{% endif %}
+                      </td>
+                    </tr>
 
-                {% empty %}
-                  取引データはありません。
-              
-                {% endfor %}
-              </tbody>
+                  {% empty %}
+                    取引データはありません。
+                    
+                  {% endfor %}
+                </tbody>
 
-            </table>
-          </div>    
+              </table>
+            </div>
 
-          {% include "partials/pagination.html" %}
+            {% include "partials/pagination.html" %}
 
             <input type="hidden" name="next" value="{{ next }}" />
 
-        </form>
-      </div> <!-- end row -->
+          </form>
+        </div> <!-- end row -->
 
-    {% else %}
+      {% else %}
 
-      <div class="row justify-content-center mt-5">
-        取引データはありません。
+        <div class="d-flex justify-content-center mt-5">
+          <h6 class="text-secondary pt-1">該当する取引データはありません。</h6>
+          <span class="pb-1"></span>
+        </div>
+
+
+      {% endif %}
+
+    {% elif IndivOrAggreg == 'aggreg'%}
+
+      <div class="d-flex justify-content-center mt-2">
+        <h5 class="text-secondary pt-1"><b>月次集計　</b></h5>
+        {% bs_icon 'receipt-cutoff' color='deeppink' size='2.2em' %}
+      </div>
+
+      <div class="row justify-content-center mt-2 mx-0">
+
+        <div class="col-md-10 col-lg-8 col-xl-7">
+      
+            <table class="table table-sm table-bordered border-primary-subtle table-responsive mt-2 mx-2">
+              <thead style="font-size:0.9rem">
+                <tr class="table-primary" style="text-align:center;">
+                  <th rowspan="2"style="vertical-align:top">#</th>
+                  <th rowspan="2" style="vertical-align:top">申請者</th>
+                  <th rowspan="2" style="vertical-align:top">年月</th>
+                  <th colspan="3" style="vertical-align:top">前払い</th>
+                </tr>
+                <tr class="table-primary" style="text-align:center;">
+                  <th rowspan="1" style="vertical-align:top">件数</th>
+                  <th rowspan="1" style="vertical-align:top">金額</th>
+                  <th rowspan="1" style="vertical-align:top">手数料</th>
+                </tr>
+
+              </thead>
+          
+              <tbody style="font-size:0.9rem">
+
+                {% for item in page_obj %}
+
+                  <tr>
+                    <td rowspan="1" style="vertical-align:middle; text-align:center;">
+                      {{ page_obj.start_index|add:forloop.counter0 }}</td>
+                    <td colspan="1" style="text-align:center">
+                      {{ item.sellEntityName }}
+                    </td>
+                    <td colspan="1" style="vertical-align:middle; text-align:center">
+                      {{ item.month | date:"Y年m月" }}
+                    </td>
+                    <td colspan="1" style="vertical-align:middle; text-align:center">
+                      {{ item.total_advance_count |intcomma }}
+                    </td>
+                    <td colspan="1" style="vertical-align:middle; text-align:center">
+                      {{ item.total_advance_amount |intcomma }}
+                    </td>
+                    <td colspan="1" style="vertical-align:middle; text-align:center">
+                      {{ item.total_advance_fee |intcomma }}
+                    </td>
+                  </tr>
+
+                {% empty %}
+                  取引データはありません。
+              
+                {% endfor %}
+              </tbody>
+            </table>
+        </div>
       </div>
 
     {% endif %}
@@ -320,16 +397,28 @@
 
 {% endblock %}
 
-<!--
- {% for item in object_list %}
-<div class="p-4 m-4 bg-light border border-success rounded">
-  <h2 class="text-success">{{ item.title }}</h2>
-    <h6>物件名：{{ item.article_name }}</h6>
-    <h6>対象数：{{ item.number }} 橋</h6>
-    <h6>その他：{{ item.other }}</h6>
-    <div class="mt-3">
-      <a href="{% url 'detail-article' item.pk %}">詳細</a>
-    </div>
-</div>
-{% endfor %}
--->
+{% block extrajs %}
+
+<script>
+
+  document.addEventListener('DOMContentLoaded', function() {
+
+    var IndivOrAggreg = document.getElementById('id_IndivOrAggregForm');
+    var ApplyPeriod = document.getElementById('id_applyPeriod');
+
+    //「リストを作る」が選択されたときの対応
+    IndivOrAggreg.addEventListener('click', function(){
+      console.log('id_IdivOrAggregForm.addEventListenerのclickが認識されました');
+      IndivOrAggreg.submit();
+    });
+
+    ApplyPeriod.addEventListener('change', function(){
+      console.log('id_applyPeriod.addEventListenerのchangeが認識されました');
+      document.getElementById('id_applyPeriodForm').submit();    
+    });
+
+  });
+
+</script>
+
+{% endblock %}

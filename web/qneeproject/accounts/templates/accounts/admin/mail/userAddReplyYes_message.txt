@@ -1,0 +1,8 @@
+{{ approver.userName }} 様 ユーザー登録申請いただき、ありがとうございました。
+
+あなたのユーザー参加がゲスト企業に認められました。
+
+ログインURL
+{{ protocol}}://{{ domain }}{% url 'accounts:login_buyer' %}
+
+株式会社Qnee（キユーニー）

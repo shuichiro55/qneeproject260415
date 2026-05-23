@@ -12,8 +12,8 @@ usermodel = get_user_model()
   
 def user_directory_path(instance, filename):
   dateTime = datetime.datetime.now()  # 現在の時刻を取得
-  date_dir = dateTime.strftime('%Y%m%d_%H-%M-%S')  # 年/月/日のフォーマットの作成
-  time_stamp = dateTime.strftime('%H-%M-%S')  # 時-分-秒のフォーマットを作成
+  date_dir = datetime.datetime.now().strftime('%Y%m%d_%H-%M-%S')  # 年/月/日のフォーマットの作成
+  time_stamp = datetime.datetime.now().strftime('%H-%M-%S')  # 時-分-秒のフォーマットを作成
   new_filename = time_stamp + filename  # 実際のファイル名と結合
   user_directory = os.path.join(date_dir, new_filename)  # 階層構造にする
   #le = LegalEntity.objects.get(pk=instance.sellerEntity_id)
@@ -69,6 +69,7 @@ class QpayTx(models.Model):
 
   buyUser_userName =models.CharField('ゲスト・ユーザー名', max_length=150, unique=False, null=True,)
 
+  created_at = models.DateTimeField(_('データ作成時点'), default=timezone.now)
   requested_at = models.DateTimeField(_('ご申請時点'), null=True)
   requested_amount = models.IntegerField(_('ご申請金額（円）'), null=False)
   exPayment_date = models.DateField(_('当初報酬日'), null=True)
@@ -88,32 +89,39 @@ class QpayTx(models.Model):
   # 4: QNEE_PAYED 前払い完了（Qnee⇒Seller）
   # 5: BUYER_PAYED Qnee受領（Buyer⇒Qnee）
 
-  created_at = models.DateTimeField(_('データ作成時点'), default=timezone.now)
+  #applied_at = models.DateTimeField(_('申請時点'), null=True, blank=True)
   approved_at = models.DateTimeField(_('承認時点'), null=True, blank=True)
   approved_amount = models.IntegerField(_('承認金額（円）'), null=True)
-  advancePayment_date = models.DateField(_('前払日'), null=True)
+  #advancePayment_date = models.DateField(_('前払日'), null=True)
+  # advanced_atがあるの不要
 
   rejected_at = models.DateTimeField(_('否認時点'), null=True, blank=True)
-  updated_at = models.DateTimeField(_('更新時点'), auto_now_add=True)
+  #updated_at = models.DateTimeField(_('更新時点'), auto_now_add=True)
 
-  advance_amount = models.IntegerField(_('前払予定額'), null=False, default=0)
-  advance_fee =  models.IntegerField(_('前払手数料'), null=False, default=0)
-  advanced_at = models.DateTimeField(_('前払時点'), null=True, blank=True)
+  """ 前払いに係る項目 """
+  advanced_at = models.DateTimeField(_('前払い時点'), null=True, blank=True)
+  advance_amount = models.IntegerField(_('前払い予定額'), null=False, default=0)
+  advance_fee =  models.IntegerField(_('前払い手数料'), null=False, default=0)
 
   referral_fee =  models.IntegerField(_('ご報酬（紹介料）'), null=False, default=0)
   transfer_fee = models.IntegerField(_('振込手数料'), null=False, default=0)
   total_fee = models.IntegerField(_('合計手数料'), null=False, default=0)
 
-  transfer_amount =  models.IntegerField(_('送金額'), null=False, default=0)
+  # transfer_amount =  models.IntegerField(_('送金額'), null=False, default=0)
 
 
   def save(self, *args, **kwargs):
 
+    # !! コードが分かりずらいの出実際には使わない
+    # ファイルパスにID（self.id）を含めるとき、
+    # 初回モデル保存時にはIDが存在しないため、
+    # モデルを一度保存した後に、データにファイルを格納して再度保存
+
     if self.id is None:
       uploaded_file = self.evidence # アップロードされたファイルを変数に代入しておく
-      self.evidence = None          # 一旦fileフィールドがNullの状態で保存(→インスタンスIDが割り当てられる)
+      self.evidence = None          # 初回データ保存時はfileフィールドがnull（フォルダに保存せず）
       super().save(*args, **kwargs)
-      print(f'ここ通る？self.evidence={self.evidence} in models.py, class QpayTx, save()')
+      print(f'pass1 self.evidence={self.evidence} in qpay.models.py, class QpayTx, save()')
 
       self.evidence = uploaded_file # fileフィールドに値をセット
 

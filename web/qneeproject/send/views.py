@@ -8,7 +8,7 @@ from django.contrib.auth import get_user_model
 from django.views import generic
 from qpay.models import QpayTx
 from accounts.models import LegalEntity
-from send.models import InvitationSets, InvitationLog, AddList, IndvAdd
+from send.models import InvitationSets, AddList, IndvAdd, InvitationLog
 
 from django.urls import reverse, reverse_lazy
 from django.http import HttpResponse, HttpResponseBadRequest #, HttpResponseRedirect
@@ -19,20 +19,21 @@ import openpyxl
 from openpyxl.utils.exceptions import InvalidFileException
 
 from django.contrib import messages
-from django.http import JsonResponse
+import json
+
+from .form import AddListSelectForm, UserEntryForm, InvitationForm, RepeatSetForm
+#from .form import CSVUploadForm, ImportExportForm #小原さん作成
+#from django.http import JsonResponse
 
 #from django.utils import timezone
 #import calendar
 #import datetime
-#from dateutil.relativedelta import relativedelta
-import json
 
+#from dateutil.relativedelta import relativedelta
 #from django.contrib import messages
 #from django.core.paginator import Paginator
 #from django.core.mail import EmailMessage
 
-from .form import AddListSelectForm, UserEntryForm, InvitationForm, RepeatSetForm
-from .form import CSVUploadForm, ImportExportForm #小原さん作成
 import datetime
 import calendar
 
@@ -700,6 +701,9 @@ class InvitationSetsView(generic.UpdateView):
 
           mailSets.save()
 
+          messages.add_message(request,
+            messages.SUCCESS, "QPAYご案内メールの送信設定を変更しました。")
+
           init_data = {
             'startDate': str_startDate,
             'interval': interval,
@@ -707,6 +711,8 @@ class InvitationSetsView(generic.UpdateView):
           }
 
           context = {
+            'WhoWhenWhat':'when',
+
             'sellEntitysUsers': sellEntitysUsers,
 
             'addListSelectForm': AddListSelectForm(buyEntity_id=buyEntity_id),
@@ -721,7 +727,7 @@ class InvitationSetsView(generic.UpdateView):
             'repeatOnOff': repeatOnOff,
             'RepeatSetForm': RepeatSetForm(initial=init_data),
           }
-          return TemplateResponse(self.request, 'send/buyer/invitationSets.html', context)
+          return render(self.request, 'send/buyer/invitationSets.html', context)
 
 
         if repeatOnOff == 'off':
@@ -985,7 +991,8 @@ class InvitationAgtView(LoginRequiredMixin, generic.UpdateView):
         if eachSets.json_sendMonth[today.month] == 1 and \
           eachSets.json_sendDay[today.day] == 1:
 
-          addList = list(IndvAdd.objects.filter(addList=eachSets.appliedList))
+          # ★★　下記はまだテストが終わっていない
+          addList = list(IndvAdd.objects.filter(addList=eachSets.appliedList).values_list('email', flat=True))
           utils.sendEmail_common('send/admin/mail/servInfo', '', addList, {})
     
     messages.add_message(request,

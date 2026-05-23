@@ -1,0 +1,373 @@
+{% extends "admin/index/base_qconnect.html" %}
+
+{% load bootstrap_icons %}
+{% load humanize %}
+
+{% block content %}
+{% csrf_token %}
+
+
+<div class="authentication-bg align-items-start">
+
+  <div class="container">
+
+    {% if messages %}
+      <div class="row justify-content-center mt-2 mx-2">
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
+            <span>{{ message }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <nav class="mt-2 border-top shadow-sm" aria-label="breadcrumb" role="navigation">
+      <ol class="breadcrumb bg-light-subtle px-2 rounded-3">
+        <li class="breadcrumb-item"><a href="{% url 'accounts:mypage_admin' %}">
+          {% bs_icon 'house' color='cornflowerblue' size='1.2em' %}
+          マイページトップ</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'accounts:infoEdit_admin' %}">
+          {% bs_icon 'gear' color='cornflowerblue' size='1.2em' %}
+          設定メニュー</a></li>
+        <li class="breadcrumb-item">
+          {% bs_icon 'pencil-square' color='text-secondary' size='1.2em' %}
+          会社情報の更新承認</li>
+      </ol>
+    </nav>
+
+    <div id="loading">
+      <div class="spinner-border text-primary"
+        style="width: 3rem; height: 3rem;"
+        role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-5">処理中です... しばらくお待ちください</p>
+    </div>
+
+    <div class="d-flex justify-content-center mt-5">
+      <h5 class="text-secondary pt-1"><b>会社情報更新の承認</b></h5>
+      <span class="ms-2">
+        {% bs_icon 'inbox' color='deeppink' size='2.2em' %}
+      </span>
+    </div>
+
+
+    <div class="d-block d-lg-none mx-4">
+
+      <div class="row justify-content-center mt-2">
+
+        <form method="POST" class="bg-light border-top shadow p-4 rounded-1"
+          id="id_PostForm">
+
+          <!-- style="background-color: transparent !important; border-color:transparent !important;" -->
+          {% csrf_token %}
+
+          {% for item in page_obj %} 
+
+            <div class="d-flex gap-1 justify-content-end">
+
+              <button type="submit" class="btn btn-outline-primary bg-light rounded-3 shadow-sm py-1"
+                style="width: 120px"
+                name="btnAction"
+                value="ToSendBack_{{item.id}}" >
+                差戻</button>
+
+              <button type="submit" class="btn btn-outline-primary shadow-sm rounded-3 py-1"
+                style="width: 120px"
+                name="btnAction"
+                value="ToApproveUpdate_{{item.id}}">
+                承認</button>
+
+              <!--
+              <button type="submit" class="btn btn-outline-primary rounded-3 shadow-sm py-1"
+                style="width: 120px"
+                name="btnAction"
+                value="ToGoNext_{{pageitem.id}}"
+                {% if page_obj.number == last_page %}disabled{% endif %}>
+                次データ</button>
+              -->
+
+            </div>
+
+            <table 
+              class="table table-sm
+                table-bordered
+                border-primary-subtle
+                table-responsive mt-2 mb-0">
+
+              <thead style="font-size:0.9rem">
+              </thead>
+
+              <tbody style="font-size:0.9rem">
+
+                <tr class="table-primary mt-2" style="text-align:center;">
+                  <td colspan="2" style="vertical-align:top; background-color: #254d74; color: white;">
+                    <b>変更前</b></td>
+                </tr>
+  
+                <tr style="text-align:center;">
+                  <td colspan="1" class="table-primary" style="vertical-align:top">
+                    申請法人</td>
+                  <td colspan="1" style="text-align:center">
+                    {{ item.applyEntity.entityName }}</td>
+                </tr>
+  
+                <tr style="text-align:center;">
+                  <td class="table-primary" colspan="1" class="table-primary" style="vertical-align:top">
+                    代表者</td>
+                  <td colspan="1" style="text-align:center">
+                    {{ item.applyEntity.representitive }}</td>            
+                </tr>
+
+                <tr>
+                  <td  class="table-primary" colspan="1" style="text-align:center">
+                    住所</td>
+                  <td colspan="1" style="text-align:center">
+                    {{ item.applyEntity.zip_entity }}　
+                    {{ item.applyEntity.address1 }}<br>
+                    {{ item.applyEntity.address2 }}　
+                    {{ item.applyEntity.address3 }}</td>
+                </tr>
+
+
+                <tr class="table-primary" style="text-align:center;">
+                  <td colspan="2" style="vertical-align:top; background-color: #254d74; color: white;">
+                    <b>変更後</b></td>
+                </tr>
+                <tr>
+                  <td class="table-primary" colspan="1" style="text-align:center; vertical-align:top">
+                    申請法人</td>
+                  <td colspan="1" style="text-align:center">
+                    {{ item.entityName }}</td>
+                </tr>
+
+                <tr>
+                  <td class="table-primary" colspan="1" style="text-align:center; vertical-align:top">
+                    代表者</td>
+                  <td colspan="1" style="text-align:center">
+                    {{ item.representitive }}</td>
+                </tr>
+                <tr>
+                  <td class="table-primary" colspan="1" style="text-align:center; vertical-align:top">
+                    住所</td>
+                  <td colspan="2" style="text-align:center">
+                    {{ item.zip_entity }}　
+                    {{ item.address1 }}<br>
+                    {{ item.address2 }}　
+                    {{ item.address3 }}</td>
+                </tr>
+
+                <tr>
+                  <td colspan="1"
+                    class="table-primary"
+                    style="text-align:center; vertical-align:middle;">
+                    <b>証明書類</b></td>
+                  <td colspan="1" style="text-align:center; vertical-align:middle;">
+                    <img src="{{ item.evidence.url }}"
+                      class="img-fluid"
+                      style="max-height:49; width:auto; cursor:zoom-in;"
+                      data-bs-toggle="modal"
+                      data-bs-target="#imageModal{{ forloop.counter }}"/>
+                  </td>
+                </tr>
+
+                <!-- モーダル・ダイアログ -->
+                <div class="modal fade"
+                  id="imageModal{{ forloop.counter }}" tabindex="-1" aria-hidden="true">
+                  <div class="modal-dialog"> <!-- modal-sm/lg/xl/xxl 指定なしは「medium」 -->
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h6 class="modal-title">証明書類</h6>
+                        <!-- 閉じるボタン: data-bs-dismiss="modal" が重要 -->
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        <img src="{{ item.evidence.url }}" class="img-fluid" alt="拡大画像">
+                      </div>
+                    </div>
+                  </div>
+                </div> 
+
+              </tbody>
+            </table>
+
+          {% empty %}
+            <div class="text-center">
+              <span class="text-secondary">
+                承認対象のデータはありません。</span>
+            </div>
+              
+          {% endfor %}
+
+          <input type="hidden" name="page_number" value="{{ page_number }}" />
+
+        </form>
+
+      </div> <!-- end row -->
+
+    </div>
+
+    <div class="d-none d-lg-block mx-4">
+
+      <div class="row justify-content-center mt-3">
+
+        <form method="POST" class="bg-light border-top shadow p-4 rounded-1"
+          id="id_PostForm">
+
+          <!-- style="background-color: transparent !important; border-color:transparent !important;" -->
+          {% csrf_token %}
+
+          {% for item in page_obj %}
+
+            <div class="d-flex gap-1 justify-content-end mt-2">
+
+              <button type="submit" class="btn btn-outline-primary bg-light rounded-3 shadow-sm py-1"
+                style="width: 120px"
+                name="btnAction"
+                value="ToSendBack_{{item.id}}" >
+                差戻</button>
+
+              <button type="submit" class="btn btn-outline-primary shadow-sm rounded-3 py-1"
+                style="width: 120px"
+                name="btnAction"
+                value="ToApproveUpdate_{{item.id}}">
+                承認</button>
+
+              <!--
+              <button type="submit" class="btn btn-outline-primary rounded-3 shadow-sm py-1"
+                style="width: 120px"
+                name="btnAction"
+                value="ToGoNext"
+                {% if page_obj.number == last_page %}disabled{% endif %}>
+                次データ</button>
+              -->
+            </div>
+
+            <table 
+              class="table table-sm
+              table-bordered
+              border-primary-subtle
+              table-responsive mt-2 mb-0">
+
+              <thead style="font-size:0.9rem">
+              </thead>
+
+              <tbody style="font-size:0.9rem">
+
+                <tr class="table-primary mt-2" style="text-align:center;">
+                  <td colspan="2" style="vertical-align:top; background-color: #254d74; color: white;">
+                    <b>変更前</b></td>
+                  <td rowspan="1" style="vertical-align:top; background-color: #254d74; color: white;">
+                    証明書類</td>
+                </tr>
+  
+                <tr style="text-align:center;">
+                  <td colspan="1" class="table-primary" style="vertical-align:top">
+                    申請法人</td>
+                  <td colspan="1" style="text-align:center">
+                    {{ item.applyEntity.entityName }}</td>
+                  <td rowspan="7" style="text-align:center; vertical-align:middle;">
+                    <img src="{{ item.evidence.url }}"
+                      class="img-fluid"
+                      style="max-height:49; width:auto; cursor:zoom-in;"
+                      data-bs-toggle="modal"
+                      data-bs-target="#imageModal{{ forloop.counter }}"/>
+                  </td>
+                </tr>
+  
+                <!-- モーダル・ダイアログ -->
+                <div class="modal fade"
+                  id="imageModal{{ forloop.counter }}" tabindex="-1" aria-hidden="true">
+                  <div class="modal-dialog"> <!-- modal-sm/lg/xl/xxl 指定なしは「medium」 -->
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h6 class="modal-title">証明書類</h6>
+                        <!-- 閉じるボタン: data-bs-dismiss="modal" が重要 -->
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        <img src="{{ item.evidence.url }}" class="img-fluid" alt="拡大画像">
+                      </div>
+                    </div>
+                  </div>
+                </div> 
+
+                <tr style="text-align:center;">
+                  <td class="table-primary" colspan="1" class="table-primary" style="vertical-align:top">
+                    代表者</td>
+                  <td colspan="1" style="text-align:center">
+                    {{ item.applyEntity.representitive }}</td>            
+                </tr>
+
+                <tr>
+                  <td  class="table-primary" colspan="1" style="text-align:center">
+                    住所</td>
+                  <td colspan="1" style="text-align:center">
+                    {{ item.applyEntity.address1 }}　
+                    {{ item.applyEntity.address2 }}　
+                    {{ item.applyEntity.address3 }}</td>
+                </tr>
+
+                <tr class="table-primary" style="text-align:center;">
+                  <td colspan="2" style="vertical-align:top; background-color: #254d74; color: white;">
+                    <b>変更後</b></td>
+                </tr>
+                <tr>
+                  <td class="table-primary" colspan="1" style="text-align:center; vertical-align:top">
+                    申請法人</td>
+                  <td colspan="1" style="text-align:center">
+                    {{ item.entityName }}</td>
+                </tr>
+
+                <tr>
+                  <td class="table-primary" colspan="1" style="text-align:center; vertical-align:top">
+                    代表者</td>
+                  <td colspan="1" style="text-align:center">
+                    {{ item.representitive }}</td>
+                </tr>
+                <tr>
+                  <td class="table-primary" colspan="1" style="text-align:center; vertical-align:top">
+                    住所</td>
+                  <td colspan="2" style="text-align:center">
+                    {{ item.zip_entity }}　
+                    {{ item.address1 }}　
+                    {{ item.address2 }}　
+                    {{ item.address3 }}</td>
+                </tr>
+              </tbody>
+            </table>
+
+          {% empty %}
+            <div class="text-center">
+              <span class="text-secondary">
+                承認対象のデータはありません。</span>
+            </div>
+              
+          {% endfor %}
+
+          <input type="hidden" name="page_number" value="{{ page_number }}" />
+
+        </form>
+
+      </div> <!-- end row -->
+    </div> <!-- end d-none -->
+
+    {% include "partials/pagination.html" %}
+
+  </div> <!-- end containaer -->
+</div>
+
+{% endblock %}
+
+{% block extrajs %}
+
+<script defer>
+  console.log('スクリプトは認識しているようです。')
+
+  document.getElementById('id_PostForm').addEventListener('submit', function() {
+    document.getElementById('loading').style.display = 'block';
+  });
+  
+</script>
+
+{% endblock %}

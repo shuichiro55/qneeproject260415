@@ -13,7 +13,7 @@
   <div class="container">
 
     {% if messages %}
-      <div class="row justify-content-center mt-2 mx-2">
+      <div class="messages row justify-content-center mt-2 mx-2">
         {% for message in messages %}
           <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
             <span>{{ message }}</span>
@@ -38,7 +38,7 @@
 
 
     <div class="d-flex justify-content-center mt-4">
-      <h5 class="text-secondary mt-2 me-3"><b>Ｑｐａｙご案内メール</b></h5>
+      <h5 class="text-secondary mt-2 me-3"><b>QPAY ご案内メール</b></h5>
       <i class="bi bi-mailbox" style="font-size:2.5em; color:deeppink;"></i>
     </div>
 
@@ -1093,7 +1093,18 @@
 
 <script>
 
+
   document.addEventListener('DOMContentLoaded', function() {
+
+    // 3秒後にメッセージを消す
+    setTimeout(function() {
+      console.log('setTimeoutが認識されました');
+
+      var messages = document.querySelectorAll('.messages div');
+      messages.forEach(function(message) {
+        message.style.display = 'none';
+      });
+    }, 3000); // 3000ミリ秒 = 3秒
 
     console.log('DOMContentLoadedが認識されました');
 

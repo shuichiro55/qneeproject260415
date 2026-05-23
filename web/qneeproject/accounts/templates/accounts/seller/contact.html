@@ -42,8 +42,8 @@
           onsubmit="return validateForm()" class="contact-form"
           name="myForm"
           id="myForm">
-
           {% csrf_token %}
+
           <span id="error-msg"></span>
 
           {% for message in messages %}

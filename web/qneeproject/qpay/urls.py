@@ -26,9 +26,9 @@ urlpatterns = [
   path('<int:page_number>/txList_seller/', views.TxListView_seller.as_view(), name='txList_seller'),
   path('<int:tx_id>/<int:page_number>/txList_seller/', views.TxListView_seller.as_view(), name='txList_seller'),
 
-  path('txList_admin/', views.TxListView_buyer.as_view(), name='txList_admin'),
-  path('<int:page_number>/txList_admin/', views.TxListView_buyer.as_view(), name='txList_admin'),
-  path('<int:tx_id>/<int:page_number>/txList_admin/', views.TxListView_buyer.as_view(), name='txList_admin'),
+  path('txList_admin/', views.TxListView_admin.as_view(), name='txList_admin'),
+  path('<int:page_number>/txList_admin/', views.TxListView_admin.as_view(), name='txList_admin'),
+  path('<int:tx_id>/<int:page_number>/txList_admin/', views.TxListView_admin.as_view(), name='txList_admin'),
 
   path('txApprove_buyer/', views.TxApproveView_buyer.as_view(), name='txApprove_buyer'),
   path('<int:page_number>/txApprove_buyer/', views.TxApproveView_buyer.as_view(), name='txApprove_buyer'),
@@ -37,18 +37,18 @@ urlpatterns = [
   path('txApproveDetailPre_buyer/<token>/', views.TxApproveDetailPreView_buyer.as_view(), name='txApproveDetailPre_buyer'),
   path('<int:tx_id>/txApproveDetail_buyer/', views.TxApproveDetailView_buyer.as_view(), name='txApproveDetail_buyer'),
 
-  path('<int:tx_id>/txDetail_buyer/', views.TxDetailView_buyer.as_view(), name='txDetail_buyer'),
-  path('<int:tx_id>/<int:page_number>/txDetail_buyer/', views.TxDetailView_buyer.as_view(), name='txDetail_buyer'),
+  path('<int:tx_id>/txListDetail_buyer/', views.TxListDetailView_buyer.as_view(), name='txListDetail_buyer'),
+  path('<int:tx_id>/<int:page_number>/txListDetail_buyer/', views.TxListDetailView_buyer.as_view(), name='txListDetail_buyer'),
 
-  path('<int:tx_id>/<int:page_number>/txDetail_seller/', views.TxDetailView_seller.as_view(), name='txDetail_seller'),
+  path('<int:tx_id>/<int:page_number>/txListDetail_seller/', views.TxListDetailView_seller.as_view(), name='txListDetail_seller'),
+  path('<int:tx_id>/<int:page_number>/txListDetail_admin/', views.TxListDetailView_admin.as_view(), name='txListDetail_admin'),
 
-  path('txInbox/', views.TxInboxView.as_view(), name='txInbox'),
+  path('txInbox/', views.TxInboxView_admin.as_view(), name='txInbox'),
   #path('<int:page_number>/txInbox/', views.TxInboxView.as_view(), name='txInbox'),
 
-  path('<int:tx_id>/txInboxDetail/', views.TxInboxDetailView.as_view(), name='txInboxDetail'),
-  path('<int:tx_id>/<int:page_number>/txInboxDetail/', views.TxInboxDetailView.as_view(), name='txInboxDetail'),
+  path('txInboxDetailPre/<token>/', views.TxInboxDetailPreView_admin.as_view(), name='txInboxDetailPre'),
+
+  path('<int:tx_id>/txInboxDetail/', views.TxInboxDetailView_admin.as_view(), name='txInboxDetail'),
+  path('<int:tx_id>/<int:page_number>/txInboxDetail/', views.TxInboxDetailView_admin.as_view(), name='txInboxDetail'),
   # 「int:page_number」は承認後、txInboxにおいて結果を確認するときに使う
-
-  path('txInboxDetailPre/<token>/', views.TxInboxDetailPreView.as_view(), name='txInboxDetailPre'),
-
 ]

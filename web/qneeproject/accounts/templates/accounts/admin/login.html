@@ -4,34 +4,41 @@
 
 {% block content %}
 
-<div class="authentication-bg min-vh-100 min-vw-100 align-items-start">
+<div class="authentication-bg align-items-start">
 
-  <div class="container mt-5">
+  <div class="container">
 
-    <div class="row justify-content-center mt-2">
-      {% for message in messages %}
-        <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
-          <span>{{ message }}</span>
-        </div>
-      {% endfor %}
-    </div>
+    {% if messages %}
+      <div class="row justify-content-center mt-2 mx-2">
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
+            <span>{{ message }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
 
-    <div class="d-flex flex-column">
-      <div class="row justify-content-center px-4">
+      <div class="row justify-content-center mt-5 mx-1">
         <div class="col-md-8 col-lg-6 col-xl-5">
 
-          <div class="d-flex justify-content-center pb-3">
-            <h3 class="text-black">{% bs_icon 'clouds' color='cornflowerblue' size='1.5em' %} Welcome to Qnee Connect !</h3>
+          <div class="d-flex justify-content-center">
+            <span>{% bs_icon 'clouds' color='cornflowerblue' size='2.2em' %}</span>
+            <span class="text-secondary ms-2" style="font-size:1.5em">
+              <b>Welcome to Qnee Connect!</b></span>
           </div>
 
-          <p></p>
-          <h5>スタッフ・ログイン</h5>
+          <div class="row justify-content-center mt-5">
+            <span class="text-secondary" style="font-size:1.25em">
+              スタッフ・ログイン
+            </span>
+          </div>
 
           <form method="POST"
             action="{% url 'accounts:login_admin' %}"
             class="form-group bg-light border border-success-subtle rounded-2 p-3 mb-0 ">
-
+            {% csrf_token %}
             {{ form.non_field_errors }}
+
             {% for field in form %}
               {{ field }}
               {{ field.errors }}
@@ -40,7 +47,7 @@
 
             <button type="submit" class="btn btn-primary w-100 shadow" >ログインする</button>
             <input type="hidden" name="next" value="{{ next }}" />
-            {% csrf_token %}
+
           </form>     
 
           <div class="d-flex justify-content-end mt-1">
@@ -50,20 +57,25 @@
             </a>
           </div>
 
-          <h5>スタッフ登録</h5>
+          <div class="row justify-content-center mt-4">
+            <span class="text-secondary" style="font-size:1.25em">
+              スタッフ登録
+            </span>
+          </div>
 
           <form method="GET"
             action="{% url 'accounts:userCreate_admin' %}"
             class="form-group bg-light border border-success-subtle rounded p-4 mb-3 ">
-
+            {% csrf_token %}
+            
             <button type="submit" class="btn btn-primary w-100 shadow" >登録する</button>
             <input type="hidden" name="next" value="{{ next }}" />
-            {% csrf_token %}
+
           </form>
 
         </div>
       </div>
-    </div>
+
   </div>
 </div>
 {% endblock %}

@@ -42,21 +42,19 @@
           <i class="bi bi-envelope-open ms-3" style="font-size:2.0em; color:deeppink;"></i>
         </div> 
 
-        {% if loginUser.canApproveAll == True or loginUser.canApproveAdd == True %}
+        {% if loginUser.canApproveAll == True or loginUser.canApproveChg == True %}
 
           <!-- 承認者がメールからアプリに入る場合の処理 -->
           {% if request.session.flag_frWhere == 1 %}
 
             <form method="POST" action="{% url 'accounts:userAdd_seller' %}"
               class="form-group border border-top shadow-sm p-3 bg-light rounded mt-2">
-
-              {% csrf_token %}         
-              {{ form.non_field_errors }}
+              {% csrf_token %}
 
               <table class="table table-sm table-bordered border-primary-subtle table-responsive">
                 <tbody class="text-center">
-                  {% if applyUser.approvedStatus_int == 1 %}<tr class="table-info"> {% endif %}
-                  {% if applyUser.approvedStatus_int == 3 %}<tr class="table-danger"> {% endif %}
+                  {% if applyUser.addStatus == 1 %}<tr class="table-info"> {% endif %}
+                  {% if applyUser.addStatus == 3 %}<tr class="table-danger"> {% endif %}
                     <th scope="col" width="36%" class="table-primary" style="text-align:left;">申請者</th>
                     <td style="text-align: right;">{{ applyUser.userName }}さん</td></tr>
                   <tr>
@@ -83,10 +81,11 @@
                   <tr>
                     <th width="24%" class="table-primary" style="text-align: left;">参加承認</th>
                     <td style="text-align: right;">
-                      {% if applyUser.canApproveAdd %} 権限あり {% else %} 権限なし {% endif %}
+                      {% if applyUser.canApproveChg %} 権限あり {% else %} 権限なし {% endif %}
                     </td></tr>
                   <tr>
-                    <th width="24%" class="table-primary" style="text-align: left;">Ｑｐａｙ</th>                  
+                    <th width="24%" class="table-primary" style="text-align: left;">
+                      QPAY</th>
                     <td style="text-align: right;">
                       {% if applyUser.canApproveQpay %} 権限あり {% else %} 権限なし {% endif %}
                     </td>
@@ -124,7 +123,6 @@
 
             <form method="POST" action="{% url 'accounts:userAdd_seller' %}"
               class="form-group border border-top shadow-sm bg-light rounded mt-3 pt-0 pb-3 px-3">
-
               {% csrf_token %}         
               {{ form.non_field_errors }}
 
@@ -136,10 +134,10 @@
 
                 <table class="table table-sm table-bordered border-primary-subtle table-responsive mb-1">
                   <tbody class="text-center">
-                    {% if applyUser.approvedStatus_int == 1 %}<tr class="table-info"> {% endif %}
-                    {% if applyUser.approvedStatus_int == 3 %}<tr class="table-danger"> {% endif %}
+                    {% if applyUser.addStatus == 1 %}<tr class="table-info"> {% endif %}
+                    {% if applyUser.addStatus == 3 %}<tr class="table-danger"> {% endif %}
                       <th scope="col" width="36%" class="table-primary" style="text-align:left;">承認状況</th>
-                      <td style="text-align: right;">{{ applyUser.approvedStatus_char }}</td></tr>
+                      <td style="text-align: right;">{{ applyUser.addStatus_char }}</td></tr>
                     <tr>
                       <th scope="col" width="36%" class="table-primary" style="text-align:left;">申請者</th>
                       <td style="text-align: right;">{{ applyUser.userName }}さん</td></tr>
@@ -165,12 +163,14 @@
                         {% if applyUser.canApproveAll %} 権限あり {% else %} 権限なし {% endif %}
                       </td></tr>
                     <tr>
-                      <th width="24%" class="table-primary" style="text-align: left;">参加承認</th>
+                      <th width="24%" class="table-primary" style="text-align: left;">
+                        各種変更</th>
                       <td style="text-align: right;">
-                        {% if applyUser.canApproveAdd %} 権限あり {% else %} 権限なし {% endif %}
+                        {% if applyUser.canApproveChg %} 権限あり {% else %} 権限なし {% endif %}
                       </td></tr>
                     <tr>
-                      <th width="24%" class="table-primary" style="text-align: left;">Ｑｐａｙ</th>                  
+                      <th width="24%" class="table-primary" style="text-align: left;">
+                        QPAY</th>                  
                       <td style="text-align: right;">
                         {% if applyUser.canApproveQpay %} 権限あり {% else %} 権限なし {% endif %}
                       </td>
@@ -225,6 +225,10 @@
     /* Bootstrapのスタイルを上書きするために!importantを使用する場合がある */
   }
 </style>
+
+{% endblock %}
+
+{% block extrajs %}
 
 <script>
 

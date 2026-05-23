@@ -59,12 +59,11 @@
     {% if flag_step == 1 %}
 
       <div class="d-flex justify-content-center mt-5">
-        <h5 class="text-secondary">
-          <b> 申請内容のご入力</b></h5>
-        <i class="bi bi-pencil-square" style="font-size:1.8em; color:deeppink;"></i>
+        <h5 class="text-secondary"><b>申請内容のご入力</b></h5>
+        <span class="ms-2">{% bs_icon 'pencil-square' color='deeppink' size='1.8em' %}</span>
       </div>
 
-      <div class="row justify-content-center mt-1">
+      <div class="row justify-content-center mt-2">
         <div class="col-lg-10 col-xl-9 col-xxl-8">
 
           <form method="POST"
@@ -197,10 +196,16 @@
 
           
             <div class="d-flex justify-content-center mt-5">
-              <button type="submit" class="btn btn-primary w-100"
+              <a href="{% url 'accounts:mypage_seller' %}" type="button"
+                class="btn btn-outline-primary w-50 me-1">
+                戻る
+              </a>
+
+              <button type="submit" class="btn btn-primary w-50 ms-1"
                 name="next"
                 value="ToConfirm_{{sellUser.id}}_{{sellEntity.id}}">
-                入力内容確認へ</button>
+                入力内容確認へ
+              </button>
             </div>
             <!--<button type="submit" class="btn btn-outline-secondary" name="next" value="back">一覧に戻る</button> -->
             <!-- <input type="hidden" name="next" value="{{ next }}" /> -->
@@ -269,11 +274,11 @@
             <hr>
 
             <div class="d-flex justify-content-center">
-              <button type="submit" class="btn btn-outline-primary w-50 me-2"
+              <button type="submit" class="btn btn-outline-primary w-50 me-1"
                 name="next"
                 value="BackToInput_{{sellUser.id}}_{{sellEntity.id}}_{{tx.id}}">
                 戻る</button>
-              <button type="submit" class="btn btn-primary w-50"
+              <button type="submit" class="btn btn-primary w-50 ms-1"
                 name="next"
                 value="ToEvidenceSelect_{{sellUser.id}}_{{sellEntity.id}}_{{tx.id}}">
                 証明書アップロードへ</button>

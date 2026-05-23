@@ -4,62 +4,103 @@
 
 {% block content %}
 
-<div class="position-fixed bottom-0 start-50 translate-middle-x mb-2 d-flex gap-3"
-  style="z-index: 1000; width: max-content;">
+<div class="d-flex gap-1 position-fixed bottom-0 start-50 translate-middle-x mb-5"
+  style="z-index:1000; margin-left: -6px;">
+
   <a href="{% url 'accounts:login_buyer' %}"
-    class="btn btn-primary btn-lg rounded-1 shadow"
-    style="font-size:1.2em;">他のサービスと違うの？</a>
+    class="btn btn-primary btn-lg rounded-1 px-0 mx-0 shadow"
+    style="font-size:1.05em; max-height:45px; min-width:190px;"
+    data-bs-toggle="modal"
+    data-bs-target="#imageModal">
+    何が違うの？</a>
+    
   <a href="{% url 'accounts:login_buyer' %}"
-    class="btn btn-primary btn-lg rounded-1 shadow"
-    style="font-size:1.2em;">キユーニーを利用してみる</a>
+    class="btn btn-primary btn-lg rounded-1 px-0 mx-0 shadow"
+    style="font-size:1.05em; max-height:45px; min-width:200px;">
+    キユーニーを利用する</a>
 </div>
 
 
-<div class="container-fluid m-0 p-0"
-  style="position:relative">
+<!-- モーダル・ダイアログ -->
+<div class="modal fade"
+  id="imageModal" tabindex="-1" aria-hidden="true">
 
-<!-- <section class="home-slider" id="home"> -->
-  
-  <div class="ParaImage-left bg1">
 
-    <div class="bg-overlay2"></div>
-    <div class="copy-wrapper align-items-start pt-5 px-0">
-      <div class="row justify-content-center mt-5">
-        <div class="container text-center">
+  <div class="modal-dialog"> <!-- 大きさ指定なしは「Medium」その他、sm/lg/xl-->
+    <div class="modal-content">
+      <div class="modal-header">
 
-          <p class="copy-head mt-4"
-            id="page1-copy-head"
-            style="color: #fff;
-              display:inline-block;
-              background-image: linear-gradient(90deg, rgb(150, 127, 195), rgb(147, 171, 226) 50%, #fff 50%, #fff);
-              background-size:200% 100%;
-              padding:.5rem 1rem;">
-            キユーニーが報酬を前払いします
-          </p>
-        </div>
+        <h6 class="modal-title">どこが違うの？</h6>
+          <!-- 閉じるボタン: data-bs-dismiss="modal" が重要 -->
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
 
-        <p class="copy-body-m mt-4" id="page1-copy-body1">
-          <br>
-          報酬が早くほしい！ <br>
-          発注先からそんなご相談ありませんか？<br>
-          <br>
-          フリーランスはカードや銀行の審査が厳しい、<br>
-          ファクタリングは手数料が高かったりするため<br>
-          会社勤めの方と比べて多くの不安があります <br>
-          <br>
-          わたしたちのパートナーとしてその不安を解消し、
-          <br>
-          フリーランスとよりよい関係を築きませんか？
-          <br>
-        </p>
-        <p class="copy-body-l" id="page1-copy-body2" >
-          キユーニーが前払いをいたします
+      <div class="modal-body p-0">
+        <img src="{% static 'images/aboutQneePay_forPartner_1_20260504.png' %}"
+          class="img-fluid py-0" alt="拡大画像">
+      </div>
 
-        </p>
+      <div class="modal-body mt-1 p-0">
+        <img src="{% static 'images/aboutQneePay_forPartner_2_20260504.png' %}"
+          class="img-fluid" alt="拡大画像">
       </div>
 
     </div>
+  </div>
+</div>
 
+
+<div class="container-fluid p-0 m-0 position-relative">
+
+<!-- <section class="home-slider" id="home"> -->
+  
+  <div class="ParaImage-left bg1 p-0 m-0 text-center" style="width:100vw">
+
+    <div class="bg-overlay2"></div>
+
+
+    <div class="container" style="height:100%;">
+
+      <div class="row mt-4 pt-2 px-3" 
+        id="page1-copy-head"
+        style="color: #fff;
+        display: inline-block;
+        font-size: clamp(1.2em, 1.0em + 0.7vh, 2.0em);
+        background-image: linear-gradient(90deg, rgb(150, 127, 195), rgb(147, 171, 226) 50%, #fff 50%, #fff);
+        background-size: 200% 100%;">
+        <p class="text-center"><b>キユーニーが報酬を前払い</b></p>
+      </div>
+
+      <div class="container mt-3" style="height:100%;">
+        <div class="row text-center pt-5"
+          style="color: #fff;
+            font-size: clamp(1.0em, 0.9em + 0.7vh, 2.0em);"
+          id="page1-copy-body1">
+          <p class="text-center">
+            報酬が早くほしい！ <br>
+            委託先からそんなご相談ありませんか？<br>
+            <br>        
+            フリーランスにおいては、<br>
+            カードや銀行の審査が厳しい、<br>
+            ファクタリングは手数料が高い、<br>
+            そんな状況かもしれません。<br>
+          </p>
+        </div>
+
+       <div class="row text-center"
+          style="color: #fff;
+          font-size: clamp(1.0em, 0.9em + 0.7vh, 2.0em);"
+          id="page1-copy-body2" >
+          <p class="text-center">
+            フリーランスの働く環境を支援し、<br>
+            よりよい関係を築きませんか？<br>
+            <br>
+            キユーニーが報酬を前払いいたします
+          </p>
+        </div>
+
+      </div>
+    </div>
   </div>
 
   <div class="ParaContent">
@@ -78,8 +119,9 @@
     </video>
     <!-- <h2>Vedio Background Parallax</h2>-->
 
-    <div class="row justify-content-center text-white">
-      <div class="copy-wrapper px-0 ">
+    <div class="row justify-content-center text-white pt-5">
+
+      <div class="copy-wrapper pt-5 px-0">
 
         <div class="copy">
           <div class="container text-center">
@@ -89,8 +131,8 @@
                 display:inline-block;
                 background-image: linear-gradient(90deg, rgb(150, 127, 195), rgb(147, 171, 226) 50%, #fff 50%, #fff);
                 background-size:200% 100%;
-                padding:.5rem 1rem;">
-              　皆さまへのお願い　
+                padding:0.5em 1.5em;">
+              皆さまへのお願い
             </p>
           </div>
   
@@ -99,10 +141,9 @@
           </p> -->
 
           <p class="copy-body-m" id="page2-copy-body1">
-            <br>
             キユーニーのパートナーとなって、<br>
             フリーランスをご紹介いただけませんか？<br>
-            <br><br>
+            <br>
           </p>
 
           <div class="container text-center">
@@ -112,8 +153,8 @@
                 display:inline-block;
                 background-image: linear-gradient(90deg, rgb(150, 127, 195), rgb(147, 171, 226) 50%, #fff 50%, #fff);
                 background-size:200% 100%;
-                padding:.5rem 1rem;">
-              キユーニーが報酬を前払いします
+                padding:0.5rem 1.5rem;">
+              キユーニーが報酬を前払い
             </p>
           </div>
 
@@ -125,8 +166,9 @@
             <br>
             フリーランスはすぐに報酬を手にし、<br>
             <br>
-            あなたの会社は、①フリーランスとの良い関係と<br>
-            ②キユーニーからのご確認の謝礼金を手にします<br>
+            あなたの会社が手にするのは、<br>
+            ①フリーランスとの良い関係と<br>
+            ②キユーニーからのご確認の謝礼金<br>
             <br><br><br>
           </p>
         </div>
@@ -155,47 +197,49 @@
               id="page3-copy-head"
               style="line-height:50px;">謝礼金と基本料金</p>
             <p class="copy-body-m" id="page3-copy-body1">
-              <br>
-              ベータ（β）版運用期間は基本料金なし<br>
+              ベータ（β）版運用期間は基本料ゼロ<br>
             </p>
             <p class="copy-body-m" id="page3-copy-body2">
-              フリーランスからの申請内容のご確認に対し、<br>
-              キユーニーが謝礼をお支払いいたします。<br>
+              フリーランスの申請内容のご確認に、<br>
+              キユーニーが謝礼をお支払いします。<br>
 
             </p>
             <p class="copy-body-m" id="page3-copy-body3">
-              いまなら優待特典として、はじめの３か月は<br>
-              ①ご確認の謝礼金が3倍、②基本料金が無料<br>
+              優待特典として、β版運用期間は、<br>
+              ①ご確認の謝礼金2倍、②基本料金ゼロ<br>
             </p>
           </div>
         </div>
 
-        <div class="row justify-content-center mt-4">
-          <div class="col-11 col-md-8 col-lg-8 col-xl-6">
-            <table class="table table-striped table-bordered table-responsive bg-light">
+        <div class="row justify-content-center mt-4 mx-1">
+          <div class="col-md-7 col-lg-6 col-xl-5">
+            <table class="table table-sm table-striped table-bordered table-responsive bg-light px-0">
 
               <tbody class="text-center">
                 <thead>
                   <tr class="table-primary" style="text-align:center">
-                    <th width="30%"></th>
-                    <th width="37%" style="text-align:center; vertical-align:middle;">ご確認の謝礼金</th>
-                    <th width="38%" style="text-align:center; vertical-align:middle;">基本料金</th>
+                    <th width="24%"></th>
+                    <th width="30%" style="text-align:center; vertical-align:middle;">
+                      基本料金</th>
+                    <th width="46%" style="text-align:center; vertical-align:middle;">
+                      ご確認の謝礼金</th>
+
                   </tr>
                 </thead>
+
                 <tr class="table-danger">
-                  <td width="25%" style="vertical-align:middle;">はじめの3か月</td>
-                  <td width="37%" style="text-align:center; vertical-align:middle;">前払い額の1.5%</td>
-                  <td width="38%" style="text-align:center; vertical-align:middle;">無料</td>
+                  <td width="24%" style="vertical-align:top;">
+                    β版期間<br><span style="font-size:0.7em">(～2027年)</span></td>
+                  <td width="30%" style="text-align:center; vertical-align:top;">月額 0円</td>
+                  <td width="46%" style="text-align:center; vertical-align:top;" class="px-0">
+                    前払い額の1.0%<br><span style="font-size:0.7em">※ユーザー初回利用時ゼロ</span></td>
                 </tr>
                 <tr>
-                  <td width="25%" style="vertical-align:middle;">β版運用期間<br>(～2027年)</td>
-                  <td width="37%" style="text-align:center; vertical-align:middle;">前払い額の1.0%</td>
-                  <td width="38%" style="text-align:center; vertical-align:middle;">月額0円</td>
-                </tr>
-                <tr>
-                  <td width="25%" style="vertical-align:middle;">通常価格</td>
-                  <td width="37%" style="text-align:center; vertical-align:middle;">前払い額の0.5%</td>
-                  <td width="38%" style="text-align:center; vertical-align:middle;">月額5000円</td>
+                  <td width="24%" style="vertical-align:top;" class="px-0">通常価格</td>
+                  <td width="30%" style="text-align:center; vertical-align:top;" class="px-0">
+                    月額5000円</td>
+                  <td width="46%" style="text-align:center; vertical-align:top;">
+                    前払い額の0.5%</td>
                 </tr>
 
               </tbody>
@@ -207,9 +251,10 @@
   </div>
 
 </div>
-
 <!-- </section> -->
+{% endblock %}
 
+{% block extrajs %}
 
 <script>
 

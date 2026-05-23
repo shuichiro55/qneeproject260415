@@ -13,22 +13,40 @@ UserModel = get_user_model()
 
 
 period_CHOICES = [
-  ("0", "日付で指定"),
-  ("3D", "3日以内の申請"),
-  ("1W", "1週間以内の申請"), ("2W", "2週間以内の申請"),
-  ("1M", "1ヶ月以内の申請"), ("3M", "3ヶ月以内の申請"),
-  ("6M", "6ヶ月以内の申請"), ("1Y", "1年以内の申請"),
+  ("0", "－"),
+  ("2W", "2週間内の申請"),
+  ("1M", "1ヶ月内の申請"), ("3M", "3ヶ月内の申請"),
+  ("6M", "6ヶ月内の申請"), ("1Y", "1年内の申請"),
 ]
+from django.forms import Select, SelectMultiple
 
 class TxPeriodSetForm(forms.Form):
    
   applyPeriod = forms.ChoiceField(label="申請時点",
     choices=period_CHOICES,
     required=False,
-    widget=forms.RadioSelect)
+    widget=forms.Select)
   
   applyPeriod_start = forms.DateField(label="開始日", required=False)
   applyPeriod_end = forms.DateField(label="終了日", required=False)
+
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+
+    # フィールドの属性をループで一括設定
+    for field_name, field in self.fields.items():
+      # ウィジェットのインスタンス判定
+      widget_type = field.widget
+            
+      # セレクトボックス(1つ選択)と複数選択セレクトボックスの判定
+      if isinstance(widget_type, (Select, SelectMultiple)):
+        field.widget.attrs['class'] = 'custom-select-center'
+      else:
+        # テキストエリア、Input、Dateなどその他
+        field.widget.attrs['class'] = 'form-control form-control-sm'
+
+        #for field in self.fields.values():
+        #    field.widget.attrs['class'] = 'form-select form-select-sm'
 
 class TxCreateForm(forms.ModelForm):
 
@@ -50,7 +68,7 @@ class TxCreateForm(forms.ModelForm):
   def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
-            field.widget.attrs['class'] = 'form-control'
+            field.widget.attrs['class'] = 'form-control form-control-sm'
             field.widget.attrs['placeholder'] = field.label        
 
 

@@ -16,7 +16,7 @@
     <meta name="author" content="富張周一郎" />
 
     <!-- favicon -->
-    <link rel="shortcut icon" href="{% static 'images/qnee.ico' %}" />
+    <link rel="shortcut icon" href="{% static 'images/icon_qnee.ico' %}" />
 
     <!-- font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -24,101 +24,67 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Sawarabi+Gothic&display=swap" rel="stylesheet">
 
     <!-- Bootstrap CSS -->
-    {% block css %}       
-    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" type="text/css" />
-    <link href="{% static 'css/swiper-bundle.min.css' %}" rel="stylesheet" type="text/css" />
-    <link href="{% static 'css/style.min.css' %}" rel="stylesheet" type="text/css" />
-    <link href="{% static 'css/colors/default.css' %}" rel="stylesheet" type="text/css" id="color-opt" />
+    {% block css %}
 
+    <!-- icons -->
     <link href="{% static 'css/bootstrap-icons.css' %}" rel="stylesheet" />
     <link href="{% static 'css/materialdesignicons.min.css' %}" rel="stylesheet" type="text/css" />
+
+    <!-- Main CSS File -->
+    <link href="{% static 'css/main.css' %}" rel="stylesheet">
+
+    <!-- Custom Css -->
+    <link href="{% static 'css/style.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'css/colors/default.css' %}" rel="stylesheet" type="text/css" id="color-opt" />
+
+    <!-- Swiper Slider css -->
+    <link href="{% static 'css/swiper-bundle.min.css' %}" rel="stylesheet" type="text/css" />
+
+
     {% endblock %}
     
   </head>
 
 
-  <body data-bs-spy="scroll" data-bs-target="#navbar-navlist" data-bs-offset="60">
-  
-    <!-- page Loader
-    <div id="preloader">
-      <div id="status">
-        <div class="load">
-          <hr />
-          <hr />
-          <hr />
-          <hr />
-          </div>
-      </div>
+  <body
+    class="p-0" 
+    data-bs-spy="scroll" data-bs-target="#navbar-navlist" data-bs-offset="70">
+  <!-- data-bs-offset="60" スクロールスパイ等を利用しているとき、 
+      ナビバーが固定（fixed）されている場合、 コンテンツのスクロール位置がナビバーに
+      隠れないよう、見出しの表示位置を60px下（または上）に調整する際に使われます。
+  -->
+
+    <!--
+    <div class="position-fixed top-0 start-0"
+      style="position:relative; z-index:1040; width: max-content; margin:10px 148px;">
+      <a href="#">
+        <img src="{% static 'images/lovebird.png' %}" alt="" height="50"></a>  
     </div>
-  
     -->
-    {% block navbar %}
-      {% include 'partials/navbar.html' %}
-    {% endblock %}
 
-    {% block home %}
-    {% endblock %}
-
-    {% block features %}
-      {% include 'partials/features.html' %}
-    {% endblock %}
-
-    {% block process %}
-      {% include 'partials/process.html' %}
-    {% endblock %}
-    
-    {% block pricing %}
-      {% include 'partials/pricing.html' %}
-    {% endblock %}
-
-    {% block clients %}
-      {% include 'partials/clients.html' %}
-    {% endblock %}
-
-    {% block faq %}
-      {% include 'partials/faq.html' %}
-    {% endblock %}
-
-    {% block contact %}
-      {% include 'partials/contact.html' %}
-    {% endblock %}
-
-    {% block footer %}
-      {% include 'partials/footer.html' %}
-    {% endblock %}
-
-    {% block modal %}
-      {% include 'partials/modal.html' %}
-    {% endblock %}
-
-    {% block subscribe_modal %}
-      {% include 'partials/subscribe-modal.html' %}
-    {% endblock %}
-
-    {% block switcher %}
-      {% include 'partials/switcher.html' %}
-    {% endblock %}
+    {% block home %}{% endblock %}
 
     <!--start back-to-top-->
     <button onclick="topFunction()" id="back-to-top">
       <i class="mdi mdi-arrow-up"></i>
     </button>
-  
+
+    <!-- 表示速度の観点でJavaScript関連は<body>内の最後に読み込み -->
+
     <!-- JavaScript js -->
-    {% block javascript %}
     <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
-    <script src="{% static 'js/swiper-bundle.min.js' %}"></script>
     <script src="{% static 'js/contact.js' %}"></script>
     <script src="{% static 'js/index.init.js' %}"></script>
+    <script src="{% static 'js/swiper-bundle.min.js' %}"></script>
     <script src="{% static 'js/app.js' %}"></script>
-  
+    
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
 
     <!-- <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script> -->
     <!-- <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script> -->
 
-    {% endblock %}
+    {% block extrajs %}{% endblock %}
 
   </body>
 

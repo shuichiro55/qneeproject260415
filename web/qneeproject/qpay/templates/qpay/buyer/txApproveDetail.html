@@ -101,7 +101,7 @@
                   id="imageModal" 
                   tabindex="-1" aria-hidden="true"> 
                   <!-- 「id」を上記「data-bs-target」に合わせる。「tabindex」は「Esc」で閉じる -->
-                  <div class="modal-dialog"> <!-- 大きさ指定なしは「Medium」 -->
+                  <div class="modal-dialog"> <!-- modal-sm/lg/xl/xxl 大きさ指定なしは「Medium」 -->
                     <div class="modal-content">
                       <div class="modal-header">
                         <h6 class="modal-title">証明書類</h6>
@@ -141,7 +141,23 @@
           {% endif %}
 
           <div class="row justify-content-center">
-            <div class="col-8 pe-0">
+
+            <div class="col-4 pe-0">
+              <form method="GET"
+                action="{% url 'qpay:txApprove_buyer' %}"
+                class="m-0 p-0"
+                style="background-color: transparent !important; border-color:transparent !important;">
+                {% csrf_token %}
+
+                <button
+                  type="submit"
+                  class="btn btn-outline-primary w-100 p-2">
+                  一覧へ
+                </button>
+              </form>
+            </div> <!-- end of col -->
+
+            <div class="col-8 ps-1">
               <form method="POST"
                 action="{% url 'qpay:txApproveDetail_buyer' tx.pk %}"
                 id="id_PostForm"
@@ -170,20 +186,6 @@
               </form>
             </div>
 
-            <div class="col-4 ps-1">
-              <form method="GET"
-                action="{% url 'qpay:txApprove_buyer' %}"
-                class="m-0 p-0"
-                style="background-color: transparent !important; border-color:transparent !important;">
-                {% csrf_token %}
-
-                <button
-                  type="submit"
-                  class="btn btn-outline-primary w-100 p-2">
-                  一覧へ
-                </button>
-              </form>
-            </div> <!-- end of col -->
           </div> <!-- end of row -->
 
       </div> <!-- end of col -->
@@ -203,6 +205,10 @@
         padding-top: 20%;
     }*/
 </style>
+
+{% endblock %}
+
+{% block extrajs %}
 
 <script>
 

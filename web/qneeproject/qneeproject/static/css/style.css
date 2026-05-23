@@ -26,12 +26,13 @@
 *****************************************/
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
-
 body {
   font-family: "Sawarabi Gothic","Noto Sans","Inter", sans-serif;
   color: #25272b;
   font-size: 15px;
   margin: 0;
+  padding-left: 0;
+  padding-right: 0;
   padding-top: 70px;
 }
 
@@ -192,10 +193,7 @@ html {
 .bg-overlay {
   position: absolute;
   background-color: rgba(48, 58, 69, 0.7);
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
+  inset: 0; /*left: 0; right: 0; top: 0; bottom: 0; */
 }
 
 .bg-overlay2 {
@@ -1385,7 +1383,7 @@ ul.pattern .color6 {
 }
 
 .form-control {
-  padding: 8px 18px;  /* 元は12px 20px;*/
+  padding: 7px 18px;  /* 元は12px 20px;*/
   border-color: rgba(37, 39, 43, 0.2);
   -webkit-box-shadow: rgba(149, 157, 165, 0.08) 0px 8px 24px;
           box-shadow: rgba(149, 157, 165, 0.08) 0px 8px 24px;
@@ -1396,7 +1394,6 @@ ul.pattern .color6 {
           box-shadow: rgba(149, 157, 165, 0.08) 0px 8px 24px;
   border-color: #3f8efc;
 }
-
 .form-control::-webkit-input-placeholder {
   color: #ced4da;
 }
@@ -1411,6 +1408,45 @@ ul.pattern .color6 {
 
 .form-control::placeholder {
   color: #ced4da;
+}
+
+/* 260426追加 form-selectにホバーを追加 */
+.form-select:hover {
+  -webkit-box-shadow: rgba(149, 157, 165, 0.08) 0px 8px 24px;
+          box-shadow: rgba(149, 157, 165, 0.08) 0px 8px 24px;
+  border-color: #3f8efc;
+}
+
+
+/* 260426追加*/
+.custom-select-center {
+  width: 100%;
+  padding: 7px 18px;  /* 元は12px 20px;*/
+  border-radius: 5px;
+  border-color: rgba(37, 39, 43, 0.2); 
+  -webkit-box-shadow: rgba(149, 157, 165, 0.08) 0px 8px 24px;
+          box-shadow: rgba(149, 157, 165, 0.08) 0px 8px 24px;
+  text-align-last: center; /* セレクトボックス内のテキストをセンターに */
+}
+
+.custom-select-center:focus {
+  -webkit-box-shadow: rgba(149, 157, 165, 0.08) 0px 8px 24px;
+          box-shadow: rgba(149, 157, 165, 0.08) 0px 8px 24px;
+  border-color: #3f8efc;
+}
+
+
+/* 260426追加*/
+.custom-select-center:focus {
+  -webkit-box-shadow: rgba(149, 157, 165, 0.08) 0px 8px 24px;
+          box-shadow: rgba(149, 157, 165, 0.08) 0px 8px 24px;
+  border-color: #3f8efc;
+}
+
+.custom-select-center:hover {
+  -webkit-box-shadow: rgba(149, 157, 165, 0.08) 0px 8px 24px;
+          box-shadow: rgba(149, 157, 165, 0.08) 0px 8px 24px;
+  border-color: #3f8efc;
 }
 
 .contact-form .input-group-text {
@@ -1494,18 +1530,21 @@ ul.pattern .color6 {
   opacity: 1;
 }
 
-.bg-blog {
+/*
+.bg-mission {
   padding: 190px 0 120px 0;
+  height: 500px;
   position: relative;
-  background-image: url("../images/blog/bg-blog.jpg");
+  background-image: url("static/images/bg-mission.jpg");
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
 }
 
-.bg-blog .bg-overlay {
+.bg-mission .bg-overlay {
   background-color: rgba(25, 34, 45, 0.7);
 }
+*/
 
 .breadcrumb .breadcrumb-item a {
   /*color: #a1a1a1; もともとはffffffだった */
@@ -1517,11 +1556,17 @@ ul.pattern .color6 {
   color: #fc3fa7; /* もともと#3f8efc; */
 }
 
+/*
 .breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+  content: var(--bs-breadcrumb-divider, "＞") !important;
+}
+*/
+
+.breadcrumb-item + .breadcrumb-item::before {
   float: left;
   padding-right: 0.25rem;
   color: #a1a1a1; /* #f8f9fa */
-  content: var(--bs-breadcrumb-divider, "＞");
+  content: var(--bs-breadcrumb-divider, "＞") !important;
 }
 
 .date-box {
@@ -1682,22 +1727,6 @@ ul.pattern .color6 {
 
 /* ★25/03/02 動画を背景とするために試験的に追加*/
 
-@media (min-width: 1200px) {
-  .ParaImage-left {
-	  width: 100%;
-	  height: 100vh;
-    /* background-color: #000; */
-	  background-attachment: fixed;
-	  /*background-size: auto 100%;*/
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-color: #2399CB;
-
-    /*position: relative;*/
-	  /*padding: 100% 0px;*/
-  }
-}
 @media (max-width: 1200px) {
   .ParaImage-left {
 	  width: 100%;
@@ -1712,6 +1741,24 @@ ul.pattern .color6 {
 
     position: relative;
 
+	  /*padding: 100% 0px;*/
+  }
+}
+
+
+@media (min-width: 1200px) {
+  .ParaImage-left {
+	  width: 100%;
+	  height: 100vh;
+    /* background-color: #000; */
+	  background-attachment: fixed;
+	  /*background-size: auto 100%;*/
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: #2399CB;
+
+    /*position: relative;*/
 	  /*padding: 100% 0px;*/
   }
 }
@@ -1781,7 +1828,7 @@ ul.pattern .color6 {
 
 .copy-wrapper {
   height: 100vh;
-  display: flex;
+  /*display: flex;*/
   justify-content: center;
   align-items: center;
 }
@@ -1793,7 +1840,7 @@ ul.pattern .color6 {
 .copy-head {
   color: #fff;
   /* font-size: 30px; */
-  font-size: clamp(1.2rem, 0.8rem + 1.2vw, 1.5rem);
+  font-size: clamp(1.2em, 2vw + 0.8em, 1.4em);
   text-shadow: 1px 1px 20px #000;
   font-weight: bold;
 
@@ -1805,14 +1852,14 @@ ul.pattern .color6 {
 .copy-body-m {
   color: #fff;
   /* font-size: 20px; */
-  font-size: clamp(1.2rem, 0.7rem + 1vw, 1.2rem);
+  font-size: clamp(1.0em, 0.9em + 1.0vw, 1.2em);
   text-shadow: 1px 1px 20px #000;
   text-align: center;
 }
 .copy-body-l{
   color: #fff;
   /* font-size: 20px; */
-  font-size: clamp(0.94rem, 0.74rem + 1vw, 1.25rem);
+  font-size: clamp(1.0em, 2vw + 0.7em, 1.2em);
   text-shadow: 2px 2px 20px #000;
   text-align: center;
 }
@@ -1828,6 +1875,8 @@ ul.pattern .color6 {
 
 .bg1 {
 	background-image: url('../images/qconnect/bg-productLP-buyer1_6.jpg');
+  inset: 0;
+  width: 100%;
 }
 
 .bg2 {
@@ -1898,6 +1947,10 @@ ul.pattern .color6 {
     position: relative;
 }
 */
+.bg-dark-blue {
+    background-color: #003366; /* 濃い青色 */
+    color: white; /* 文字色を白に */
+}
 
 .MenuBtn1 {
   width: 100%;
@@ -2051,9 +2104,12 @@ ul.pattern .color6 {
   top: 0; left: 0; width: 100%; height: 100%;
   background: rgba(255, 255, 255, 0.8);
   z-index: 9999;
+  
+  
   text-align: center;
   padding-top: 20%;
 }
+
 
 /* 260310 追加 */
 /*

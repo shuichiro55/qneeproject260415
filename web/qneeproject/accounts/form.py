@@ -2,7 +2,7 @@ from django import forms
 from django.db import models
 from django.contrib.auth.forms import \
   AuthenticationForm, UserCreationForm, PasswordChangeForm, SetPasswordForm
-from .models import CustomUser, LegalEntity, BankAccount 
+from .models import CustomUser, LegalEntity, BankAccount, CorpInfo
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
@@ -432,6 +432,19 @@ class PermissionUpdateForm_buyer(forms.Form):
     #for field in self.fields.values():
     #  field.widget.attrs['class'] = 'form-check form-switch'
 
+# 260501追加 
+class PermissionUpdateForm_admin(forms.Form):
+ 
+  canApproveAll = forms.BooleanField(label='承認権限（全部）')
+  canApproveAdd = forms.BooleanField(label='承認権限（参加）')
+  canApproveQpay = forms.BooleanField(label='承認権限（Qpay）')
+
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+    #for field in self.fields.values():
+    #  field.widget.attrs['class'] = 'form-check form-switch'
+
+
 # ★★ 250929 エンティティを選択するケースがカバーされていない
 class EntitySetForm_seller(forms.Form):
 
@@ -622,7 +635,6 @@ class EntityCreateForm_seller(forms.Form):
       return address3
     else:
       raise forms.ValidationError('この項目は必須となります。ご入力お願いたします。')
-
 
   #個人用の項目
   def clean_lastName(self):
@@ -832,3 +844,311 @@ class MyPasswordResetForm(SetPasswordForm):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
             field.widget.attrs['class'] = 'form-control'
+
+
+class ProfileEditForm_buyer(forms.Form):
+
+  """ パートナー情報 """
+  entityName = forms.CharField(label='取引主体名', max_length=100)
+  representitive = forms.CharField(label='代表者名', max_length=100)
+  tel_entity = forms.CharField(label='電話番号（代表）', max_length=30)
+
+  zip_entity = forms.CharField(label='郵便番号', max_length=15)
+  address1 = forms.CharField(label='郵便番号', max_length=30)
+  address2 = forms.CharField(label='郵便番号', max_length=20)
+  address3 = forms.CharField(label='郵便番号', max_length=30)
+
+  """ ユーザー情報 """
+  lastName = forms.CharField(label='姓（last name）', max_length=50, required=True, validators=[name_validator])
+  firstName = forms.CharField(label='名（first name）', max_length=50, required=True, validators=[name_validator])
+  lastName_kana = forms.CharField(label='姓（フリガナ）', max_length=50, required=True, validators=[name_validator])
+  firstName_kana = forms.CharField(label='名（フリガナ）', max_length=50, required=True, validators=[name_validator])
+
+  tel_user = forms.CharField(label='電話番号（直通）', max_length=30)
+  department = forms.CharField(label='部署名', max_length=100)
+  title = forms.CharField(label='役職名', max_length=100)
+
+  def __init__(self, *args, **kwargs, ):
+    #self.nextCase = kwargs.pop('nextCase', None)
+    # 260103 ①パートナー追加と②ユーザー追加の場合に分ける
+ 
+    super().__init__(*args, **kwargs)
+      
+    for field in self.fields.values():
+      field.widget.attrs['class'] = 'form-control'
+
+    # 注釈が必要な項目だけ
+    self.fields['lastName'].widget.attrs['placeholder'] = '例：山田'
+    self.fields['firstName'].widget.attrs['placeholder'] = '例：太郎'
+    self.fields['lastName_kana'].widget.attrs['placeholder'] = '例：ヤマダ'
+    self.fields['firstName_kana'].widget.attrs['placeholder'] = '例：タロウ'
+
+    self.fields['tel_entity'].widget.attrs['placeholder'] = '数字のみご記載ください。'
+    self.fields['zip_entity'].widget.attrs['placeholder'] = '数字のみご記載ください。'
+    self.fields['tel_user'].widget.attrs['placeholder'] = '数字のみご記載ください。'
+  
+  def clean_entityName(self):
+    input = self.cleaned_data['entityName']
+
+    if input != None or input !="":
+      return unicodedata.normalize('NFKC', input)
+
+    else:
+      raise forms.ValidationError('この項目は必須となります。ご入力お願いたします。')
+
+  def clean_representitive(self):
+    input = self.cleaned_data['representitive']
+    if input != None and input != "":
+      return unicodedata.normalize('NFKC', input)   
+    else:
+      raise forms.ValidationError('この項目は必須となります。ご入力お願いたします。')
+
+
+  def clean_tel_entity(self):
+    input = self.cleaned_data['tel_entity']
+    if input != None and input != "":
+      input = input.translate(tran_zen_han)
+      input = unicodedata.normalize('NFKC', ''.join(re.findall('[0-9０-９]+', input)))
+      print(f'tel_entity:{input}（clean_tel_entity. in class ProfileEditForm_buyer）')
+      return input
+    else:
+      raise forms.ValidationError('この項目は必須となります。ご入力お願いたします。')
+
+  def clean_zip_entity(self):
+    if self.cleaned_data['zip_entity'] is not None:
+      zip_entity = self.cleaned_data['zip_entity'].translate(tran_zen_han)
+      zip_entity = unicodedata.normalize('NFKC', ''.join(re.findall('[0-9０-９]+', zip_entity)))
+      return zip_entity
+    else:
+      raise forms.ValidationError('この項目は必須となります。ご入力お願いたします。')
+
+  def clean_address1(self):
+    address1 = self.cleaned_data.get('address1')
+    print(f'self.cleaned_data[address1]={address1} (in ProfileEditForm_buyer)')
+    if address1 is None :
+      raise forms.ValidationError('この項目は必須となります。ご入力お願いたします。')
+    return address1
+  
+  def clean_address2(self):
+    if self.cleaned_data['address2'] is not None:
+      address2 = self.cleaned_data['address2'].translate(tran_zen_han)
+      return address2
+    else:
+      raise forms.ValidationError('この項目は必須となります。ご入力お願いたします。')
+
+  def clean_address3(self):
+    if self.cleaned_data['address3'] is not None:
+      address3 = self.cleaned_data['address3'].translate(tran_zen_han)
+      address3 = unicodedata.normalize('NFKC', ''.join(re.findall('[0-9０-９]+', address3)))
+      return address3
+    else:
+      raise forms.ValidationError('この項目は必須となります。ご入力お願いたします。')
+
+  def clean_lastName(self):
+    lastName = re.sub("[\u3000 \t]", "", self.cleaned_data['lastName'])
+    return unicodedata.normalize('NFKC', lastName)
+    # unicodedaata.normalize('NFKC',)で「unicodeの正規化」
+    # カタカナは半角を全角に、数字は全角を半角にする
+
+  def clean_lastName_kana(self):
+    lastName_kana = re.sub("[\u3000 \t]", "", self.cleaned_data['lastName_kana']) # スペースとタブを削除
+    lastName_kana = unicodedata.normalize('NFKC', lastName_kana)
+    print(f'lastName_kana={lastName_kana} in def clean_lastName_kana in ProfileEditForm_buyer')
+    if bool(re.search(r'[ァ-ヶ]', lastName_kana)) == False:
+      raise forms.ValidationError('カナ以外の文字が入力されています')
+    return lastName_kana
+  
+    
+  def clean_firstName(self):
+    firstName = re.sub("[\u3000 \t]", "", self.cleaned_data['firstName'])
+    return unicodedata.normalize('NFKC', firstName)
+    # unicodedaata.normalize('NFKC',)で「unicodeの正規化」
+    # カタカナは半角を全角に、数字は全角を半角にする
+
+  def clean_firstName_kana(self):
+    firstName_kana = re.sub("[\u3000 \t]", "", self.cleaned_data['firstName_kana'])
+    firstName_kana = unicodedata.normalize('NFKC', firstName_kana)
+    if bool(re.search(r'[ァ-ヶ]', firstName_kana)) == False:
+      raise forms.ValidationError('カナ以外の文字が入力されています')
+    return firstName_kana
+
+
+  def clean_tel_user(self):
+    if self.cleaned_data['tel_user'] is not None:
+      tel_user = self.cleaned_data['tel_user'].translate(tran_zen_han)
+      tel_user = unicodedata.normalize('NFKC', ''.join(re.findall('[0-9０-９]+', tel_user)))
+      print(f'tel_user:{tel_user}（clean_tel_user. in class ProfileEditForm_buyer）')
+      return tel_user
+    else:
+      raise forms.ValidationError('この項目は必須となります。ご入力お願いたします。')
+
+  def clean_department(self):
+    department = self.cleaned_data['department']
+    print(f'self.cleaned_data[department]={department} (clean_department in ProfileEditForm_buyer)')
+    return unicodedata.normalize('NFKC', department)
+
+  def clean_title(self):
+    title = self.cleaned_data['title']
+    return unicodedata.normalize('NFKC', title)
+
+class InfoEvidenceForm(forms.ModelForm):
+
+  class Meta:
+    model = CorpInfo
+    fields = (
+      'evidence',
+    )
+    #widgets= {'sellUser_userName':forms.HiddenInput(), 'sellEntityName':forms.HiddenInput()}
+
+  # ★全部のフィールドに'form-control'をセットするべきか？ 2025/02/14
+  def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
+            # field.widget.attrs['placeholder'] = field.label
+
+
+class ProfileEditForm_seller(forms.Form):
+
+  """ パートナー情報 """
+  entityName = forms.CharField(label='取引主体名', max_length=100)
+  representitive = forms.CharField(label='代表者名', max_length=100)
+  tel_entity = forms.CharField(label='電話番号（代表）', max_length=30)
+
+  zip_entity = forms.CharField(label='郵便番号', max_length=15)
+  address1 = forms.CharField(label='郵便番号', max_length=30)
+  address2 = forms.CharField(label='郵便番号', max_length=20)
+  address3 = forms.CharField(label='郵便番号', max_length=30)
+
+  """ ユーザー情報 """
+  lastName = forms.CharField(label='姓（last name）', max_length=50, required=True, validators=[name_validator])
+  firstName = forms.CharField(label='名（first name）', max_length=50, required=True, validators=[name_validator])
+  lastName_kana = forms.CharField(label='姓（フリガナ）', max_length=50, required=True, validators=[name_validator])
+  firstName_kana = forms.CharField(label='名（フリガナ）', max_length=50, required=True, validators=[name_validator])
+
+  tel_user = forms.CharField(label='電話番号（直通）', max_length=30)
+  department = forms.CharField(label='部署名', max_length=100)
+  title = forms.CharField(label='役職名', max_length=100)
+
+  def __init__(self, *args, **kwargs, ):
+    #self.nextCase = kwargs.pop('nextCase', None)
+    # 260103 ①パートナー追加と②ユーザー追加の場合に分ける
+ 
+    super().__init__(*args, **kwargs)
+      
+    for field in self.fields.values():
+      field.widget.attrs['class'] = 'form-control'
+
+    # 注釈が必要な項目だけ
+    self.fields['lastName'].widget.attrs['placeholder'] = '例：山田'
+    self.fields['firstName'].widget.attrs['placeholder'] = '例：太郎'
+    self.fields['lastName_kana'].widget.attrs['placeholder'] = '例：ヤマダ'
+    self.fields['firstName_kana'].widget.attrs['placeholder'] = '例：タロウ'
+
+    self.fields['tel_entity'].widget.attrs['placeholder'] = '数字のみご記載ください。'
+    self.fields['zip_entity'].widget.attrs['placeholder'] = '数字のみご記載ください。'
+    self.fields['tel_user'].widget.attrs['placeholder'] = '数字のみご記載ください。'
+  
+  def clean_entityName(self):
+    input = self.cleaned_data['entityName']
+
+    if input != None or input !="":
+      return unicodedata.normalize('NFKC', input)
+
+    else:
+      raise forms.ValidationError('この項目は必須となります。ご入力お願いたします。')
+
+  def clean_representitive(self):
+    input = self.cleaned_data['representitive']
+    if input != None and input != "":
+      return unicodedata.normalize('NFKC', input)   
+    else:
+      raise forms.ValidationError('この項目は必須となります。ご入力お願いたします。')
+
+
+  def clean_tel_entity(self):
+    input = self.cleaned_data['tel_entity']
+    if input != None and input != "":
+      input = input.translate(tran_zen_han)
+      input = unicodedata.normalize('NFKC', ''.join(re.findall('[0-9０-９]+', input)))
+      print(f'tel_entity:{input}（clean_tel_entity. in class ProfileEditForm_seller）')
+      return input
+    else:
+      raise forms.ValidationError('この項目は必須となります。ご入力お願いたします。')
+
+  def clean_zip_entity(self):
+    if self.cleaned_data['zip_entity'] is not None:
+      zip_entity = self.cleaned_data['zip_entity'].translate(tran_zen_han)
+      zip_entity = unicodedata.normalize('NFKC', ''.join(re.findall('[0-9０-９]+', zip_entity)))
+      return zip_entity
+    else:
+      raise forms.ValidationError('この項目は必須となります。ご入力お願いたします。')
+
+  def clean_address1(self):
+    address1 = self.cleaned_data.get('address1')
+    print(f'self.cleaned_data[address1]={address1} (in ProfileEditForm_seller)')
+    if address1 is None :
+      raise forms.ValidationError('この項目は必須となります。ご入力お願いたします。')
+    return address1
+  
+  def clean_address2(self):
+    if self.cleaned_data['address2'] is not None:
+      address2 = self.cleaned_data['address2'].translate(tran_zen_han)
+      return address2
+    else:
+      raise forms.ValidationError('この項目は必須となります。ご入力お願いたします。')
+
+  def clean_address3(self):
+    if self.cleaned_data['address3'] is not None:
+      address3 = self.cleaned_data['address3'].translate(tran_zen_han)
+      address3 = unicodedata.normalize('NFKC', ''.join(re.findall('[0-9０-９]+', address3)))
+      return address3
+    else:
+      raise forms.ValidationError('この項目は必須となります。ご入力お願いたします。')
+
+  def clean_lastName(self):
+    lastName = re.sub("[\u3000 \t]", "", self.cleaned_data['lastName'])
+    return unicodedata.normalize('NFKC', lastName)
+    # unicodedaata.normalize('NFKC',)で「unicodeの正規化」
+    # カタカナは半角を全角に、数字は全角を半角にする
+
+  def clean_lastName_kana(self):
+    lastName_kana = re.sub("[\u3000 \t]", "", self.cleaned_data['lastName_kana']) # スペースとタブを削除
+    lastName_kana = unicodedata.normalize('NFKC', lastName_kana)
+    print(f'lastName_kana={lastName_kana} in def clean_lastName_kana in ProfileEditForm_seller')
+    if bool(re.search(r'[ァ-ヶ]', lastName_kana)) == False:
+      raise forms.ValidationError('カナ以外の文字が入力されています')
+    return lastName_kana
+  
+    
+  def clean_firstName(self):
+    firstName = re.sub("[\u3000 \t]", "", self.cleaned_data['firstName'])
+    return unicodedata.normalize('NFKC', firstName)
+    # unicodedaata.normalize('NFKC',)で「unicodeの正規化」
+    # カタカナは半角を全角に、数字は全角を半角にする
+
+  def clean_firstName_kana(self):
+    firstName_kana = re.sub("[\u3000 \t]", "", self.cleaned_data['firstName_kana'])
+    firstName_kana = unicodedata.normalize('NFKC', firstName_kana)
+    if bool(re.search(r'[ァ-ヶ]', firstName_kana)) == False:
+      raise forms.ValidationError('カナ以外の文字が入力されています')
+    return firstName_kana
+
+
+  def clean_tel_user(self):
+    if self.cleaned_data['tel_user'] is not None:
+      tel_user = self.cleaned_data['tel_user'].translate(tran_zen_han)
+      tel_user = unicodedata.normalize('NFKC', ''.join(re.findall('[0-9０-９]+', tel_user)))
+      print(f'tel_user:{tel_user}（clean_tel_user. in class ProfileEditForm_seller）')
+      return tel_user
+    else:
+      raise forms.ValidationError('この項目は必須となります。ご入力お願いたします。')
+
+  def clean_department(self):
+    department = self.cleaned_data['department']
+    print(f'self.cleaned_data[department]={department} (clean_department in ProfileEditForm_seller)')
+    return unicodedata.normalize('NFKC', department)
+
+  def clean_title(self):
+    title = self.cleaned_data['title']
+    return unicodedata.normalize('NFKC', title)

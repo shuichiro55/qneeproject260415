@@ -43,7 +43,6 @@
 
         <form method="POST" action="{% url 'accounts:permissionSets_buyer' %}"
           class="form-group border border-top shadow-sm p-3 mb-5 bg-light rounded">
-
           {% csrf_token %}         
           {{ form.non_field_errors }}
 
@@ -84,10 +83,10 @@
 
                   <div class="form-check form-switch ms-2">
                     <input class="form-check-input col-xs-3 col-lg-2" type="checkbox"
-                      id="{{form.canApproveAdd.id_for_label}}"
-                      name="{{form.canApproveAdd.name}}"
+                      id="{{form.canApproveChg.id_for_label}}"
+                      name="{{form.canApproveChg.name}}"
                       value="True">
-                    <label class="form-check-label col-xs-6 col-lg-6 ms-3" for="{{form.canApproveAdd.id_for_label}}">
+                    <label class="form-check-label col-xs-6 col-lg-6 ms-3" for="{{form.canApproveChg.id_for_label}}">
                       ユーザー追加</label>
                   </div>
       
@@ -97,8 +96,8 @@
                       name="{{form.canApproveQpay.name}}"
                       value="True">
                     <label class="form-check-label col-xs-6 col-lg-6 ms-3" for="{{form.canApproveQpay.id_for_label}}">
-                      Ｑｐａｙ承認</label>
-                  </div>                               
+                      QPAY承認</label>
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -149,12 +148,12 @@
       CanApproveAll.checked = false;
     }
 
-    var CanApproveAdd = document.getElementById("{{ form.canApproveAdd.id_for_label }}");
-    var value_CanApproveAdd = "{{ editedUser.canApproveAdd }}"; // DjangoからJSに値を渡す
+    var CanApproveAdd = document.getElementById("{{ form.canApproveChg.id_for_label }}");
+    var value_CanApproveAdd = "{{ editedUser.canApproveChg }}"; // DjangoからJSに値を渡す
 
     console.log(value_CanApproveAdd)
 
-    if ("{{ editedUser.canApproveAdd }}" == "True") {
+    if ("{{ editedUser.canApproveChg }}" == "True") {
       console.log('value_CanApproveAdd == on で判定されました');
       CanApproveAdd.checked = true;
     } else {

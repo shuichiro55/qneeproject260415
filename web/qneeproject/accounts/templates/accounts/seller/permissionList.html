@@ -46,7 +46,6 @@
 
         <form method="POST"
           class="border border-top shadow-sm p-3 bg-light rounded">
-
           {% csrf_token %}
 
           <div class="d-flex justify-content-start">
@@ -87,17 +86,20 @@
               <tr>
                 <th scope="col" td width="15%" rowspan="3" class="table-primary" style="text-align: left;">
                   権限</th>
-                <th width="25%" class="table-primary" style="text-align: left;">すべて</td>
+                <th width="25%" class="table-primary" style="text-align: left;">
+                  すべて</td>
                 <td style="text-align: right;">
                   {% if loginUser.canApproveAll %} 権限あり {% else %} 権限なし {% endif %}
                 </td></tr>
               <tr>
-                <th width="25%" class="table-primary" style="text-align: left;">参加承認</th>
+                <th width="25%" class="table-primary" style="text-align: left;">
+                  各種変更</th>
                 <td style="text-align: right;">
-                  {% if loginUser.canApproveAdd %} 権限あり {% else %} 権限なし {% endif %}
+                  {% if loginUser.canApproveChg %} 権限あり {% else %} 権限なし {% endif %}
                 </td></tr>
               <tr>
-                <th width="25%" class="table-primary" style="text-align: left;">Ｑｐａｙ</th>                  
+                <th width="25%" class="table-primary" style="text-align: left;">
+                  QPAY</th>                  
                 <td style="text-align: right;">
                   {% if loginUser.canApproveQpay %} 権限あり {% else %} 権限なし {% endif %}
                 </td></tr>
@@ -154,13 +156,15 @@
                   <tr>
                     <th width="25%" class="table-primary" style="text-align: left;">参加承認</td>
                     <td style="text-align: right;">
-                      {% if eachUser.canApproveAdd %} 権限あり {% else %} 権限なし {% endif %}
+                      {% if eachUser.canApproveChg %} 権限あり {% else %} 権限なし {% endif %}
                     </td></tr>
                   <tr>
-                    <th width="25%" class="table-primary" style="text-align: left;">Ｑｐａｙ</td>                  
+                    <th width="25%" class="table-primary" style="text-align: left;">
+                      QPAY</td>                  
                     <td style="text-align: right;">
                       {% if eachUser.canApproveQpay %} 権限あり {% else %} 権限なし {% endif %}
-                    </td></tr>
+                    </td>
+                  </tr>
                 </tbody>
               </table>
 
