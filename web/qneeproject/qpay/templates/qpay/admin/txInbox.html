@@ -4,24 +4,23 @@
 {% load humanize %}
 
 {% block content %}
-{% csrf_token %}
 
 <div class="authentication-bg align-items-start">
 
   <div class="container">
 
     {% if messages %}
-      <div class="row justify-content-center mt-2 mx-2">
+      <div class="messages row justify-content-center mt-2 mx-2">
         {% for message in messages %}
-          <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
+          <div class="alert alert-{{ message.tags }} py-2 rounded-1 mb-0" role="alert">
             <span>{{ message }}</span>
           </div>
         {% endfor %}
       </div>
     {% endif %}
 
-    <nav class="mt-2" aria-label="breadcrumb" role="navigation">
-      <ol class="breadcrumb bg-light-subtle px-2 rounded-3">
+    <nav class="mt-2 bg-light rounded-3" aria-label="breadcrumb" role="navigation">
+      <ol class="breadcrumb px-2">
         <li class="breadcrumb-item">
           <a href="{% url 'accounts:mypage_admin' %}">
             <i class="bi bi-house" style="font-size:1.2em; color:cornflowerblue"></i>
@@ -37,7 +36,7 @@
     
     <div class="d-flex justify-content-center mt-5">
       <h5 class="text-secondary pt-1"><b>QPAY インボックス</b></h5>
-      <span class="ms-3">{% bs_icon 'inbox' color='deeppink' size='2.2em' %}</span>
+      <span class="ms-3">{% bs_icon 'inbox-fill' color='deeppink' size='2.2em' %}</span>
     </div>
 
     {% if object_list.count >= 1 %}
@@ -53,7 +52,7 @@
         
             {% for item in page_obj %}
 
-              <table class="table table-sm table-bordered border-primary-subtle table-responsive mb-2">
+              <table class="table table-sm bg-light table-bordered border-primary-subtle table-responsive mb-2">
                 <tbody style="font-size:0.9rem">
 
                   <tr class="table-primary" style="text-align:center;">
@@ -90,14 +89,18 @@
                       承認</td>
                     <td style="text-align:start">{{ item.buyEntityName }}</td>
                     <td style="vertical-align:middle; text-align:center">
-                      {{ item.approved_amount|default:'-'|intcomma }}</td>
+                      {{ item.approved_amount|default:'-'|intcomma | default:'ー'}}</td>
 
                     {% if item.txStatus_int == 1 %}
                       <td class="table-danger" style="vertical-align:middle; text-align:center">未了</td>
                     {% endif %}
                     {% if item.txStatus_int == 2 %}
+                      <td class="table-danger" style="vertical-align:middle; text-align:center">未了</td>
+                    {% endif %}
+
+                    {% if item.txStatus_int >= 3 %}
                       <td style="vertical-align:middle; text-align:center">
-                        {{ item.approved_at| date:"n/j H:i"| default:'-' }}
+                        {{ item.approved_at| date:"n/j H:i"| default:'ー' }}
                       </td>
                     {% endif %}
   
@@ -114,7 +117,7 @@
 
           <div class="d-none d-lg-block">
              
-            <table class="table table-sm table-bordered border-primary-subtle table-responsive">
+            <table class="table table-sm bg-light bg-light table-bordered border-primary-subtle table-responsive">
               <thead style="font-size:0.9rem">
                 <tr class="table-primary" style="text-align:center;">
                   <th rowspan="2" style="vertical-align:middle; text-align:center">#</th>
@@ -177,16 +180,16 @@
                   <tr>
                     <td style="text-align:center">{{ item.requested_amount|intcomma }}</td>
                     <td style="text-align:center">
-                      {% if item.txStatus_int == 1 %} 未了 {% endif %}
-                      {% if item.txStatus_int == 2 %}{{ item.requested_at|date:"n/j H:i" }}{% endif %}
-                      {% if item.txStatus_int == 3 %} 否認 {% endif %}
+                      {% if item.txStatus_int == 1 %} ー {% endif %}
+                      {% if item.txStatus_int >= 2 %}{{ item.requested_at|date:"n/j H:i"| default:'ー' }}{% endif %}
                     </td>
                     <td style="text-align:center">
                       {{ item.approved_amount|default:'-'|intcomma }}
                     </td>
                     <td style="text-align:center">
-                      {% if item.txStatus_int == 1 %} 未了 {% endif %}
-                      {% if item.txStatus_int == 2 %}{{ item.approved_at|default:'-'|date:"n/j H:i" }}{% endif %}
+                      {% if item.txStatus_int == 1 %} ー {% endif %}
+                      {% if item.txStatus_int == 2 %} ー {% endif %}
+                      {% if item.txStatus_int >= 3 %}{{ item.approved_at| date:"n/j H:i"| default:'ー'}}{% endif %}
                     </td>
                   </tr>
 

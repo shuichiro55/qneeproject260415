@@ -29,6 +29,8 @@ mysqlclient==2.2.7
 openpyxl==3.1.5
 packaging==26.0
 prompt_toolkit==3.0.52
+psycopg==3.3.4
+psycopg2-binary==2.9.12
 pycparser==2.22
 PyMySQL==1.1.1
 python-crontab==3.3.0

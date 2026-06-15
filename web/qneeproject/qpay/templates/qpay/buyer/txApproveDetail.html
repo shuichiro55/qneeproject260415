@@ -10,17 +10,17 @@
   <div class="container">
 
     {% if messages %}
-      <div class="row justify-content-center mt-2 mx-2">
+      <div class="messages row justify-content-center mt-2 mx-2">
         {% for message in messages %}
-          <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
+          <div class="alert alert-{{ message.tags }} py-2 rounded-1 mb-0" role="alert">
             <span>{{ message }}</span>
           </div>
         {% endfor %}
       </div>
     {% endif %}
 
-    <nav class="mt-2" aria-label="breadcrumb" role="navigation">
-      <ol class="breadcrumb bg-light-subtle px-2 rounded-3">
+    <nav class="mt-2 bg-light rounded-3" aria-label="breadcrumb" role="navigation">
+      <ol class="breadcrumb px-2">
         <li class="breadcrumb-item">
           <a href="{% url 'accounts:mypage_buyer' %}">
             <i class="bi bi-house" style="font-size:1.2em; color:cornflowerblue"></i>
@@ -49,30 +49,27 @@
     </div>
 
     <div class="d-flex justify-content-center mt-4">
-      <h5 class="text-secondary pt-1"><b>承認処理　</b></h5>
-      {% bs_icon 'person-check' color='deeppink' size='2.2em' %}
+      <h5 class="text-secondary pt-1"><b>承認処理</b></h5>
+      <span class="ms-3">{% bs_icon 'person-check' color='deeppink' size='2.2em' %}</span>
     </div>
 
     <div class="row justify-content-center mt-2 mx-2">
       <div class="col-md-9 col-lg-6">
 
-          <!--
-          <div class="text-center">
-            <div class="spinner-border" role="status">
-              <span class="visually-hidden">処理中</span>
-            </div>
-          </div>
-          -->
+        {% if step_process == 1 %}
+          <table class="table table-sm bg-light
+            table-bordered border-primary-subtle
+            shadow-sm table-responsive mt-1">
 
-          <table class="table table-sm table-bordered border-primary-subtle table-responsive mt-1">
             <tbody>
               <tr class="table-info">
                 <td width="40%" class="table-primary"><b>承認処理</b></td>
                 <td style="text-align:right;">
                   
                   {% if tx.txStatus_int == 1 %}パートナー承認未了{% endif %}
-                  {% if tx.txStatus_int == 2 %}パートナー承認済み<br>Qnee前払い前{% endif %}
-                  {% if tx.txStatus_int == 3 %}パートナー否認　{{ tx.rejected_at|date:"y/n/j H:i" }}{% endif %}
+                  {% if tx.txStatus_int == 2 %}パートナー承認未了{% endif %}
+                  {% if tx.txStatus_int >= 3 %}パートナー承認済み<br>Qnee前払い前{% endif %}
+                  {% if tx.txStatus_int == -3 %}パートナー否認{{ tx.rejected_at|date:"y/n/j H:i"| default:'ー' }}{% endif %}
                 </td>
               </tr>
 
@@ -122,7 +119,10 @@
 
           {% if tx.transfer_amount %}
 
-            <table class="table table-sm table-bordered border-primary-subtle table-responsive">
+            <table class="table table-sm bg-light
+              table-bordered border-primary-subtle
+              shadow-sm table-responsive">
+              
               <tbody>
                 <tr class="table-info">
                   <td width="40%" class="table-primary"><b>ゲスト受取り</b></td>
@@ -140,9 +140,9 @@
 
           {% endif %}
 
-          <div class="row justify-content-center">
+          <div class="row justify-content-center mx-0">
 
-            <div class="col-4 pe-0">
+            <div class="col-3 mx-0 px-0">
               <form method="GET"
                 action="{% url 'qpay:txApprove_buyer' %}"
                 class="m-0 p-0"
@@ -151,13 +151,13 @@
 
                 <button
                   type="submit"
-                  class="btn btn-outline-primary w-100 p-2">
-                  一覧へ
+                  class="btn btn-outline-primary w-100">
+                  一覧
                 </button>
               </form>
             </div> <!-- end of col -->
 
-            <div class="col-8 ps-1">
+            <div class="col-9 mx-0 px-0">
               <form method="POST"
                 action="{% url 'qpay:txApproveDetail_buyer' tx.pk %}"
                 id="id_PostForm"
@@ -166,9 +166,17 @@
   
                 {% csrf_token %}
 
-                <div class="d-flex justify-content-center">
+                <div class="d-flex justify-content-center px-0 mx-0">
+
+                  <button type="submit"
+                    class="btn btn-primary p-2 w-100 ms-1"
+                    name="next" value="ToSendbackQpay"
+                    disabled>
+                    <span class="btn-text">差戻</span>
+                  </button>
+
                   <button type="submit" 
-                    class="btn btn-primary p-2 w-50"
+                    class="btn btn-primary p-2 w-100 ms-1"
                     name="next"
                     value="ToApproveQpay">
                     <span class="btn-text">
@@ -177,7 +185,7 @@
                     </span>
                   </button>
                   <button type="submit"
-                    class="btn btn-primary p-2 w-50 ms-1"
+                    class="btn btn-primary p-2 w-100 ms-1"
                     name="next" value="ToRejectQpay">
                     <span class="btn-text">否認</span>
                   </button>
@@ -187,6 +195,109 @@
             </div>
 
           </div> <!-- end of row -->
+
+        {% elif step_process == 2 %}
+
+
+          <div class="d-flex justify-content-center mt-5">
+            <h5 class="text-secondary pt-1"><b>申請の差戻理由</b></h5>
+            <span class="ms-3">
+              {% bs_icon 'inbox-fill' color='deeppink' size='2.2em' %}
+            </span>
+          </div>
+
+          <div class="row justify-content-center mt-3">
+            <div class="col-md-8 col-lg-6">
+
+              <form method="POST"
+                action="{% url 'accounts:corpInfoUpdate_admin' %}"
+                class="form-group bg-light border border-top shadow-sm rounded-2 p-3 mb-0 ">
+                {% csrf_token %}
+
+                <div class="mx-4">
+
+                  <div class="d-flex mt-2">
+                    <span class="mt-1">{% bs_icon 'bookmark-check-fill' color='deeppink' size='1.2rem' %}</span>
+                    <span class="ms-2" style="font-size:1.1rem">
+                      <b>入力金額が誤っている</b></span>
+                  </div>
+
+                  <div class="ms-4" id="id_radioGroup">
+                    <div class="form-check mt-3">
+                      <input class="form-check-input" type="radio"
+                        name='sendbackReason_radio' id="radio1" value="option1">
+                      <label class="form-check-label" for="radio1">
+                        当初報酬日が誤っている
+                      </label>
+                    </div>
+
+                    <div class="form-check mt-2">
+                      <input class="form-check-input" type="radio"
+                        name='sendbackReason_radio' id="radio2" value="option2">
+                      <label class="form-check-label" for="radio2">
+                        証明書類（画像）が違う
+                      </label>
+                    </div>
+
+                    <div class="form-check mt-2">
+                      <input class="form-check-input" type="radio"
+                        name='sendbackReason_radio' id="radio3" value="option3">
+                      <label class="form-check-label" for="radio3">
+                        証明書類の画像が不鮮明
+                      </label>
+                    </div>
+
+                    <div class="form-check mt-2">
+                      <input class="form-check-input" type="radio"
+                        name='sendbackReason_radio' id="radio4" value="option4">
+                      <label class="form-check-label" for="radio4">
+                        その他
+                      </label>
+                    </div>
+                    <span id="id_addition_sendbackReason" style="display:none;">
+
+                      <input type="text" class='form-control'
+                        name='{{FeedbackForm.sendbackReason_text.name}}'
+                        value="{{FeedbackForm.sendbackReason_text.value| default:''}}"
+                        placeholder="差戻の理由を記載">
+                    </span>
+
+                  </div>
+
+                  <div class="mt-4 mb-2">
+                    <label for="textarea" class="d-flex form-label">
+                      <span>{% bs_icon 'envelope-fill' color='deeppink' size='1.5rem' %}</span>
+                      <span class="ms-2" style="font-size:1.1rem;">
+                        <b>申請者へのメッセージ</b>（任意）</span>
+                    </label>
+                    <textarea class="form-control" id="textarea" rows="3"
+                      name="{{FeedbackForm.sendbackMessage.name}}"
+                      value="{{FeedbackForm.sendbackMessage.value| default:''}}"></textarea>
+                  </div>
+
+                  <hr>
+
+                  <div class="d-flex gap-1">
+
+                  <a href="{% url 'accounts:corpInfoUpdate_admin' corpInfo_id %}"
+                    type="button" class="btn btn-outline-primary w-50 shadow-sm">
+                    戻る</a>
+
+                  <button type="submit"
+                    class="btn btn-primary w-50 shadow-sm"
+                    name="btnAction"
+                    value="ToSendback2_{{corpInfo_id}}">
+                    差戻を実行</button>
+
+                  </div>
+                </div>
+
+                <input type="hidden" name="next" value="{{ next }}" />
+              </form>
+            </div>
+          </div>
+
+        {% endif %}
 
       </div> <!-- end of col -->
     </div> <!-- end of row -->

@@ -10,17 +10,17 @@
   <div class="container">
 
     {% if messages %}
-      <div class="row justify-content-center mt-2 mx-2">
+      <div class="messages row justify-content-center mt-2 mx-2">
         {% for message in messages %}
-          <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
+          <div class="alert alert-{{ message.tags }} py-2 rounded-1 mb-0" role="alert">
             <span>{{ message }}</span>
           </div>
         {% endfor %}
       </div>
     {% endif %}
 
-    <nav class="mt-2" aria-label="breadcrumb" role="navigation">
-      <ol class="breadcrumb bg-light-subtle px-2 rounded-3">
+    <nav class="mt-2 bg-light rounded-3" aria-label="breadcrumb" role="navigation">
+      <ol class="breadcrumb px-2">
         <li class="breadcrumb-item">
           <a href="{% url 'accounts:mypage_seller' %}">
             <i class="bi bi-house" style="font-size:1.2em; color:cornflowerblue"></i>
@@ -54,7 +54,7 @@
       
           {% csrf_token %}
 
-          <table class="table table-sm table-bordered border-primary-subtle table-responsive">
+          <table class="table table-sm bg-light table-bordered border-primary-subtle table-responsive">
             <tbody>
               <tr class="table-info">
                 <td width="40%" class="table-primary"><b>処理状況</b></td>
@@ -118,7 +118,10 @@
 
           {% if tx.transfer_amount %}
 
-            <table class="table table-sm table-bordered border-primary-subtle table-responsive">
+            <table class="table table-sm bg-light
+              table-bordered border-primary-subtle
+              shadow-sm table-responsive">
+              
               <tbody>
                 <tr>
                   <td width="40%" class="table-primary"><b>受取り金額</b></td>

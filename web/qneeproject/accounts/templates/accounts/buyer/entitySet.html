@@ -10,9 +10,9 @@
   <div class="container">
 
     {% if messages %}
-      <div class="row justify-content-center mt-2 mx-2">
+      <div class="messages row justify-content-center mt-2 mx-2">
         {% for message in messages %}
-          <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
+          <div class="alert alert-{{ message.tags }} py-2 rounded-1 mb-0" role="alert">
             <span>{{ message }}</span>
           </div>
         {% endfor %}
@@ -71,35 +71,54 @@
 
         <div class="d-flex justify-content-center align-items-center mt-5 gap-2">
           <h5 class="text-secondary text-center"><b>パートナー登録</b></h5>
-            <i class="bi bi-person-add ms-2 mb-2" style="font-size:2.2em; color:deeppink;"></i>
+            <i class="bi bi-person-add ms-2 mb-2"
+              style="font-size:2.2em; color:deeppink;"></i>
         </div>
 
-        <div class="row justify-content-center mt-4 px-4">
-          <div class="btn-group btn-group-toggle col-md-10 col-lg-8 col-xl-6"
-            id="id_NewOrNot" data-toggle="buttons">
+        <form method="POST" action="{% url 'accounts:entityCreate_buyer' %}"
+          id="id_form_NewOrNot" >
+          {% csrf_token %}
 
-            <label class="btn btn-secondary px-2" for="id_radio1">
-              <input type="radio" id="id_radio1" name="name_NewOrNot" autocomplete="off">
-              新規パートナー登録
-            </label>
+          <div class="row justify-content-center mt-4 px-4">
+            <div class="btn-group btn-group-toggle col-md-10 col-lg-8 col-xl-6"
+              id="id_NewOrNot" data-toggle="buttons">
 
-            <!-- autocompleteは過去の入力情報を自動的に補完する機能-->
+              <label class="btn btn-secondary px-2" for="id_radio1">
+                <input type="radio"
+                  id="id_radio1"
+                  name="next1"
+                  value="ToCreateEntity_{{user.id}}"
+                  autocomplete="off">
+                新規パートナー登録
+              </label>
+              <!-- autocompleteは過去の入力情報を自動的に補完する機能-->
           
-            <label class="btn btn-secondary px-2" for="id_radio2">
-              <input type="radio" id="id_radio2" name="name_NewOrNot" autocomplete="off">
-              既存パートナーに参加
-            </label>
-          </div>   
+              <label class="btn btn-secondary px-2" for="id_radio2">
+                <input type="radio"
+                  id="id_radio2"
+                  name="next1"
+                  value="ToAddToEntity"
+                  autocomplete="off">
+                既存パートナーに参加
+              </label>         
+            </div>
+
         </div> <!-- end row -->
+        </form>
         
         <!-- パートナーを新規登録する場合 -->
+        <!-- 「id="id_radio1」の選択でPOST送信するので以下は不要とした 20260611  -->
         <span id="id_addition1" style="display: none;">
           <hr>
-          <form method="POST" action="{% url 'accounts:entityCreate_buyer' %}" >
+
+          <form method="POST" action="{% url 'accounts:entityCreate_buyer' %}">
             {% csrf_token %}
 
             <div class= "d-flex justify-content-center mt-5">
-              <button type="submit" class="btn btn-primary shadow" name="next1" value="ToEntityCreate_{{user.id}}" >
+              <button type="submit"
+                class="btn btn-primary shadow"
+                name="next1"
+                value="ToEntityCreate_{{user.id}}" >
                 パートナーの新規登録へ</button>
             </div>
           </form>
@@ -122,7 +141,7 @@
               <div class="d-flex col-md-10 col-lg-8 col-xl-6 text-left">
 
                 <i class="bi bi-building" style="font-size:1.5em; color:darkred;"></i>
-                <h6 class="text-secondary"><b>　パートナー選択</b></h6>
+                <h6 class="text-secondary ms-3"><b>パートナー選択</b></h6>
               </div>
             </div>
               
@@ -136,7 +155,8 @@
                     name="name_SearchInput"
                     value="{{form.entityName.value| default:''}}"
                     placeholder="キーワード入力 （ex. IMAGICA or イマジ or いま）">
-                  <button type="submit" class="btn btn-primary shadow" name="name_SearchInput" value="searchStart">検索</button>
+                  <button type="button" class="btn btn-primary shadow"
+                    name="name_SearchBtn" value="searchStart">検索</button>
                   <!-- <button type="submit" class="btn btn-outline-primary" name="select" value="select_bank">選択</button> -->
                 </div>
               </div>
@@ -186,13 +206,13 @@
             <div class="row justify-content-center mt-2">
               <div class="d-flex col-md-10 col-lg-8 col-xl-6 text-left mt-1">
                 <i class="bi bi-file-person" style="font-size:1.5em; color:darkred;"></i>
-                <h6 class="text-secondary"><b>　お申込者の情報</b></h6>
+                <h6 class="text-secondary ms-3"><b>お申込者の情報</b></h6>
               </div>
             </div>
             
             <div class="row justify-content-center px-4">
               <div class="col-6 col-md-5 col-lg-4 col-xl-3 pe-1">
-                <label for="{{form.lastName.id_for_label}}" class="form-label mt-1">
+                <label for="{{form.lastName.id_for_label}}" class="form-label mt-1 mb-0">
                   姓</label>
                 <input type="{{form.lastName.widget.input_type}}"
                   class="form-control"
@@ -202,7 +222,7 @@
                   placeholder="例：山田">
               </div>
               <div class="col-6 col-md-5 col-lg-4 col-xl-3 ps-0">
-                <label for="{{form.firstName.id_for_label}}" class="form-label mt-1">
+                <label for="{{form.firstName.id_for_label}}" class="form-label mt-1 mb-0">
                   名</label>
                 <input type="{{form.firstName.widget.input_type}}"
                   class="form-control"
@@ -224,7 +244,7 @@
 
             <div class="row justify-content-center px-4">
               <div class="col-6 col-md-5 col-lg-4 col-xl-3 pe-1">
-                <label for="{{form.lastName_kana.id_for_label}}" class="form-label mt-1">
+                <label for="{{form.lastName_kana.id_for_label}}" class="form-label mt-1 mb-0">
                   姓（フリガナ）</label>
                 <input type="{{form.lastName_kana.widget.input_type}}" class="form-control"
                   name="{{form.lastName_kana.name}}"
@@ -233,9 +253,10 @@
                   placeholder="例：ヤマダ">
               </div>
               <div class="col-6 col-md-5 col-lg-4 col-xl-3 ps-0">
-                <label for="{{form.firstName_kana.id_for_label}}" class="form-label mt-1">
+                <label for="{{form.firstName_kana.id_for_label}}" class="form-label mt-1 mb-0">
                   名（フリガナ）</label>
-                <input type="{{form.firstName_kana.widget.input_type}}" class="form-control"
+                <input type="{{form.firstName_kana.widget.input_type}}"
+                  class="form-control"
                   name="{{form.firstName_kana.name}}"
                   value="{{form.firstName_kana.value|default:''}}"
                   id="{{form.firstName_kana.id_for_label}}"
@@ -260,7 +281,7 @@
 
             
             <div class="form-group row justify-content-center px-4">
-              <label class="col-md-3 col-lg-2 col-form-label"
+              <label class="col-md-3 col-lg-2 col-form-label pb-0"
                 for="{{form.tel_user.id_for_label}}" >
                 お電話（直通）</label>
               <div class="col-md-7 col-lg-6 col-xl-4">
@@ -279,7 +300,7 @@
 
   
             <div class="form-group row justify-content-center px-4">
-              <label class="col-md-3 col-lg-2 col-form-label"
+              <label class="col-md-3 col-lg-2 col-form-label pb-0"
                 for="{{form.department.id_for_label}}" >
                 所属部署</label>
               <div class="col-md-7 col-lg-6 col-xl-4">
@@ -297,7 +318,7 @@
             {% endif %}
 
             <div class="form-group row justify-content-center px-4">
-              <label class="col-md-3 col-lg-2 col-form-label"
+              <label class="col-md-3 col-lg-2 col-form-label pb-0"
                 for="{{form.title.id_for_label}}" >
                 役職</label>
               <div class="col-md-7 col-lg-6 col-xl-4">
@@ -346,7 +367,7 @@
               class="form-group bg-light border border-top rounded shadow p-4 m-2">
               {% csrf_token %}
 
-              <table class="table table-sm table-bordered border-primary-subtle table-responsive">
+              <table class="table table-sm bg-light table-bordered border-primary-subtle table-responsive">
                 <tbody> <!-- 郵便番号のところは住所にする -->
                   <tr>
                     <th scope="col" width="40%" class="table-primary">パートナー</th>
@@ -363,7 +384,7 @@
                 </tbody>
               </table>
 
-              <table class="table table-sm table-bordered  border-primary-subtle table-responsive">
+              <table class="table table-sm bg-light table-bordered  border-primary-subtle table-responsive">
                 <tbody class="text-center">
                   <tr>
                     <th scope="col" width="40%" class="table-primary" style="text-align:left;">
@@ -390,15 +411,16 @@
               <hr>
 
               <div class="d-flex justify-content-center">
-                <button type="submit" class="btn btn-primary flex-grow-1"
-                  name="next2"
-                  value="ToSave&Apply_{{user.id}}_{{entity.id}}">
-                  パートナーに参加申請</button>
 
-                <button type="submit" class="btn btn-outline-primary  flex-grow-1 ms-2"
+                <button type="submit" class="btn btn-outline-primary  flex-grow-1 px-0 shadow"
                   name="next2"
                   value="BackToInput_{{user.id}}_{{entity.id}}">
                   戻る　　</button>
+
+                <button type="submit" class="btn btn-primary flex-grow-1 ms-1 px-0 shadow"
+                  name="next2"
+                  value="ToSave&Apply_{{user.id}}_{{entity.id}}">
+                  登録して規約の同意へ</button>
 
               </div>
 
@@ -439,7 +461,8 @@
 
     console.log('DOMContentLoadedが認識されました');
 
-    var NewOrNot = document.getElementById('id_NewOrNot');
+    var NewOrNot = document.getElementById('id_form_NewOrNot');
+    //var SelectNew = document.getElementById('id_SelectNew');
     var SearchInput = document.getElementById('id_SearchInput');
     var BuyerSelect = document.getElementById('id_BuyerSelect');
 
@@ -448,19 +471,19 @@
     var addition1 = document.getElementById('id_addition1');
     var addition2 = document.getElementById('id_addition2');
 
-    NewOrNot.addEventListener('click', function(){
 
-      if (id_radio1.checked) {      
-        console.log('id_radio1が認識されました');
-        addition1.style.display = "block";
-        addition2.style.display = "none";
-      }
-
-      if (id_radio2.checked) {      
-        console.log('id_radio2が認識されました');
+    NewOrNot.addEventListener('change', (event) => {
+      console.log(event.target.value);
+      if (event.target.value.includes('ToCreateEntity')){
+        console.log('新規エンティティの登録処理.');
+        NewOrNot.submit();
+      };
+      if (event.target.value.includes('ToAddToEntity')){
+        console.log('既存エンティティへの追加処理.');
         addition1.style.display = "none";
         addition2.style.display = "block";
-      }
+      };
+
     });
 
     function normalizeText(text) {
@@ -521,6 +544,8 @@
       console.log('BuyerSelect.addEventListener(change)に入りました');
       SearchInput.value = obj_buyEntityName[event.target.value];  
     });
+
+
   });
 
 

@@ -9,10 +9,10 @@
   <div class="container">
 
     {% if messages %}
-      <div class="row justify-content-center mt-2 mx-2">
+      <div class="messages row justify-content-center mt-2 mx-2">
         {% for message in messages %}
-          <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
-            <span>{{ message }}</span>
+          <div class="alert alert-{{ message.tags }} py-2 rounded-1 mb-0" role="alert">
+            <span style="font-size:0.9rem">{{ message }}</span>
           </div>
         {% endfor %}
       </div>
@@ -30,8 +30,8 @@
 
     <div class="d-flex justify-content-center pt-4 pb-2">
       <h5 class="text-secondary pt-1">
-      <b>お手続きメニュー　</b></h5>
-      {% bs_icon 'menu-app' color='deeppink' size='2.5em' %}
+      <b>お手続きメニュー</b></h5>
+      <span class="ms-3">{% bs_icon 'menu-app' color='deeppink' size='2.5em' %}</span>
     </div>
 
     <div class="d-block d-lg-none">
@@ -128,12 +128,13 @@
               <span class="MenuBtn1IconCircle pt-2">
                 <i class="bi bi-gear" style="font-size:2.0em; color:cornflowerblue;"></i>
               </span>
-              <span class="MenuBtn1Text ms-2">
+              <span class="MenuBtn1Text ms-3">
                 <h5>設定・承認メニューへ</h5>
               </span>
 
-              <!-- ユーザー追加の承認待ちがある場合に件数表示（テスト未了） -->  
-              {% if cnt_toBeApproved_add >= 1 %}
+              <!-- ユーザー追加の承認待ちがある場合に件数表示 -->  
+              {% if cnt_toBeApproved_add %}
+
                 <span class="badge bg-danger text-light rounded-1 ms-3">
                   {{ cnt_toBeApproved_add }}
                 </span>
@@ -253,8 +254,10 @@
                       name="next"
                       value="myinfo">
                       ご編集へ
-                      <!-- ユーザー追加の承認待ちがある場合に件数表示（テスト未了） -->  
+
+                      <!-- ユーザー追加の承認待ちがある場合に件数表示 -->  
                       {% if cnt_toBeApproved_add >= 1 %}
+
                         <span class="badge bg-danger text-light rounded-1 ms-1">
                           {{ cnt_toBeApproved_add }}
                         </span>
@@ -276,5 +279,26 @@
   </div>
 </div>
 
+{% endblock %}
+
+
+{% block extrajs %}
+
+<script>
+
+  document.addEventListener('DOMContentLoaded', function() {
+
+    // 3秒後にメッセージを消す
+    setTimeout(function() {
+      console.log('setTimeoutが認識されました');
+
+      var messages = document.querySelectorAll('.messages div');
+      messages.forEach(function(message) {
+        message.style.display = 'none';
+      });
+    }, 3000); // 3000ミリ秒 = 3秒
+  });
+
+</script>
 
 {% endblock %}

@@ -85,7 +85,7 @@ class UserCreateForm_admin(UserCreationForm):
 
   class Meta:
     model = UserModel
-    fields = ('email', )
+    fields = ('email', 'userName',)
 
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
@@ -133,7 +133,6 @@ class MyPasswordChangeForm(PasswordChangeForm):
 
 
 class EntitySetForm_buyer(forms.Form):
-
 
   entityName = forms.CharField(label='取引主体名', max_length=100, required=True,)
 
@@ -424,7 +423,7 @@ class AgreementConfirmForm_buyer(forms.Form):
 class PermissionUpdateForm_buyer(forms.Form):
  
   canApproveAll = forms.BooleanField(label='承認権限（全部）')
-  canApproveAdd = forms.BooleanField(label='承認権限（参加）')
+  canApproveChg = forms.BooleanField(label='承認権限（変更）')
   canApproveQpay = forms.BooleanField(label='承認権限（Qpay）')
 
   def __init__(self, *args, **kwargs):
@@ -436,7 +435,7 @@ class PermissionUpdateForm_buyer(forms.Form):
 class PermissionUpdateForm_admin(forms.Form):
  
   canApproveAll = forms.BooleanField(label='承認権限（全部）')
-  canApproveAdd = forms.BooleanField(label='承認権限（参加）')
+  canApproveChg = forms.BooleanField(label='承認権限（変更）')
   canApproveQpay = forms.BooleanField(label='承認権限（Qpay）')
 
   def __init__(self, *args, **kwargs):
@@ -717,7 +716,7 @@ class AgreementConfirmForm_seller(forms.Form):
 class PermissionUpdateForm_seller(forms.Form):
 
   canApproveAll = forms.BooleanField(label='承認権限（全部）')
-  canApproveAdd = forms.BooleanField(label='承認権限（参加）')
+  canApproveChg = forms.BooleanField(label='承認権限（変更）')
   canApproveQpay = forms.BooleanField(label='承認権限（Qpay）')
 
   def __init__(self, *args, **kwargs):
@@ -1152,3 +1151,37 @@ class ProfileEditForm_seller(forms.Form):
   def clean_title(self):
     title = self.cleaned_data['title']
     return unicodedata.normalize('NFKC', title)
+  
+class FeedbackForm(forms.Form):
+
+  # ラジオボタンの選択肢（例：評価）
+  RATING_CHOICES = [
+    ('textCorrection', '入力値の修正'),
+    ('imageCorrection', '画像の修正'),
+  ]
+  #sendbackReason_radio = forms.ChoiceField(
+  #  choices=RATING_CHOICES, widget=forms.RadioSelect, label="差戻理由")
+
+  # その他理由の場合の記載
+  sendbackReason_text = forms.CharField(
+    max_length=100, required=False, label="その他理由")
+    
+  # ゲストへのメッセージ
+  sendbackMessage = forms.CharField(
+    max_length=200, widget=forms.Textarea(), required=False, label="メッセージ")
+
+
+  def clean_sendbackReason_radio(self):
+    sendbackReason_radio = self.cleaned_data['sendbackReason_radio']
+    print(f'self.cleaned_data[sendbackReason_radio]={sendbackReason_radio} (clean_department in FeedbackForm)')
+    return unicodedata.normalize('NFKC', sendbackReason_radio)
+
+  def clean_sendbackReason_text(self):
+    sendbackReason_text = self.cleaned_data['sendbackReason_text']
+    print(f'self.cleaned_data[sendbackReason_text]={sendbackReason_text} (clean_department in FeedbackForm)')
+    return unicodedata.normalize('NFKC', sendbackReason_text)
+
+  def clean_sendbackMessage(self):
+    sendbackMessage = self.cleaned_data['sendbackMessage']
+    print(f'self.cleaned_data[sendbackMessage]={sendbackMessage} (clean_department in FeedbackForm)')
+    return unicodedata.normalize('NFKC', sendbackMessage)

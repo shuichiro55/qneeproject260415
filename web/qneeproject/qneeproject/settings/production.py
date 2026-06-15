@@ -29,14 +29,14 @@ PROTOCOL = os.environ.get('SITE_PROTOCOL', 'https')
 DOMAIN = os.environ.get('SITE_DOMAIN', 'localhost:8000')
 SITE_URL = f"{PROTOCOL}://{DOMAIN}"
 
-DATABASES = {
-  'default': {
-    'ENGINE': 'django.db.backends.mysql',
-    'NAME': 'qnee_db',
-    'USER': 'shuichiro',
-    'PASSWORD': '921Story552@',
-    'HOST': 'localhost',
-    'PORT': '3306',
-    'ATOMIC_REQUESTS': True, # 最後まで問題なければcommit、例外あればトランザクションはロールバック
-  }
-}
+#DATABASES = {
+#  'default': {
+#    'ENGINE': 'django.db.backends.mysql',
+#    'NAME': 'qnee_db',
+#    'USER': 'shuichiro',
+#    'PASSWORD': '921Story552@',
+#    'HOST': 'localhost',
+#    'PORT': '3306',
+#    'ATOMIC_REQUESTS': True, # 最後まで問題なければcommit、例外あればトランザクションはロールバック
+#  }
+#eixt}

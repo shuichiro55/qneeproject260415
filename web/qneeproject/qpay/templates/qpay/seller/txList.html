@@ -10,17 +10,17 @@
   <div class="container">
 
     {% if messages %}
-      <div class="row justify-content-center mt-2 mx-2">
+      <div class="messages row justify-content-center mt-2 mx-2">
         {% for message in messages %}
-          <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
+          <div class="alert alert-{{ message.tags }} py-2 rounded-1 mb-0" role="alert">
             <span>{{ message }}</span>
           </div>
         {% endfor %}
       </div>
     {% endif %}
 
-    <nav class="mt-2" aria-label="breadcrumb" role="navigation">
-      <ol class="breadcrumb bg-light-subtle px-2 rounded-3">
+    <nav class="mt-2 bg-light rounded-3" aria-label="breadcrumb" role="navigation">
+      <ol class="breadcrumb px-2">
         <li class="breadcrumb-item">
           <a href="{% url 'accounts:mypage_seller' %}">
             <i class="bi bi-house" style="font-size:1.2em; color:cornflowerblue"></i>
@@ -45,7 +45,10 @@
 
         <div class="d-block d-lg-none">
 
-          <table class="table table-sm table-bordered border-primary-subtle table-responsive">
+          <table class="table table-sm bg-light
+            table-bordered border-primary-subtle
+            shadow-sm table-responsive">
+
             <thead style="font-size:0.9rem">
               <tr class="table-primary" style="text-align:center;">
                 <th rowspan="2" style="vertical-align:middle">#</th>
@@ -78,9 +81,9 @@
                   </td>
                 </tr>
                 <tr>
-                  <td style="text-align:center">{{ item.requested_at|date:"y.n.j H:i"| default:'-' }}</td>
-                  <td style="text-align:center">{{ item.approved_at|date:"y.n.j H:i"| default:'-'}}</td>
-                  <td style="text-align:center">{{ item.advanced_at|date:"y.n.j H:i"| default:'-'}}</td>
+                  <td style="text-align:center">{{ item.requested_at|date:"y.n.j H:i"| default:'ー' }}</td>
+                  <td style="text-align:center">{{ item.approved_at|date:"y.n.j H:i"| default:'ー'}}</td>
+                  <td style="text-align:center">{{ item.advanced_at|date:"y.n.j H:i"| default:'ー'}}</td>
                 </tr>
 
               {% empty %}
@@ -97,7 +100,10 @@
         
         <div class="d-none d-lg-block">
 
-          <table class="table table-sm table-bordered border-primary-subtle table-responsive">
+          <table class="table table-sm bg-light
+            table-bordered border-primary-subtle
+            shadow-sm table-responsive">
+            
             <thead style="font-size:0.9rem">
               <tr class="table-primary" style="text-align:center;">
                 <th rowspan="2" style="vertical-align:middle">#</th>
@@ -160,17 +166,10 @@
                   <td style="text-align:center; vertical-align:middle;">
                     {{ item.requested_at|date:"y.n.j H:i" }}</td>
                   <td style="vertical-align:middle; text-align:center">
-                    {% if item.txStatus_int == 1 %}未了{% endif %}
-                    {% if item.txStatus_int == 2 or item.txStatus_int == 4 %}
-                      {{ item.approved_at|date:"y.n.j H:i" }}{% endif %}
-                    {% if item.txStatus_int == 3 %}否認{% endif %}
+                    {{ item.approved_at|date:"y.n.j H:i"| default:'ー' }}{% endif %}
                   </td>
                   <td style="vertical-align:middle; text-align:center">
-                    {% if item.txStatus_int == 1 %}未了{% endif %}
-                    {% if item.txStatus_int == 2 %}未了{% endif %}
-                    {% if item.txStatus_int == 3 %}不可{% endif %}
-                    {% if item.txStatus_int == 4 %}
-                      {{ item.approved_at|date:"y.n.j H:i" }}{% endif %}
+                    {{ item.approved_at|date:"y.n.j H:i"| default:'ー' }}{% endif %}
                   </td>
                 </tr>
   

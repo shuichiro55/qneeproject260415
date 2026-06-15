@@ -4,7 +4,6 @@
 {% load humanize %}
 
 {% block content %}
-{% csrf_token %}
 
 
 <div class="authentication-bg align-items-start">
@@ -12,17 +11,17 @@
   <div class="container">
 
     {% if messages %}
-      <div class="row justify-content-center mt-2 mx-2">
+      <div class="messages row justify-content-center mt-2 mx-2">
         {% for message in messages %}
-          <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
+          <div class="alert alert-{{ message.tags }} py-2 rounded-1 mb-0" role="alert">
             <span>{{ message }}</span>
           </div>
         {% endfor %}
       </div>
     {% endif %}
 
-    <nav class="mt-2" aria-label="breadcrumb" role="navigation">
-      <ol class="breadcrumb bg-light-subtle px-2 rounded-1">
+    <nav class="mt-2 bg-light rounded-3" aria-label="breadcrumb" role="navigation">
+      <ol class="breadcrumb px-2">
         <li class="breadcrumb-item">
           <a href="{% url 'accounts:mypage_buyer' %}">
             <i class="bi bi-house" style="font-size:1.2em; color:cornflowerblue"></i>
@@ -150,7 +149,10 @@
 
             <div class="d-block d-lg-none">
 
-              <table class="table table-sm table-bordered border-primary-subtle table-responsive">
+              <table class="table table-sm bg-light
+                table-bordered border-primary-subtle
+                shadow-sm table-responsive">
+
                 <thead style="font-size:0.8em">
                   <tr class="table-primary" style="text-align:center;">
                     <th rowspan="2"style="vertical-align:top" class="px-0">#</th>
@@ -177,7 +179,7 @@
                       <td colspan="1" style="text-align:center">
                         {{ item.sellEntityName }}</td>
                       <td colspan="1" style="text-align:center">
-                        {{ item.requested_at| date:"y.n.j H:i" |default:'-' }}</td>
+                        {{ item.requested_at| date:"y.n.j H:i" |default:'ー' }}</td>
                       <td rowspan="3" class="p-1" style="vertical-align:middle; text-align:center">
                         <a href="{% url 'qpay:txListDetail_buyer' item.id page_obj.number %}"
                           class="btn btn-outline-primary w-100 h-100 px-1"
@@ -188,12 +190,9 @@
                       <td colspan="1" style="text-align:center" class="table-primary">
                         承認</td>
                       <td colspan="1" style="vertical-align:middle; text-align:center" class="px-0">
-                        {{ item.buyUser_userName |default:'-' }}</td>
+                        {{ item.buyUser_userName |default:'ー' }}</td>
                       <td colspan="1" style="text-align:center" class="px-0">
-                        {% if item.txStatus_int == 1 %}未了{% endif %}
-                        {% if item.txStatus_int == 2 or item.txStatus_int == 4 %}
-                          {{ item.approved_at| date:"y.n.j H:i" |default:'-' }}{% endif %}
-                        {% if item.txStatus_int == 3 %}否認{% endif %}
+                        {{ item.approved_at| date:"y.n.j H:i" |default:'ー' }}
                       </td>
                     </tr>
 
@@ -203,11 +202,7 @@
                       <td colspan="1" style="vertical-align:middle; text-align:center">
                         Qnee</td>
                       <td rowspan="1" style="vertical-align:middle; text-align:center" class="px-0">
-                        {% if item.txStatus_int == 1 %}未了{% endif %}
-                        {% if item.txStatus_int == 2 %}未了{% endif %}
-                        {% if item.txStatus_int == 3 %}不可{% endif %}
-                        {% if item.txStatus_int == 4 %}
-                          {{ item.advanced_at |date:"y.n.j H:i" |default:'-' }}{% endif %}</td>
+                        {{ item.advanced_at |date:"y.n.j H:i" |default:'ー' }}</td>
                     </tr>
 
                   {% empty %}
@@ -221,7 +216,7 @@
 
             <div class="d-none d-lg-block">
 
-              <table class="table table-sm table-bordered border-primary-subtle table-responsive mx-2">
+              <table class="table table-sm bg-light table-bordered border-primary-subtle table-responsive mx-2">
                 <thead style="font-size:0.9rem">
                   <tr class="table-primary" style="text-align:center;">
                     <th rowspan="2"style="vertical-align:top">#</th>
@@ -289,18 +284,18 @@
                     </tr>
                     <tr>
                       <td style="text-align:center">{{ item.requested_amount|intcomma }}</td>
-                    <td style="text-align:center">{{ item.requested_at|date:"y.n.j H:i" }}</td>
+                    <td style="text-align:center">{{ item.requested_at|date:"y.n.j H:i"| default:'ー' }}</td>
                       <td style="vertical-align:middle; text-align:center">
-                          {% if item.txStatus_int == 1 %}まだ{% endif %}
-                          {% if item.txStatus_int == 2 %}承認{% endif %}
-                          {% if item.txStatus_int == 3 %}否認{% endif %}
-                          {% if item.txStatus_int == 4 %}承認{% endif %}
+                          {% if item.txStatus_int == 1 %}未了{% endif %}
+                          {% if item.txStatus_int == 2 %}未了{% endif %}
+                          {% if item.txStatus_int >= 3 %}承認{% endif %}
+                          {% if item.txStatus_int == -3 %}否認{% endif %}
                       </td>
                       <td style="vertical-align:middle; text-align:center">
-                        {% if item.txStatus_int == 1 %}-{% endif %}
-                        {% if item.txStatus_int == 2 %}{{ item.approved_at|date:"y/n/j H:i"|default:'-' }}{% endif %}
-                        {% if item.txStatus_int == 3 %}{{ item.rejected_at|date:"y/n/j H:i"|default:'-' }}{% endif %}
-                        {% if item.txStatus_int == 4 %}{{ item.approved_at|date:"y/n/j H:i"|default:'-' }}{% endif %}
+                        {% if item.txStatus_int == 1 %}ー{% endif %}
+                        {% if item.txStatus_int == 2 %}ー{% endif %}
+                        {% if item.txStatus_int >= 3 %}{{ item.approved_at|date:"y/n/j H:i"|default:'ー' }}{% endif %}
+                        {% if item.txStatus_int == -3 %}{{ item.rejected_at|date:"y/n/j H:i"|default:'ー' }}{% endif %}
                       </td>
                     </tr>
 
@@ -333,15 +328,18 @@
     {% elif IndivOrAggreg == 'aggreg'%}
 
       <div class="d-flex justify-content-center mt-2">
-        <h5 class="text-secondary pt-1"><b>月次集計　</b></h5>
-        {% bs_icon 'receipt-cutoff' color='deeppink' size='2.2em' %}
+        <h5 class="text-secondary pt-1"><b>月次集計</b></h5>
+        <span class="ms-2">{% bs_icon 'receipt-cutoff' color='deeppink' size='2.2em' %}</span>
       </div>
 
       <div class="row justify-content-center mt-2 mx-0">
 
         <div class="col-md-10 col-lg-8 col-xl-7">
       
-            <table class="table table-sm table-bordered border-primary-subtle table-responsive mt-2 mx-2">
+            <table class="table table-sm bg-light
+              table-bordered border-primary-subtle
+              shadow-sm table-responsive mt-2 mx-2">
+              
               <thead style="font-size:0.9rem">
                 <tr class="table-primary" style="text-align:center;">
                   <th rowspan="2"style="vertical-align:top">#</th>

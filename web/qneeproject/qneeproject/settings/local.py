@@ -10,17 +10,32 @@ PROTOCOL = os.environ.get('SITE_PROTOCOL', 'http')
 DOMAIN = os.environ.get('SITE_DOMAIN', 'localhost:8000')
 SITE_URL = f"{PROTOCOL}://{DOMAIN}"
 
+
 DATABASES = {
   'default': {
-    'ENGINE': 'django.db.backends.mysql',
+    'ENGINE': 'django.db.backends.postgresql',
     'NAME': 'qnee_db',
     'USER': 'shuichiro',
     'PASSWORD': '921Story552@',
-    'HOST': 'localhost',  # 'mysql',
-    'PORT': '3306',  #'53306',
-    'ATOMIC_REQUESTS': True, # 最後まで問題なければcommit、例外あればトランザクションはロールバック
+    'HOST': 'localhost',
+    'PORT': '5432',     # PostgreSQLのデフォルトポート
+    'OPTIONS': {
+      'options': '-c search_path=public'  # ここを確認・追加
+    },
   }
 }
+
+#DATABASES = {
+#  'default': {
+#    'ENGINE': 'django.db.backends.mysql',
+#    'NAME': 'qnee_db',
+#    'USER': 'shuichiro',
+#    'PASSWORD': '921Story552@',
+#    'HOST': 'localhost',  # 'mysql',
+#    'PORT': '3306',  #'53306',
+#    'ATOMIC_REQUESTS': True, # 最後まで問題なければcommit、例外あればトランザクションはロールバック
+#  }
+#}
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases

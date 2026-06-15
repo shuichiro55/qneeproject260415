@@ -10,17 +10,17 @@
   <div class="container">
 
     {% if messages %}
-      <div class="row justify-content-center mt-2 mx-2">
+      <div class="messages row justify-content-center mt-2 mx-2">
         {% for message in messages %}
-          <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
+          <div class="alert alert-{{ message.tags }} py-2 rounded-1 mb-0" role="alert">
             <span>{{ message }}</span>
           </div>
         {% endfor %}
       </div>
     {% endif %}
 
-    <nav class="mt-2" aria-label="breadcrumb" role="navigation">
-      <ol class="breadcrumb bg-light-subtle px-2 rounded-3">
+    <nav class="mt-2 bg-light rounded-3" aria-label="breadcrumb" role="navigation">
+      <ol class="breadcrumb px-2">
         <li class="breadcrumb-item">
           <a href="{% url 'accounts:mypage_admin' %}">
             <i class="bi bi-house" style="font-size:1.2em; color:cornflowerblue"></i>
@@ -49,7 +49,7 @@
     <div class="row justify-content-center">
       <div class="col-md-9 col-lg-6">
       
-        <table class="table table-sm table-bordered border-primary-subtle table-responsive mt-1 mb-0">
+        <table class="table table-sm bg-light table-bordered border-primary-subtle table-responsive mt-1 mb-0">
           <tbody>
             <tr class="table-info">
               <td width="40%" class="table-primary"><b>取引状況</b></td>
@@ -57,11 +57,11 @@
               {% if tx.txStatus_int == 1 %}
                 <td class="table-danger" style="text-align:right;">パートナ承認前</td>{% endif %}
               {% if tx.txStatus_int == 2 %}
+                <td class="table-danger" style="text-align:right;">パートナ承認前</td>{% endif %}
+              {% if tx.txStatus_int >= 3 %}
                 <td class="table-info" style="text-align:right;">パートナ承認済<br>Qnee支払い前</td>{% endif %}
-              {% if tx.txStatus_int == 3 %}
+              {% if tx.txStatus_int == -3 %}
                 <td class="table-danger" style="text-align:right;">パートナ否認</td>{% endif %}
-              {% if tx.txStatus_int == 4 %}
-                <td class="talbe-info" style="text-align:right;">パートナ承認済<br>Qnee支払い済</td>{% endif %}
             </tr>
 
             <tr>
@@ -109,33 +109,33 @@
           </tbody>
         </table>
 
-        <table class="table table-sm table-bordered border-primary-subtle table-responsive mt-1">
+        <table class="table table-sm bg-light table-bordered border-primary-subtle table-responsive mt-1">
           <tbody>
             <tr>
               <td width="40%" class="table-primary"><b>承認者</b></td>
               <td style="text-align:right;">{{ tx.buyEntityName }}</td></tr>
             <tr>
               <td width="40%" class="table-primary"><b>承認ユーザー</b></td>
-              <td style="text-align:right;">{{ tx.buyUser_userName|default:'-' }}</td></tr>
+              <td style="text-align:right;">{{ tx.buyUser_userName|default:'ー' }}</td></tr>
             <tr class="table-info">
               <td width="40%" class="table-primary"><b>承認額</b></td>
-              <td style="text-align:right;">{{ tx.approved_amount|default:'-'|intcomma }}</td></tr>
+              <td style="text-align:right;">{{ tx.approved_amount| intcomma| default:'ー' }}</td></tr>
 
           </tbody>
         </table>
 
         {% if tx.txStatus_int >= 2 %}
-          <table class="table table-sm table-bordered border-primary-subtle table-responsive mt-0">
+          <table class="table table-sm bg-light table-bordered border-primary-subtle table-responsive mt-0">
             <tbody>
               <tr class="table-info">
                 <td width="40%" class="table-primary"><b>申請者受取り</b></td>
-                <td style="text-align:right;">{{ tx.transfer_amount|default:'-'|intcomma }}</td></tr>
+                <td style="text-align:right;">{{ tx.transfer_amount| intcomma| default:'ー' }}</td></tr>
               <tr>
                 <td width="40%" class="table-primary" >＋Qnee前払額</td>
-                <td style="text-align:right;">{{ tx.advance_amount|intcomma }}</td></tr>
+                <td style="text-align:right;">{{ tx.advance_amount| intcomma| default:'ー' }}</td></tr>
               <tr>
                 <td width="40%" class="table-primary" >－前払手数料</td>
-                <td style="text-align:right;">{{ tx.advance_fee|intcomma }}</td></tr>
+                <td style="text-align:right;">{{ tx.advance_fee| intcomma| default:'ー' }}</td></tr>
               <tr>
                 <td width="40%" class="table-primary" >－振込手数料</td><td style="text-align:right;">{{ tx.transfer_fee|intcomma }}</td></tr>
             </tbody>
@@ -146,7 +146,7 @@
           <i class="bi bi-bank2" style="font-size:1.3em; color:deeppink;"></i>
           <b class="ms-1">申請者の設定口座</b></h6>
 
-        <table class="table table-sm table-bordered border-primary-subtle table-responsive mt-0 mb-0">
+        <table class="table table-sm bg-light table-bordered border-primary-subtle table-responsive mt-0 mb-0">
           <tbody>
             <tr>
               <td width="40%" class="table-primary"><b>金融機関・支店</b></td>

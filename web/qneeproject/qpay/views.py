@@ -515,12 +515,14 @@ class TxApproveView_buyer(LoginRequiredMixin, generic.UpdateView):
     # 承認待ちの取引を抽出する   
     object_list = QpayTx.objects.select_related('buyUser').filter(
       Q(buyEntity=loginUser.entity)
-      & (Q(txStatus_int=1) | Q(txStatus_int=3))).order_by('-requested_at')
+      & (Q(txStatus_int__lte=2) | Q(txStatus_int=-3))
+      ).order_by('-requested_at')
 
     # 確認用
     cnt = QpayTx.objects.select_related('buyUser').filter(
       Q(buyEntity=loginUser.entity)
-      & Q(txStatus_int__lte=3)).order_by('txStatus_int', '-requested_at').count()
+      & (Q(txStatus_int__lte=2) | Q(txStatus_int=-3))
+      ).order_by('txStatus_int', '-requested_at').count()
     
     paginator = Paginator(object_list, self.paginate_by)
 
@@ -580,8 +582,9 @@ class TxApproveDetailView_buyer(LoginRequiredMixin, generic.UpdateView):
     tx_id = self.request.session.get('tx_id')
     print(f'tx_id = {tx_id} in get of TxApproveDetailView_buyer')
 
+    context = { 'step_process': 1, 'tx': tx, }
     return TemplateResponse(request,
-      "qpay/buyer/txApproveDetail.html", {'tx': tx,}) 
+      "qpay/buyer/txApproveDetail.html", context) 
 
 
   def post(self, request, *args, **kwargs):
@@ -598,9 +601,9 @@ class TxApproveDetailView_buyer(LoginRequiredMixin, generic.UpdateView):
 
     if next == "ToApproveQpay":
  
-      # 承認された場合の処理（処理状況の更新、Qneeへの連絡等）を行う
-      tx.txStatus_int = 2
-      tx.txStatus_char = "承認済・前払い前"
+      # 承認された場合の処理
+      tx.txStatus_int = 3
+      tx.txStatus_char = "承認済"
       tx.approved_at = timezone.now()
 
       ## 一旦、リスクエスト金額を承認された金額にする 24/07/25
@@ -647,15 +650,36 @@ class TxApproveDetailView_buyer(LoginRequiredMixin, generic.UpdateView):
         print(f'flag_bankAccountUnset={flag_bankAccountUnset} in TxApproveDetailView_buyer')
 
       #del self.request.session['tx_id']
-      return TemplateResponse(request, "qpay/buyer/txApproveDetail.html", {'tx': tx,})
-    
+      context = { 'step_process': 1, 'tx': tx,}
+      return TemplateResponse(request, "qpay/buyer/txApproveDetail.html", context)
+
+
+    # 差戻しした場合の処理
+    elif next == "ToSendbackQpay":
+
+      print(f'after ToRejectQpay in post of TxApproceDetailView_buyer')
+
+      # 否認された場合の処理（処理状況の更新、受注者への連絡等）を行う
+      tx.txStatus_int = 2
+      tx.txStatus_char = "差戻済"
+      tx.sendbacked_at = timezone.now()
+
+      tx.buyUser = buyUser
+      tx.buyUser_userName = buyUser.userName
+
+      tx.save()
+
+      context = { 'step_process': 2, 'tx': tx, }
+      return TemplateResponse(request, "qpay/buyer/txApproveDetail.html", context)
+
 
     elif next == "ToRejectQpay":
 
       print(f'after ToRejectQpay in post of TxApproceDetailView_buyer')
+
       # 否認された場合の処理（処理状況の更新、受注者への連絡等）を行う
-      tx.txStatus_int = 3
-      tx.txStatus_char = "否認済み"
+      tx.txStatus_int = -3
+      tx.txStatus_char = "否認済"
       tx.rejected_at = timezone.now()
 
       tx.buyUser = buyUser
@@ -663,7 +687,7 @@ class TxApproveDetailView_buyer(LoginRequiredMixin, generic.UpdateView):
 
       tx.save()
 
-      context = {'tx': tx,}
+      context = {'step_process': 1, 'tx': tx,}
       return TemplateResponse(request, "qpay/buyer/txApproveDetail.html", context)
 
     print(f'pass3 other')
@@ -795,13 +819,13 @@ class TxInboxView_admin(generic.UpdateView):
 
   def get(self, request, *args, **kwargs):
 
-    # パートナーに承認されたデータを抽出する
+    # パートナー承認まで（Qnee支払前）のデータを抽出
     object_list = QpayTx.objects.select_related('sellEntity').filter(
-      Q(txStatus_int=1) | Q(txStatus_int=2)).order_by('-requested_at')
+      Q(txStatus_int__lte=2) | Q(txStatus_int=-3)).order_by('-requested_at')
     
     # 確認用
     cnt = QpayTx.objects.select_related('sellEntity').filter(
-      Q(txStatus_int=1) | Q(txStatus_int=2)).order_by('-requested_at').count()
+      Q(txStatus_int__lte=2) | Q(txStatus_int=-3)).order_by('-requested_at').count()
     print(f'cnt={cnt} in def get of TxInboxView')
 
     paginator = Paginator(object_list, self.paginate_by)
@@ -909,9 +933,10 @@ class TxInboxDetailView_admin(LoginRequiredMixin, generic.UpdateView):
     if actionBtn == "ToTransferMoney":
 
       print("「振込処理する」が押下された post in TxInboxDetailView")
-      # 承認された場合の処理（処理状況の更新、Qneeへの連絡等）を行う
-      tx.txStatus_int = 4
-      tx.txStatus_char = "承認済み・前払い済み" 
+
+      # 振込処理をした場合の処理
+      tx.txStatus_int = 5
+      tx.txStatus_char = "前払済" 
       tx.advanced_at = timezone.now()
       
       tx.save()
@@ -953,9 +978,9 @@ class TxInboxDetailView_admin(LoginRequiredMixin, generic.UpdateView):
 
     elif next == "RejectRemittance":
 
-      # 否認された場合の処理（処理状況の更新、受注者への連絡等）を行う
-      tx.txStatus_int = 5
-      tx.txStatus_char = "承認済み・支払い保留"
+      # 振込処理を謝絶の場合の処理
+      tx.txStatus_int = -5
+      tx.txStatus_char = "前払謝絶"
       tx.rejected_at = timezone.now()
       tx.save()
 

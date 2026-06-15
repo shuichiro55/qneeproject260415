@@ -9,9 +9,9 @@
   <div class="container">
   
     {% if messages %}
-      <div class="row justify-content-center mt-2 mx-2">
+      <div class="messages row justify-content-center mt-2 mx-2">
         {% for message in messages %}
-          <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
+          <div class="alert alert-{{ message.tags }} py-2 rounded-1 mb-0" role="alert">
             <span>{{ message }}</span>
           </div>
         {% endfor %}
@@ -64,7 +64,7 @@
 
         <div class="row justify-content-center mt-4">
           <span class="text-secondary" style="font-size:1.25em">
-            ゲスト登録
+            ユーザー登録
           </span>
         </div>
 
@@ -82,4 +82,28 @@
   </div>
 
 </div>
+
+{% endblock %}
+
+
+{% block extrajs %}
+
+<script>
+  
+  document.addEventListener('DOMContentLoaded', function() {
+
+    // 3秒後にメッセージを消す
+    setTimeout(function() {
+      console.log('setTimeoutが認識されました');
+
+      var messages = document.querySelectorAll('.messages div');
+      messages.forEach(function(message) {
+        message.style.display = 'none';
+      });
+    }, 3000); // 3000ミリ秒 = 3秒
+
+  });
+  
+</script>
+
 {% endblock %}

@@ -12,17 +12,17 @@
   <div class="container">
 
     {% if messages %}
-      <div class="row justify-content-center mt-2 mx-2">
+      <div class="messages row justify-content-center mt-2 mx-2">
         {% for message in messages %}
-          <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
+          <div class="alert alert-{{ message.tags }} py-2 rounded-1 mb-0" role="alert">
             <span>{{ message }}</span>
           </div>
         {% endfor %}
       </div>
     {% endif %}
 
-    <nav class="mt-2" aria-label="breadcrumb" role="navigation">
-      <ol class="breadcrumb bg-light-subtle px-2 rounded-3">
+    <nav class="mt-2 bg-light rounded-3" aria-label="breadcrumb" role="navigation">
+      <ol class="breadcrumb px-2">
         <li class="breadcrumb-item"><a href="{% url 'accounts:mypage_seller' %}">
           <i class="bi bi-house" style="font-size:1.2em; color:cornflowerblue;"></i>
           マイページトップ</a></li>
@@ -33,20 +33,20 @@
       </ol>
     </nav>
 
-    <div class="d-flex justify-content-center mt-4">
+    <div class="d-flex justify-content-center mt-5">
       <h5 class="text-secondary"><b>ユーザー権限の編集</b></h5>
       <i class="bi bi-pencil-square ms-3" style="font-size:1.8em; color:deeppink;"></i>
     </div>
 
     <div class="row justify-content-center mt-2">
-      <div class="col-10 col-md-8 col-lg-6 col-xl-5">
+      <div class="col-11 col-md-8 col-lg-6 col-xl-5">
 
         <form method="POST" action="{% url 'accounts:permissionSets_seller' %}"
           class="form-group border border-top shadow-sm p-3 mb-5 bg-light rounded">
           {% csrf_token %}         
           {{ form.non_field_errors }}
 
-          <table class="table table-sm table-bordered border-primary-subtle table-responsive">
+          <table class="table table-sm bg-light table-bordered border-primary-subtle table-responsive">
             <tbody class="text-center">
               <tr>
                 <th scope="col" width="33%" class="table-primary" style="text-align: left;">申請者</th>
@@ -65,7 +65,7 @@
 
           <!-- <hr> -->
 
-          <table class="table table-bordered border-primary-subtle table-responsive">
+          <table class="table table-sm bg-light table-bordered border-primary-subtle table-responsive">
             <tbody class="text-center">
               <tr>
                 <th scope="col" width="33%" class="table-primary" style="text-align: left;">各種権限</th>
@@ -85,7 +85,7 @@
                       name="{{form.canApproveChg.name}}"
                       value="True">
                     <label class="form-check-label col-xs-6 col-lg-6 ms-3" for="{{form.canApproveChg.id_for_label}}">
-                      ユーザー追加</label>
+                      各種変更</label>
                   </div>
       
                   <div class="form-check form-switch ms-2">
@@ -135,7 +135,7 @@
 <script>
 
   document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOMContentLoaded in permissionUpate_seller.html が認識されました');
+    console.log('DOMContentLoaded 1 in permissionUpate_seller.html が認識されました');
 
     var CanApproveAll = document.getElementById("{{ form.canApproveAll.id_for_label }}");
     var value_CanApproveAll = "{{ editedUser.canApproveAll }}"; // DjangoからJSに値を渡す
@@ -173,6 +173,35 @@
     } else {
       CanApproveQpay.checked = false;
     }
+
+    console.log('DOMContentLoaded 2 in permissionUpate_seller.html が認識されました');
+
+    const SwitchButtons = document.querySelectorAll('input[type="checkbox"]'); // チェックボックスをすべて取得
+
+    //★★ 正しく動いていない 20260615
+    SwitchButtons.forEach(eachButton => {
+      console.log('forEachに入りました');
+      const eventLabel = document.querySelector(`label[for="${eachButton.id}"]`);
+
+      if (eachButton.checked) {
+        eventLabel.classList.add('active-underline');
+      } else {
+        eventLabel.classList.remove('active-underline');
+      }
+    });
+
+    SwitchButtons.forEach(eachButton => {
+      eachButton.addEventListener('change', function(event) {
+        const eventButton = event.target;
+        const eventLabel = document.querySelector(`label[for="${eventButton.id}"]`);
+
+        if (eventButton.checked) {
+          eventLabel.classList.add('active-underline');
+        } else {
+          eventLabel.classList.remove('active-underline');
+        }
+      });
+    });
 
   });
 

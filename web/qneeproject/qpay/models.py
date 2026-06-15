@@ -13,7 +13,7 @@ usermodel = get_user_model()
 def user_directory_path(instance, filename):
   dateTime = datetime.datetime.now()  # 現在の時刻を取得
   date_dir = datetime.datetime.now().strftime('%Y%m%d_%H-%M-%S')  # 年/月/日のフォーマットの作成
-  time_stamp = datetime.datetime.now().strftime('%H-%M-%S')  # 時-分-秒のフォーマットを作成
+  time_stamp = datetime.datetime.now().strftime('%H-%M-%S_')  # 時-分-秒のフォーマットを作成
   new_filename = time_stamp + filename  # 実際のファイル名と結合
   user_directory = os.path.join(date_dir, new_filename)  # 階層構造にする
   #le = LegalEntity.objects.get(pk=instance.sellerEntity_id)
@@ -22,12 +22,16 @@ def user_directory_path(instance, filename):
 
 class TxStatus(models.IntegerChoices):
   """ 状態 """
-  UNPROCESSED = 1 # 「未処理」：未処理
-  BUYER_APPROVED = 2    # 「承認」：承認済み（前払い未了）
-  BUYER_DISAPPROVED = 3 # 「否認」：否認済み
-  QNEE_PAYED = 4  # 　「前払い済み」：前払い完了（Qnee⇒Seller）
-  QNEE_UNPAYED = 5  # 「前払い保留」：前払い保留（Qnee⇒Seller）
-  BUYER_PAYED = 6 # 　「完了」：Qnee受領（Buyer⇒Qnee）
+  UNPROCESSED = 1 # 未処理
+  BUYER_PENDING = 2 # 申請差戻
+  BUYER_APPROVED = 3    # 承認
+  QNEE_PENDING = 4 # 申請差戻
+  QNEE_PAYED = 5  # 前払済（Qnee⇒Seller）
+  BUYER_PAYED = 6 # 取引完了：パートナーからQneeに送金済み
+
+  BUYER_DISAPPROVED = -3 # 否認
+  QNEE_DISAPPROVED = -5  # 前払謝絶
+
   
 class QpayTx(models.Model):
 
@@ -95,6 +99,7 @@ class QpayTx(models.Model):
   #advancePayment_date = models.DateField(_('前払日'), null=True)
   # advanced_atがあるの不要
 
+  sendbacked_at = models.DateTimeField(_('差戻時点'), null=True, blank=True)
   rejected_at = models.DateTimeField(_('否認時点'), null=True, blank=True)
   #updated_at = models.DateTimeField(_('更新時点'), auto_now_add=True)
 

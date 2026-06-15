@@ -7,17 +7,19 @@
   <div class="container">
 
     {% if messages %}
-      <div class="row justify-content-center mt-2 mx-2">
+      <div class="messages row justify-content-center mt-2 mx-2">
         {% for message in messages %}
-          <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
+          <div class="alert alert-{{ message.tags }} py-2 rounded-1 mb-0" role="alert">
             <span>{{ message }}</span>
           </div>
         {% endfor %}
       </div>
     {% endif %}
 
-    <nav class="mt-2" aria-label="breadcrumb" role="navigation">
-      <ol class="breadcrumb bg-light-subtle px-2 rounded-3">
+    <nav class="mt-2 bg-light rounded-3 border-top shadow-sm"
+      aria-label="breadcrumb" role="navigation">
+
+      <ol class="breadcrumb px-2">
         <li class="breadcrumb-item">
           <a href="{% url 'accounts:mypage_seller' %}">
           <i class="bi bi-house" style="font-size:1.2em; color:cornflowerblue;"></i>
@@ -34,29 +36,39 @@
       </ol>
     </nav>
 
-    <div class="row justify-content-center my-auto mt-4">
-      <div class="col-10 col-md-8 col-lg-6 col-xl-5">
+    <div class="d-flex justify-content-center mt-5">
+      <h5 class="text-secondary mt-1 my-0"><b>ユーザーからの参加申請</b></h5>
+      <i class="bi bi-envelope-open-fill ms-3" style="font-size:2.0em; color:deeppink;"></i>
+    </div> 
 
-        <div class="d-flex justify-content-center mt-4">
-          <h5 class="text-secondary mt-1"><b>ユーザーからの参加申請</b></h5>
-          <i class="bi bi-envelope-open ms-3" style="font-size:2.0em; color:deeppink;"></i>
-        </div> 
+    <div class="row justify-content-center my-auto mt-2">
+      <div class="col-11 col-md-8 col-lg-6 col-xl-5">
 
         {% if loginUser.canApproveAll == True or loginUser.canApproveChg == True %}
 
           <!-- 承認者がメールからアプリに入る場合の処理 -->
           {% if request.session.flag_frWhere == 1 %}
 
+            {% if applyUser.addStatus == 1 or applyUser.addStatus == 3 %}
+
             <form method="POST" action="{% url 'accounts:userAdd_seller' %}"
               class="form-group border border-top shadow-sm p-3 bg-light rounded mt-2">
               {% csrf_token %}
 
-              <table class="table table-sm table-bordered border-primary-subtle table-responsive">
+              <table class="table table-sm bg-light table-bordered border-primary-subtle table-responsive">
                 <tbody class="text-center">
-                  {% if applyUser.addStatus == 1 %}<tr class="table-info"> {% endif %}
-                  {% if applyUser.addStatus == 3 %}<tr class="table-danger"> {% endif %}
-                    <th scope="col" width="36%" class="table-primary" style="text-align:left;">申請者</th>
-                    <td style="text-align: right;">{{ applyUser.userName }}さん</td></tr>
+
+                  <tr class="table-info">
+                    <th scope="col" width="36%" class="table-primary" style="text-align:left;">
+                      承認状況</th>
+                    <td style="text-align: right;">
+                      {{ applyUser.addStatus_char }}</td></tr>
+
+                  <tr>
+                    <th scope="col" width="36%" class="table-primary" style="text-align:left;">
+                      申請者</th>
+                    <td style="text-align: right;">
+                      {{ applyUser.userName }}さん</td></tr>
                   <tr>
                     <th scope="col" width="36%" class="table-primary" style="text-align:left;">電話番号</th>
                     <td style="text-align: right;">{{ applyUser.tel_user }}</td></tr>
@@ -69,7 +81,7 @@
                 </tbody>
               </table>
 
-              <table class="table table-sm table-bordered border-primary-subtle table-responsive">
+              <table class="table table-sm bg-light table-bordered border-primary-subtle table-responsive">
                 <tbody class="text-center">
                   <tr>
                     <th scope="col" td width="12%" rowspan="3" class="table-primary" style="text-align: left;">
@@ -97,23 +109,27 @@
               <p></p>
           
               <div class="d-flex justify-content-center">
-                <button type="submit" class="btn btn-primary flex-grow-1 shadow"
+
+                <button type="submit" class="btn btn-outline-primary flex-grow-1 px-0 shadow"
+                  name="next"
+                  value="ToRefuseUser_{{applyUser.id}}" >
+                  否認　　</button>
+
+                <button type="submit" class="btn btn-primary flex-grow-1 px-0 ms-1 shadow"
                   name="next"
                   value="ToEditPermission_{{applyUser.id}}" >
                   ① 権限編集</button>
 
-                <button type="submit" class="btn btn-primary shadow flex-grow-1 ms-1"
+                <button type="submit" class="btn btn-primary flex-grow-1 px-0 ms-1 shadow"
                   name="next"
                   value="ToApproveUser_{{applyUser.id}}" >
                   ② 承認　　</button>
 
-                <button type="submit" class="btn btn-outline-primary bg-light shadow flex-grow-1 ms-1"
-                  name="next"
-                  value="ToRefuseUser_{{applyUser.id}}" >
-                  否認　　</button>  
               </div>
 
             </form>
+
+            {% endif %}
 
           {% endif %}
 
@@ -132,15 +148,19 @@
                 {% else %} <hr class="">
                 {% endif %}
 
-                <table class="table table-sm table-bordered border-primary-subtle table-responsive mb-1">
+                <table class="table table-sm bg-light table-bordered border-primary-subtle table-responsive mb-1">
                   <tbody class="text-center">
-                    {% if applyUser.addStatus == 1 %}<tr class="table-info"> {% endif %}
-                    {% if applyUser.addStatus == 3 %}<tr class="table-danger"> {% endif %}
-                      <th scope="col" width="36%" class="table-primary" style="text-align:left;">承認状況</th>
+
+                    <tr class="table-info">
+                      <th scope="col" width="36%" class="table-primary" style="text-align:left;">
+                        承認状況</th>
                       <td style="text-align: right;">{{ applyUser.addStatus_char }}</td></tr>
+
                     <tr>
-                      <th scope="col" width="36%" class="table-primary" style="text-align:left;">申請者</th>
+                      <th scope="col" width="36%" class="table-primary" style="text-align:left;">
+                        申請者</th>
                       <td style="text-align: right;">{{ applyUser.userName }}さん</td></tr>
+
                     <tr>
                       <th scope="col" width="36%" class="table-primary" style="text-align:left;">電話番号</th>
                       <td style="text-align: right;">{{ applyUser.tel_user }}</td></tr>
@@ -153,7 +173,7 @@
                   </tbody>
                 </table>
 
-                <table class="table table-sm table-bordered border-primary-subtle table-responsive">
+                <table class="table table-sm bg-light table-bordered border-primary-subtle table-responsive">
                   <tbody class="text-center">
                     <tr>
                       <th scope="col" td width="12%" rowspan="3" class="table-primary" style="text-align: left;">
@@ -181,20 +201,22 @@
 
 
                 <div class="d-flex justify-content-center pb-3">
-                  <button type="submit" class="btn btn-primary flex-grow-1 shadow"
+
+                  <button type="submit" class="btn btn-outline-primary flex-grow-1 px-0 shadow ms-1"
+                    name="next"
+                    value="ToRefuseUser_{{applyUser.id}}" >
+                    否認　　</button>
+
+                  <button type="submit" class="btn btn-primary flex-grow-1 px-0 ms-1 shadow"
                     name="next"
                     value="ToEditPermission_{{applyUser.id}}" >
                     ① 権限編集</button>
-
-                  <button type="submit" class="btn btn-primary flex-grow-1 shadow ms-1"
+                    
+                  <button type="submit" class="btn btn-primary flex-grow-1 px-0 ms-1 shadow"
                     name="next"
                     value="ToApproveUser_{{applyUser.id}}" >
                     ② 承認　　</button>
 
-                  <button type="submit" class="btn btn-outline-primary bg-light flex-grow-1 shadow ms-1"
-                    name="next"
-                    value="ToRefuseUser_{{applyUser.id}}" >
-                    否認　　</button>  
                 </div>
 
               {% empty %}

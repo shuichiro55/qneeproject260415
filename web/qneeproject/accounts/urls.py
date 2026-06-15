@@ -76,10 +76,6 @@ urlpatterns = [
   path('userAdd_seller', views.UserAddView_seller.as_view(), name='userAdd_seller'),
   path('buyUserAdd_admin', views.BuyUserAddView_admin.as_view(), name='buyUserAdd_admin'),
 
-  path('<str:token>/corpInfoUpdatePre_admin', views.CorpInfoUpdatePreView_admin.as_view(), name='corpInfoUpdatePre_admin'),
-  path('<int:corpInfo_id>/corpInfoUpdate_admin', views.CorpInfoUpdateView_admin.as_view(), name='corpInfoUpdate_admin'),
-  path('corpInfoUpdate_admin', views.CorpInfoUpdateView_admin.as_view(), name='corpInfoUpdate_admin'),
-
   path('passwordChange_buyer/', views.MyPasswordChangeView_buyer.as_view(), name='passwordChange_buyer'),
   #path('passwordChange2_buyer/', views.MyPasswordChange2View_buyer.as_view(), name='passwordChange2_buyer'),
 
@@ -135,7 +131,12 @@ urlpatterns = [
   path('accounts/passwordResetDone_admin/', views.MyPasswordResetDoneView_admin.as_view(), name='passwordResetDone_admin'),
   path('passwordReset_admin/<uidb64>/<token>/', views.MyPasswordResetConfirmView_admin.as_view(), name='passwordResetConfirm_admin'),
 
-  path('profileEdit_buyer/', views.ProfileEditView_buyer.as_view(), name='profileEdit_buyer'),  # 24/08/21追加
-  path('profileEdit_seller/', views.ProfileEditView_seller.as_view(), name='profileEdit_seller'),  # 24/08/21追加
+  path('profileEdit_buyer/', views.ProfileEditView_buyer.as_view(), name='profileEdit_buyer'),
+  path('profileEdit_seller/', views.ProfileEditView_seller.as_view(), name='profileEdit_seller'),
+
+  path('<str:token>/corpInfoUpdatePre_admin', views.CorpInfoUpdatePreView_admin.as_view(), name='corpInfoUpdatePre_admin'),
+
+  path('<int:corpInfo_id>/corpInfoUpdate_admin', views.CorpInfoUpdateView_admin.as_view(), name='corpInfoUpdate_admin'),
+  path('corpInfoUpdate_admin', views.CorpInfoUpdateView_admin.as_view(), name='corpInfoUpdate_admin'),
 
 ]

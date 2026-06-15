@@ -101,9 +101,9 @@ class LegalEntity(models.Model):
     _('規約同意の日時'), null=True, blank=True,)
 
   # 業務委託契約の同意状況、同意日時
-  sourcingConsent_boolean = models.BooleanField(_('契約合意'),default=False)  
+  sourcingConsent_boolean = models.BooleanField(_('委託契約の合意'),default=False)  
   sourcingConsent_at = models.DateTimeField(
-    _('契約合意の日時'), null=True, blank=True,)
+    _('委託契約の合意日時'), null=True, blank=True,)
   
   # 会員登録した日時 規約に同意したタイミングで管理するので不要
   #joined_at = models.DateTimeField(_('登録日'), null=True, blank=True)
@@ -152,7 +152,8 @@ class CustomUserManager(UserManager):
 class AddStatus(models.IntegerChoices):
 
   """ 承認された参加者かを判定するフラグ """
-  UNPROCCESSED = 1  # 未処理
+  UNPROCCESSED = 0  # 初期値
+  APPLIED = 1       # 申請済み（承認前）
   APPROVED = 2      # 承認済み
   DISAPPROVED = 3   # 否認済み
 
@@ -235,7 +236,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
   is_active = models.BooleanField(_('アクティブ'), default=False)   # 利用規約に同意した時点
 
   addStatus = models.IntegerField(choices=AddStatus.choices,
-    default=1, verbose_name='参加承認')
+    default=0, verbose_name='参加承認')
   addStatus_char = models.CharField(max_length=20, null=False, blank=False, default="承認待ち", verbose_name='承認状況')
 
   # 登録の経過を確認するためのフラグ
@@ -299,11 +300,13 @@ def user_directory_path(instance, filename):
 
 """ 会社情報を更新するときの承認ステータス """
 class UpdateStatus(models.IntegerChoices):
-  DEFAULT = 0
-  UNDER_APPLICATION = 1  # 申請中
-  APPROVED = 2     # 承認済み
-  PENDDING = 3   # 保留
+  DEFAULT = 1
+  UNDER_APPLICATION = 2  # 申請中
+  PENDING = 3     # 申請差戻
+  APPROVED = 4   # 承認
 
+  DISAPPROVED = -4   # 否認
+  
 
 """ 会社情報を更新する場合に、Qneeに承認されるまで更新後データを維持 """
 """ このデータを維持することで更新履歴が見れるようにする """
@@ -318,7 +321,7 @@ class CorpInfo(models.Model):
   # このデータがある場合、参照先（親）のデータが削除を防ぐ（ProtectedError）
 
   status = models.IntegerField(choices=UpdateStatus.choices,
-    default=0, verbose_name='更新状況')
+    default=1, verbose_name='更新状況')
   status_char = models.CharField(max_length=20, 
     null=False, blank=False, default="承認待ち", verbose_name='更新状況')
 
@@ -372,6 +375,12 @@ class CorpInfo(models.Model):
     _('更新情報の証明（登記簿謄本など）'),
     upload_to = user_directory_path , 
     validators=[FileExtensionValidator(['jpg', 'png', 'jpeg', 'pdf', ])], null=True, default=None) 
+
+  sendbackReason = models.CharField(
+    '差戻理由', max_length=100, unique=False, null=True, blank=True,)
+  
+  sendbackMessage = models.TextField(
+    '差戻理由', max_length=200, unique=False, null=True, blank=True,)
 
 
   def save(self, *args, **kwargs):

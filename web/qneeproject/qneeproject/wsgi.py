@@ -12,5 +12,7 @@ import os
 from django.core.wsgi import get_wsgi_application
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'qneeproject.settings.production')
+# Djangoの設定いついて、wsgi.py内で設定ファイル*.pyを指定する
 
-application = get_wsgi_application()  # WSGIアプリケーションオブジェクト
+application = get_wsgi_application()
+# WSGIアプリケーションオブジェクトをセット

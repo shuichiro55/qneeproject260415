@@ -11,12 +11,14 @@
   <div class="container">
 
     {% if messages %}
-      <div class="row justify-content-center mt-2 mx-2">
-        {% for message in messages %}
-          <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
-            <span>{{ message }}</span>
-          </div>
-        {% endfor %}
+      <div class="messages row justify-content-center mt-2">
+        <div class="col-11 col-sm-10 col-md-9">
+          {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} py-2 rounded-1 mb-0" role="alert">
+              <span>{{ message }}</span>
+            </div>
+          {% endfor %}
+        </div>
       </div>
     {% endif %}
     
@@ -78,23 +80,22 @@
 
     {% if flag_step == 1 %}
 
-      <div class ="row justify-content-center mx-4">
-        <div class="col-sm-10 col-md-9">
+      <div class="d-flex justify-content-center align-items-center mt-4 gap-2">
+        <h5 class="text-secondary text-center"><b>利用規約のご確認</b></h5>
+        <i class="bi bi-check-all mb-2" style="font-size:2.4em; color:deeppink;"></i>
+      </div>
 
-          <div class="d-flex justify-content-center align-items-center mt-5 gap-2">
-            <h5 class="text-secondary text-center"><b>利用規約のご確認</b></h5>
-            <i class="bi bi-check-all mb-2" style="font-size:2.4em; color:deeppink;"></i>
-          </div>
-
-          <div class="iframe-wrapper d-flex justify-content-center mt-3">
-            <iframe src= "{% static 'accounts/利用規約（サンプル）.pdf' %}"></iframe>
+      <div class ="row justify-content-center mt-2">
+        <div class="col-11 col-md-7 col-lg-5">
+          <div class="iframe-wrapper d-flex justify-content-center" style="height: 420px;">
+            <iframe src= "{% static 'accounts/利用規約（サンプル）.pdf' %}" class="w-100"></iframe>
           </div>
 
         </div> <!-- end col -->
       </div> <!-- end row -->
 
-      <div class="row justify-content-center mt-3 mx-4">
-        <div class="col-sm-10 col-md-9">
+      <div class="row justify-content-center mt-3">
+        <div class="col-11 col-md-8 col-lg-6">
 
           <form method="POST"
             action="{% url 'accounts:agreementConfirm_seller' %}"
@@ -106,32 +107,37 @@
                 <input id="checkbox" type="checkbox"
                   name="checkConsent"
                   value="ToAgree">
-                <span> 利用規約に同意する </span>
+                <span> 利用規約を確認した </span>
               </label>
             </div>
 
             <div class="d-flex justify-content-center mt-3">
-              <button id="next1" type="submit" class="btn btn-primary me-2"
+              <button id="next1" type="submit"
+                class="btn btn-outline-primary flex-grow-1 px-0 shadow"
                 name="next"
                 value="ToDisagree_{{user.id}}_{{entity.id}}"
                 data-bs-toggle="tooltip"
                 data-bs-placement="bottom"
-                title="">同意しない
+                title="">手続き終了
               </button>
             
-              <button id="next2" type="submit" class="btn btn-primary ms-2 shadow"
+              <button id="next2" type="submit" class="btn btn-primary ms-1 flex-grow-1 px-0 shadow"
                 name="next"
                 value="ToAgree_{{user.id}}_{{entity.id}}"
                 data-bs-toggle="tooltip"
                 data-bs-placement="bottom"
                 title="上記「利用規約に同意します」にチェックしたうえクリック"
                 disabled>
-                同意します
+                {% if flag_firsPerson == 1 %}
+                  同意します
+                {% else %}
+                  同意してゲスト企業に申請
+                {% endif %}
               </button>
             </div>
          
             {% for field in form %}
-            {{field.as_hidden}}
+              {{field.as_hidden}}
             {% endfor %}
 
           </form>
@@ -142,9 +148,20 @@
 
     {% if flag_step == 2 %}
 
-      <div class="row justify-content-center mt-4 text-secondary">
-        申請手続きは終了し、ゲスト企業に参加申請しました。<br>
-        ゲスト企業の承認の結果はメールでご連絡いたします。
+      <div class="row justify-content-center mt-5 text-center text-secondary">
+        <br><br>
+        パートナー及びユーザー参加の手続きが終了しました。<br>
+        Qnee Connectをご利用いただけます。
+      </div>
+
+    {% endif %}
+
+    {% if flag_step == 3 %}
+
+      <div class="row justify-content-center text-center mt-5 text-secondary">
+        <br><br>
+        手続きは終了し、ゲスト企業に参加申請しました。<br>
+        承認結果はメールでご案内いたします。
       </div>
 
     {% endif %}

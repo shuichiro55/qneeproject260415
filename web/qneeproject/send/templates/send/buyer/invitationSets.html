@@ -15,15 +15,15 @@
     {% if messages %}
       <div class="messages row justify-content-center mt-2 mx-2">
         {% for message in messages %}
-          <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
+          <div class="alert alert-{{ message.tags }} py-2 rounded-1 mb-0" role="alert">
             <span>{{ message }}</span>
           </div>
         {% endfor %}
       </div>
     {% endif %}
 
-    <nav class="mt-2" aria-label="breadcrumb" role="navigation">
-      <ol class="breadcrumb bg-light-subtle px-2 rounded-3">
+    <nav class="mt-2 bg-light rounded-3" aria-label="breadcrumb" role="navigation">
+      <ol class="breadcrumb px-2">
         <li class="breadcrumb-item">
           <a href="{% url 'accounts:mypage_buyer' %}">
             {% bs_icon 'house' color='cornflowerblue' size='1.2em' %}
@@ -249,7 +249,7 @@
 
                   {% if request.session.nameOfAppliedList %}
                     {% if listName == request.session.nameOfAppliedList %}
-                      <table class="table table-sm table-bordered border-primary-subtle mb-0">
+                      <table class="table table-sm bg-light table-bordered border-primary-subtle mb-0">
                         <thead>
                           <tr class="table-primary" style="font-size:13px">
                             <th style="text-align:center">メール</th>
@@ -275,7 +275,7 @@
                   {% else %}
   
                     {% if forloop.counter == 1 %}
-                      <table class="table table-sm table-bordered border-primary-subtle mb-0">
+                      <table class="table table-sm bg-light table-bordered border-primary-subtle mb-0">
                         <thead>
                           <tr class="table-primary" style="font-size:13px">
                             <th style="text-align:center">メール</th>
@@ -505,7 +505,7 @@
 
             <div class="bg-light mt-2 ms-3 p-1 rounded-1">
               <div class="table-responsive">
-                <table class="table table-sm table-bordered border-primary-subtle table-responsive mb-0">
+                <table class="table table-sm bg-light table-bordered border-primary-subtle table-responsive mb-0">
                   <thead>
                     <tr class="table-primary" style="font-size:13px">
                       <th style="text-align:center">No.</th>
@@ -714,7 +714,7 @@
 
             <div class="bg-light ms-3 p-1 m-0 rounded-1">
               <div class="table-responsive">
-                <table class="table table-sm table-bordered border-primary-subtle table-responsive mb-0">
+                <table class="table table-sm bg-light table-bordered border-primary-subtle table-responsive mb-0">
                   <thead>
                     <tr class="table-primary" style="font-size:13px">
                       <th style="text-align:center">No.</th>
@@ -754,7 +754,7 @@
         <div class="col-md-8 col-lg-6 bg-light rounded-1">
 
           <div class="table-responsive">
-            <table class="table table-sm align-middle">
+            <table class="table table-sm bg-light align-middle">
               <thead>
                 <tr>
                   <th style="text-align:center">除外</th>
@@ -794,7 +794,7 @@
             </div>
             <div class="modal-body" id="recipientsModalBody">
               <div class="table-responsive">
-                <table class="table table-sm align-middle">
+                <table class="table table-sm bg-light align-middle">
                   <thead>
                     <tr>
                       <th style="text-align:center">除外</th>
@@ -999,7 +999,7 @@
             </div>
             <div class="modal-body" id="recipientsModalBody">
               <div class="table-responsive">
-                <table class="table table-sm align-middle">
+                <table class="table table-sm bg-light align-middle">
                   <thead>
                     <tr>
                       <th style="text-align:center">除外</th>
@@ -1427,6 +1427,7 @@
     }
   };
 
+  //小原さんが作成したもので利用していない
   // クエリ文字列付きのリンクもモーダル内で動くよう、モーダル内のクリックは Ajax で差し替える
   async function loadIntoModal(url) {
     const body = document.getElementById('recipientsModalBody');
@@ -1435,6 +1436,7 @@
     const res = await fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" }});
     body.innerHTML = await res.text();
 
+    //小原さんが作成したもので利用していない
     // モーダル内の <a> クリック（ページネーション、検索）をキャッチして再読込
     body.querySelectorAll('a.page-link').forEach(a => {
       a.addEventListener('click', (e) => {

@@ -9,17 +9,17 @@
   <div class="container">
 
     {% if messages %}
-      <div class="row justify-content-center mt-2 mx-2">
+      <div class="messages row justify-content-center mt-2 mx-2">
         {% for message in messages %}
-          <div class="alert alert-{{ message.tags }} py-2 rounded-1" role="alert">
+          <div class="alert alert-{{ message.tags }} py-2 rounded-1 mb-0" role="alert">
             <span>{{ message }}</span>
           </div>
         {% endfor %}
       </div>
     {% endif %}
 
-    <nav class="mt-2" aria-label="breadcrumb" role="navigation">
-      <ol class="breadcrumb bg-light-subtle px-2 rounded-3">
+    <nav class="mt-2 bg-light rounded-3" aria-label="breadcrumb" role="navigation">
+      <ol class="breadcrumb px-2">
         <li class="breadcrumb-item"><a href="{% url 'accounts:mypage_seller' %}">
           {% bs_icon 'house' color='cornflowerblue' size='1.2em' %}
           マイページトップ</a></li>
@@ -44,6 +44,33 @@
     <div class="bg-light border border-top shadow rounded mt-3 p-5 mx-3">
 
       <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3" >
+
+        {% if cnt_toBeApproved_add >= 1 %}
+
+          <form method="GET" action="{% url 'accounts:userAdd_seller' %}">
+            {% csrf_token %}
+
+            <button type="submit"
+              class="MenuBtn2 color-9 w-100 rounded-1 shadow"
+              name="next"
+              value="Permission">
+
+              <span class="MenuBtn2IconCircle">
+                <i class="bi bi-person-add" style="font-size:2.2em; color:cornflowerblue"></i>
+              </span>
+              ユーザー参加承認
+
+              {% if cnt_toBeApproved_add >= 1 %}
+                　
+                <span class="badge bg-danger text-light rounded-1">
+                  {{ cnt_toBeApproved_add }}
+                </span>
+                <span class="visually-hidden">未承認データ</span>
+              {% endif %}
+
+            </button>
+          </form> <!-- end col -->
+        {% endif %}
 
         <form method="GET" action="{% url 'accounts:bankAccountCreate' %}">
           {% csrf_token %}

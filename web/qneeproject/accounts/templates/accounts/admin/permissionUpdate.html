@@ -1,11 +1,9 @@
-{% extends "buyer/index/base_qconnect.html" %}
+{% extends "admin/index/base_qconnect.html" %}
 
 {% load humanize %}
 {% load bootstrap_icons %}
 
 {% block content %}
-{% csrf_token %}
-
 
 <div class="authentication-bg align-items-start">
 
@@ -21,12 +19,14 @@
       </div>
     {% endif %}
 
-    <nav class="mt-2 bg-light rounded-3" aria-label="breadcrumb" role="navigation">
+    <nav class="mt-2 bg-light rounded-3 border-top shadow-sm"
+      aria-label="breadcrumb" role="navigation">
+      
       <ol class="breadcrumb px-2">
-        <li class="breadcrumb-item"><a href="{% url 'accounts:mypage_buyer' %}">
+        <li class="breadcrumb-item"><a href="{% url 'accounts:mypage_admin' %}">
           <i class="bi bi-house" style="font-size:1.2em; color:cornflowerblue;"></i>
           マイページトップ</a></li>
-        <li class="breadcrumb-item"><a href="{% url 'accounts:infoEdit_buyer' %}">
+        <li class="breadcrumb-item"><a href="{% url 'accounts:infoEdit_admin' %}">
           <i class="bi bi-gear" style="font-size:1.2em; color:text-secondary;"></i>
           設定メニュー</a></li>
         <li class="breadcrumb-item" aria-current="page">ユーザー権限編集</li>
@@ -41,7 +41,7 @@
     <div class="row justify-content-center mt-2">
       <div class="col-11 col-md-8 col-lg-6 col-xl-5">
 
-        <form method="POST" action="{% url 'accounts:permissionSets_buyer' %}"
+        <form method="POST" action="{% url 'accounts:permissionSets_admin' %}"
           class="form-group border border-top shadow-sm p-3 mb-5 bg-light rounded">
           {% csrf_token %}         
           {{ form.non_field_errors }}
@@ -133,8 +133,7 @@
 <script>
 
   document.addEventListener('DOMContentLoaded', function() {
-
-    console.log('DOMContentLoaded 1 in permissionUpate_buyer.html が認識されました');
+    console.log('DOMContentLoaded 1 in permissionUpate_admin.html が認識されました');
 
     var CanApproveAll = document.getElementById("{{ form.canApproveAll.id_for_label }}");
     var value_CanApproveAll = "{{ editedUser.canApproveAll }}"; // DjangoからJSに値を渡す
@@ -173,8 +172,7 @@
       CanApproveQpay.checked = false;
     }
 
-
-    console.log('DOMContentLoaded 2 in permissionUpate_buyer.html が認識されました');
+    console.log('DOMContentLoaded 2 in permissionUpate_admin.html が認識されました');
 
     const SwitchButtons = document.querySelectorAll('input[type="checkbox"]'); // チェックボックスをすべて取得
 
@@ -201,7 +199,7 @@
         }
       });
     });
-
+    
   });
 
 </script>

@@ -118,8 +118,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = '/static/'
-# {% load static %} <img src = "{% static  '*.jpg' %}">で指定できる
-# django.contrib.staticfilesをINSTALLED APPSに加える必要あり
+# リクエストURLが/static/で始まるときに静的ファイルを返す
+# テンプレートで"{% static  '*.jpg' %}"でURLを作成できる
 
 STATIC_ROOT = '/var/www/{}/static'.format(PROJECT_NAME)
 # 集約用の管理コマンド「manage.py collectstatic」を実行した時に、
@@ -131,7 +131,7 @@ print(f'STATIC_ROOTは、{STATIC_ROOT}')
 STATICFILES_DIRS = [
   os.path.join(BASE_DIR, 'qneeproject/static/'),
   #os.path.join(BASE_DIR, 'static/')
-]
+] # django.contrib.staticfilesをINSTALLED APPSに加える必要あり
 
 MEDIA_URL = '/media/'              # 240414 追加　本人確認や請求書の画像アップロード用
 MEDIA_ROOT = '/var/www/{}/media'.format(PROJECT_NAME)    
@@ -197,6 +197,20 @@ DATETIME_INPUT_FORMATS += [
   '%Y/%m/%d %H:%M:%S',
 ]
 
+DATABASES = {
+  'default': {
+    'ENGINE': 'django.db.backends.postgresql',
+    'NAME': 'qnee_db',
+    'USER': 'shuichiro',
+    'PASSWORD': '921Story552@',
+    'HOST': 'localhost',
+    'PORT': '5432',     # PostgreSQLのデフォルトポート
+    'OPTIONS': {
+      'options': '-c search_path=public'  # ここを確認・追加
+    },
+  }
+}
+
 # Celeryの設定
 CELERY_BROKER_URL = 'redis://localhost:6379/0' # RedisのURL
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
@@ -206,6 +220,7 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Asia/Tokyo' # タイムゾーン
 
 from celery.schedules import crontab
+
 
 # 定期タスクのスケジュールを設定 (beat)
 # 260329 完成したらProductionにもコピーすｒ

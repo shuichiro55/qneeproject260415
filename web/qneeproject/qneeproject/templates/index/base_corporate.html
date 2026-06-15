@@ -24,7 +24,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Sawarabi+Gothic&display=swap" rel="stylesheet">
 
     <!-- Bootstrap CSS -->
-    {% block css %}
+
 
     <!-- icons -->
     <link href="{% static 'css/bootstrap-icons.css' %}" rel="stylesheet" />
@@ -34,15 +34,11 @@
     <link href="{% static 'css/main.css' %}" rel="stylesheet">
 
     <!-- Custom Css -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" type="text/css" />
     <link href="{% static 'css/style.css' %}" rel="stylesheet" type="text/css" />
     <link href="{% static 'css/colors/default.css' %}" rel="stylesheet" type="text/css" id="color-opt" />
 
-    <!-- Swiper Slider css -->
-    <link href="{% static 'css/swiper-bundle.min.css' %}" rel="stylesheet" type="text/css" />
 
-
-    {% endblock %}
-    
   </head>
 
 
@@ -62,7 +58,7 @@
     </div>
     -->
 
-    {% block home %}{% endblock %}
+    {% block home %}{% endblock home %}
 
     <!--start back-to-top-->
     <button onclick="topFunction()" id="back-to-top">
@@ -70,21 +66,26 @@
     </button>
 
     <!-- 表示速度の観点でJavaScript関連は<body>内の最後に読み込み -->
+    <!-- Swiper Slider css -->
+    <link href="{% static 'css/swiper-bundle.min.css' %}" rel="stylesheet" type="text/css" />
+    <script src="{% static 'js/swiper-bundle.min.js' %}"></script>
 
-    <!-- JavaScript js -->
+     <!-- JavaScript js -->
     <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
     <script src="{% static 'js/contact.js' %}"></script>
     <script src="{% static 'js/index.init.js' %}"></script>
-    <script src="{% static 'js/swiper-bundle.min.js' %}"></script>
     <script src="{% static 'js/app.js' %}"></script>
-    
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
 
+    {% block extrajs %}{% endblock %}
+
+
+    
+
     <!-- <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script> -->
     <!-- <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script> -->
-
-    {% block extrajs %}{% endblock %}
 
   </body>
 
