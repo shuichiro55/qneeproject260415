@@ -12,15 +12,16 @@
     {% if messages %}
       <div class="messages row justify-content-center mt-2 mx-2">
         {% for message in messages %}
-          <div class="alert alert-{{ message.tags }} py-2 rounded-1 mb-0" role="alert">
+          <div class="alert alert-{{ message.tags }} py-1 rounded-1 mb-0" role="alert">
             <span>{{ message }}</span>
           </div>
         {% endfor %}
       </div>
     {% endif %}
 
-    <nav class="mt-2 bg-light rounded-3" aria-label="breadcrumb" role="navigation">
-      <ol class="breadcrumb px-2">
+    <nav class="mt-2 bg-light rounded-3 border-top shadow-sm"
+      aria-label="breadcrumb" role="navigation">
+      <ol class="breadcrumb px-2" style="font-size: 0.85rem !important">
         <li class="breadcrumb-item">
           <a href="{% url 'accounts:mypage_seller' %}">
             <i class="bi bi-house" style="font-size:1.2em; color:cornflowerblue"></i>
@@ -70,8 +71,8 @@
                     {{ page_obj.start_index|add:forloop.counter0 }}</td>
                   <td rowspan="2" style="text-align:center; vertical-align:middle">{{ item.requested_amount|intcomma }}</td>
 
-                  <td colspan="1" style="text-align:center">{{ item.sellEntityName }}</td>
-                  <td colspan="1" style="text-align:center">{{ item.buyEntityName }}</td>
+                  <td colspan="1" style="text-align:center">{{ item.sellEntityname }}</td>
+                  <td colspan="1" style="text-align:center">{{ item.buyEntityname }}</td>
                   <td colspan="1" style="text-align:center">Qnee</td>
 
                   <td rowspan="2" style="text-align:center; vertical-align:middle">
@@ -121,6 +122,7 @@
             </thead>
 
             <tbody style="font-size:0.9rem">
+              
               {% for item in page_obj %}
                 <tr>
                   <td rowspan="2" style="text-align:center; vertical-align:middle;">
@@ -128,8 +130,8 @@
                   <td rowspan="2" style="text-align:center; vertical-align:middle;">
                     {{ item.requested_amount|intcomma }}</td>
 
-                  <td colspan="1" style="text-align:center">{{ item.sellEntityName }}</td>
-                  <td colspan="1" style="text-align:center">{{ item.buyEntityName }}</td>
+                  <td colspan="1" style="text-align:center">{{ item.sellEntityname }}</td>
+                  <td colspan="1" style="text-align:center">{{ item.buyEntityname }}</td>
                   <td colspan="1" style="text-align:center" class="px-4">Qnee</td>
 
                   <td rowspan="2" style="text-align:center; vertical-align:middle;">
@@ -166,10 +168,10 @@
                   <td style="text-align:center; vertical-align:middle;">
                     {{ item.requested_at|date:"y.n.j H:i" }}</td>
                   <td style="vertical-align:middle; text-align:center">
-                    {{ item.approved_at|date:"y.n.j H:i"| default:'ー' }}{% endif %}
+                    {{ item.approved_at|date:"y.n.j H:i"| default:'ー' }}
                   </td>
                   <td style="vertical-align:middle; text-align:center">
-                    {{ item.approved_at|date:"y.n.j H:i"| default:'ー' }}{% endif %}
+                    {{ item.approved_at|date:"y.n.j H:i"| default:'ー' }}
                   </td>
                 </tr>
   

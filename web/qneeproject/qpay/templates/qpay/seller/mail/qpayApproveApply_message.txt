@@ -1,6 +1,6 @@
-{{ tx.buyUser.userName }} 様 
+{{ tx.buyUser.personname }} 様 
 
-{{ tx.buyEntityName }} 様宛に、{{ tx.sellEntityName }} 様から前払いの申請が届いております。
+{{ tx.buyEntityname }} 様宛に、{{ tx.sellEntityname }} 様から前払いの申請が届いております。
 
 下記URLよりサイトにアクセスの上、お手続きをお願いいたします。
 

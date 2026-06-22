@@ -1,5 +1,8 @@
-{{ applyUser.userName }} 様 会社情報の更新が承認されました。
+{{ applyUser.personname }} 様 会社情報の更新が承認されました。
 
-{{ applyEntity.entityName }}の情報更新が承認されましたのでご連絡いたしました。
+{{ applyEntity.entityname }}の会社情報更新が承認されましたのでご連絡いたしました。
+
+ログインURL
+{{ protocol}}://{{ domain }}{% url 'accounts:login_buyer' %}
 
 株式会社Qnee（キユーニー）

@@ -13,15 +13,16 @@
     {% if messages %}
       <div class="messages row justify-content-center mt-2 mx-2">
         {% for message in messages %}
-          <div class="alert alert-{{ message.tags }} py-2 rounded-1 mb-0" role="alert">
+          <div class="alert alert-{{ message.tags }} py-1 rounded-1 mb-0" role="alert">
             <span>{{ message }}</span>
           </div>
         {% endfor %}
       </div>
     {% endif %}
 
-    <nav class="mt-2 bg-light rounded-3" aria-label="breadcrumb" role="navigation">
-      <ol class="breadcrumb px-2">
+    <nav class="mt-2 bg-light rounded-3 border-top shadow-sm"
+      aria-label="breadcrumb" role="navigation">
+      <ol class="breadcrumb px-2" style="font-size: 0.85rem !important">
         <li class="breadcrumb-item">
           <a href="{% url 'accounts:mypage_buyer' %}">
             <i class="bi bi-house" style="font-size:1.2em; color:cornflowerblue;"></i>
@@ -75,7 +76,7 @@
             <tbody class="text-center">
               <tr>
                 <th scope="col" width="40%" colspan="2" class="table-primary" style="text-align: left;">申請者</th>
-                <td style="text-align: right;">{{ loginUser.userName }}さん</td></tr>
+                <td style="text-align: right;">{{ loginUser.personname }}さん</td></tr>
               <tr>
                 <th scope="col"width="40%" colspan="2" class="table-primary" style="text-align: left;">電話番号</th>
                 <td style="text-align: right;">{{ loginUser.tel_user }}</td></tr>
@@ -142,7 +143,7 @@
                 <tbody class="text-center">
                   <tr>
                     <th scope="col" width="40%" colspan="2" class="table-primary" style="text-align: left;">申請者</td>
-                    <td style="text-align: right;">{{ eachUser.userName }}さん</td></tr>
+                    <td style="text-align: right;">{{ eachUser.personname }}さん</td></tr>
                   <tr>
                     <th scope="col"width="40%" colspan="2" class="table-primary" style="text-align: left;">電話番号</td>
                     <td style="text-align: right;">{{ eachUser.tel_user }}</td></tr>

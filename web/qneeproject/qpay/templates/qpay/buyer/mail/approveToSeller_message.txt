@@ -1,0 +1,15 @@
+{{ tx.sellUser_personname }} 様 ご利用ありがとうございます。
+
+{{ tx.buyEntityname }} 様が前払いの申請を承認されました。
+キユーニーによりご報酬が支払われます。
+
+{% if flag_bankAccountUnset == 0 %}
+下記URLからキユーニー・アプリにログインすると取引状況をご確認いただけます。
+{{ protocol}}://{{ domain }}{% url 'accounts:login_seller' token %}
+
+{% else %}
+下記からキユーニー・アプリにログインして受け取り用の銀行口座をご登録お願いいたします。
+{{ protocol}}://{{ domain }}{% url 'accounts:login_seller' afterLogin token %}
+{% endif %}
+
+株式会社Qnee（キユーニー）

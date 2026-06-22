@@ -12,15 +12,16 @@
     {% if messages %}
       <div class="messages row justify-content-center mt-2">
       {% for message in messages %}
-        <div class="alert alert-{{ message.tags }} py-2 rounded-1 mb-0" role="alert">
+        <div class="alert alert-{{ message.tags }} py-1 rounded-1 mb-0" role="alert">
           <span>{{ message }}</span>
         </div>
       {% endfor %}
     </div>
     {% endif %}
 
-    <nav class="mt-2 bg-light rounded-3" aria-label="breadcrumb" role="navigation">
-      <ol class="breadcrumb px-2">
+    <nav class="mt-2 bg-light rounded-3 border-top shadow-sm"
+      aria-label="breadcrumb" role="navigation">
+      <ol class="breadcrumb px-2" style="font-size: 0.85rem !important">
         <li class="breadcrumb-item text-primary"><a href="{% url 'accounts:mypage_seller' %}">
           {% bs_icon 'house' color='cornflowerblue' size='1.2em' %}
           マイページトップ</a></li>
@@ -74,46 +75,46 @@
 
             {{ form.non_field_errors }}
 
-            {% if form.sellEntityName.errors %}
-              <div style="color:red;">{{ form.sellEntityName.errors.as_text }}<br></div>
+            {% if form.sellEntityname.errors %}
+              <div style="color:red;">{{ form.sellEntityname.errors.as_text }}<br></div>
             {% endif %}
             <div class="form-group row justify-content-center">
               <label class="col-md-4 col-form-label"
-                for="{{form.sellEntityName.id_for_label}}" >
+                for="{{form.sellEntityname.id_for_label}}" >
                 報酬を貰う方</label>
               <div class="col-md-8">
-                <input type="{{form.sellEntityName.widget.input_type}}" class="form-control"
-                  name="{{form.sellEntityName.name}}"
-                  value="{{form.sellEntityName.value|default:''}}"
+                <input type="{{form.sellEntityname.widget.input_type}}" class="form-control"
+                  name="{{form.sellEntityname.name}}"
+                  value="{{form.sellEntityname.value|default:''}}"
                   readonly
                   placeholder=""
-                  id="{{form.sellEntityName.id_for_label}}" >
+                  id="{{form.sellEntityname.id_for_label}}" >
               </div>
             </div>
 
             <!-- １ユーザーが複数エンティティに属する場合の処理（今後検討）
-            {% if form.sellEntityName.errors %}
-              <div style="color:red;">{{ form.sellEntityName.errors.as_text }}<br></div>
+            {% if form.sellEntityname.errors %}
+              <div style="color:red;">{{ form.sellEntityname.errors.as_text }}<br></div>
             {% endif %}
             <div class="form-group row justify-content-center pt-3">
-              <label class="col-11 col-md-3 col-form-label" for="{{form.sellEntityName.id_for_label}}" >
+              <label class="col-11 col-md-3 col-form-label" for="{{form.sellEntityname.id_for_label}}" >
                 報酬を貰う方</label>
               <div class="col-md-8 col-xl-7">
                 <select class="form-select"
-                  name="{{form.sellEntityName.name}}"
-                  value="{{form.sellEntityName.value}}"
-                  id="{{form.sellEntityName.id_for_label}}">
+                  name="{{form.sellEntityname.name}}"
+                  value="{{form.sellEntityname.value}}"
+                  id="{{form.sellEntityname.id_for_label}}">
           
-                  {% if temporal_sellEntityName == "" %}
+                  {% if temporal_sellEntityname == "" %}
                     <option value="" selected></option>
-                    {% for key, value in dict_sellEntityName.items %}
+                    {% for key, value in dict_sellEntityname.items %}
                       <option value="{{ value }}">{{ value }}</option>
                     {% endfor %}
 
                   {% else %}
 
-                    {% for key, value in dict_sellEntityName.items %}
-                      {% if value == temporal_sellEntityName %}
+                    {% for key, value in dict_sellEntityname.items %}
+                      {% if value == temporal_sellEntityname %}
                         <option value="{{value}}" selected>{{value}}</option>
                       {% else %}
                         <option value="{{ value }}">{{ value }}</option>
@@ -127,29 +128,29 @@
             </div>
               -->
 
-            {% if form.buyEntityName.errors %}
-              <div style="color:red;">{{ form.buyEntityName.errors.as_text }}<br></div>
+            {% if form.buyEntityname.errors %}
+              <div style="color:red;">{{ form.buyEntityname.errors.as_text }}<br></div>
             {% endif %}
             <div class="form-group row justify-content-center mt-2">
-              <label class="col-md-4 col-form-label" id="{{form.buyEntityName.id_for_label}}">
+              <label class="col-md-4 col-form-label" id="{{form.buyEntityname.id_for_label}}">
                 報酬を払う方</label>
 
                 <div class="col-md-8">
                 <select class="form-select"
-                  name="{{form.buyEntityName.name}}"
-                  value="{{form.buyEntityName.value}}"
-                  id="{{form.buyEntityName.id_for_label}}">
+                  name="{{form.buyEntityname.name}}"
+                  value="{{form.buyEntityname.value}}"
+                  id="{{form.buyEntityname.id_for_label}}">
 
-                  {% if temporal_buyEntityName == "" %}
+                  {% if temporal_buyEntityname == "" %}
                     <option value="" selected></option>
-                    {% for key, value in dict_buyEntityName.items %}
+                    {% for key, value in dict_buyEntityname.items %}
                       <option value="{{ value }}">{{ value }}</option>
                     {% endfor %}
 
                   {% else %}
 
-                    {% for key, value in dict_buyEntityName.items %}
-                      {% if value == temporal_buyEntityName %}
+                    {% for key, value in dict_buyEntityname.items %}
+                      {% if value == temporal_buyEntityname %}
                         <option value="{{value}}" selected>{{value}}</option>
                       {% else %}
                         <option value="{{ value }}">{{ value }}</option>
@@ -196,7 +197,7 @@
           
             <div class="d-flex justify-content-center mt-5">
               <a href="{% url 'accounts:mypage_seller' %}" type="button"
-                class="btn btn-outline-primary w-50 me-1">
+                class="btn btn-outline-primary w-50">
                 戻る
               </a>
 
@@ -210,8 +211,8 @@
             <!-- <input type="hidden" name="next" value="{{ next }}" /> -->
 
             {{ form.sellUser_email.as_hidden}}
-            {{ form.sellUser_userName.as_hidden}}
-            <!-- {{ form.buyEntityName.as_hidden}} ここで表示してしまうとフォームで「報酬を貰う人」が表示されない -->
+            {{ form.sellUser_personname.as_hidden}}
+            <!-- {{ form.buyEntityname.as_hidden}} ここで表示してしまうとフォームで「報酬を貰う人」が表示されない -->
 
           </form>
         </div>
@@ -240,13 +241,13 @@
               <tbody class="text-center">
                 <tr>
                   <th scope="col" width="45%" class="table-primary">パートナー</th>
-                  <td style="text-align: right;">{{ form.buyEntityName.value }}　様</td></tr>
+                  <td style="text-align: right;">{{ form.buyEntityname.value }}　様</td></tr>
                 <tr>
                   <th scope="col" width="45%" class="table-primary">報酬を貰う人</th>
-                  <td style="text-align: right;">{{ sellEntity.entityName }}　様</td></tr>
+                  <td style="text-align: right;">{{ sellEntity.entityname }}　様</td></tr>
                 <tr>
                   <th scope="col" width="45%" class="table-primary">ご申請者</th>
-                  <td style="text-align: right;">{{ sellUser.userName }}　様</td></tr>
+                  <td style="text-align: right;">{{ sellUser.personname }}　様</td></tr>
                 <tr>
                   <th scope="col" width="45%" class="table-primary">ご申請額</th>
                   <td style="text-align: right;">{{ form.requested_amount.value|intcomma }}</td></tr>
@@ -273,7 +274,7 @@
             <hr>
 
             <div class="d-flex justify-content-center">
-              <button type="submit" class="btn btn-outline-primary w-50 me-1"
+              <button type="submit" class="btn btn-outline-primary w-50"
                 name="next"
                 value="BackToInput_{{sellUser.id}}_{{sellEntity.id}}_{{tx.id}}">
                 戻る</button>

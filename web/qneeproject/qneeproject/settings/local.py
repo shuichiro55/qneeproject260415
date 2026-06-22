@@ -11,19 +11,7 @@ DOMAIN = os.environ.get('SITE_DOMAIN', 'localhost:8000')
 SITE_URL = f"{PROTOCOL}://{DOMAIN}"
 
 
-DATABASES = {
-  'default': {
-    'ENGINE': 'django.db.backends.postgresql',
-    'NAME': 'qnee_db',
-    'USER': 'shuichiro',
-    'PASSWORD': '921Story552@',
-    'HOST': 'localhost',
-    'PORT': '5432',     # PostgreSQLのデフォルトポート
-    'OPTIONS': {
-      'options': '-c search_path=public'  # ここを確認・追加
-    },
-  }
-}
+
 
 #DATABASES = {
 #  'default': {

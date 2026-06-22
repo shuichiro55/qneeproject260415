@@ -1,0 +1,9 @@
+{{ tx.sellUser_personname }} 様 ご利用ありがとうございます。
+
+{{ tx.buyEntityname }} 様が前払いを差戻されました。
+
+下記からキユーニ・アプリに入って内容をご確認をお願いいたします。
+{{ protocol}}://{{ domain }}{% url 'accounts:login_seller' token %}
+
+
+株式会社Qnee（キユーニー）

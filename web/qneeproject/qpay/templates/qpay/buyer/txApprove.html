@@ -13,15 +13,16 @@
     {% if messages %}
       <div class="messages row justify-content-center mt-2 mx-2">
         {% for message in messages %}
-          <div class="alert alert-{{ message.tags }} py-2 rounded-1 mb-0" role="alert">
+          <div class="alert alert-{{ message.tags }} py-1 rounded-1 mb-0" role="alert">
             <span>{{ message }}</span>
           </div>
         {% endfor %}
       </div>
     {% endif %}
 
-    <nav class="mt-2 bg-light rounded-3" aria-label="breadcrumb" role="navigation">
-      <ol class="breadcrumb px-2">
+    <nav class="mt-2 bg-light rounded-3 border-top shadow-sm"
+      aria-label="breadcrumb" role="navigation">
+      <ol class="breadcrumb px-2" style="font-size: 0.85rem !important">
         <li class="breadcrumb-item">
           <a href="{% url 'accounts:mypage_buyer' %}">
             <i class="bi bi-house" style="font-size:1.2em; color:cornflowerblue"></i>
@@ -88,7 +89,7 @@
                           <td colspan="2" style="text-align:center">
                             {{ item.sellEntityName }}</td>
                           <td colspan="2" style="text-align:center">
-                            {{ item.buyUser_userName | default:'ー' }}</td>
+                            {{ item.buyUser_personname | default:'ー' }}</td>
 
                             <!-- <td rowspan="2" style="text-align:center">
                             <img src="{{ item.evidence.url }}" class="img-evidence" style="width:50;height:auto" /></td> -->
@@ -105,13 +106,14 @@
                               <td style="vertical-align:middle; text-align:center">未了</td>
                             {% endif %}
                             {% if item.txStatus_int == 2 %}
-                              <td style="vertical-align:middle; text-align:center">未了</td>
+                              <td style="vertical-align:middle; text-align:center">差戻</td>
                             {% endif %}
                             {% if item.txStatus_int >= 3 %}
                               <td style="vertical-align:middle; text-align:center">承認</td>
                             {% endif %}
                             {% if item.txStatus_int == -3 %}
-                              <td class="table-danger" style="vertical-align:middle; text-align:center">否認</td>
+                              <td class="table-danger" style="vertical-align:middle; text-align:center">
+                                否認</td>
                             {% endif %}
 
                           <td style="vertical-align:middle; text-align:center">
@@ -193,7 +195,7 @@
                           </div>
 
                           <td colspan="2" style="vertical-align:middle; text-align:center">
-                            {{ item.buyUser_userName |default:'ー' }}</td>
+                            {{ item.buyUser_personname |default:'ー' }}</td>
 
                           <td rowspan="2" class="p-1" style="vertical-align:middle; text-align:center;">
                             <a href="{% url 'qpay:txApproveDetail_buyer' item.pk %}"
@@ -211,13 +213,14 @@
                               <td style="vertical-align:middle; text-align:center">未了</td>
                             {% endif %}
                             {% if item.txStatus_int == 2 %}
-                              <td style="vertical-align:middle; text-align:center">未了</td>
+                              <td style="vertical-align:middle; text-align:center">差戻</td>
                             {% endif %}
                             {% if item.txStatus_int >= 3 %}
                               <td style="vertical-align:middle; text-align:center">承認</td>
                             {% endif %}
                             {% if item.txStatus_int == -3 %}
-                              <td class="table-danger" style="vertical-align:middle; text-align:center">否認</td>
+                              <td class="table-danger" style="vertical-align:middle; text-align:center">
+                                否認</td>
                             {% endif %}
 
                           <td style="vertical-align:middle; text-align:center">

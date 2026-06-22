@@ -18,7 +18,16 @@
         {% endfor %}
       </div>
     {% endif %}
-  
+
+    <div id="loading">
+      <div class="spinner-border text-primary"
+        style="width: 3rem; height: 3rem;"
+        role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-5">処理中です... しばらくお待ちください</p>
+    </div>
+
     <!--
     <nav aria-label="breadcrumb" role="navigation">
       <ol class="breadcrumb bg-light-subtle px-2 rounded-3 mt-2">
@@ -127,7 +136,7 @@
         <!-- 既存パートナーにユーザーを追加する場合 -->
         <span id="id_addition2" style="display: none;">
 
-          <form method="POST">
+          <form method="POST" id="id_PostForm">
             {% csrf_token %}
 
             <div class="row justify-content-center mt-1">
@@ -140,11 +149,12 @@
             <div class="row justify-content-center mt-3">
               <div class="d-flex col-md-10 col-lg-8 col-xl-6 text-left">
 
-                <i class="bi bi-building" style="font-size:1.5em; color:darkred;"></i>
+                <i class="bi bi-building-fill"
+                  style="font-size:1.5em; color:deeppink;"></i>
                 <h6 class="text-secondary ms-3"><b>パートナー選択</b></h6>
               </div>
             </div>
-              
+
             <div class="row justify-content-center mt-2 px-4">
               <div class="col-md-10 col-lg-8 col-xl-6">
                 <!-- <label class="form-label" for="id_SearchInput">
@@ -153,7 +163,7 @@
                   <input type="text" class="form-control"
                     id="id_SearchInput"
                     name="name_SearchInput"
-                    value="{{form.entityName.value| default:''}}"
+                    value="{{form.entityname.value| default:''}}"
                     placeholder="キーワード入力 （ex. IMAGICA or イマジ or いま）">
                   <button type="button" class="btn btn-primary shadow"
                     name="name_SearchBtn" value="searchStart">検索</button>
@@ -169,15 +179,15 @@
                 <!-- 「multiple」はリストのスタイルを変える -->
                 <select class="form-select"
                   id="id_BuyerSelect"
-                  name="{{form.entityName.name}}">
+                  name="{{form.entityname.name}}">
 
-                  {% if dict_buyEntityName.items %}
+                  {% if dict_buyEntityname.items %}
 
-                    {% if temporal_buyEntityName != "" %}
+                    {% if temporal_buyEntityname != "" %}
                       <!-- <option>パートナー名（取引主体）</option> -->
-                      {% for key, value in dict_buyEntityName.items %}
+                      {% for key, value in dict_buyEntityname.items %}
           
-                        {% if value == temporal_buyEntityName %}
+                        {% if value == temporal_buyEntityname %}
                           <option value='{{value}}' selected>{{value}}</option>
                         {% else %}
                           <option value='{{value}}'>{{value}}</option>
@@ -187,7 +197,7 @@
                     {% else %}
   
                       <!-- <option selected>パートナー名（取引主体）</option> -->
-                      {% for key, value in dict_buyEntityName.items %}
+                      {% for key, value in dict_buyEntityname.items %}
                         <option value='{{value}}'>{{value}}</option>
                       {% endfor %}
                     {% endif %}
@@ -196,80 +206,81 @@
               </div> <!-- end col -->
             </div> <!-- end row -->
 
-          <div class="row justify-content-center mt-2">
-            <div class="col-md-10 col-lg-8 col-xl-6">
-              <hr>
+            <div class="row justify-content-center mt-2">
+              <div class="col-md-10 col-lg-8 col-xl-6">
+                <hr>
+              </div>
             </div>
-          </div>
 
             <!-- ゲスト企業の担当者情報を入力するフォーム -->
             <div class="row justify-content-center mt-2">
               <div class="d-flex col-md-10 col-lg-8 col-xl-6 text-left mt-1">
-                <i class="bi bi-file-person" style="font-size:1.5em; color:darkred;"></i>
+                <i class="bi bi-file-person-fill"
+                  style="font-size:1.5em; color:deeppink;"></i>
                 <h6 class="text-secondary ms-3"><b>お申込者の情報</b></h6>
               </div>
             </div>
             
             <div class="row justify-content-center px-4">
               <div class="col-6 col-md-5 col-lg-4 col-xl-3 pe-1">
-                <label for="{{form.lastName.id_for_label}}" class="form-label mt-1 mb-0">
+                <label for="{{form.lastname.id_for_label}}" class="form-label mt-1 mb-0">
                   姓</label>
-                <input type="{{form.lastName.widget.input_type}}"
+                <input type="{{form.lastname.widget.input_type}}"
                   class="form-control"
-                  name="{{form.lastName.name}}"
-                  value="{{form.lastName.value|default:''}}"
-                  id="{{form.lastName.id_for_label}}"
+                  name="{{form.lastname.name}}"
+                  value="{{form.lastname.value|default:''}}"
+                  id="{{form.lastname.id_for_label}}"
                   placeholder="例：山田">
               </div>
               <div class="col-6 col-md-5 col-lg-4 col-xl-3 ps-0">
-                <label for="{{form.firstName.id_for_label}}" class="form-label mt-1 mb-0">
+                <label for="{{form.firstname.id_for_label}}" class="form-label mt-1 mb-0">
                   名</label>
-                <input type="{{form.firstName.widget.input_type}}"
+                <input type="{{form.firstname.widget.input_type}}"
                   class="form-control"
-                  name="{{form.firstName.name}}"
-                  value="{{form.firstName.value|default:''}}"
-                  id="{{form.firstName.id_for_label}}"
+                  name="{{form.firstname.name}}"
+                  value="{{form.firstname.value|default:''}}"
+                  id="{{form.firstname.id_for_label}}"
                   placeholder="例：次郎">
               </div>
             </div> <!-- end of row -->
-            {% if form.lastName.errors or form.firstName.errors %}
+            {% if form.lastname.errors or form.firstname.errors %}
               <div class="row justify-content-center px-4">
                 <div class="col-6 col-md-5 col-lg-4 col-xl-3 text-left pe-1" style="color:red;">
-                  {{ form.lastName.errors.as_text }}</div>
+                  {{ form.lastname.errors.as_text }}</div>
                 <div class="col-6 col-md-5 col-lg-4 col-xl-3 text-left ps-0" style="color:red;">
-                  {{ form.firstName.errors.as_text }}</div>
+                  {{ form.firstname.errors.as_text }}</div>
               </div>
             {% endif %}
        
 
             <div class="row justify-content-center px-4">
               <div class="col-6 col-md-5 col-lg-4 col-xl-3 pe-1">
-                <label for="{{form.lastName_kana.id_for_label}}" class="form-label mt-1 mb-0">
+                <label for="{{form.lastname_kana.id_for_label}}" class="form-label mt-1 mb-0">
                   姓（フリガナ）</label>
-                <input type="{{form.lastName_kana.widget.input_type}}" class="form-control"
-                  name="{{form.lastName_kana.name}}"
-                  value="{{form.lastName_kana.value|default:''}}"
-                  id="{{form.lastName_kana.id_for_label}}"
+                <input type="{{form.lastname_kana.widget.input_type}}" class="form-control"
+                  name="{{form.lastname_kana.name}}"
+                  value="{{form.lastname_kana.value|default:''}}"
+                  id="{{form.lastname_kana.id_for_label}}"
                   placeholder="例：ヤマダ">
               </div>
               <div class="col-6 col-md-5 col-lg-4 col-xl-3 ps-0">
-                <label for="{{form.firstName_kana.id_for_label}}" class="form-label mt-1 mb-0">
+                <label for="{{form.firstname_kana.id_for_label}}" class="form-label mt-1 mb-0">
                   名（フリガナ）</label>
-                <input type="{{form.firstName_kana.widget.input_type}}"
+                <input type="{{form.firstname_kana.widget.input_type}}"
                   class="form-control"
-                  name="{{form.firstName_kana.name}}"
-                  value="{{form.firstName_kana.value|default:''}}"
-                  id="{{form.firstName_kana.id_for_label}}"
+                  name="{{form.firstname_kana.name}}"
+                  value="{{form.firstname_kana.value|default:''}}"
+                  id="{{form.firstname_kana.id_for_label}}"
                   placeholder="例：ジロウ">
               </div>
             </div>
 
-            {% if form.lastName_kana.errors or form.firstName_kana.errors %}
+            {% if form.lastname_kana.errors or form.firstname_kana.errors %}
               <div class="row justify-content-center px-4">
                 <div class="col-6 col-md-5 col-lg-4 col-xl-3 text-left pe-1" style="color:red;">
-                  {{ form.lastName_kana.errors.as_text }}</div>
+                  {{ form.lastname_kana.errors.as_text }}</div>
                 <div class="col-6 col-md-5 col-lg-4 col-xl-3 text-left ps-0" style="color:red;">
-                  {{ form.firstName_kana.errors.as_text }}</div>
+                  {{ form.firstname_kana.errors.as_text }}</div>
               </div>
             {% endif %}
 
@@ -335,12 +346,19 @@
                 </div>
               {% endif %}
 
-            <div class= "row justify-content-center mt-5 px-4">
-              <div class="col-md-10 col-lg-8 col-xl-6">
-                <button type="submit" class="btn btn-primary w-100 shadow"
+            <div class="row justify-content-center mt-4 px-4">
+              <hr>
+              <div class="d-flex col-md-10 col-lg-8 col-xl-6">
+
+                <button type="submit" class="btn btn-outline-primary flex-grow-1 shadow"
+                  name="next2"
+                  value="ToStopProcess_{{user.id}}">
+                  手続きを止める</button>
+
+                <button type="submit" class="btn btn-primary flex-grow-1 ms-1 shadow"
                   name="next2"
                   value="ToConfirm_{{user.id}}">
-                  選んだパートナーにユーザー申請する
+                  入力情報の確認へ
                   <span class="ms-1">
                     <i class="bi bi-send" style="font-size:1.0em; color:rgb(250, 139, 194)"></i>
                   </span>
@@ -364,14 +382,15 @@
           <div class="col-md-9 col-lg-6">
         
             <form method="POST"
-              class="form-group bg-light border border-top rounded shadow p-4 m-2">
+              class="form-group bg-light border border-top rounded shadow p-4 m-2"
+              id="id_PostForm">
               {% csrf_token %}
 
               <table class="table table-sm bg-light table-bordered border-primary-subtle table-responsive">
                 <tbody> <!-- 郵便番号のところは住所にする -->
                   <tr>
                     <th scope="col" width="40%" class="table-primary">パートナー</th>
-                    <td style="text-align: right;">{{ entity.entityName }}</td></tr>
+                    <td style="text-align: right;">{{ entity.entityname }}</td></tr>
                   <tr>
                     <th scope="col" width="40%" class="table-primary">代表者</th>
                     <td style="text-align: right;">{{ entity.representitive }}さん</td></tr>
@@ -390,7 +409,7 @@
                     <th scope="col" width="40%" class="table-primary" style="text-align:left;">
                       あなたのお名前</th>
                     <td style="text-align: right;">
-                      {{ form.lastName.value }}　{{ form.firstName.value }}さん
+                      {{ form.lastname.value }}　{{ form.firstname.value }}さん
                     </td>
                   </tr>
                   <tr>
@@ -466,7 +485,7 @@
     var SearchInput = document.getElementById('id_SearchInput');
     var BuyerSelect = document.getElementById('id_BuyerSelect');
 
-    let obj_buyEntityName = JSON.parse('{{ json_buyEntityName|safe }}' || "null");
+    let obj_buyEntityname = JSON.parse('{{ json_buyEntityname|safe }}' || "null");
     
     var addition1 = document.getElementById('id_addition1');
     var addition2 = document.getElementById('id_addition2');
@@ -512,25 +531,25 @@
         BuyerOptions.remove( i );
       }
 
-      let obj_buyEntityName = JSON.parse('{{ json_buyEntityName|safe }}' || "null");
+      let obj_buyEntityname = JSON.parse('{{ json_buyEntityname|safe }}' || "null");
       //「safe」はエスケープを無効化する.Django側で''を除いた形で認識する
       //https://se-memorandum.com/django-safe/
 
-      console.log(obj_buyEntityName);
+      console.log(obj_buyEntityname);
       console.log('forEachに入る前です');
 
-      //keyおよびobj_buyEntityName[key]には、entityNameが入る
-      Object.keys(obj_buyEntityName).forEach((key) => {
+      //keyおよびobj_buyEntityname[key]には、entitynameが入る
+      Object.keys(obj_buyEntityname).forEach((key) => {
 
-        matches = keywords.some(keyword => normalizeText(obj_buyEntityName[key]).includes(keyword));
+        matches = keywords.some(keyword => normalizeText(obj_buyEntityname[key]).includes(keyword));
 
-        console.log(key, obj_buyEntityName[key]);
+        console.log(key, obj_buyEntityname[key]);
         if(matches){
           let option = document.createElement('option');
           option.value = key;  //option.valueは非表示部。（key, value）のvalueと間違わないように！
-          option.text = obj_buyEntityName[key];         
+          option.text = obj_buyEntityname[key];         
           //option.setAttribute("value", key);  //option.valueは非表示部。（key, value）のvalueと間違わないように！
-          //option.appendChild(document.createTextNode(obj_buyEntityName[key]));
+          //option.appendChild(document.createTextNode(obj_buyEntityname[key]));
 
           console.log('BuyerOptions=', BuyerOptions);
           console.log('option.innerHTML=', option.innerHTML);
@@ -542,9 +561,14 @@
 
     BuyerSelect.addEventListener('click', (event) => {
       console.log('BuyerSelect.addEventListener(change)に入りました');
-      SearchInput.value = obj_buyEntityName[event.target.value];  
+      SearchInput.value = obj_buyEntityname[event.target.value];  
     });
 
+
+    // Submitボタンを押下後「しばらくお待ちください。」を表示する
+    document.getElementById('id_PostForm').addEventListener('submit', function() {
+      document.getElementById('loading').style.display = 'block';
+    });
 
   });
 

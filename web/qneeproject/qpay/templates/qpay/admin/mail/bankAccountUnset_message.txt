@@ -1,6 +1,6 @@
-{{ tx.sellUser_userName }} 様 ご利用ありがとうございます。
+{{ tx.sellUser_personname }} 様 ご利用ありがとうございます。
 
-{{ tx.buyer_entityname }} 様が {{ tx.sellEntityName }} 様の申請を承認されました。
+{{ tx.buyEntityname }} 様が {{ tx.sellEntityname }} 様の申請を承認されました。
 受取り口座の設定がなされておりません。下記のURLから銀行口座をご登録お願いいたします。
 
 銀行口座登録用URL

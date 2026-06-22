@@ -143,7 +143,7 @@ class InvitationForm(forms.Form):
 
 
 class UserEntryForm(forms.Form):
-  userName = forms.CharField(label='あなたのお名前', max_length=100)
+  personname = forms.CharField(label='あなたのお名前', max_length=100)
   email = forms.CharField(label='メールアドレス', max_length=150)
 
 

@@ -11,7 +11,7 @@
     {% if messages %}
       <div class="messages row justify-content-center mt-2 mx-2">
         {% for message in messages %}
-          <div class="alert alert-{{ message.tags }} py-2 rounded-1 mb-0" role="alert">
+          <div class="alert alert-{{ message.tags }} py-1 rounded-1 mb-0" role="alert">
             <span>{{ message }}</span>
           </div>
         {% endfor %}
@@ -88,8 +88,12 @@
 
 {% block extrajs %}
 
-<script>
-  
+<script defer>
+//「defer」は、HTMLの解析と並行してJavaScriptの読み込みを裏側で進め、
+// HTMLの読み込み（パース）がすべて完了してからスクリプトを実行します。
+//deferを指定しない場合、ブラウザはJavaScriptの読み込みと実行が終わるまで
+// HTMLの読み込みを一時停止
+
   document.addEventListener('DOMContentLoaded', function() {
 
     // 3秒後にメッセージを消す

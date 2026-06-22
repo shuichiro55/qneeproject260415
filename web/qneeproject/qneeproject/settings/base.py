@@ -38,8 +38,8 @@ INSTALLED_APPS = [
   'django.contrib.messages',
   'django.contrib.staticfiles',
   'accounts.apps.AccountsConfig',
-  'qpay',
-  'send',
+  'qpay.apps.QpayConfig',
+  'send.apps.SendConfig',
 
   'django_bootstrap5',
   'django_bootstrap_icons',

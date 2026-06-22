@@ -11,13 +11,21 @@
     {% if messages %}
       <div class="messages row justify-content-center mt-2 mx-2">
         {% for message in messages %}
-          <div class="alert alert-{{ message.tags }} py-2 rounded-1 mb-0" role="alert">
+          <div class="alert alert-{{ message.tags }} py-1 rounded-1 mb-0" role="alert">
             <span style="font-size:0.9rem">{{ message }}</span>
           </div>
         {% endfor %}
       </div>
     {% endif %}
 
+    <div id="loading">
+      <div class="spinner-border text-primary"
+        style="width: 3rem; height: 3rem;"
+        role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-5">処理中です... しばらくお待ちください</p>
+    </div>
 
     <div class="d-flex justify-content-center pt-5 pb-2">
       <h5 class="text-secondary pt-1">
@@ -273,7 +281,11 @@
 
 {% block extrajs %}
 
-<script>
+<script defer>
+//「defer」は、HTMLの解析と並行してJavaScriptの読み込みを裏側で進め、
+// HTMLの読み込み（パース）がすべて完了してからスクリプトを実行します。
+//deferを指定しない場合、ブラウザはJavaScriptの読み込みと実行が終わるまで
+// HTMLの読み込みを一時停止
 
   document.addEventListener('DOMContentLoaded', function() {
 

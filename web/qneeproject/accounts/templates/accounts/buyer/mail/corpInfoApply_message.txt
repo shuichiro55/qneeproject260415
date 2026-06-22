@@ -1,6 +1,6 @@
-{{ qneeUser.userName }} 様 パートナーからの更新申請が来ています。
+{{ qneeUser.personname }} 様 パートナーからの更新申請が来ています。
 
-{{ applyEntityName }}から会社情報の変更申請が来ています。
+{{ applyEntityname }}から会社情報の変更申請が来ています。
 下記URLよりサイトにアクセスのうえ、ご確認をお願いいたします。
 
 申請の確認用URL

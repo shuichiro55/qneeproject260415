@@ -9,7 +9,7 @@
     {% if messages %}
       <div class="messages row justify-content-center mt-2 mx-2">
         {% for message in messages %}
-          <div class="alert alert-{{ message.tags }} py-2 rounded-1 my-0" role="alert">
+          <div class="alert alert-{{ message.tags }} py-1 rounded-1 my-0" role="alert">
             <span>{{ message }}</span>
           </div>
         {% endfor %}
@@ -25,8 +25,9 @@
       <p class="mt-5">処理中です... しばらくお待ちください</p>
     </div>
 
-    <nav class="mt-2 bg-light rounded-3 border-top shadow-sm" aria-label="breadcrumb" role="navigation">
-      <ol class="breadcrumb px-2">
+    <nav class="mt-2 bg-light rounded-3 border-top shadow-sm"
+      aria-label="breadcrumb" role="navigation">
+      <ol class="breadcrumb px-2" style="font-size: 0.85rem !important">
         <li class="breadcrumb-item">
           <a href="{% url 'accounts:mypage_buyer' %}">
           <i class="bi bi-house" style="font-size:1.2em; color:cornflowerblue;"></i>
@@ -73,7 +74,7 @@
                   <tr>
                     <th scope="col" width="36%" class="table-primary" style="text-align:left;">
                       申請者</th>
-                    <td style="text-align: right;">{{ applyUser.userName }}さん</td></tr>
+                    <td style="text-align: right;">{{ applyUser.personname }}さん</td></tr>
                   <tr>
                     <th scope="col" width="36%" class="table-primary" style="text-align:left;">電話番号</th>
                     <td style="text-align: right;">{{ applyUser.tel_user }}</td></tr>
@@ -169,7 +170,7 @@
                       <th scope="col" width="36%" class="table-primary" style="text-align:left;">
                         申請者</th>
                       <td style="text-align: right;">
-                        {{ applyUser.userName }}さん</td></tr>
+                        {{ applyUser.personname }}さん</td></tr>
                     <tr>
                       <th scope="col" width="36%" class="table-primary" style="text-align:left;">
                         電話番号</th>

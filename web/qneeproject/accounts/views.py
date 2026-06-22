@@ -25,8 +25,8 @@ from .form import \
   MyPageForm_buyer, MyPageForm_seller, \
   ContactForm, BankSelectForm, BankAccountForm, \
   AgreementConfirmForm_buyer, AgreementConfirmForm_seller, \
-  MyPasswordChangeForm, ProfileEditForm_buyer, ProfileEditForm_seller, \
-  InfoEvidenceForm, FeedbackForm
+  MyPasswordChangeForm, ProfileEditForm_buyer, ProfileEditForm1_seller, ProfileEditForm2_seller, \
+  InfoEvidenceForm, FeedbackForm_corpInfo
 
 from qpay.form import TxCreateForm, TxApproveForm_buyer
 
@@ -74,7 +74,7 @@ def MyLoginRedirect(request):
 
   #http_method_names = ['get']
 
-  #email = request.user.username
+  #email = request.user.personname
 
   #return reverse('accounts:mypage_seller', kwargs={'user_id':request.user.id})  
   return HttpResponseRedirect(reverse('accounts:mypage_seller'))
@@ -194,6 +194,17 @@ class MyLoginView_seller(LoginView):
         return reverse_lazy(
           'accounts:userAddPre_seller',
           kwargs={'token':self.request.POST['token']})
+
+      if self.request.POST['afterLogin'] == 'qpaySendback':
+        return reverse_lazy(
+          'qpay:txApproveDetailPre_buyer',
+          kwargs={'token':self.request.POST['token']})
+
+      if self.request.POST['afterLogin'] == 'bankAccountSet':
+        return reverse_lazy(
+          'accounts:bankAccountCreate_before',
+          kwargs={'token':self.request.POST['token']})
+
     else:
 
       return reverse_lazy('accounts:mypage_seller')
@@ -613,7 +624,7 @@ class UserCreateView_admin(generic.CreateView):
       user.joined_at = timezone.now()
 
       entity, created = LegalEntity.objects.get_or_create(
-        entityName='株式会社Qnee',
+        entityname='株式会社Qnee',
         type1=3, type2=2,)
       
       user.entity = entity
@@ -663,16 +674,16 @@ class EntityCreateView_buyer(generic.CreateView):
   #login_url = '/accounts/login_buyer/'
   form_class = EntityCreateForm_buyer
   timeout_seconds = getattr(settings, 'ACTIVATION_TIMEOUT_SECONDS', 60*60*24)
-  #dict_buyEntityName = dict((f, f) for idx, f in enumerate(LegalEntity.objects.filter(type1=1).values_list('entityName', flat=True), 1))
+  #dict_buyEntityname = dict((f, f) for idx, f in enumerate(LegalEntity.objects.filter(type1=1).values_list('entityname', flat=True), 1))
   
 
   def dispatch(self, request, *args, **kwargs):
   
     self.request.session['dict_buyEntityname'] = \
-      dict((f, f) for idx, f in enumerate(LegalEntity.objects.filter(type1=1).values_list('entityName', flat=True), 1))
+      dict((f, f) for idx, f in enumerate(LegalEntity.objects.filter(type1=1).values_list('entityname', flat=True), 1))
   
     """ 初回のマイグレーションの時のみ下記を採用する """
-    #dict_buyEntityName = {'Qnee','Qnee'}
+    #dict_buyEntityname = {'Qnee','Qnee'}
     # 「flat=True」はリスト、「flat=False」はタプル
   
     return super().dispatch(request, *args, **kwargs)
@@ -718,11 +729,11 @@ class EntityCreateView_buyer(generic.CreateView):
     self.user_id = user.id
     print(f'self.user_id = {self.user_id}')
 
-    dict_buyEntityName = self.request.session.get('dict_buyEntityname')
-    #print(f'dict_buyEntityName={dict_buyEntityName} def get in EntityCreateView_buyer')
+    dict_buyEntityname = self.request.session.get('dict_buyEntityname')
+    #print(f'dict_buyEntityname={dict_buyEntityname} def get in EntityCreateView_buyer')
 
     init_dict = {
-      #'userName': '',
+      #'personname': '',
       #'email': user.email,
       #'tel_user': "",
     }
@@ -730,10 +741,10 @@ class EntityCreateView_buyer(generic.CreateView):
       'flag_step': 1,
       'user': user,
       'form': EntitySetForm_buyer(initial=init_dict),
-      'temporal_buyEntityName': "",
+      'temporal_buyEntityname': "",
       # コメント(25/06/08)：Selectボックスで未選択であることを示す。選択後はページ移動でデータ保持するために使う
-      'dict_buyEntityName': dict_buyEntityName,
-      'json_buyEntityName': json.dumps(dict_buyEntityName),
+      'dict_buyEntityname': dict_buyEntityname,
+      'json_buyEntityname': json.dumps(dict_buyEntityname),
     }
 
     print(f'ここ来てる1 request.user={request.user} email={user.email} type2={user.type2}（get in class EntityCreateView_buyer）')
@@ -780,7 +791,7 @@ class EntityCreateView_buyer(generic.CreateView):
           cleaned_data = form.cleaned_data
 
           init_dict = {
-            'entityName' : cleaned_data['entityName'],
+            'entityname' : cleaned_data['entityname'],
             'representitive' : cleaned_data['representitive'],
             'tel_entity' : cleaned_data['tel_entity'],
             
@@ -789,10 +800,10 @@ class EntityCreateView_buyer(generic.CreateView):
             'address2' : cleaned_data['address2'],
             'address3' : cleaned_data['address3'],
 
-            'lastName' : cleaned_data['lastName'],
-            'lastName_kana' : cleaned_data['lastName_kana'],
-            'firstName' : cleaned_data['firstName'],
-            'firstName_kana' : cleaned_data['firstName_kana'],
+            'lastname' : cleaned_data['lastname'],
+            'lastname_kana' : cleaned_data['lastname_kana'],
+            'firstname' : cleaned_data['firstname'],
+            'firstname_kana' : cleaned_data['firstname_kana'],
             'tel_user' : cleaned_data['tel_user'],
             'department' : cleaned_data['department'],
             'title' : cleaned_data['title'],
@@ -831,9 +842,9 @@ class EntityCreateView_buyer(generic.CreateView):
         user = UserModel.objects.get(pk=next1.split('_')[1]) 
 
         entity = LegalEntity.objects.create()
-        entity.entityName = self.request.POST['entityName']
-        #entity.entityName = form.entityName 
-        # この式はエラー（'EntityCreateForm_buyer' object has no attribute 'entityName'）
+        entity.entityname = self.request.POST['entityname']
+        #entity.entityname = form.entityname 
+        # この式はエラー（'EntityCreateForm_buyer' object has no attribute 'entityname'）
 
         entity.representitive = self.request.POST['representitive']
         entity.tel_entity = self.request.POST['tel_entity']
@@ -854,16 +865,16 @@ class EntityCreateView_buyer(generic.CreateView):
 
         entity.save()
        
-        user.userName = \
-          self.request.POST.get('lastName') + ' ' + self.request.POST.get('firstName')
-        user.userName_kana = \
-          self.request.POST.get('lastName_kana') + ' ' + self.request.POST.get('firstName_kana')
+        user.personname = \
+          self.request.POST.get('lastname') + ' ' + self.request.POST.get('firstname')
+        user.personname_kana = \
+          self.request.POST.get('lastname_kana') + ' ' + self.request.POST.get('firstname_kana')
 
         # アプリで使うのはuseNameだが、名前を変更する場合があるので保存しておく
-        user.lastName = self.request.POST.get('lastName')
-        user.firstName = self.request.POST.get('firstName')
-        user.lastName_kana = self.request.POST.get('lastName_kana')
-        user.firstName_kana = self.request.POST.get('firstName_kana')
+        user.lastname = self.request.POST.get('lastname')
+        user.firstname = self.request.POST.get('firstname')
+        user.lastname_kana = self.request.POST.get('lastname_kana')
+        user.firstname_kana = self.request.POST.get('firstname_kana')
 
         user.tel_user = self.request.POST.get('tel_user', None)
         user.department = self.request.POST.get('department', None)
@@ -899,6 +910,12 @@ class EntityCreateView_buyer(generic.CreateView):
 
     if next2 != None:
 
+      if next2.find('ToStopProcess') >= 0: # プロセスと止める
+        messages.error(self.request, "ユーザー登録の手続きを終了しました。")
+        logout(request)
+        return HttpResponseRedirect(reverse('accounts:login_buyer'))
+
+
       if next2.find('ToConfirm') >= 0:  # 登録済みパートナーにユーザー追加
 
         user = UserModel.objects.get(pk=next2.split('_')[1]) 
@@ -910,21 +927,21 @@ class EntityCreateView_buyer(generic.CreateView):
         # 下記①、②、③の順で実行
         # ①.is_valid()、②フォームでのclean、clean_<field>、③form.cleaned_data[]に格納
 
-          #temporal_buyEntityName = self.request.POST.get('entityName', None)
-          #print(f'temporal_buyEntityName={temporal_buyEntityName} post if next2.find(ToConfirm)>=0: EntityCreateView_buyer')
+          #temporal_buyEntityname = self.request.POST.get('entityname', None)
+          #print(f'temporal_buyEntityname={temporal_buyEntityname} post if next2.find(ToConfirm)>=0: EntityCreateView_buyer')
 
           cleaned_data = form.cleaned_data 
-          entityName = cleaned_data['entityName']
-          print(f'cleaned_data[entityName]={entityName}')
-          entity = LegalEntity.objects.get(entityName=cleaned_data['entityName'])
+          entityname = cleaned_data['entityname']
+          print(f'cleaned_data[entityname]={entityname}')
+          entity = LegalEntity.objects.get(entityname=cleaned_data['entityname'])
 
 
           init_dict = {
-            #'entityName' : entity.entityName, テンプレートではentityで渡す
-            'lastName' : cleaned_data['lastName'],
-            'firstName' : cleaned_data['firstName'],
-            'lastName_kana' : cleaned_data['lastName_kana'],
-            'firstName_kana' : cleaned_data['firstName_kana'],
+            #'entityname' : entity.entityname, テンプレートではentityで渡す
+            'lastname' : cleaned_data['lastname'],
+            'firstname' : cleaned_data['firstname'],
+            'lastname_kana' : cleaned_data['lastname_kana'],
+            'firstname_kana' : cleaned_data['firstname_kana'],
             'tel_user' : cleaned_data['tel_user'],
             'department' : cleaned_data['department'],
             'title' : cleaned_data['title'],
@@ -933,7 +950,7 @@ class EntityCreateView_buyer(generic.CreateView):
             'user': user,
             'entity': entity,
             'flag_step': 2,
-            'form' : EntitySetForm_buyer(initial=init_dict),
+            'form' : form, #EntitySetForm_buyer(initial=init_dict),
           }
           return TemplateResponse(self.request, 'accounts/buyer/entitySet.html', context)  # 確認画面に行く
         else:
@@ -947,17 +964,17 @@ class EntityCreateView_buyer(generic.CreateView):
         user = UserModel.objects.get(pk=next2.split('_')[1]) 
         entity = LegalEntity.objects.get(pk=next2.split('_')[2])
 
-        dict_buyEntityName = self.request.session.get('dict_buyEntityname')
+        dict_buyEntityname = self.request.session.get('dict_buyEntityname')
 
         context = {
           'user': user,
           'entity': entity,
           'flag_step': 1,
           'form': form,
-          'temporal_buyEntityName': entity.entityName,
+          'temporal_buyEntityname': entity.entityname,
           # Note(25/06/08)：選択済み内容をページ移動後も維持するために使う（初期は空欄）
-          'dict_buyEntityName': dict_buyEntityName,
-          'json_buyEntityName': json.dumps(dict_buyEntityName),
+          'dict_buyEntityname': dict_buyEntityname,
+          'json_buyEntityname': json.dumps(dict_buyEntityname),
         }
         return TemplateResponse(request, 'accounts/buyer/entitySet.html', context)
 
@@ -969,20 +986,20 @@ class EntityCreateView_buyer(generic.CreateView):
         user = UserModel.objects.get(pk=next2.split('_')[1]) 
         entity = LegalEntity.objects.get(pk=next2.split('_')[2])
 
-        #temporal_buyEntityName = self.request.POST.get('temporal_buyEntityName', "")
-        #entity = LegalEntity.objects.get(entityName=temporal_buyEntityName)
+        #temporal_buyEntityname = self.request.POST.get('temporal_buyEntityname', "")
+        #entity = LegalEntity.objects.get(entityname=temporal_buyEntityname)
 
         user.entity = entity
-        user.userName = \
-          self.request.POST.get('lastName') + ' ' + self.request.POST.get('firstName')
-        user.userName_kana = \
-          self.request.POST.get('lastName_kana') + ' ' + self.request.POST.get('firstName_kana')
+        user.personname = \
+          self.request.POST.get('lastname') + ' ' + self.request.POST.get('firstname')
+        user.personname_kana = \
+          self.request.POST.get('lastname_kana') + ' ' + self.request.POST.get('firstname_kana')
 
         # アプリで使うのはuseNameだが、名前を変更する場合があるので保存しておく
-        user.lastName = self.request.POST.get('lastName')
-        user.firstName = self.request.POST.get('firstName')
-        user.lastName_kana = self.request.POST.get('lastName_kana')
-        user.firstName_kana = self.request.POST.get('firstName_kana')
+        user.lastname = self.request.POST.get('lastname')
+        user.firstname = self.request.POST.get('firstname')
+        user.lastname_kana = self.request.POST.get('lastname_kana')
+        user.firstname_kana = self.request.POST.get('firstname_kana')
 
         user.tel_user = self.request.POST.get('tel_user', None)
         user.department = self.request.POST.get('department', None)
@@ -1026,7 +1043,7 @@ class AgreementConfirmView_buyer(generic.CreateView):
 
     except UserModel.DoesNotExist:
       messages.add_message(self.request,
-        messages.INFO, "ユーザー情報がありません。ユーザー登録をお願いいたします。")
+        messages.DANGER, "ユーザー情報がありません。ユーザー登録をお願いいたします。")
       return TemplateResponse(request,'accounts/buyer/login.html', {'form':MyLoginForm}) 
 
     """ エンティティの一人目か。一人目はQneenに申請、以降はパートナーに申請 """
@@ -1060,7 +1077,7 @@ class AgreementConfirmView_buyer(generic.CreateView):
       applyUser = UserModel.objects.get(pk=buttonValue.split('_')[1]) 
       buyEntity = LegalEntity.objects.get(pk=buttonValue.split('_')[2])
       print(f'applyUser.email={applyUser.email}')
-      print(f'applyUser.userName={applyUser.userName}')
+      print(f'applyUser.personname={applyUser.personname}')
       print(f'applyUser.tel_user={applyUser.tel_user}')
       print(f'applyUser.department={applyUser.department}')
       print(f'applyUser.title={applyUser.title}')
@@ -1169,16 +1186,16 @@ class EntityCreateView_seller(generic.CreateView):
   template_name = 'accounts/seller/entityCreate.html'
   timeout_seconds = getattr(settings, 'ACTIVATION_TIMEOUT_SECONDS', 60*60*72)
 
-  #dict_sellEntityName = dict((f, f) for idx, f in enumerate(LegalEntity.objects.filter(type1=2,type2=2).values_list('entityName', flat=True), 1))
+  #dict_sellEntityname = dict((f, f) for idx, f in enumerate(LegalEntity.objects.filter(type1=2,type2=2).values_list('entityname', flat=True), 1))
   #パートナー新規登録後に2人目のユーザーを追加しても反映されないため没
 
   def dispatch(self, request, *args, **kwargs):
   
     self.request.session['dict_sellEntityname'] = \
-      dict((f, f) for idx, f in enumerate(LegalEntity.objects.filter(type1=2,type2=2).values_list('entityName', flat=True), 1))
+      dict((f, f) for idx, f in enumerate(LegalEntity.objects.filter(type1=2,type2=2).values_list('entityname', flat=True), 1))
   
     """ 初回のマイグレーションの時のみ下記を採用する """
-    #dict_sellEntityName = {'Qnee','Qnee'}
+    #dict_sellEntityname = {'Qnee','Qnee'}
     # 「flat=True」はリスト、「flat=False」はタプル
   
     return super().dispatch(request, *args, **kwargs)
@@ -1216,7 +1233,7 @@ class EntityCreateView_seller(generic.CreateView):
     user.is_active = False # 参加承認が得られた時点でTrueにする
     user.save()
 
-    dict_sellEntityName = self.request.session.get('dict_sellEntityname')
+    dict_sellEntityname = self.request.session.get('dict_sellEntityname')
 
     print(f'ここ来てる1 self.request.user={self.request.user} email={user.email} type2={user.type2}（get in class EntityCreateView_seller）')
 
@@ -1236,17 +1253,17 @@ class EntityCreateView_seller(generic.CreateView):
 
       init_dict = {
         'email': user.email,
-        #'userName': '',
+        #'personname': '',
         'tel_user': "",
       }
       context = {
         'flag_step': 1,
         'user': user,
         'form': EntitySetForm_seller(initial=init_dict),
-        'temporal_sellEntityName': "",
+        'temporal_sellEntityname': "",
         # コメント(25/06/08)：Selectボックスで未選択であることを示す。選択後はページ移動でデータ保持するために使う
-        'dict_sellEntityName': dict_sellEntityName,
-        'json_sellEntityName': json.dumps(dict_sellEntityName),
+        'dict_sellEntityname': dict_sellEntityname,
+        'json_sellEntityname': json.dumps(dict_sellEntityname),
       }
       print(f'ここ来てる2 self.request.user={self.request.user} email={user.email} type2={user.type2}（get in class EntityCreateView_seller）')
      
@@ -1278,21 +1295,24 @@ class EntityCreateView_seller(generic.CreateView):
         # 下記①、②、③の順で実行
         # ①.is_valid()、②フォームでのclean、clean_<field>、③form.cleaned_data[]に格納
 
-          cleaned_data = form.cleaned_data 
+          #cleaned_data = form.cleaned_data 
     
-          init_dict = {
-            'lastName' : cleaned_data['lastName'],
-            'firstName' : cleaned_data['firstName'],
-            'lastName_kana' : cleaned_data['lastName_kana'],
-            'firstName_kana' : cleaned_data['firstName_kana'],
+          #init_dict = {
+          #  'lastname' : cleaned_data['lastname'],
+          #  'firstname' : cleaned_data['firstname'],
+          #  'lastname_kana' : cleaned_data['lastname_kana'],
+          #  'firstname_kana' : cleaned_data['firstname_kana'],
 
-            'tel_user' : cleaned_data['tel_user'],
-            'zip_user' : cleaned_data['zip_user'],
-          }
+          #  'tel_user' : cleaned_data['tel_user'],
+          #  'zip_user' : cleaned_data['zip_user'],
+          #  'address1' : cleaned_data['address1'],
+          #  'address2' : cleaned_data['address2'],
+          #  'address3' : cleaned_data['address3'],
+          #}
           context = {
             'flag_step': 2,
             'user': user,
-            'form' : self.form_class(initial=init_dict),
+            'form' : form,  #self.form_class(initial=init_dict),
           }
           return TemplateResponse(
             self.request, 'accounts/seller/entityCreate.html', context)
@@ -1307,26 +1327,26 @@ class EntityCreateView_seller(generic.CreateView):
 
       if next1_indiv.find('ToSave') >= 0: # 確認した内容をデータベースに登録
 
-        user.userName = \
-          self.request.POST.get('lastName') + ' ' + self.request.POST.get('firstName')
-        user.userName_kana = \
-          self.request.POST.get('lastName_kana') + ' ' + self.request.POST.get('firstName_kana')
+        user.personname = \
+          self.request.POST.get('lastname') + ' ' + self.request.POST.get('firstname')
+        user.personname_kana = \
+          self.request.POST.get('lastname_kana') + ' ' + self.request.POST.get('firstname_kana')
 
         # アプリで使うのはuseNameだが、名前を変更する場合があるので保存しておく
-        user.lastName = self.request.POST.get('lastName')
-        user.firstName = self.request.POST.get('firstName')
-        user.lastName_kana = self.request.POST.get('lastName_kana')
-        user.firstName_kana = self.request.POST.get('firstName_kana')
+        user.lastname = self.request.POST.get('lastname')
+        user.firstname = self.request.POST.get('firstname')
+        user.lastname_kana = self.request.POST.get('lastname_kana')
+        user.firstname_kana = self.request.POST.get('firstname_kana')
 
         user.tel_user = self.request.POST.get('tel_user')
         user.zip_user = self.request.POST.get('zip_user')
 
         entity = LegalEntity.objects.create()
 
-        entity.entityName = \
-          self.request.POST.get('lastName') + ' ' + self.request.POST.get('firstName')
-        #　entity.entityName = form.entityName 
-        # 上式はエラー（'EntityCreateForm_buyer' object has no attribute 'entityName'）
+        entity.entityname = \
+          self.request.POST.get('lastname') + ' ' + self.request.POST.get('firstname')
+        #　entity.entityname = form.entityname 
+        # 上式はエラー（'EntityCreateForm_buyer' object has no attribute 'entityname'）
 
         entity.tel_entity = self.request.POST.get('tel_user')
         entity.zip_entity = self.request.POST.get('zip_user')
@@ -1404,7 +1424,6 @@ class EntityCreateView_seller(generic.CreateView):
 
       form = self.form_class(request.POST, userType2=user.type2)
 
-
       if next1_corp.find('ToConfirm') >= 0:
       
         if form.is_valid():
@@ -1412,10 +1431,11 @@ class EntityCreateView_seller(generic.CreateView):
         # ①.is_valid()、②フォームでのclean、clean_<field>、③form.cleaned_data[]に格納
 
           cleaned_data = form.cleaned_data
-
+          address1 =cleaned_data['address1']
+          print(f'address1={address1}')
 
           init_dict = {
-            'entityName' : cleaned_data['entityName'],
+            'entityname' : cleaned_data['entityname'],
             'representitive' : cleaned_data['representitive'],
             'tel_entity' : cleaned_data['tel_entity'],
             'zip_entity' : cleaned_data['zip_entity'],
@@ -1423,10 +1443,10 @@ class EntityCreateView_seller(generic.CreateView):
             'address2' : cleaned_data['address2'],
             'address3' : cleaned_data['address3'],
 
-            'lastName' : cleaned_data['lastName'],
-            'lastName_kana' : cleaned_data['lastName_kana'],
-            'firstName' : cleaned_data['firstName'],
-            'firstName_kana' : cleaned_data['firstName_kana'],
+            'lastname' : cleaned_data['lastname'],
+            'lastname_kana' : cleaned_data['lastname_kana'],
+            'firstname' : cleaned_data['firstname'],
+            'firstname_kana' : cleaned_data['firstname_kana'],
             'tel_user' : cleaned_data['tel_user'],
             'department' : cleaned_data['department'],
             'title' : cleaned_data['title'],
@@ -1452,9 +1472,9 @@ class EntityCreateView_seller(generic.CreateView):
         entity = LegalEntity.objects.create()
 
         # ★★ 250923 法人の処理として記載。このうえに個人の処理を入れる
-        entity.entityName = self.request.POST['entityName']
-        #　entity.entityName = form.entityName 
-        # 上式はエラー（'EntityCreateForm_buyer' object has no attribute 'entityName'）
+        entity.entityname = self.request.POST['entityname']
+        #　entity.entityname = form.entityname 
+        # 上式はエラー（'EntityCreateForm_buyer' object has no attribute 'entityname'）
 
         entity.representitive = self.request.POST.get('representitive')
         entity.tel_entity = self.request.POST.get('tel_entity')
@@ -1468,19 +1488,18 @@ class EntityCreateView_seller(generic.CreateView):
         entity.type1 = user.type1  
         entity.type2 = user.type2
 
-        entity.save()
-
         user.entity = entity
-        user.userName = \
-          self.request.POST.get('lastName') + ' ' + self.request.POST.get('firstName')
-        user.userName_kana = \
-          self.request.POST.get('lastName_kana') + ' ' + self.request.POST.get('firstName_kana')
 
         # アプリで使うのはuseNameだが、名前を変更する場合があるので保存しておく
-        user.lastName = self.request.POST.get('lastName')
-        user.firstName = self.request.POST.get('firstName')
-        user.lastName_kana = self.request.POST.get('lastName_kana')
-        user.firstName_kana = self.request.POST.get('firstName_kana')
+        user.lastname = self.request.POST.get('lastname')
+        user.firstname = self.request.POST.get('firstname')
+        user.lastname_kana = self.request.POST.get('lastname_kana')
+        user.firstname_kana = self.request.POST.get('firstname_kana')
+
+        user.personname = \
+          self.request.POST.get('lastname') + ' ' + self.request.POST.get('firstname')
+        user.personname_kana = \
+          self.request.POST.get('lastname_kana') + ' ' + self.request.POST.get('firstname_kana')
 
         user.tel_user = self.request.POST.get('tel_user')
         user.department = self.request.POST.get('department')
@@ -1491,18 +1510,19 @@ class EntityCreateView_seller(generic.CreateView):
         user.canApproveAll = False
         user.canApproveChg = False
         user.canApproveQpay = False
-        # 【留意】 「False」とし、AgreementConfirmView_sellerにおいて、
-        # パートナ一１人目の場合は「True」、２人目以降は権限者が「True/False」を設定
-
-        # ★★ 25009254 Qneeはゲストに対しては承認しない
-        # ★★ この部分はパートナーと異なる
+        # 【留意】 ここでは「False」とし、後続のAgreementConfirmView_sellerにおいて、
+        # 1人目の場合は3つとも「True」、2人目以降はゲスト権限者が「True/False」を設定
+        # （パートナーと運用が異なる）
 
         user.is_active = False
-        
-        user.save()
 
         print(f'request.user.get_username={request.user.get_username} type2={user.type2}（def post ==confirm after form.is_valid in EntityCreateView_seller）')
         print(f'entity.id = {entity.id}（post ==create after form.is_valid in EntityCreateView_seller）')
+
+        entity.save()
+        user.save()
+        # saveが途中にあるとコードが途中で止まったとき、
+        # インスタンスが生成されたままになるため最後にsaveは最後にしている
 
         context = {
           'flag_step': 1, # agreementConfirm.htmlのflag
@@ -1547,23 +1567,23 @@ class EntityCreateView_seller(generic.CreateView):
         # 下記①、②、③の順で実行
         # ①.is_valid()、②フォームでのclean、clean_<field>、③form.cleaned_data[]に格納
 
-          #temporal_sellEntityName = self.request.POST.get('name_SellerSelect', None)
-          #sellEntity = LegalEntity.objects.get(entityName=temporal_sellEntityName)
+          #temporal_sellEntityname = self.request.POST.get('name_SellerSelect', None)
+          #sellEntity = LegalEntity.objects.get(entityname=temporal_sellEntityname)
  
           cleaned_data = form.cleaned_data 
-          entityName = cleaned_data['entityName']
-  
+          entityname = cleaned_data['entityname']
+          print(f'cleaned_data[entityname]={entityname}')
           # 確認用
-          entityName2 = self.request.POST.get('entityName', None)
-          print(f'self.request.POST.get(entityName)={entityName2}')
-          entity = LegalEntity.objects.get(entityName=cleaned_data['entityName'])
+          entityname2 = self.request.POST.get('entityname', None)
+          print(f'self.request.POST.get(entityname)={entityname2} def post if next2_corp==ToConfirm in EntityCreateView_seller')
+          entity = LegalEntity.objects.get(entityname=cleaned_data['entityname'])
 
           init_dict = {
-            #'entityName' : entity.entityName,　テンプレートにはentityで渡す
-            'lastName' : cleaned_data['lastName'],
-            'lastName_kana' : cleaned_data['lastName_kana'],
-            'firstName' : cleaned_data['firstName'],
-            'firstName_kana' : cleaned_data['firstName_kana'],
+            #'entityname' : entity.entityname,　テンプレートにはentityで渡す
+            'lastname' : cleaned_data['lastname'],
+            'lastname_kana' : cleaned_data['lastname_kana'],
+            'firstname' : cleaned_data['firstname'],
+            'firstname_kana' : cleaned_data['firstname_kana'],
             'tel_user' : cleaned_data['tel_user'],
             'department' : cleaned_data['department'],
             'title' : cleaned_data['title'],
@@ -1579,9 +1599,9 @@ class EntityCreateView_seller(generic.CreateView):
         else: #バリデーションエラーの時に通る
 
           print(f'ここ来てる4（def post after if not form.is_valid in class EntityCreateView_seller）')
-          entityName = self.request.POST.get('entityName')
-          entity = LegalEntity.objects.get(entityName=entityName)
-          dict_sellEntityName = self.request.session.get('dict_sellEntityname')
+          entityname = self.request.POST.get('entityname')
+          entity = LegalEntity.objects.get(entityname=entityname)
+          dict_sellEntityname = self.request.session.get('dict_sellEntityname')
 
           context = {
             'flag_step': 1,
@@ -1589,14 +1609,13 @@ class EntityCreateView_seller(generic.CreateView):
             'user': user,
             'entity': entity,
             'form' : form,
-            'temporal_sellEntityName': entity.entityName,
+            'temporal_sellEntityname': entity.entityname,
             # コメント(25/06/08)：Selectボックスで未選択であることを示す。選択後はページ移動でデータ保持するために使う
-            'dict_sellEntityName': dict_sellEntityName,
-            'json_sellEntityName': json.dumps(dict_sellEntityName),
+            'dict_sellEntityname': dict_sellEntityname,
+            'json_sellEntityname': json.dumps(dict_sellEntityname),
 
           }
           return TemplateResponse(self.request, 'accounts/seller/entitySet.html', context)
-
 
 
       if next2_corp.find('BackToInput') >= 0:
@@ -1605,7 +1624,7 @@ class EntityCreateView_seller(generic.CreateView):
 
         user = UserModel.objects.get(pk=next2_corp.split('_')[1]) 
         entity = LegalEntity.objects.get(pk=next2_corp.split('_')[2])
-        dict_sellEntityName = self.request.session.get('dict_sellEntityname')
+        dict_sellEntityname = self.request.session.get('dict_sellEntityname')
 
         context = {
           'selectedValue': 'AddToEntity',
@@ -1613,10 +1632,10 @@ class EntityCreateView_seller(generic.CreateView):
           'user': user,
           'entity': entity,
           'form': form,
-          'temporal_sellEntityName': entity.entityName,
+          'temporal_sellEntityname': entity.entityname,
           # Note(25/06/08)：選択済み内容をページ移動後も維持するために使う（初期は空欄）
-          'dict_sellEntityName': dict_sellEntityName,
-          'json_sellEntityName': json.dumps(dict_sellEntityName),
+          'dict_sellEntityname': dict_sellEntityname,
+          'json_sellEntityname': json.dumps(dict_sellEntityname),
         }
         return TemplateResponse(request, 'accounts/seller/entitySet.html', context)
 
@@ -1629,18 +1648,19 @@ class EntityCreateView_seller(generic.CreateView):
         user = UserModel.objects.get(pk=next2_corp.split('_')[1]) 
         entity = LegalEntity.objects.get(pk=next2_corp.split('_')[2])
 
-        #user.userName = self.request.POST.get('userName', None)
+        #user.personname = self.request.POST.get('personname', None)
         user.entity = entity
-        user.userName = \
-          self.request.POST.get('lastName') + ' ' + self.request.POST.get('firstName')
-        user.userName_kana = \
-          self.request.POST.get('lastName_kana') + ' ' + self.request.POST.get('firstName_kana')
 
         # 名前を変更する場合があるので保存しておく
-        user.lastName = self.request.POST.get('lastName')
-        user.firstName = self.request.POST.get('firstName')
-        user.lastName_kana = self.request.POST.get('lastName_kana')
-        user.firstName_kana = self.request.POST.get('firstName_kana')
+        user.lastname = self.request.POST.get('lastname')
+        user.firstname = self.request.POST.get('firstname')
+        user.lastname_kana = self.request.POST.get('lastname_kana')
+        user.firstname_kana = self.request.POST.get('firstname_kana')
+
+        user.personname = \
+          self.request.POST.get('lastname') + ' ' + self.request.POST.get('firstname')
+        user.personname_kana = \
+          self.request.POST.get('lastname_kana') + ' ' + self.request.POST.get('firstname_kana')
 
         user.tel_user = self.request.POST.get('tel_user')
         user.department = self.request.POST.get('department')
@@ -1735,7 +1755,12 @@ class AgreementConfirmView_seller(generic.UpdateView):
           applyUser.addStatus_char = '承認不要'
 
           applyUser.entity = sellEntity
+          applyUser.is_active = True
+
           applyUser.save()
+
+          messages.add_message(self.request,
+            messages.SUCCESS, "ご登録ありがとうございます。ログインしてご利用いただけます。")
 
           return TemplateResponse(request,'accounts/seller/login.html', {'form':MyLoginForm()})
 
@@ -1761,9 +1786,13 @@ class AgreementConfirmView_seller(generic.UpdateView):
             applyUser.entity = sellEntity
             applyUser.save()
 
-            context2 = {'flag_step': 2,}
-            return TemplateResponse(self.request, 'accounts/seller/agreementConfirm.html', context2)
-            #return TemplateResponse(request,'accounts/seller/login.html', {'form':MyLoginForm}) 
+            #context2 = {'flag_step': 2,}
+            #return TemplateResponse(self.request, 'accounts/seller/agreementConfirm.html', context2)
+
+            messages.add_message(self.request,
+              messages.SUCCESS, "ご登録ありがとうございます。ログインしてご利用いただけます。")
+
+            return TemplateResponse(request,'accounts/seller/login.html', {'form':MyLoginForm}) 
 
 
           else:   # ゲスト内の権限者に参加申請する
@@ -1790,7 +1819,7 @@ class AgreementConfirmView_seller(generic.UpdateView):
 
               print(f'pass1 approver.email={approver.email}（EntityCreateView_seller, post, checkbox==agree)')
 
-              context2 = {'flag_step': 3,}
+              context2 = {'flag_step': 2,}
               return TemplateResponse(self.request, 'accounts/seller/agreementConfirm.html', context2)
 
 
@@ -2788,8 +2817,9 @@ class MyPageView_admin(generic.DetailView):
     else: cnt_toBeApproved_add = 0
     print(f'cnt_toBeApproved_add={cnt_toBeApproved_add}')
 
+    # 会社情報更新の申請中（status=1）の件数を抽出
     if adminUser.canApproveAll == True or adminUser.canApproveChg == True:
-      cnt_toBeApproved_info = CorpInfo.objects.filter(status=2).count()
+      cnt_toBeApproved_info = CorpInfo.objects.filter(status=1).count()
     else: cnt_toBeApproved_info = 0
 
     return TemplateResponse(
@@ -2808,7 +2838,7 @@ class MyPageView_buyer(generic.DetailView):
 
   model = CustomUser
   template_name = "accounts/buyer/mypage.html"
-  form_class = MyPageForm_buyer
+  #form_class = MyPageForm_buyer
   
   def get(self, request, *args, **kwargs):
 
@@ -2857,9 +2887,17 @@ class MyPageView_buyer(generic.DetailView):
         & (Q(addStatus=1) | Q(addStatus=3))).count()
       
     else: cnt_toBeApproved_add = 0
-    
+
+    # 会社情報の申請に「差戻」があった場合にフラグを立てる
+    flag_sendback = 0
+    if loginUser.canApproveAll == True or loginUser.canApproveChg == True:
+      if CorpInfo.objects.filter(
+        applyEntity=loginUser.entity, status=2).exists():
+        flag_sendback = 1
+
     print(f'cnt_toBeApproved_qpay = {cnt_toBeApproved_qpay} in get of MypageView_buyer')
     print(f'cnt_toBeApproved_add = {cnt_toBeApproved_add} in get of MypageView_buyer')
+    print(f'flag_sendback = {flag_sendback} in get of MypageView_buyer')
 
     firstOfThisMonth = date.today().replace(day=1)
     firstOfNextMonth = firstOfThisMonth + relativedelta(months=+1)
@@ -2884,6 +2922,7 @@ class MyPageView_buyer(generic.DetailView):
         'paybacked_at': paybacked_at,
         'cnt_toBeApproved_qpay': cnt_toBeApproved_qpay, 
         'cnt_toBeApproved_add': cnt_toBeApproved_add,
+        'flag_sendback': flag_sendback,
       }
     ) 
 
@@ -2893,7 +2932,7 @@ class MyPageView_seller(generic.DetailView):
 
   model = CustomUser
   template_name = "accounts/seller/mypage.html"
-  form_class = MyPageForm_seller
+  #form_class = MyPageForm_seller
   
   def get(self, request, *args, **kwargs):
 
@@ -3558,12 +3597,24 @@ class InfoEditView_buyer(generic.DetailView):
     try:    # 通常ケース（管理画面がログアウトされていないとワークせずエラーケースに）
       buyUser = UserModel.objects.get(email=self.request.user)
 
-      # ユーザー追加の承認依頼の件数を抽出する 
+      # ユーザー追加の承認依頼の件数を抽出する
+      cnt_toBeApproved_add = 0
       if buyUser.canApproveAll == True or buyUser.canApproveChg == True:
         cnt_toBeApproved_add = UserModel.objects.filter(
           Q(entity=buyUser.entity)
           & (Q(addStatus=1) | Q(addStatus=3))).count()
       else: cnt_toBeApproved_add = 0
+
+      # 会社情報の申請に「差戻」があった場合にフラグを立てる
+      flag_sendback = 0
+      if buyUser.canApproveAll == True or buyUser.canApproveChg == True:
+        if CorpInfo.objects.filter(
+          applyEntity=buyUser.entity, status=2).exists():
+          flag_sendback = 1
+      
+      # 確認用
+      corpInfo_tmp = CorpInfo.objects.get(applyEntity=buyUser.entity)
+      print(f'corpInfo_tmp={corpInfo_tmp} status={corpInfo_tmp.status}')
 
     except UserModel.DoesNotExist:
 
@@ -3574,6 +3625,7 @@ class InfoEditView_buyer(generic.DetailView):
 
     context = {
       "cnt_toBeApproved_add": cnt_toBeApproved_add,
+      "flag_sendback": flag_sendback,
     }
     return TemplateResponse(request, "accounts/buyer/infoEdit.html", context) 
 
@@ -3622,8 +3674,9 @@ class InfoEditView_admin(generic.DetailView):
           Q(type1=1) & (Q(addStatus=1) | Q(addStatus=3))).count()
       else: cnt_toBeApproved_add = 0
 
+      # 会社情報の更新申請中（CorpInfo.status=1）の件数を抽出
       if adminUser.canApproveAll == True or adminUser.canApproveChg == True:
-        cnt_toBeApproved_info = CorpInfo.objects.filter(status=2).count()
+        cnt_toBeApproved_info = CorpInfo.objects.filter(status=1).count()
       else: cnt_toBeApproved_info = 0
 
     except UserModel.DoesNotExist:
@@ -3651,12 +3704,12 @@ class ProfileEditView_buyer(generic.UpdateView):
     user = UserModel.objects.get(email=self.request.user)
     entity = LegalEntity.objects.get(pk=user.entity_id)
 
-    """ 申請中・申請差戻データがない場合 """
+    """ 申請中（status=1）及び申請差戻（status=2）のデータがない場合 """
     if CorpInfo.objects.filter(
-      Q(applyEntity=entity) & (Q(status=2) | Q(status=3))).exists() == False:
+      Q(applyEntity=entity) & (Q(status=1) | Q(status=2))).exists() == False:
 
       init_dict = {
-        'entityName' : entity.entityName,
+        'entityname' : entity.entityname,
         'representitive' : entity.representitive,
         'tel_entity' : entity.tel_entity,
             
@@ -3665,32 +3718,32 @@ class ProfileEditView_buyer(generic.UpdateView):
         'address2' : entity.address2,
         'address3' : entity.address3,
 
-        'firstName' : user.firstName,
-        'lastName' : user.lastName,
-        'firstName_kana' : user.firstName_kana,
-        'lastName_kana' : user.lastName_kana,
+        'firstname' : user.firstname,
+        'lastname' : user.lastname,
+        'firstname_kana' : user.firstname_kana,
+        'lastname_kana' : user.lastname_kana,
 
         'tel_user' : user.tel_user,
         'department' : user.department,
         'title' : user.title,
       }
       context = {
+        'flag_status': 0,
         'step_edit': 1,
-        'flag_pending': 0,
         #'frWhere': '',
         'form': ProfileEditForm_buyer(initial=init_dict),
       }
       return TemplateResponse(self.request, 'accounts/buyer/profileEdit.html', context)
 
 
-    """ 既に申請中の場合 """
-    if CorpInfo.objects.filter(applyEntity=entity, status=2).exists():
+    """ 既に申請中（status=1）の場合 """
+    if CorpInfo.objects.filter(applyEntity=entity, status=1).exists():
 
       corpInfo = CorpInfo.objects.select_related(
-        'applyUser','applyEntity').get(applyEntity=entity, status=2)
+        'applyUser','applyEntity').get(applyEntity=entity, status=1)
 
       init_dict = {
-        'entityName' : entity.entityName,
+        'entityname' : entity.entityname,
         'representitive' : entity.representitive,
         'tel_entity' : entity.tel_entity,
             
@@ -3699,10 +3752,10 @@ class ProfileEditView_buyer(generic.UpdateView):
         'address2' : entity.address2,
         'address3' : entity.address3,
 
-        'firstName' : user.firstName,
-        'lastName' : user.lastName,
-        'firstName_kana' : user.firstName_kana,
-        'lastName_kana' : user.lastName_kana,
+        'firstname' : user.firstname,
+        'lastname' : user.lastname,
+        'firstname_kana' : user.firstname_kana,
+        'lastname_kana' : user.lastname_kana,
 
         'tel_user' : user.tel_user,
         'department' : user.department,
@@ -3710,9 +3763,9 @@ class ProfileEditView_buyer(generic.UpdateView):
       }
 
       context = {
+        'flag_status': 1,
         'step_edit': 1,
-        'flag_pending': 1,
-        'frWhere': '',
+        #'frWhere': '',
         'corpInfo': corpInfo,
         'user': user,
         'form': ProfileEditForm_buyer(initial=init_dict), 
@@ -3721,13 +3774,13 @@ class ProfileEditView_buyer(generic.UpdateView):
 
 
     """ 申請差戻データがある場合 """
-    if CorpInfo.objects.filter(applyEntity=entity, status=3).exists():
+    if CorpInfo.objects.filter(applyEntity=entity, status=2).exists():
 
       corpInfo = CorpInfo.objects.select_related(
-        'applyUser','applyEntity').get(applyEntity=entity, status=3)
+        'applyUser','applyEntity').get(applyEntity=entity, status=2)
 
       init_dict = {
-        'entityName' : corpInfo.entityName,
+        'entityname' : corpInfo.entityname,
         'representitive' : corpInfo.representitive,
         'tel_entity' : corpInfo.tel_entity,
             
@@ -3736,18 +3789,18 @@ class ProfileEditView_buyer(generic.UpdateView):
         'address2' : corpInfo.address2,
         'address3' : corpInfo.address3,
 
-        'firstName' : user.firstName,
-        'lastName' : user.lastName,
-        'firstName_kana' : user.firstName_kana,
-        'lastName_kana' : user.lastName_kana,
+        'firstname' : user.firstname,
+        'lastname' : user.lastname,
+        'firstname_kana' : user.firstname_kana,
+        'lastname_kana' : user.lastname_kana,
 
         'tel_user' : user.tel_user,
         'department' : user.department,
         'title' : user.title,
       }
       context = {
+        'flag_status': 2,
         'step_edit': 1,
-        'flag_pending': 2,
         #'frWhere': '',
         'corpInfo': corpInfo,
         'form': ProfileEditForm_buyer(initial=init_dict),
@@ -3755,6 +3808,13 @@ class ProfileEditView_buyer(generic.UpdateView):
       return TemplateResponse(self.request, 'accounts/buyer/profileEdit.html', context)
 
 
+  # 申請ステータス
+  # HISTORY = -1
+  # DEFAULT = 0
+  # UNDER_APPLICATION = 1 # 申請中
+  # PENDING = 2           # 申請差戻
+  # APPROVED = 3          # 承認
+  # DISAPPROVED = 4      # 否認
 
   def post(self, request, *args, **kwargs):
 
@@ -3765,15 +3825,16 @@ class ProfileEditView_buyer(generic.UpdateView):
     # 260103 nextCaseを追加（①パートナー追加と②ユーザー追加に分ける）
     # 260301 ユーザー追加の場合はEntitySetform_buyerを利用（nextCaseをなくした）
 
-    btnAction = self.request.POST.get('btnAction', None)
-    if btnAction != None:
+    actionBtn = self.request.POST.get('actionBtn', None)
+    if actionBtn != None:
 
       user = UserModel.objects.get(email=self.request.user)
       entity = LegalEntity.objects.get(pk=user.entity_id)
 
 
       """ 会社情報の更新内容を確認する画面 """
-      if btnAction.find('ToConfirm_corp') >= 0:
+      if actionBtn.find('ToConfirm_corp') >= 0 \
+      or actionBtn.find('ToCorrectUpdate') >= 0:
 
         if form.is_valid():
         # 下記①、②、③の順で実行
@@ -3781,17 +3842,22 @@ class ProfileEditView_buyer(generic.UpdateView):
 
           cleaned_data = form.cleaned_data
 
-          """ 申請中のデータがあるがある場合は処理をストップする """
-          """ 基本的にここは通らないようにする """
+          """ 申請中のデータがある場合は、申請中のデータを表示する """
 
           if CorpInfo.objects.filter(
-            Q(applyEntity=entity) & (Q(status=2) | Q(status=3))).exists():
-          # 申請中、申請差戻のデータがある場合は、申請不可とする
-    
-            messages.add_message(request, messages.WARNING, "申請中、又は差戻のデータがあります。") 
+            Q(applyEntity=entity) & Q(status=1)).exists():
+          # 申請中の場合は申請不可（申請差戻のデータは申請可）
 
-            return TemplateResponse(self.request, 'accounts/buyer/profileEdit.html',
-            {'step_edit': 1, 'whatUpdate': '', 'user':user, 'form':form, })
+            messages.add_message(request, messages.WARNING, "申請中のデータがあります。") 
+            corpInfo = CorpInfo.objects.get(applyEntity=entity)
+
+            context ={
+              'flag_status': corpInfo.status,
+              'step_edit': 1,
+              #'whatUpdate': '',
+              'user':user,
+              'form':form, }
+            return TemplateResponse(self.request, 'accounts/buyer/profileEdit.html', context)
 
 
           else: # 申請中のデータがない場合
@@ -3802,20 +3868,27 @@ class ProfileEditView_buyer(generic.UpdateView):
 
             flag_needEvidence = 0
 
-            if entity.entityName != cleaned_data['entityName'] or \
+            if entity.entityname != cleaned_data['entityname'] or \
               entity.representitive != cleaned_data['representitive'] or \
               entity.zip_entity != cleaned_data['zip_entity'] or \
               entity.address1 != cleaned_data['address1'] or \
               entity.address2 != cleaned_data['address2'] or \
               entity.address3 != cleaned_data['address3']:
 
-              print(f'pass1 コーポレート情報変更')
+              print(f'pass1 会社情報変更（エビデンス要） in ProfileEditView_buyer')
               flag_needEvidence = 1
 
-              " Qnee承認まで変更内容をCorpInfoに保存 "
-              corpInfo = CorpInfo.objects.create()
+              """ Qnee承認されるまで変更後内容をCorpInfoに保存 """
+              """ 差戻データ（status=2）がある場合、既存のCorpInfoデータをセット """
 
-              corpInfo.entityName = cleaned_data['entityName']
+              if CorpInfo.objects.filter(applyEntity=entity,status=2).exists():
+                corpInfo = CorpInfo.objects.get(applyEntity=entity,status=2)
+              else:
+                # status=0（処理過程のデータ）は削除する
+                CorpInfo.objects.filter(applyEntity=entity, status=0).delete()
+                corpInfo = CorpInfo.objects.create(applyEntity=entity, status=0)
+
+              corpInfo.entityname = cleaned_data['entityname']
               corpInfo.representitive =cleaned_data['representitive']
               corpInfo.tel_entity = cleaned_data['tel_entity']
               corpInfo.zip_entity = cleaned_data['zip_entity']
@@ -3826,7 +3899,7 @@ class ProfileEditView_buyer(generic.UpdateView):
               corpInfo.applyUser = user
               corpInfo.applyEntity = entity
 
-              # 後続でエビデンスをアップロードした後、申請中（corpInfo.status=2）に変更
+              # 後続でエビデンスをアップロードした後、申請中（corpInfo.status=3）に変更
 
               corpInfo.save()
 
@@ -3836,6 +3909,7 @@ class ProfileEditView_buyer(generic.UpdateView):
 
             " 下記はエビデンス要否に拘わらず行う処理 "
             context = {
+              'flag_status': corpInfo.status, # テンプレート側で通常申請、差戻後の再申請に分けて処理
               'step_edit': 2,
               'flag_needEvidence': flag_needEvidence,
               'user': user,
@@ -3850,9 +3924,10 @@ class ProfileEditView_buyer(generic.UpdateView):
 
           print(f'ここ来てる3（def post after if form.is_valid==False in class ProfileEditView_buyer）')
 
+          corpInfo = CorpInfo.objects.get(applyEntity=entity)
           context = {
+            'flag_status': corpInfo.status,
             'step_edit': 1,
-            'flag_pending': 0,
             #'frWhere': '',
             'user': user,
             'form': form,
@@ -3862,9 +3937,11 @@ class ProfileEditView_buyer(generic.UpdateView):
 
 
       # データ確認画面から入力画面に戻る時の処理 2025/02/14
-      if btnAction.find('BackToInput') >= 0:
+      if actionBtn.find('BackToInput') >= 0:
 
+        corpInfo = CorpInfo.objects.get(applyEntity=entity)
         context = {
+          'flag_status': corpInfo.status,
           'step_edit': 1,
           'user': user,
           'form': form,
@@ -3873,7 +3950,7 @@ class ProfileEditView_buyer(generic.UpdateView):
 
 
       # 代表者、住所を変更した場合にはエビデンスをアップロード
-      if btnAction.find('ToSelectEvidence_corp') >= 0:
+      if actionBtn.find('ToSelectEvidence_corp') >= 0:
 
         context = {
           'step_upEvidence': 1,
@@ -3882,7 +3959,7 @@ class ProfileEditView_buyer(generic.UpdateView):
         return TemplateResponse(request, "accounts/buyer/profileEdit_evidence.html", context)
 
 
-      if btnAction.find('ToEvidenceConfirm_corp') >= 0:
+      if actionBtn.find('ToEvidenceConfirm_corp') >= 0:
 
         corpInfo_id = self.request.session.get('corpInfo_id', None)
         corpInfo = CorpInfo.objects.get(pk=corpInfo_id)
@@ -3890,7 +3967,7 @@ class ProfileEditView_buyer(generic.UpdateView):
         form = InfoEvidenceForm(request.POST, request.FILES)
         if form.is_valid():
 
-          print(f'pass4 btnAction={btnAction} after form.is_valid()')
+          print(f'pass4 actionBtn={actionBtn} after form.is_valid()')
 
           corpInfo.evidence = form.cleaned_data.get('evidence')
           " 【メモ】フォームからデータを取り出す場合の取り方 "
@@ -3912,13 +3989,13 @@ class ProfileEditView_buyer(generic.UpdateView):
     
 
       # エビデンスをアップロードし、Qneeへ申請
-      if btnAction.find('ToApplyToQnee_corp') >= 0:
+      if actionBtn.find('ToApplyToQnee_corp') >= 0:
 
         corpInfo_id = self.request.session.get('corpInfo_id', None)
         if corpInfo_id != None:
 
           corpInfo = CorpInfo.objects.select_related('applyUser','applyEntity').get(pk=corpInfo_id)
-          corpInfo.status = 2 # 申請中のステータスに変更
+          corpInfo.status = 1 # 申請中のステータスに変更
 
           corpInfo.save()
 
@@ -3932,7 +4009,7 @@ class ProfileEditView_buyer(generic.UpdateView):
               'afterLogin': 'corpInfoApply',
               'token': dumps(corpInfo.pk), 
               'qneeUser': eachUser,
-              'applyEntityName': corpInfo.applyEntity.entityName,
+              'applyEntityname': corpInfo.applyEntity.entityname,
               'afterLogin': 'corpInfoApply',}
             utils.sendEmail_common('accounts/buyer/mail/corpInfoApply', '', [eachUser.email], context1)
   
@@ -3945,27 +4022,32 @@ class ProfileEditView_buyer(generic.UpdateView):
 
           messages.add_message(request, messages.DANGER, "エラー。該当データが見つかりません。") 
 
-          return TemplateResponse(self.request, 'accounts/buyer/profileEdit.html',
-          {'step_edit': 1, 'whatUpdate': '', 'user':user, 'form':form, })
+          context = {
+            'step_edit': 1,
+            #'whatUpdate': '',
+            'user':user, 'form':form,            
+          }
+          return TemplateResponse(self.request,
+            'accounts/buyer/profileEdit.html', context )
 
 
       """ 会社情報の申請を取り下げる処理 """
       """ ①申請中の場合、②申請差戻の場合の2パターンに対応する """
-      if btnAction.find('ToDropUpdate') >= 0:
+      if actionBtn.find('ToDropUpdate') >= 0:
 
-        corpInfo_id = btnAction.split('_')[1]
+        corpInfo_id = actionBtn.split('_')[1]
         print(f'pass3 corpInfo_id={corpInfo_id} after ToDoropUpdate')
 
         corpInfo = CorpInfo.objects.get(pk=corpInfo_id)
         corpInfo.delete()
-        #corpInfo.status = 1 # 未処理のステータスに変更
+        #corpInfo.status = 0 # 未処理（DEFAULT）のステータスに変更
         #corpInfo.save()
 
         return HttpResponseRedirect(reverse_lazy('accounts:profileEdit_buyer'))
 
 
       """ ユーザー情報の変更内容を確認する画面 """
-      if btnAction.find('ToConfirm_user') >= 0:
+      if actionBtn.find('ToConfirm_user') >= 0:
 
         if form.is_valid():
 
@@ -3974,7 +4056,7 @@ class ProfileEditView_buyer(generic.UpdateView):
 
           context = {
             'step_edit': 2,
-            'whatUpdate': 'userInfo',
+            #'whatUpdate': 'userInfo', # 使っていない 20260618
             'flag_needEvidence': 0,
             'user': user,
             'form' : form,
@@ -3985,12 +4067,17 @@ class ProfileEditView_buyer(generic.UpdateView):
         else: #バリデーションエラーの時に通る
 
           print(f'ここ来てる3（def post after if not form.is_valid in class ProfileEditView_buyer）')
-          return TemplateResponse(self.request, 'accounts/buyer/profileEdit.html',
-            {'step_edit': 1, 'whatUpdate': 'userInfo', 'user':user, 'form':form, })
-
+          context = {
+            'step_edit': 1,
+            #'whatUpdate': 'userInfo',
+            'user':user, 'form':form,             
+          }
+          return TemplateResponse(self.request,
+            'accounts/buyer/profileEdit.html', context )
+        
 
       # データ確認画面から入力画面に戻る時の処理 2025/02/14
-      if btnAction.find('BackToInput') >= 0:
+      if actionBtn.find('BackToInput') >= 0:
 
         context = {
           'step_edit': 1,
@@ -4001,9 +4088,9 @@ class ProfileEditView_buyer(generic.UpdateView):
 
 
       " 会社情報もユーザー情報も同時に扱う "
-      if btnAction.find('ToSave') >= 0: 
+      if actionBtn.find('ToSave') >= 0: 
 
-        entity.entityName = self.request.POST['entityName']
+        entity.entityname = self.request.POST['entityname']
         entity.representitive = self.request.POST['representitive']
         entity.tel_entity = self.request.POST['tel_entity']
         entity.zip_entity = self.request.POST['zip_entity']
@@ -4013,16 +4100,16 @@ class ProfileEditView_buyer(generic.UpdateView):
 
         entity.save()
 
-        user.userName = \
-          self.request.POST.get('lastName') + ' ' + self.request.POST.get('firstName')
-        user.userName_kana = \
-          self.request.POST.get('lastName_kana') + ' ' + self.request.POST.get('firstName_kana')
+        user.personname = \
+          self.request.POST.get('lastname') + ' ' + self.request.POST.get('firstname')
+        user.personname_kana = \
+          self.request.POST.get('lastname_kana') + ' ' + self.request.POST.get('firstname_kana')
 
         # アプリで使うのはuseNameだが、名前を変更する場合があるので保存しておく
-        user.lastName = self.request.POST.get('lastName')
-        user.firstName = self.request.POST.get('firstName')
-        user.lastName_kana = self.request.POST.get('lastName_kana')
-        user.firstName_kana = self.request.POST.get('firstName_kana')
+        user.lastname = self.request.POST.get('lastname')
+        user.firstname = self.request.POST.get('firstname')
+        user.lastname_kana = self.request.POST.get('lastname_kana')
+        user.firstname_kana = self.request.POST.get('firstname_kana')
 
         user.tel_user = self.request.POST.get('tel_user', None)
         user.department = self.request.POST.get('department', None)
@@ -4042,113 +4129,182 @@ class ProfileEditView_seller(generic.UpdateView):
     user = UserModel.objects.get(email=self.request.user)
     entity = LegalEntity.objects.get(pk=user.entity_id)
 
-    init_dict = {
-      'userName': '',
-      'email': user.email,
-      'tel_user': "",
+    if user.type2 == 1:
 
-      'entityName' : entity.entityName,
-      'representitive' : entity.representitive,
-      'tel_entity' : entity.tel_entity,
+      init_dict = {
+        'personname': '',
+        'email': user.email,
+        'lastname' : user.lastname,
+        'firstname' : user.firstname,
+        'lastname_kana' : user.lastname_kana,
+        'firstname_kana' : user.firstname_kana,
+        'tel_user': user.tel_user,           
+
+        'zip_entity' : user.zip_user,
+        'address1' : entity.address1,
+        'address2' : entity.address2,
+        'address3' : entity.address3,
+      }
+      context = {
+        'step_edit': 1,
+        #'frWhere': '',
+        'user': user,
+        'form': ProfileEditForm1_seller(initial=init_dict),
+      }
+      return TemplateResponse(self.request, 'accounts/seller/profileEdit.html', context)
+    
+
+    if user.type2 == 2:
+
+      init_dict = {
+        'personname': '',
+        'email': user.email,
+        'tel_user': "",
+
+        'entityname' : entity.entityname,
+        'representitive' : entity.representitive,
+        'tel_entity' : entity.tel_entity,
             
-      'zip_entity' : entity.zip_entity,
-      'address1' : entity.address1,
-      'address2' : entity.address2,
-      'address3' : entity.address3,
+        'zip_entity' : entity.zip_entity,
+        'address1' : entity.address1,
+        'address2' : entity.address2,
+        'address3' : entity.address3,
 
-      'lastName' : user.lastName,
-      'firstName' : user.firstName,
-      'lastName_kana' : user.lastName_kana,
-      'firstName_kana' : user.firstName_kana,
+        'lastname' : user.lastname,
+        'firstname' : user.firstname,
+        'lastname_kana' : user.lastname_kana,
+        'firstname_kana' : user.firstname_kana,
 
-      'tel_user' : user.tel_user,
-      'department' : user.department,
-      'title' : user.title,
+        'tel_user' : user.tel_user,
+        'department' : user.department,
+        'title' : user.title,
 
-    }
-    context = {
-      'step_edit': 1,
-      'frWhere': '',
-      'user': user,
-      'form': ProfileEditForm_seller(initial=init_dict),
-    }
-    return TemplateResponse(self.request, 'accounts/seller/profileEdit.html', context)
+      }
+      context = {
+        'step_edit': 1,
+        #'frWhere': '',
+        'user': user,
+        'form': ProfileEditForm2_seller(initial=init_dict),
+      }
+      return TemplateResponse(self.request, 'accounts/seller/profileEdit.html', context)
 
 
   def post(self, request, *args, **kwargs):
 
-    user = UserModel.objects.get(email=self.request.user) 
-    form = ProfileEditForm_seller(request.POST)
+    user = UserModel.objects.get(email=self.request.user)
+    entity = LegalEntity.objects.get(pk=user.entity_id) 
+
+    form = ProfileEditForm1_seller(request.POST)
     # 260103 nextCaseを追加（①パートナー追加と②ユーザー追加に分ける）
     # 260301 ユーザー追加の場合はEntitySetform_sellerを利用（nextCaseをなくした）
 
-    btnAction = self.request.POST.get('btnAction', None)
+    actionBtn = self.request.POST.get('actionBtn', None)
 
-    if btnAction != None:
+    print(f'actionBtn={actionBtn}')
+    if actionBtn != None:
 
+      """ 個人の場合の処理 """
       """ 入力内容を確認する画面 """
-      if btnAction.find('ToConfirm_corp') >= 0:
+
+      if actionBtn.find('ToConfirm_indiv') >= 0:
 
         if form.is_valid():
         # 下記①、②、③の順で実行
         # ①.is_valid()、②フォームでのclean、clean_<field>、③form.cleaned_data[]に格納
 
+          """
           cleaned_data = form.cleaned_data
 
-          #if CorpInfo.objects.filter(applyEntity=entity).exists():
-          #  CorpInfo.objects.filter(applyEntity=entity).delete()
-          # データクリエイトの前に、これまでの利用してデータは削除
+          user.personname = \
+            cleaned_data['lastname'] + ' ' + cleaned_data['firstname']
+          user.personname_kana = \
+            cleaned_data['lastname_kana'] + ' ' + cleaned_data['firstname_kana']
 
-          " エビデンスが必要かチェック "
-          flag_needEvidence = 0
+          user.lastname = cleaned_data['lastname'],
+          user.firstname = cleaned_data['firstname'],
+          user.lastname_kana = cleaned_data['lastname_kana'],
+          user.firstname_kana = cleaned_data['firstname_kana'],
+          user.tel_user = cleaned_data['tel_user'],
+          user.zip_user = cleaned_data['zip_entity']
+          user.save()
 
-          if entity.entityName != cleaned_data['entityName'] or \
-            entity.representitive != cleaned_data['representitive'] or \
-            entity.zip_entity != cleaned_data['zip_entity'] or \
-            entity.address1 != cleaned_data['address1'] or \
-            entity.address2 != cleaned_data['address2'] or \
-            entity.address3 != cleaned_data['address3']:
-
-            print(f'pass1 コーポレート情報変更')
-            flag_needEvidence = 1
-
-            " パートナー承認まで変更内容をCorpInfoに保存 "
-            corpInfo = CorpInfo.objects.create()
-            corpInfo.entityName = cleaned_data['entityName']
-            corpInfo.representitive =cleaned_data['representitive']
-            corpInfo.tel_entity = cleaned_data['tel_entity']
-            corpInfo.zip_entity = cleaned_data['zip_entity']
-            corpInfo.address1 = cleaned_data['address1']
-            corpInfo.address2 = cleaned_data['address2']
-            corpInfo.address3 = cleaned_data['address3']
-
-            corpInfo.applyUser = user
-            corpInfo.applyEntity = entity
-
-            # エビデンスをアップデートした後、申請中（corpInfo.status = 2）とする
-
-            corpInfo.save()
-
+          entity.tel_entity = cleaned_data['tel_user'],
+          entity.zip_entity = cleaned_data['zip_entity']
+          entity.address1 = cleaned_data['address1']
+          entity.address2 = cleaned_data['address2']
+          entity.address3 = cleaned_data['address3']
+          entity.save()
+          """
           context = {
             'step_edit': 2,
-            'flag_needEvidence': flag_needEvidence,
-            'whatUpdate': 'corpInfo',
             'user': user,
             'form' : form,
           }
           return TemplateResponse(
-            self.request, 'accounts/buyer/profileEdit.html', context)
+            self.request, 'accounts/seller/profileEdit.html', context)
 
 
         else: #バリデーションエラーの時に通る
 
           print(f'ここ来てる3（def post after if not form.is_valid in class ProfileEditView_seller）')
-          return TemplateResponse(self.request, 'accounts/seller/profileEdit.html',
-            {'step_edit': 1, 'frWhere': '', 'user':user, 'form':form, })
+          context = {
+            'step_edit': 1,
+            #'frWhere': '',
+            'user':user,
+            'form':form, 
+          }
+          return TemplateResponse(self.request, 'accounts/seller/profileEdit.html', context )
+
+      # データ確認画面から入力画面に戻る時の処理 2025/02/14
+      if actionBtn.find('BackToInput_indiv') >= 0:
+
+        user = UserModel.objects.get(email=self.request.user) 
+
+        context = {
+          'step_edit': 1,
+          'user': user,
+          'form': form,
+        }
+        return TemplateResponse(self.request, 'accounts/seller/profileEdit.html', context)
+      
+
+      if actionBtn.find('ToSave_indiv') >= 0: # 確認した内容をデータベースに登録
+
+        user.personname = \
+          self.request.POST.get('lastname') + ' ' + self.request.POST.get('firstname')
+        user.personname_kana = \
+          self.request.POST.get('lastname_kana') + ' ' + self.request.POST.get('firstname_kana')
+
+        # アプリで使うのはuseNameだが、名前を変更する場合があるので保存しておく
+        user.lastname = self.request.POST.get('lastname')
+        user.firstname = self.request.POST.get('firstname')
+        user.lastname_kana = self.request.POST.get('lastname_kana')
+        user.firstname_kana = self.request.POST.get('firstname_kana')
+        user.tel_user = self.request.POST.get('tel_user', None)
+        user.zip_user = self.request.POST['zip_entity']
+        user.save()
+
+        # ★★ 260618 Qneeがパートナーに変わって承認するか
+        # ★★ Qneeが承認する場合はゲストに承認を求める
+        
+
+        entity.tel_entity = self.request.POST['tel_user']
+        entity.zip_entity = self.request.POST['zip_entity']
+        entity.address1 = self.request.POST['address1']
+        entity.address2 = self.request.POST['address2']
+        entity.address3 = self.request.POST['address3']
+        entity.save()
+
+        print(f'request.user.get_username={request.user.get_username} type2={user.type2}（def post ==confirm after form.is_valid in EntityCreateView_seller）')
+
+        return HttpResponseRedirect(reverse_lazy('accounts:profileEdit_seller'))
 
 
-      """ 入力内容を確認する画面 """
-      if btnAction.find('ToConfirm') >= 0:
+
+      """ 法人の場合の対応 """
+
+      """ 入力内容をCorpInfoに保存し、内容確認に遷移 """
+      if actionBtn.find('ToConfirm_corp') >= 0:
 
         if form.is_valid():
         # 下記①、②、③の順で実行
@@ -4157,7 +4313,7 @@ class ProfileEditView_seller(generic.UpdateView):
           cleaned_data = form.cleaned_data
 
           init_dict = {
-            'entityName' : cleaned_data['entityName'],
+            'entityname' : cleaned_data['entityname'],
             'representitive' : cleaned_data['representitive'],
             'tel_entity' : cleaned_data['tel_entity'],
             
@@ -4166,10 +4322,10 @@ class ProfileEditView_seller(generic.UpdateView):
             'address2' : cleaned_data['address2'],
             'address3' : cleaned_data['address3'],
 
-            'lastName' : cleaned_data['lastName'],
-            'firstName' : cleaned_data['firstName'],
-            'lastName_kana' : cleaned_data['lastName_kana'],
-            'firstName_kana' : cleaned_data['firstName_kana'],
+            'lastname' : cleaned_data['lastname'],
+            'firstname' : cleaned_data['firstname'],
+            'lastname_kana' : cleaned_data['lastname_kana'],
+            'firstname_kana' : cleaned_data['firstname_kana'],
 
             'tel_user' : cleaned_data['tel_user'],
             'department' : cleaned_data['department'],
@@ -4177,22 +4333,27 @@ class ProfileEditView_seller(generic.UpdateView):
           }
           context = {
             'step_edit': 2,
-            'frWhere': 'userInfoUpdate',
+            #'frWhere': 'userInfoUpdate',
             'user': user,
-            'form' : ProfileEditForm_seller(initial=init_dict),
+            'form' : ProfileEditForm2_seller(initial=init_dict),
           }         
           return TemplateResponse(
             self.request, 'accounts/seller/profileEdit.html', context)
 
         else: #バリデーションエラーの時に通る
 
+          context =  {
+            'step_edit': 1,
+            #'frWhere': '',
+            'user':user,
+            'form':form, }
           print(f'ここ来てる3（def post after if not form.is_valid in class ProfileEditView_seller）')
-          return TemplateResponse(self.request, 'accounts/seller/profileEdit.html',
-            {'step_edit': 1, 'frWhere': '', 'user':user, 'form':form, })
+          return TemplateResponse(self.request, 'accounts/seller/profileEdit.html', context )
+
 
 
       # データ確認画面から入力画面に戻る時の処理 2025/02/14
-      if btnAction.find('BackToInput') >= 0:
+      if actionBtn.find('BackToInput_corp') >= 0:
 
         user = UserModel.objects.get(email=self.request.user) 
 
@@ -4204,15 +4365,15 @@ class ProfileEditView_seller(generic.UpdateView):
         return TemplateResponse(self.request, 'accounts/seller/profileEdit.html', context)
 
 
-      if btnAction.find('ToSave') >= 0: # 確認した内容をデータベースに登録
+      if actionBtn.find('ToSave_corp') >= 0: # 確認した内容をデータベースに登録
 
         # 250802 フォームをモデルフォームから通常フォームに変更したことに伴い変更
         user = UserModel.objects.get(email=self.request.user) 
 
         entity = LegalEntity.objects.get(pk=user.entity_id)
-        entity.entityName = self.request.POST['entityName']
-        #entity.entityName = form.entityName 
-        # この式はエラー（'EntityCreateForm_seller' object has no attribute 'entityName'）
+        entity.entityname = self.request.POST['entityname']
+        #entity.entityname = form.entityname 
+        # この式はエラー（'EntityCreateForm_seller' object has no attribute 'entityname'）
 
         entity.representitive = self.request.POST['representitive']
         entity.tel_entity = self.request.POST['tel_entity']
@@ -4223,29 +4384,29 @@ class ProfileEditView_seller(generic.UpdateView):
 
         entity.save()
 
-        user.userName = \
-          self.request.POST.get('lastName') + ' ' + self.request.POST.get('firstName')
-        user.userName_kana = \
-          self.request.POST.get('lastName_kana') + ' ' + self.request.POST.get('firstName_kana')
+        user.personname = \
+          self.request.POST.get('lastname') + ' ' + self.request.POST.get('firstname')
+        user.personname_kana = \
+          self.request.POST.get('lastname_kana') + ' ' + self.request.POST.get('firstname_kana')
 
         # アプリで使うのはuseNameだが、名前を変更する場合があるので保存しておく
-        user.lastName = self.request.POST.get('lastName')
-        user.firstName = self.request.POST.get('firstName')
-        user.lastName_kana = self.request.POST.get('lastName_kana')
-        user.firstName_kana = self.request.POST.get('firstName_kana')
+        user.lastname = self.request.POST.get('lastname')
+        user.firstname = self.request.POST.get('firstname')
+        user.lastname_kana = self.request.POST.get('lastname_kana')
+        user.firstname_kana = self.request.POST.get('firstname_kana')
 
         user.tel_user = self.request.POST.get('tel_user', None)
         user.department = self.request.POST.get('department', None)
         user.title = self.request.POST.get('title', None)
 
-        # ★★ 250824 Qneeに登録を承認するプロセスを入れる（Qneeでis_active=Trueにする）
-        # ★★ 250824 Qneeに申請が見れるようにする
+        # ★★ 260618 Qneeがパートナーに変わって承認するか
+        # ★★ Qneeが承認する場合はゲストに承認を求める
         
         user.save()
 
         print(f'request.user.get_username={request.user.get_username} type2={user.type2}（def post ==confirm after form.is_valid in EntityCreateView_seller）')
 
-        return TemplateResponse(self.request, 'accounts/seller/mypage.html', {})
+        return HttpResponseRedirect(reverse_lazy('accounts:profileEdit_seller'))
       
 
 class CorpInfoUpdatePreView_admin(LoginRequiredMixin, generic.TemplateView):
@@ -4303,7 +4464,7 @@ class CorpInfoUpdateView_admin(LoginRequiredMixin, generic.TemplateView):
       # この場合は、該当データのみ表示する
 
       object_list = CorpInfo.objects.select_related(
-        'applyUser', 'applyEntity').filter(status=2).order_by('-created_at')
+        'applyUser', 'applyEntity').filter(status=1).order_by('-created_at')
 
       paginator = Paginator(object_list, 1)
 
@@ -4318,15 +4479,15 @@ class CorpInfoUpdateView_admin(LoginRequiredMixin, generic.TemplateView):
 
           break
 
-
-    except: # mypage経由で来る場合（corpInfo_idの指定がない場合）
+    
+    except: # mypage経由で来る場合（corpInfo_idの指定がない場合） 
 
       #self.request.session['flag_frWhere'] = 2
       # テンプレート側で「corpInfo_id指定なし」と認識するためセッションに保存
       # この場合は、該当データのみ表示する
 
       object_list = CorpInfo.objects.select_related(
-        'applyUser', 'applyEntity').filter(status=2).order_by('-created_at')
+        'applyUser', 'applyEntity').filter(status=1).order_by('-created_at')
       #self.request.session['corpInfo_id'] = None
 
       paginator = Paginator(object_list, 1)
@@ -4351,18 +4512,18 @@ class CorpInfoUpdateView_admin(LoginRequiredMixin, generic.TemplateView):
 
     #flag_frWhere = self.request.session.get('flag_frWhere', None)
 
-    btnAction = self.request.POST.get('btnAction', None)
-    if btnAction.find('ToApproveUpdate') >= 0:
+    actionBtn = self.request.POST.get('actionBtn', None)
+    if actionBtn.find('ToApproveUpdate') >= 0:
 
-      corpInfo_id = btnAction.split('_')[1]
+      corpInfo_id = actionBtn.split('_')[1]
       print(f'corpInfo_id={corpInfo_id}')
       corpInfo = CorpInfo.objects.select_related('applyUser', 'applyEntity').get(pk=corpInfo_id)
       
-      if corpInfo.status == 2: # 申請中の場合
+      if corpInfo.status == 1: # 申請中の場合
 
         applyEntity = LegalEntity.objects.get(pk=corpInfo.applyEntity_id)
 
-        applyEntity.entityName = corpInfo.entityName
+        applyEntity.entityname = corpInfo.entityname
         applyEntity.representitive = corpInfo.representitive
 
         applyEntity.zip_entity = corpInfo.zip_entity
@@ -4372,7 +4533,9 @@ class CorpInfoUpdateView_admin(LoginRequiredMixin, generic.TemplateView):
 
         applyEntity.save()
 
-        corpInfo.status = 4 # 承認のステータスに変更
+        corpInfo.status = -1 # 過去履歴（status=-1）に変更
+        corpInfo.approved_at = timezone.now()
+
         corpInfo.save()
 
         context = {
@@ -4389,7 +4552,7 @@ class CorpInfoUpdateView_admin(LoginRequiredMixin, generic.TemplateView):
           reverse_lazy('accounts:corpInfoUpdate_admin', kwargs={'corpInfo_id': corpInfo.id}))
 
 
-      else: # corpInfo.status != 2の場合（ここは通らないはず）
+      else: # corpInfo.status != 1の場合（ここは通らないはず）
 
         messages.add_message(self.request,
           messages.DANGER, "申請中のステータスのデータが見つかりません。") 
@@ -4401,47 +4564,45 @@ class CorpInfoUpdateView_admin(LoginRequiredMixin, generic.TemplateView):
     ## ★★ 262528 以下工事中
     ## ToSendBack1で差戻理由を入力、ToSendBack2で差戻実行
 
-    if btnAction.find('ToSendback1') >= 0:
+    if actionBtn.find('ToSendback1') >= 0:
       
-      print(f'btnAction={btnAction}')
-      corpInfo_id = btnAction.split('_')[1]
+      print(f'actionBtn={actionBtn}')
+      corpInfo_id = actionBtn.split('_')[1]
       #corpInfo = CorpInfo.objects.select_related('applyUser', 'applyEntity').get(pk=corpInfo_id)
       
       context = {
         'step_process': 2,
         'corpInfo_id': corpInfo_id,
-        'FeedbackForm': FeedbackForm(), }
+        'FeedbackForm': FeedbackForm_corpInfo(), }
       return TemplateResponse(request, 'accounts/admin/corpInfoUpdate.html', context)
 
 
-    if btnAction.find('ToSendback2') >= 0:
+    if actionBtn.find('ToSendback2') >= 0:
 
-      corpInfo_id = btnAction.split('_')[1]
+      corpInfo_id = actionBtn.split('_')[1]
       print(f'corpInfo_id={corpInfo_id}')
       corpInfo = CorpInfo.objects.select_related('applyUser', 'applyEntity').get(pk=corpInfo_id)
 
-      # 確認用
-      sendbackReason_radio = self.request.POST.get('sendbackReason_radio')
-      print(f'sendbackReason_radio={sendbackReason_radio}')
+      form = FeedbackForm_corpInfo(request.POST)
 
-      form = FeedbackForm(self.request.POST)
+      sendbackReason = self.request.POST.get('sendbackReason_radio')
+      print(f'sendbackReason_radio={sendbackReason}')
+      
+      form = FeedbackForm_corpInfo(self.request.POST)
       if form.is_valid(): 
 
         print(f'pass1 after if form.is_valid==True in CorpInfoUpdateView_admin')
 
-        radioValue = self.request.POST.get('sendbackReason_radio', None)
+        sendbackReason = form.cleaned_data['sendbackReason_radio']
         sendbackMessage = form.cleaned_data['sendbackMessage']
 
-        if radioValue == 'option4':
+        if sendbackReason == 'その他':
           print(f'pass2 after if form.is_valid==True in CorpInfoUpdateView_admin')
           sendbackReason = form.cleaned_data['sendbackReason_text']
         else:
           print(f'pass3 after if form.is_valid==True in CorpInfoUpdateView_admin')
-          if radioValue == 'option1': sendbackReason = '入力に誤りがある'
-          if radioValue == 'option2': sendbackReason = '証明書類が適切でない'
-          if radioValue == 'option3': sendbackReason = '画像の写りが不十分'
 
-        corpInfo.status = 3 # 差戻のステータスに変更
+        corpInfo.status = 2 # 差戻のステータスに変更
         corpInfo.status_char = "差戻"
         corpInfo.sendbackReason = sendbackReason
         corpInfo.sendbackMessage = sendbackMessage
@@ -4450,7 +4611,9 @@ class CorpInfoUpdateView_admin(LoginRequiredMixin, generic.TemplateView):
         print(f'corpInfo.status={corpInfo.status}')
         # 差戻されたことを通知する
         context = {
-          'sendbackReasonText': sendbackReason,
+          'applyUser': corpInfo.applyUser,
+          'applyEntity': corpInfo.applyEntity,
+          'sendbackReason': sendbackReason,
           'sendbackMessage': sendbackMessage,
         }
         utils.sendEmail_common(
@@ -4463,11 +4626,16 @@ class CorpInfoUpdateView_admin(LoginRequiredMixin, generic.TemplateView):
           reverse_lazy('accounts:corpInfoUpdate_admin', kwargs={}))
 
       else:
-        print(f'pass2 after if form.is_valid==False in CorpInfoUpdateView_admin')
+
+        context = {
+          'step_process': 2,
+          'corpInfo_id': corpInfo_id,
+          'form': form, }
+        return TemplateResponse(request, 'accounts/admin/corpInfoUpdate.html', context)
 
 
     
-    print(f'pass2 本当はここは通らないんだけど！ in BuyUserAddView_admin')
+    print(f'pass2 本当はここは通らないんだけど！ in CorpInfoUpdateView_admin')
     return HttpResponseRedirect(
       reverse_lazy('accounts:corpInfoUpdate_admin', kwargs={}))
 

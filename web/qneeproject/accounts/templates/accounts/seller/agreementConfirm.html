@@ -14,7 +14,7 @@
       <div class="messages row justify-content-center mt-2">
         <div class="col-11 col-sm-10 col-md-9">
           {% for message in messages %}
-          <div class="alert alert-{{ message.tags }} py-2 rounded-1 mb-0" role="alert">
+          <div class="alert alert-{{ message.tags }} py-1 rounded-1 mb-0" role="alert">
               <span>{{ message }}</span>
             </div>
           {% endfor %}
@@ -147,16 +147,6 @@
     {% endif %}
 
     {% if flag_step == 2 %}
-
-      <div class="row justify-content-center mt-5 text-center text-secondary">
-        <br><br>
-        パートナー及びユーザー参加の手続きが終了しました。<br>
-        Qnee Connectをご利用いただけます。
-      </div>
-
-    {% endif %}
-
-    {% if flag_step == 3 %}
 
       <div class="row justify-content-center text-center mt-5 text-secondary">
         <br><br>

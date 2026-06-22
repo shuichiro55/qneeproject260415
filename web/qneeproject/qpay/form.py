@@ -53,17 +53,17 @@ class TxCreateForm(forms.ModelForm):
   class Meta:
     model = QpayTx
     fields = (
-      'buyEntityName',
+      'buyEntityname',
       'requested_amount',
       'exPayment_date',
-      'sellUser_userName',
-      'sellEntityName'
+      'sellUser_personname',
+      'sellEntityname'
       #'sellUser_email',
     )
 #    widgets = {
 #      'exPayment_date': forms.SelectDateWidget
 #    }
-#    widgets= {'sellUser_userName':forms.HiddenInput(), 'sellEntityName':forms.HiddenInput()}
+#    widgets= {'sellUser_personname':forms.HiddenInput(), 'sellEntityname':forms.HiddenInput()}
     
   def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -74,7 +74,7 @@ class TxCreateForm(forms.ModelForm):
 
   def clean_requested_amount(self):
       requested_amount = self.cleaned_data.get('requested_amount')
-      print(f'self.cleaned_data[entityName]={requested_amount} (in TxCreateForm)')
+      print(f'self.cleaned_data[entityname]={requested_amount} (in TxCreateForm)')
       if requested_amount is None or "" :
         raise forms.ValidationError("申請金額をご入力ください.")
       return requested_amount
@@ -98,7 +98,7 @@ class TxEvidenceForm(forms.ModelForm):
     fields = (
       'evidence',
     )
-    #widgets= {'sellUser_userName':forms.HiddenInput(), 'sellEntityName':forms.HiddenInput()}
+    #widgets= {'sellUser_personname':forms.HiddenInput(), 'sellEntityname':forms.HiddenInput()}
 
   # ★全部のフィールドに'form-control'をセットするべきか？ 2025/02/14
   def __init__(self, *args, **kwargs):
@@ -110,7 +110,7 @@ class TxEvidenceForm(forms.ModelForm):
   # modelsのvalidatorが優先されるので下記は通過しない
   def clean_evidence(self):
       evidence = self.cleaned_data.get('evidence')
-      print(f'self.cleaned_data[entityName]={evidence} (in TxEvidenceForm)')
+      print(f'self.cleaned_data[entityname]={evidence} (in TxEvidenceForm)')
       if not evidence: #if evidence is None or "" :
         raise forms.ValidationError('証明書類のファイルを選択してください')   
       return evidence
@@ -146,6 +146,53 @@ class TxListForm_seller(forms.ModelForm):
     fields = ('sellEntity', 'sellUser', 'requested_amount', 'evidence')
     ##fields = ('sellEntity', 'requested_amount', 'evidence')
 
+CHOICES = [
+    ('入力に誤りがある', '入力に誤りがある'),
+    ('証明書類が適切でない', '証明書類が適切でない'),
+    ('画像の写りが不十分', '画像の写りが不十分'),
+    ('その他', 'その他'),
+]
+
+class FeedbackForm_qpay(forms.Form):
+
+  sendbackReason_radio = forms.ChoiceField(
+    choices=CHOICES,
+    widget=forms.RadioSelect(attrs={'class': 'form-check-input'}), # 基本のBootstrapクラス
+    label="差戻理由"
+  )
+
+  # その他理由の場合の記載
+  sendbackReason_text = forms.CharField(
+    max_length=100, required=False, label="その他理由")
+    
+  # ゲストへのメッセージ
+  sendbackMessage = forms.CharField(
+    max_length=200, widget=forms.Textarea(), required=False, label="メッセージ")
+
+  def __init__(self, *args, **kwargs):
+    self.radioValue = kwargs.pop('radioValue', None)
+    super().__init__(*args, **kwargs)
+
+  def clean_sendbackReason_radio(self):
+    sendbackReason_radio = self.cleaned_data['sendbackReason_radio']
+    print(f'self.cleaned_data[sendbackReason_radio]={sendbackReason_radio} (clean_sendbackReason_radio in FeedbackForm_qpay)')
+
+  def clean_sendbackReason_text(self):
+    sendbackReason_text = self.cleaned_data['sendbackReason_text']
+    print(f'self.radioValue=={self.radioValue} (clean_sendbackReason_text in FeedbackForm_qpay)')
+
+    if self.radioValue == 'その他':
+      if sendbackReason_text == '' or sendbackReason_text is None:
+        raise forms.ValidationError('その他を選択した場合は理由をご記載ください。')
+    
+    print(f'self.cleaned_data[sendbackReason_text]={sendbackReason_text} (clean_department in FeedbackForm)')
+    return unicodedata.normalize('NFKC', sendbackReason_text)
+
+  def clean_sendbackMessage(self):
+    sendbackMessage = self.cleaned_data['sendbackMessage']
+    print(f'self.cleaned_data[sendbackMessage]={sendbackMessage} (clean_sendbackMessage in FeedbackForm_qpay)')
+    return unicodedata.normalize('NFKC', sendbackMessage)
+  
 #class TxDetailForm(forms.ModelForm):
 #
 #  class meta:

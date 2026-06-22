@@ -1,11 +1,11 @@
-こんにちは、{{ buyEntity.entityName }}さまから依頼によりご連絡しております。
+こんにちは、{{ buyEntity.entityname }}さまから依頼によりご連絡しております。
 
-{{ buyEntity.entityName }}さまからの受け取る報酬を、
+{{ buyEntity.entityname }}さまからの受け取る報酬を、
 わたしたちキユーニーが前倒しでお支払いします。
 
 なぜそれができるか？
 
-今回、{{ buyEntity.entityName }}さまがあなたに報酬を
+今回、{{ buyEntity.entityname }}さまがあなたに報酬を
 前倒ししてお支払いする枠組みを導入したことにより実現しております。
 
 

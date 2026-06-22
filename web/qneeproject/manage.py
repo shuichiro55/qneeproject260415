@@ -7,6 +7,7 @@ def main():
 
     # コマンドに環境変数がセットされない場合、本番用の設定ファイルを読み込む
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", 'qneeproject.settings.production')
+    #os.environ.setdefault("DJANGO_SETTINGS_MODULE", 'settings.production')
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:

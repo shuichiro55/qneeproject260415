@@ -13,15 +13,16 @@
     {% if messages %}
       <div class="messages row justify-content-center mt-2">
       {% for message in messages %}
-          <div class="alert alert-{{ message.tags }} py-2 rounded-1 mb-0" role="alert">
+          <div class="alert alert-{{ message.tags }} py-1 rounded-1 mb-0" role="alert">
           <span>{{ message }}</span>
         </div>
       {% endfor %}
     </div>
     {% endif %}
 
-    <nav class="mt-2 bg-light rounded-3 border-top shadow-sm" aria-label="breadcrumb" role="navigation">
-      <ol class="breadcrumb px-2">
+    <nav class="mt-2 bg-light rounded-3 border-top shadow-sm"
+      aria-label="breadcrumb" role="navigation">
+      <ol class="breadcrumb px-2" style="font-size: 0.85rem !important">
         <li class="breadcrumb-item"><a href="{% url 'accounts:mypage_buyer' %}">
           {% bs_icon 'house' color='cornflowerblue' size='1.2em' %}
           マイページトップ</a></li>
@@ -75,7 +76,7 @@
           
             <div class="d-flex justify-content-center pt-2 mx-2">
               <button type="submit" class="btn btn-primary w-100"
-                name="btnAction"
+                name="actionBtn"
                 value="ToEvidenceConfirm_corp">
                 アップロード・ファイルの確認へ</button>
             </div>
@@ -106,11 +107,11 @@
                 
                 <div class="d-flex justify-content-center py-1">
                   <button type="submit" class="btn btn-outline-primary w-50"
-                    name="btnAction"
+                    name="actionBtn"
                     value="ToEvidenceSelect_corp">
                     再アップロード</button>
                   <button type="submit" class="btn btn-primary w-50 ms-1"
-                    name="btnAction"
+                    name="actionBtn"
                     value="ToApplyToQnee_corp">
                     Qneeに申請</button>
                 </div>

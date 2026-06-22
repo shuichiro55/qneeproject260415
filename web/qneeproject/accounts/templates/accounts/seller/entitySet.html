@@ -12,7 +12,7 @@
     {% if messages %}
       <div class="messages row justify-content-center mt-2 mx-2">
         {% for message in messages %}
-          <div class="alert alert-{{ message.tags }} py-2 rounded-1 mb-0" role="alert">
+          <div class="alert alert-{{ message.tags }} py-1 rounded-1 mb-0" role="alert">
             <span>{{ message }}</span>
           </div>
         {% endfor %}
@@ -84,57 +84,57 @@
 
           <div class="row justify-content-center px-4">
             <div class="col-6 col-md-5 col-lg-4 col-xl-3 pe-1">
-              <label for="{{form.lastName.id_for_label}}" class="form-label">
+              <label for="{{form.lastname.id_for_label}}" class="form-label">
                 姓</label>
-              <input type="{{form.lastName.widget.input_type}}" class="form-control"
-                name="{{form.lastName.name}}"
-                value="{{form.lastName.value|default:''}}"
-                id="{{form.lastName.id_for_label}}">
+              <input type="{{form.lastname.widget.input_type}}" class="form-control"
+                name="{{form.lastname.name}}"
+                value="{{form.lastname.value|default:''}}"
+                id="{{form.lastname.id_for_label}}">
             </div>
             <div class="col-6 col-md-5 col-lg-4 col-xl-3 ps-0">
-              <label for={{form.firstName.id_for_label}} class="form-label">
+              <label for={{form.firstname.id_for_label}} class="form-label">
                 名</label>
-              <input type="{{form.firstName.widget.input_type}}" class="form-control"
-                name="{{form.firstName.name}}"
-                value="{{form.firstName.value|default:''}}"
-                id="{{form.firstName.id_for_label}}">
+              <input type="{{form.firstname.widget.input_type}}" class="form-control"
+                name="{{form.firstname.name}}"
+                value="{{form.firstname.value|default:''}}"
+                id="{{form.firstname.id_for_label}}">
               </div>
             </div>
           </div> <!-- end of row --> 
-          {% if form.lastName.errors or form.firstName.errors %}
+          {% if form.lastname.errors or form.firstname.errors %}
             <div class="row justify-content-center px-4">
               <div class="col-6 col-md-5 col-lg-4 col-xl-3 text-left pe-1" style="color:red;">
-                {{ form.lastName.errors.as_text }}</div>
+                {{ form.lastname.errors.as_text }}</div>
               <div class="col-6 col-md-5 col-lg-4 col-xl-3 text-left ps-0" style="color:red;">
-                {{ form.firstName.errors.as_text }}</div>
+                {{ form.firstname.errors.as_text }}</div>
             </div>
           {% endif %}
 
           <div class="row justify-content-center px-4">
             <div class="col-6 col-md-5 col-lg-4 col-xl-3 pe-1">
 
-              <label for="{{form.lastName_kana.id_for_label}}" class="form-label">
+              <label for="{{form.lastname_kana.id_for_label}}" class="form-label">
                 姓（フリガナ）</label>
-              <input type="{{form.lastName_kana.widget.input_type}}" class="form-control"
-                name="{{form.lastName_kana.name}}"
-                value="{{form.lastName_kana.value|default:''}}"
-                id="{{form.lastName_kana.id_for_label}}">
+              <input type="{{form.lastname_kana.widget.input_type}}" class="form-control"
+                name="{{form.lastname_kana.name}}"
+                value="{{form.lastname_kana.value|default:''}}"
+                id="{{form.lastname_kana.id_for_label}}">
             </div>
             <div class="col-6 col-md-5 col-lg-4 col-xl-3 ps-0">
-              <label for={{form.firstName_kana.id_for_label}} class="form-label">
+              <label for={{form.firstname_kana.id_for_label}} class="form-label">
                 名（フリガナ）</label>
-              <input type="{{form.firstName_kana.widget.input_type}}" class="form-control"
-                name="{{form.firstName_kana.name}}"
-                value="{{form.firstName_kana.value|default:''}}"
-              id="{{form.firstName_kana.id_for_label}}">
+              <input type="{{form.firstname_kana.widget.input_type}}" class="form-control"
+                name="{{form.firstname_kana.name}}"
+                value="{{form.firstname_kana.value|default:''}}"
+              id="{{form.firstname_kana.id_for_label}}">
             </div>
           </div>
-          {% if form.lastName_kana.errors or form.firstName_kana.errors %}
+          {% if form.lastname_kana.errors or form.firstname_kana.errors %}
             <div class="row justify-content-center px-4">
               <div class="col-6 col-md-5 col-lg-4 col-xl-3 text-left pe-1" style="color:red;">
-                {{ form.lastName_kana.errors.as_text }}</div>
+                {{ form.lastname_kana.errors.as_text }}</div>
               <div class="col-6 col-md-5 col-lg-4 col-xl-3 text-left ps-0" style="color:red;">
-                {{ form.firstName_kana.errors.as_text }}</div>
+                {{ form.firstname_kana.errors.as_text }}</div>
             </div>
           {% endif %}
 
@@ -221,7 +221,7 @@
 
               <table class="table table-sm bg-light table-bordered table-primary-subtle table-responsive">
                 <tbody> <!-- 郵便番号のところは住所にする -->
-                  <tr><td width="33%">お取引者</td><td style="text-align: right;">{{ entity.entityName.value }}</td></tr>
+                  <tr><td width="33%">お取引者</td><td style="text-align: right;">{{ entity.entityname.value }}</td></tr>
                   <tr><td width="33%">代表者</td><td style="text-align: right;">{{ entity.representitive.value }}</td></tr>
                   <tr><td width="33%">郵便番号</td><td style="text-align: right;">{{ entity.zip_entity.value }}</td></tr>
                   <tr><td width="33%">電話番号</td><td style="text-align: right;">{{ entity.tel_entity.value }}</td></tr>
@@ -249,7 +249,7 @@
                   value="ToSave&Apply">ゲストに参加を申請</button>
               </div>
 
-              <!-- {{ form.entityName.as_hidden }} -->
+              <!-- {{ form.entityname.as_hidden }} -->
 
             </form> <!-- end form -->
           </div> <!-- end col -->
@@ -338,7 +338,8 @@
             
             <div class="row justify-content-center">
               <div class="d-flex col-md-10 col-lg-8 col-xl-6 text-left mt-1">
-                <i class="bi bi-buildings" style="font-size:1.5em; color:darkred;"></i>
+                <i class="bi bi-buildings-fill"
+                  style="font-size:1.5em; color:deeppink;"></i>
                 <h6 class="text-secondary ms-3"><b>ゲストの選択</b></h6>
               </div>
             </div>
@@ -349,7 +350,7 @@
                   <input type="text" class="form-control"
                     id="id_SearchInput"
                     name="name_SearchInput"
-                    value="{{form.entityName.value| default:''}}"
+                    value="{{form.entityname.value| default:''}}"
                     placeholder="キーワード入力 （ex. IMAGICA or イマジ or いま）">
                   <button type="button" class="btn btn-primary shadow"
                     name="name_SearchInput"
@@ -366,15 +367,15 @@
                 <!-- 「multiple」はリストのスタイルを変える -->
                 <select class="form-select"
                   id="id_SellerSelect"
-                  name="{{form.entityName.name}}">
+                  name="{{form.entityname.name}}">
 
-                  {% if dict_sellEntityName.items %}
+                  {% if dict_sellEntityname.items %}
 
-                    {% if temporal_sellEntityName != "" %}
+                    {% if temporal_sellEntityname != "" %}
                       <!-- <option>ゲスト名（取引主体）</option> -->
-                      {% for key, value in dict_sellEntityName.items %}
+                      {% for key, value in dict_sellEntityname.items %}
           
-                        {% if value == temporal_sellEntityName %}
+                        {% if value == temporal_sellEntityname %}
                           <option value='{{value}}' selected>{{value}}</option>
                         {% else %}
                           <option value='{{value}}'>{{value}}</option>
@@ -384,12 +385,16 @@
                     {% else %}
   
                       <!-- <option selected>ゲスト名（取引主体）</option> -->
-                      {% for key, value in dict_sellEntityName.items %}
+                      {% for key, value in dict_sellEntityname.items %}
                         <option value='{{value}}'>{{value}}</option>
                       {% endfor %}
                     {% endif %}
                   {% endif %}
                 </select>
+                {% if form.entityname.errors %}
+                  <span style="color:red;">
+                    {{ form.entityname.errors.as_text }}</span>
+                {% endif %}
               </div> <!-- end col -->
             </div> <!-- end row -->
 
@@ -398,70 +403,71 @@
             <!-- ゲスト企業の担当者情報を入力するフォーム -->
             <div class="row justify-content-center">
               <div class="d-flex col-md-10 col-lg-8 col-xl-6 text-left mt-1">
-                <i class="bi bi-person" style="font-size:1.5em; color:darkred;"></i>
+                <i class="bi bi-file-person-fill"
+                  style="font-size:1.5em; color:deeppink;"></i>
                 <h6 class="text-secondary ms-3"><b>お申込者の情報</b></h6>
               </div>
             </div>
             
             <div class="row justify-content-center px-4">
               <div class="col-6 col-md-5 col-lg-4 col-xl-3 pe-1">
-                <label for="{{form.lastName.id_for_label}}" class="form-label mt-1 mb-0">
+                <label for="{{form.lastname.id_for_label}}" class="form-label mt-1 mb-0">
                   姓</label>
-                <input type="{{form.lastName.widget.input_type}}"
+                <input type="{{form.lastname.widget.input_type}}"
                   class="form-control"
-                  name="{{form.lastName.name}}"
-                  value="{{form.lastName.value|default:''}}"
-                  id="{{form.lastName.id_for_label}}"
+                  name="{{form.lastname.name}}"
+                  value="{{form.lastname.value|default:''}}"
+                  id="{{form.lastname.id_for_label}}"
                   placeholder="例：山田">
               </div>
               <div class="col-6 col-md-5 col-lg-4 col-xl-3 ps-0">
-                <label for="{{form.firstName.id_for_label}}" class="form-label mt-1 mb-0">
+                <label for="{{form.firstname.id_for_label}}" class="form-label mt-1 mb-0">
                   名</label>
-                <input type="{{form.firstName.widget.input_type}}"
+                <input type="{{form.firstname.widget.input_type}}"
                   class="form-control"
-                  name="{{form.firstName.name}}"
-                  value="{{form.firstName.value|default:''}}"
-                  id="{{form.firstName.id_for_label}}"
+                  name="{{form.firstname.name}}"
+                  value="{{form.firstname.value|default:''}}"
+                  id="{{form.firstname.id_for_label}}"
                   placeholder="例：次郎">
               </div>
             </div> <!-- end of row -->
-            {% if form.lastName.errors or form.firstName.errors %}
+            {% if form.lastname.errors or form.firstname.errors %}
               <div class="row justify-content-center px-4">
                 <div class="col-6 col-md-5 col-lg-4 col-xl-3 text-left pe-1" style="color:red;">
-                  {{ form.lastName.errors.as_text }}</div>
+                  {{ form.lastname.errors.as_text }}</div>
                 <div class="col-6 col-md-5 col-lg-4 col-xl-3 text-left ps-0" style="color:red;">
-                  {{ form.firstName.errors.as_text }}</div>
+                  {{ form.firstname.errors.as_text }}</div>
               </div>
             {% endif %}
        
 
             <div class="row justify-content-center px-4">
               <div class="col-6 col-md-5 col-lg-4 col-xl-3 pe-1">
-                <label for="{{form.lastName_kana.id_for_label}}" class="form-label mt-1 mb-0">
+                <label for="{{form.lastname_kana.id_for_label}}" class="form-label mt-1 mb-0">
                   姓（フリガナ）</label>
-                <input type="{{form.lastName_kana.widget.input_type}}" class="form-control"
-                  name="{{form.lastName_kana.name}}"
-                  value="{{form.lastName_kana.value|default:''}}"
-                  id="{{form.lastName_kana.id_for_label}}"
+                <input type="{{form.lastname_kana.widget.input_type}}" class="form-control"
+                  name="{{form.lastname_kana.name}}"
+                  value="{{form.lastname_kana.value|default:''}}"
+                  id="{{form.lastname_kana.id_for_label}}"
                   placeholder="例：ヤマダ">
               </div>
               <div class="col-6 col-md-5 col-lg-4 col-xl-3 ps-0">
-                <label for="{{form.firstName_kana.id_for_label}}" class="form-label mt-1 mb-0">
+                <label for="{{form.firstname_kana.id_for_label}}" class="form-label mt-1 mb-0">
                   名（フリガナ）</label>
-                <input type="{{form.firstName_kana.widget.input_type}}" class="form-control"
-                  name="{{form.firstName_kana.name}}"
-                  value="{{form.firstName_kana.value|default:''}}"
-                  id="{{form.firstName_kana.id_for_label}}"
+                <input type="{{form.firstname_kana.widget.input_type}}" class="form-control"
+                  name="{{form.firstname_kana.name}}"
+                  value="{{form.firstname_kana.value|default:''}}"
+                  id="{{form.firstname_kana.id_for_label}}"
                   placeholder="例：ジロウ">
               </div>
             </div>
 
-            {% if form.lastName_kana.errors or form.firstName_kana.errors %}
+            {% if form.lastname_kana.errors or form.firstname_kana.errors %}
               <div class="row justify-content-center px-4">
                 <div class="col-6 col-md-5 col-lg-4 col-xl-3 text-left pe-1" style="color:red;">
-                  {{ form.lastName_kana.errors.as_text }}</div>
+                  {{ form.lastname_kana.errors.as_text }}</div>
                 <div class="col-6 col-md-5 col-lg-4 col-xl-3 text-left ps-0" style="color:red;">
-                  {{ form.firstName_kana.errors.as_text }}</div>
+                  {{ form.firstname_kana.errors.as_text }}</div>
               </div>
             {% endif %}
 
@@ -529,7 +535,6 @@
             {% endif %}
 
 
-
             <div class="row justify-content-center mt-4 px-4">
               <hr>
               <div class="d-flex col-md-10 col-lg-8 col-xl-6">
@@ -573,7 +578,7 @@
                 <tbody> <!-- 郵便番号のところは住所にする -->
                   <tr>
                     <th scope="col" width="33%" class="table-primary">お取引者</th>
-                    <td style="text-align: right;">{{ entity.entityName }}</td></tr>
+                    <td style="text-align: right;">{{ entity.entityname }}</td></tr>
                   <tr>
                     <th scope="col" width="33%" class="table-primary">代表者</th>
                     <td style="text-align: right;">{{ entity.representitive }}さん</td></tr>
@@ -591,7 +596,7 @@
                   <tr>
                     <th scope="col" width="33%" class="table-primary">ご登録者</th>
                     <td style="text-align: right;">
-                      {{ form.lastName.value }}　{{ form.firstName.value }}さん</td></tr>
+                      {{ form.lastname.value }}　{{ form.firstname.value }}さん</td></tr>
                   <tr>
                     <th scope="col" width="33%" class="table-primary">電話番号</th>
                     <td style="text-align: right;">{{ form.tel_user.value }}</td></tr>
@@ -650,8 +655,12 @@
 
 {% block extrajs %}
 
-<script>
- 
+<script defer>
+//「defer」は、HTMLの解析と並行してJavaScriptの読み込みを裏側で進め、
+// HTMLの読み込み（パース）がすべて完了してからスクリプトを実行します。
+//deferを指定しない場合、ブラウザはJavaScriptの読み込みと実行が終わるまで
+// HTMLの読み込みを一時停止
+
   document.addEventListener('DOMContentLoaded', function() {
 
     console.log('DOMContentLoadedが認識されました');
@@ -662,7 +671,7 @@
     var SearchInput = document.getElementById('id_SearchInput');
     var SellerSelect = document.getElementById('id_SellerSelect');
 
-    let obj_sellEntityName = JSON.parse('{{ json_sellEntityName|safe }}' || "null");
+    let obj_sellEntityname = JSON.parse('{{ json_sellEntityname|safe }}' || "null");
     
     var addition1 = document.getElementById('id_addition1');
     var addition2 = document.getElementById('id_addition2');
@@ -706,25 +715,25 @@
         SellerOptions.remove( i );
       }
 
-      let obj_sellEntityName = JSON.parse('{{ json_sellEntityName|safe }}' || "null");
+      let obj_sellEntityname = JSON.parse('{{ json_sellEntityname|safe }}' || "null");
       //「safe」はエスケープを無効化する.Django側で''を除いた形で認識する
       //https://se-memorandum.com/django-safe/
 
-      console.log(obj_sellEntityName);
+      console.log(obj_sellEntityname);
       console.log('forEachに入る前です');
 
-      //keyおよびobj_sellEntityName[key]には、entityNameが入る
-      Object.keys(obj_sellEntityName).forEach((key) => {
+      //keyおよびobj_sellEntityname[key]には、entitynameが入る
+      Object.keys(obj_sellEntityname).forEach((key) => {
 
-        matches = keywords.some(keyword => normalizeText(obj_sellEntityName[key]).includes(keyword));
+        matches = keywords.some(keyword => normalizeText(obj_sellEntityname[key]).includes(keyword));
 
-        console.log(key, obj_sellEntityName[key]);
+        console.log(key, obj_sellEntityname[key]);
         if(matches){
           let option = document.createElement('option');
           option.value = key;  //option.valueは非表示部。（key, value）のvalueと間違わないように！
-          option.text = obj_sellEntityName[key];         
+          option.text = obj_sellEntityname[key];         
           //option.setAttribute("value", key);  //option.valueは非表示部。（key, value）のvalueと間違わないように！
-          //option.appendChild(document.createTextNode(obj_sellEntityName[key]));
+          //option.appendChild(document.createTextNode(obj_sellEntityname[key]));
 
           console.log('SellerOptions=', SellerOptions);
           console.log('option.innerHTML=', option.innerHTML);
@@ -736,7 +745,7 @@
 
     SellerSelect.addEventListener('click', (event) => {
       console.log('SellerSelect.addEventListener(change)に入りました');
-      SearchInput.value = obj_sellEntityName[event.target.value];  
+      SearchInput.value = obj_sellEntityname[event.target.value];  
     });
   });
 

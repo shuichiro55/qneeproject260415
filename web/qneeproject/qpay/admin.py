@@ -3,8 +3,8 @@ from .models import QpayTx
 
 class QpayTxAdmin(admin.ModelAdmin):
   list_display = (
-    'sellEntityName',
-    'buyEntityName',
+    'sellEntityname',
+    'buyEntityname',
     'requested_amount',
     'requested_at',
     'approved_at'

@@ -13,15 +13,25 @@
     {% if messages %}
       <div class="messages row justify-content-center mt-2 mx-2">
         {% for message in messages %}
-          <div class="alert alert-{{ message.tags }} py-2 rounded-1 mb-0" role="alert">
+          <div class="alert alert-{{ message.tags }} py-1 rounded-1 mb-0" role="alert">
             <span>{{ message }}</span>
           </div>
         {% endfor %}
       </div>
     {% endif %}
 
-    <nav class="mt-2 bg-light rounded-3 border-top shadow-sm" aria-label="breadcrumb" role="navigation">
-      <ol class="breadcrumb px-2">
+    <div id="loading">
+      <div class="spinner-border text-primary"
+        style="width: 3rem; height: 3rem;"
+        role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-5">処理中です... しばらくお待ちください</p>
+    </div>
+
+    <nav class="mt-2 bg-light rounded-3 border-top shadow-sm"
+      aria-label="breadcrumb" role="navigation">
+      <ol class="breadcrumb px-2" style="font-size: 0.85rem !important">
         <li class="breadcrumb-item"><a href="{% url 'accounts:mypage_buyer' %}">
           {% bs_icon 'house' color='cornflowerblue' size='1.2em' %}
           マイページトップ</a></li>
@@ -34,53 +44,90 @@
       </ol>
     </nav>
 
+
     <!-- 必要項目の入力 -->
     {% if step_edit == 1 %}
 
       <div class="d-flex justify-content-center mt-5">
-        <h5 class="text-secondary"><b>登録情報のご編集</b></h5>
+        <h5 class="text-secondary"><b>登録情報</b></h5>
         <span class="ms-3 mb-1">{% bs_icon 'pencil-square' color='deeppink' size='1.8em' %}</span>
       </div> 
 
 
-      {% if flag_pending == 0 %} <!-- 申請中、申請差戻がない場合 -->
+      {% if flag_status == 0 %} <!-- 申請中、申請差戻がない場合 -->
 
-        <form method="POST" class="h-adr"> <!--「class="adr"」は郵便番号から住所を自動入力するため -->
+        <div class="row justify-content-center px-4">
+          <div class="col-md-10 col-lg-8 col-xl-6">
+
+            <div class="d-flex justify-content-end">
+              <div class="d-flex">
+                <a type="button" href="{% url 'accounts:infoEdit_buyer' %}"
+                  class="btn btn-outline-primary py-0 px-4 rounded-1 shadow"
+                  style="font-size:0.80rem">
+                  戻る</a>
+
+              <button type="button"
+                class="btn btn-primary ms-1 py-0 ps-3 pe-2 rounded-1 shadow"
+                style="font-size: 0.80rem"
+                id="modeChangeBtn">
+                編集
+                <span class="ms-1">{% bs_icon 'pencil-fill' color='white' size='0.80rem' %}</span>
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        <form method="POST" class="h-adr" id="id_PostForm"> <!--「class="adr"」は郵便番号から住所を自動入力するため -->
           {% csrf_token %}
 
           {{ form.non_field_errors }}
 
           <!-- パートナーの企業情報を入力するフォーム -->
-          <div class="row justify-content-center mt-3 mb-2">
-            <div class="d-flex col-md-10 col-lg-8 col-xl-6 text-left">
-              <i class="bi bi-building" style="font-size:1.5em; color:darkred;"></i>
-              <h6 class="text-secondary ms-3"><b>会社情報</b></h6>
-                <span class="text-danger ms-3" style="font-size:0.75rem">
+          <div class="row justify-content-center mt-3 mb-3">
+            <div class="col-md-10 col-lg-8 col-xl-6">
+              <div class="d-flex text-left">
+                <i class="bi bi-building-fill" style="font-size:1.5em; color:deeppink;"></i>
+                <span class="text-secondary ms-3" style="font-size: 1.1rem"><b>会社情報</b></span>
+ 
+                <!--
+                <button type="button"
+                  class="btn btn-outline-primary rounded-3 py-0 px-2 ms-4"
+                  style="font-size: 0.80rem"
+                  id="endEdit">
+                  <b>編集終わり</b><span class="ms-1">{% bs_icon 'pencil-fill' color='cornflowerblue' size='0.85rem' %}</span></button>
+                -->
+                <span id="id_addition_text"
+                  style="font-size:0.75rem; display:none;"
+                  class="text-danger ms-3">
                   ※電話番号以外の更新は証明画像を添付
                 </span>
+              </div>
+
             </div>
           </div>  
 
           <div class="form-group row justify-content-center px-4">
             <label class="col-md-3 col-lg-2 col-form-label pb-0"
               style="font-size:0.9rem"
-              for="{{form.entityName.id_for_label}}">
+              for="{{form.entityname.id_for_label}}">
               企業名
             </label>
             <div class="col-md-7 col-lg-6 col-xl-4 ms-1 pb-1">
-              <input type="{{form.entityName.widget.input_type}};"
+              <input type="{{form.entityname.widget.input_type}};"
                 style="font-size:0.9rem"
                 class='form-control'
-                name='{{form.entityName.name}}'
-                value="{{form.entityName.value|default:''}}"
-                id='{{form.entityName.id_for_label}}'
+                name='{{form.entityname.name}}'
+                value="{{form.entityname.value|default:''}}"
+                id="userInput"
+                readonly
                 {% if corInfo.applyUser.canApproveAll != True and corInfo.applyUser.canApproveChg != True %} disable {% endif %}>
             </div>
           </div>
-          {% if form.entityName.errors %}
+          {% if form.entityname.errors %}
             <div class="row justify-content-center px-4">
               <div class="col-md-10 col-lg-8 col-xl-6 text-left" style="color:red;">
-                {{ form.entityName.errors.as_text }}</div>
+                {{ form.entityname.errors.as_text }}</div>
             </div>
           {% endif %}
   
@@ -97,7 +144,8 @@
                 name="{{form.representitive.name}}"
                 value="{{form.representitive.value|default:''}}"
                 placeholder="記入例：窮仁 太郎"
-                id="{{form.representitive.id_for_label}}"
+                id="userInput"
+                readonly
                 {% if user.canApproveAll != True and user.canApproveChg != True %} disable {% endif %}>
             </div>
           </div>
@@ -121,7 +169,8 @@
                 name="{{form.tel_entity.name}}"
                 value="{{form.tel_entity.value|default:''}}"
                 placeholder="数字のみご記載ください。"
-                id="{{form.tel_entity.id_for_label}}"
+                id="userInput"
+                readonly
                 {% if user.canApproveAll != True and user.canApproveChg != True %} disable {% endif %}>
             </div>
           </div>
@@ -151,7 +200,8 @@
                 name="{{form.zip_entity.name}}"
                 value="{{form.zip_entity.value|default:''}}"
                 placeholder="数字のみご記載ください。"
-                id="{{form.zip_entity.id_for_label}}"
+                id="userInput"
+                readonly
                 {% if user.canApproveAll != True and user.canApproveChg != True %} disable {% endif %}>
             </div>
           </div>
@@ -176,7 +226,8 @@
                 name="{{form.address1.name}}"
                 value="{{form.address1.value|default:''}}"
                 placeholder="都道府県・市町村・町"
-                id="{{form.address1.id_for_label}}"
+                id="userInput"
+                readonly
                 {% if user.canApproveAll != True and user.canApproveChg != True %} disable {% endif %}>
             </div>
           </div>
@@ -199,7 +250,8 @@
                 name="{{form.address2.name}}"
                 value="{{form.address2.value|default:''}}"
                 placeholder="〇丁目〇番〇号、〇-〇-〇"
-                id="{{form.address2.id_for_label}}"
+                id="userInput"
+                readonly
                 {% if user.canApproveAll != True and user.canApproveChg != True %} disable {% endif %}>
             </div>
           </div>
@@ -222,7 +274,8 @@
                 name="{{form.address3.name}}"
                 value="{{form.address3.value|default:''}}"
                 placeholder="建物・マンション名　フロア・号室"
-                id="{{form.address3.id_for_label}}"
+                id="userInput"
+                readonly
                 {% if user.canApproveAll != True and user.canApproveChg != True %} disable {% endif %}>
             </div>
           </div>
@@ -234,108 +287,121 @@
            </div>
           {% endif %}
 
-          <div class="row justify-content-center mt-3 px-4">
-            <div class="col-md-10 col-lg-8 col-xl-6">
-              <div class="d-flex">
-                <a type="button" href="{% url 'accounts:infoEdit_buyer' %}"
-                  class="btn btn-outline-primary w-50 shadow"
-                  style="font-size:0.9rem">
-                  戻る
-                </a>
-                <button type="submit" class="btn btn-primary w-50 ms-1 px-2 shadow"
-                  style="font-size:0.9rem"
-                  name="btnAction"
-                  value="ToConfirm_corp">
-                  会社情報の更新へ
+          <span id="id_addition_actionBtn1" style="display:none;">
+
+            <div class="row justify-content-center mt-4 px-4">
+
+              <div class="col-md-10 col-lg-8 col-xl-6">
+                <div class="d-flex">
+                  <!--
+                  <a type="button" href="{% url 'accounts:infoEdit_buyer' %}"
+                    class="btn btn-outline-primary w-50 shadow"
+                    style="font-size:0.9rem">
+                    メニューに戻る
+                  </a>
+                  -->
+
+                  <button type="submit" class="btn btn-primary w-100 ms-1 px-2 shadow"
+                    style="font-size:0.9rem"
+                    name="actionBtn"
+                    value="ToConfirm_corp">
+                    会社情報の更新を申請する
+                </div>
               </div>
             </div>
-          </div>
 
-          <hr class="mt-4">
+          </span>
+
+          <br>
+          <hr class="mt-3">
         
           <!-- パートナー企業の担当者情報を入力するフォーム -->
           <div class="row justify-content-center mt-4 mb-2">
             <div class="d-flex col-md-10 col-lg-8 col-xl-6 text-left">
-              <i class="bi bi-person-circle" style="font-size:1.5em; color:darkred;"></i>
+              <i class="bi bi-file-person-fill" style="font-size:1.5em; color:deeppink;"></i>
               <h6 class="text-secondary ms-3"><b>ユーザー情報</b></h6>
             </div>
           </div>  
 
           <div class="row justify-content-center px-4">
             <div class="col-6 col-md-5 col-lg-4 col-xl-3 pe-1">
-              <label for="{{form.lastName.id_for_label}}"
+              <label for="{{form.lastname.id_for_label}}"
                 style="font-size:0.9rem"
                 class="form-label mt-1 mb-0">
                 姓</label>
-              <input type="{{form.lastName.widget.input_type}}"
+              <input type="{{form.lastname.widget.input_type}}"
                 style="font-size:0.9rem"
                 class="form-control my-0"
-                name="{{form.lastName.name}}"
-                value="{{form.lastName.value|default:''}}"
-                id="{{form.lastName.id_for_label}}"
-                placeholder="例：山田">
+                name="{{form.lastname.name}}"
+                value="{{form.lastname.value|default:''}}"
+                id="userInput"
+                placeholder="例：山田"
+                readonly>
             </div>
 
             <div class="col-6 col-md-5 col-lg-4 col-xl-3 ps-0">
-              <label for="{{form.firstName.id_for_label}}"
+              <label for="{{form.firstname.id_for_label}}"
                 style="font-size:0.9rem"
                 class="form-label mt-1 mb-0">
                 名</label>
-              <input type="{{form.firstName.widget.input_type}}"
+              <input type="{{form.firstname.widget.input_type}}"
                 style="font-size:0.9rem"
                 class="form-control my-0"
-                name="{{form.firstName.name}}"
-                value="{{form.firstName.value|default:''}}"
-                id="{{form.firstName.id_for_label}}"
-                placeholder="例：次郎">
+                name="{{form.firstname.name}}"
+                value="{{form.firstname.value|default:''}}"
+                id="userInput"
+                placeholder="例：次郎"
+                readonly>
             </div>
           </div> <!-- end of row -->
 
-          {% if form.lastName.errors or form.firstName.errors %}
+          {% if form.lastname.errors or form.firstname.errors %}
             <div class="row justify-content-center px-4">
               <div class="col-6 col-md-5 col-lg-4 col-xl-3 pe-1 text-left" style="color:red;">
-                {{ form.lastName.errors.as_text }}</div>
+                {{ form.lastname.errors.as_text }}</div>
               <div class="col-6 col-md-5 col-lg-4 col-xl-3 ps-0 text-left" style="color:red;">
-                {{ form.firstName.errors.as_text }}</div>
+                {{ form.firstname.errors.as_text }}</div>
             </div>
           {% endif %}
 
           <div class="row justify-content-center px-4">
             <div class="col-6 col-md-5 col-lg-4 col-xl-3 pe-1">
-              <label for="{{form.lastName_kana.id_for_label}}"
+              <label for="{{form.lastname_kana.id_for_label}}"
                 style="font-size:0.9rem"
                 class="form-label mt-1 mb-0">
                 姓（フリガナ）</label>
-              <input type="{{form.lastName_kana.widget.input_type}}"
+              <input type="{{form.lastname_kana.widget.input_type}}"
                 style="font-size:0.9rem"
                 class="form-control"
-                name="{{form.lastName_kana.name}}"
-                value="{{form.lastName_kana.value|default:''}}"
-                id="{{form.lastName_kana.id_for_label}}"
-                placeholder="例：ヤマダ">
+                name="{{form.lastname_kana.name}}"
+                value="{{form.lastname_kana.value|default:''}}"
+                id="userInput"
+                placeholder="例：ヤマダ"
+                readonly>
             </div>
 
             <div class="col-6 col-md-5 col-lg-4 col-xl-3 ps-0">
-              <label for="{{form.firstName_kana.id_for_label}}"
+              <label for="{{form.firstname_kana.id_for_label}}"
                 style="font-size:0.9rem"
                 class="form-label mt-1 mb-0">
                 名（フリガナ）</label>
-              <input type="{{form.firstName_kana.widget.input_type}}"
+              <input type="{{form.firstname_kana.widget.input_type}}"
                 style="font-size:0.9rem"
                 class="form-control"
-                name="{{form.firstName_kana.name}}"
-                value="{{form.firstName_kana.value|default:''}}"
-                id="{{form.firstName_kana.id_for_label}}"
-                placeholder="例：ジロウ">
+                name="{{form.firstname_kana.name}}"
+                value="{{form.firstname_kana.value|default:''}}"
+                id="userInput"
+                placeholder="例：ジロウ"
+                readonly>
             </div>
           </div>
 
-          {% if form.lastName_kana.errors or form.firstName_kana.errors %}
+          {% if form.lastname_kana.errors or form.firstname_kana.errors %}
             <div class="row justify-content-center px-4">
               <div class="col-6 col-md-5 col-lg-4 col-xl-3 pe-1 text-left" style="color:red;">
-                {{ form.lastName_kana.errors.as_text }}</div>
+                {{ form.lastname_kana.errors.as_text }}</div>
               <div class="col-6 col-md-5 col-lg-4 col-xl-3 ps-0 text-left" style="color:red;">
-                {{ form.firstName_kana.errors.as_text }}</div>
+                {{ form.firstname_kana.errors.as_text }}</div>
             </div>
           {% endif %}
 
@@ -357,7 +423,8 @@
                 name="{{form.tel_user.name}}"
                 value="{{form.tel_user.value|default:''}}"
                 placeholder="数字のみご記載ください"
-                id="{{form.tel_user.id_for_label}}" >
+                id="userInput"
+                readonly>
             </div>
           </div>
           {% if form.tel_user.errors %}
@@ -379,7 +446,8 @@
                 name="{{form.department.name}}"
                 value="{{form.department.value|default:''}}"
                 placeholder=""
-                id="{{form.department.id_for_label}}" >
+                id="userInput"
+                readonly>
             </div>
           </div>
           {% if form.department.errors %}
@@ -401,7 +469,8 @@
                 name="{{form.title.name}}"
                 value="{{form.title.value|default:''}}"
                 placeholder=""
-                id="{{form.title.id_for_label}}" >
+                id="userInput"
+                readonly>
             </div>
           </div>
           {% if form.title.errors %}
@@ -411,39 +480,50 @@
             </div>
           {% endif %}
 
-          <div class="row justify-content-center mt-3 px-4">
-            <div class="col-md-10 col-lg-8 col-xl-6">
-              <div class="d-flex">
-                <a type="button" href="{% url 'accounts:infoEdit_buyer' %}"
-                  class="btn btn-outline-primary w-50 shadow"
-                  style="font-size:0.9rem">
-                  戻る
-                </a>
-                <button type="submit" class="btn btn-primary w-50 ms-1 px-2 shadow"
-                  style="font-size:0.9rem"
-                  name="btnAction"
-                  value="ToConfirm_user">
-                  ユーザー情報の更新
-                </button>
+
+          <span id="id_addition_actionBtn2" style="display:none;">
+
+            <div class="row justify-content-center mt-4 px-4">
+              <div class="col-md-10 col-lg-8 col-xl-6">
+
+                <div class="d-flex">
+                  <!--
+                  <a type="button" href="{% url 'accounts:infoEdit_buyer' %}"
+                    class="btn btn-outline-primary w-50 shadow"
+                    style="font-size:0.9rem">
+                    メニューに戻る
+                  </a>
+                  -->
+
+                  <button type="submit" class="btn btn-primary w-100 ms-1 px-2 shadow"
+                    style="font-size:0.9rem"
+                    name="actionBtn"
+                    value="ToConfirm_user">
+                    ユーザー情報の更新
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
+
+          </span>
 
         </form>
 
-      {% endif %}  <!-- end「if flag_pending == 0」 -->
+      {% endif %}  <!-- end「if flag_status == 0」 -->
 
 
-      {% if flag_pending == 1 %} <!-- 申請中 -->
+      {% if flag_status == 1 %} <!-- 申請中 -->
 
         <!-- パートナーの企業情報を入力するフォーム -->
         <div class="row justify-content-center mt-3 mb-2">
-          <div class="d-flex col-md-10 col-lg-8 col-xl-6 text-left">
-            <i class="bi bi-building" style="font-size:1.5em; color:darkred;"></i>
-            <h6 class="text-secondary ms-3"><b>会社情報</b></h6>
+          <div class="col-md-10 col-lg-8 col-xl-6">
+            <div class="d-flex text-left">
+              <i class="bi bi-building-fill" style="font-size:1.5em; color:deeppink;"></i>
+              <h6 class="text-secondary ms-3"><b>会社情報</b></h6>
               <span class="text-danger ms-3" style="font-size:0.8rem">
                 <b>※更新申請中</b>
               </span>
+            </div>
           </div>
         </div>  
 
@@ -453,7 +533,7 @@
 
             <div class="col-md-10 col-lg-8 col-xl-6">
 
-              <form method="POST" class="p-0 m-0 rounded-1"
+              <form method="POST" class="p-0 m-0 rounded-1" id="id_PostForm"
                 style="background-color: transparent !important; border-color:transparent !important;">
                 <!-- style="background-color: transparent !important; border-color:transparent !important;" -->
                 {% csrf_token %}
@@ -463,9 +543,9 @@
                   <button type="submit" 
                     class="btn btn-outline-primary rounded-3 shadow-sm py-1"
                     style="width: 120px; font-size:0.9rem"
-                    name="btnAction"
+                    name="actionBtn"
                     value="ToDropUpdate_{{corpInfo.id}}"
-                    {% if user.canApproveAll == False and user.canApproveChg == False %}disabled{% endif %}>                       
+                    {% if user.canApproveAll == False and user.canApproveChg == False %}readonly{% endif %}>                       
                     取り下げ</button>
                 </div>
                   
@@ -489,7 +569,7 @@
                       <td colspan="1" class="table-primary" style="text-align:left; vertical-align:top">
                         申請法人</td>
                       <td colspan="1" style="text-align:right" class="pe-2">
-                        {{ corpInfo.applyEntity.entityName }}</td>
+                        {{ corpInfo.applyEntity.entityname }}</td>
                     </tr>
   
                     <tr style="text-align:center;">
@@ -518,7 +598,7 @@
                       <td class="table-primary" colspan="1" style="text-align:left; vertical-align:top">
                         申請法人</td>
                       <td colspan="1" style="text-align:right">
-                        {{ corpInfo.entityName }}</td>
+                        {{ corpInfo.entityname }}</td>
                     </tr>
 
                     <tr>
@@ -578,7 +658,7 @@
 
             <div class="col-md-10 col-lg-8 col-xl-6">
 
-              <form method="POST" class="p-0 m-0 rounded-1"
+              <form method="POST" class="p-0 m-0 rounded-1" id="id_PostForm"
                 style="background-color: transparent !important; border-color:transparent !important;">
                 <!-- style="background-color: transparent !important; border-color:transparent !important;" -->
                 {% csrf_token %}
@@ -588,9 +668,9 @@
                   <button type="submit"
                     class="btn btn-outline-primary rounded-3 shadow-sm py-1"
                     style="width: 120px; font-size:0.9rem"
-                    name="btnAction"
+                    name="actionBtn"
                     value="ToDropUpdate_{{corpInfo.id}}"
-                    {% if user.canApproveAll == False and user.canApproveChg == False %}disabled{% endif %}>                       
+                    {% if user.canApproveAll == False and user.canApproveChg == False %}readonly{% endif %}>                       
                     取り下げ</button>
                 </div>
               </form>
@@ -616,7 +696,7 @@
                     <td colspan="1" class="table-primary" style="vertical-align:top">
                       申請法人</td>
                     <td colspan="1" style="text-align:right" class="pe-2">
-                      {{ corpInfo.applyEntity.entityName }}</td>
+                      {{ corpInfo.applyEntity.entityname }}</td>
                     <td rowspan="7" style="text-align:center; vertical-align:middle;">
                       <img src="{{ corpInfo.evidence.url }}"
                         class="img-fluid p-0"
@@ -669,7 +749,7 @@
                     <td class="table-primary" colspan="1" style="text-align:center; vertical-align:top">
                       申請法人</td>
                     <td colspan="1" style="text-align:right" class="pe-2">
-                      {{ corpInfo.entityName }}</td>
+                      {{ corpInfo.entityname }}</td>
                   </tr>
 
                   <tr>
@@ -700,15 +780,15 @@
         <!-- パートナー企業の担当者情報を入力するフォーム -->
         <div class="row justify-content-center mt-4 mb-2">
           <div class="d-flex col-md-10 col-lg-8 col-xl-6 text-left">
-            <i class="bi bi-person-circle" style="font-size:1.5em; color:darkred;"></i>
+            <i class="bi bi-file-person-fill" style="font-size:1.5em; color:deeppink;"></i>
             <h6 class="text-secondary ms-3"><b>ユーザー情報</b></h6>
           </div>
         </div>  
 
-        <form method="POST" class="h-adr"> <!--「class="adr"」は郵便番号から住所を自動入力するため -->
+        <form method="POST" class="h-adr" id="id_PostForm"> <!--「class="adr"」は郵便番号から住所を自動入力するため -->
           {% csrf_token %}
 
-          {{form.entityName.as_hidden}}
+          {{form.entityname.as_hidden}}
           {{form.representitive.as_hidden}}
           {{form.tel_entity.as_hidden}}
           {{form.zip_entity.as_hidden}}
@@ -718,79 +798,81 @@
 
           <div class="row justify-content-center px-4">
             <div class="col-6 col-md-5 col-lg-4 col-xl-3 pe-1">
-              <label for="{{form.lastName.id_for_label}}"
+              <label for="{{form.lastname.id_for_label}}"
                 style="font-size:0.9rem"
                 class="form-label mt-1 mb-0">
                 姓</label>
-              <input type="{{form.lastName.widget.input_type}}"
+              <input type="{{form.lastname.widget.input_type}}"
                 style="font-size:0.9rem"
                 class="form-control my-0"
-                name="{{form.lastName.name}}"
-                value="{{form.lastName.value|default:''}}"
-                id="{{form.lastName.id_for_label}}"
-                placeholder="例：山田">
+                name="{{form.lastname.name}}"
+                value="{{form.lastname.value|default:''}}"
+                id="userInput"
+                placeholder="例：山田"
+                realdonly>
             </div>
 
             <div class="col-6 col-md-5 col-lg-4 col-xl-3 ps-0">
-              <label for="{{form.firstName.id_for_label}}"
+              <label for="{{form.firstname.id_for_label}}"
                 style="font-size:0.9rem"
                 class="form-label mt-1 mb-0">
                 名</label>
-              <input type="{{form.firstName.widget.input_type}}"
+              <input type="{{form.firstname.widget.input_type}}"
                 style="font-size:0.9rem"
                 class="form-control my-0"
-                name="{{form.firstName.name}}"
-                value="{{form.firstName.value|default:''}}"
-                id="{{form.firstName.id_for_label}}"
-                placeholder="例：次郎">
+                name="{{form.firstname.name}}"
+                value="{{form.firstname.value|default:''}}"
+                id="userInput"
+                placeholder="例：次郎"
+                readonly>
             </div>
           </div> <!-- end of row -->
 
-          {% if form.lastName.errors or form.firstName.errors %}
+          {% if form.lastname.errors or form.firstname.errors %}
             <div class="row justify-content-center px-4">
               <div class="col-6 col-md-5 col-lg-4 col-xl-3 pe-1 text-left" style="color:red;">
-                {{ form.lastName.errors.as_text }}</div>
+                {{ form.lastname.errors.as_text }}</div>
               <div class="col-6 col-md-5 col-lg-4 col-xl-3 ps-0 text-left" style="color:red;">
-                {{ form.firstName.errors.as_text }}</div>
+                {{ form.firstname.errors.as_text }}</div>
             </div>
           {% endif %}
 
           <div class="row justify-content-center px-4">
             <div class="col-6 col-md-5 col-lg-4 col-xl-3 pe-1">
-              <label for="{{form.lastName_kana.id_for_label}}"
+              <label for="{{form.lastname_kana.id_for_label}}"
                 style="font-size:0.9rem"
                 class="form-label mt-1 mb-0">
                 姓（フリガナ）</label>
-              <input type="{{form.lastName_kana.widget.input_type}}"
+              <input type="{{form.lastname_kana.widget.input_type}}"
                 style="font-size:0.9rem"
                 class="form-control"
-                name="{{form.lastName_kana.name}}"
-                value="{{form.lastName_kana.value|default:''}}"
-                id="{{form.lastName_kana.id_for_label}}"
+                name="{{form.lastname_kana.name}}"
+                value="{{form.lastname_kana.value|default:''}}"
+                id="userInput"
                 placeholder="例：ヤマダ">
             </div>
 
             <div class="col-6 col-md-5 col-lg-4 col-xl-3 ps-0">
-              <label for="{{form.firstName_kana.id_for_label}}"
+              <label for="{{form.firstname_kana.id_for_label}}"
                 style="font-size:0.9rem"
                 class="form-label mt-1 mb-0">
                 名（フリガナ）</label>
-              <input type="{{form.firstName_kana.widget.input_type}}"
+              <input type="{{form.firstname_kana.widget.input_type}}"
                 style="font-size:0.9rem"
                 class="form-control"
-                name="{{form.firstName_kana.name}}"
-                value="{{form.firstName_kana.value|default:''}}"
-                id="{{form.firstName_kana.id_for_label}}"
+                name="{{form.firstname_kana.name}}"
+                value="{{form.firstname_kana.value|default:''}}"
+                id="userInput"
                 placeholder="例：ジロウ">
             </div>
           </div>
 
-          {% if form.lastName_kana.errors or form.firstName_kana.errors %}
+          {% if form.lastname_kana.errors or form.firstname_kana.errors %}
             <div class="row justify-content-center px-4">
               <div class="col-6 col-md-5 col-lg-4 col-xl-3 pe-1 text-left" style="color:red;">
-                {{ form.lastName_kana.errors.as_text }}</div>
+                {{ form.lastname_kana.errors.as_text }}</div>
               <div class="col-6 col-md-5 col-lg-4 col-xl-3 ps-0 text-left" style="color:red;">
-                {{ form.firstName_kana.errors.as_text }}</div>
+                {{ form.firstname_kana.errors.as_text }}</div>
             </div>
           {% endif %}
 
@@ -812,7 +894,8 @@
                 name="{{form.tel_user.name}}"
                 value="{{form.tel_user.value|default:''}}"
                 placeholder="数字のみご記載ください"
-                id="{{form.tel_user.id_for_label}}" >
+                id="userInput"
+                readonly>
             </div>
           </div>
           {% if form.tel_user.errors %}
@@ -834,7 +917,8 @@
                 name="{{form.department.name}}"
                 value="{{form.department.value|default:''}}"
                 placeholder=""
-                id="{{form.department.id_for_label}}" >
+                id="userInput"
+                readonly>
             </div>
           </div>
           {% if form.department.errors %}
@@ -856,7 +940,8 @@
                 name="{{form.title.name}}"
                 value="{{form.title.value|default:''}}"
                 placeholder=""
-                id="{{form.title.id_for_label}}" >
+                id="userInput"
+                readonly>
             </div>
           </div>
           {% if form.title.errors %}
@@ -872,11 +957,11 @@
                 <a type="button" href="{% url 'accounts:infoEdit_buyer' %}"
                   class="btn btn-outline-primary w-50 shadow"
                   style="font-size:0.9rem">
-                  戻る
+                  メニューに戻る
                 </a>
                 <button type="submit" class="btn btn-primary w-50 ms-1 px-2 shadow"
                   style="font-size:0.9rem"
-                  name="btnAction"
+                  name="actionBtn"
                   value="ToConfirm_user">
                   ユーザー情報の更新
                 </button>
@@ -886,24 +971,29 @@
 
         </form>
 
+      <!-- 申請が差し戻された場合 -->
+      {% elif flag_status == 2 %}
 
-      {% elif flag_pending == 2 %} <!-- 申請が差し戻された場合 -->
+        <form method="POST" class="h-adr" id="id_PostForm">
+          <!--「class="adr"」は郵便番号から住所を自動入力するため -->
 
-        <form method="POST" class="h-adr"> <!--「class="adr"」は郵便番号から住所を自動入力するため -->
           {% csrf_token %}
 
           {{ form.non_field_errors }}
 
           <!-- パートナーの企業情報を入力するフォーム -->
           <div class="row justify-content-center mt-3 mb-1">
-            <div class="d-flex col-md-10 col-lg-8 col-xl-6 text-left">
-              <i class="bi bi-building" style="font-size:1.5em; color:darkred;"></i>
-              <h6 class="text-secondary ms-3"><b>会社情報</b></h6>
-            </div>
-            <div class="d-flex col-md-10 col-lg-8 col-xl-6 text-left">
-              <span class="text-danger ms-3" style="font-size:0.75rem">
-                ※申請が差戻されました。取下げ・再申請、又は内容修正をお願いします
-              </span>
+            <div class="col-md-10 col-lg-8 col-xl-6">
+              <div class="d-flex text-left">
+                <i class="bi bi-building-fill" style="font-size:1.5em; color:deeppink;"></i>
+                <h6 class="text-secondary ms-3"><b>会社情報</b></h6>
+              </div>
+              <div class="text-left">
+                <span class="text-danger ms-3" style="font-size:0.75rem">
+                  ※申請が差戻されました。取下げ・再申請、又は内容修正をお願いします
+                </span>
+              </div>
+
             </div>
           </div>  
 
@@ -911,7 +1001,9 @@
             <div class="col-md-10 col-lg-8 col-xl-6 text-left">
               <div class="border bg-warning-subtle shadow py-2 px-3"
                 style="font-size:0.9rem">
-                差戻理由：　{{corpInfo.sendbackReason}}<br>
+                {% bs_icon 'feather' color='forestgreen' size='1rem' %}
+                差戻理由：　　{{corpInfo.sendbackReason}}<br>
+                {% bs_icon 'feather' color='forestgreen' size='1rem' %}
                 メッセージ：　{{corpInfo.sendbackMessage}}
               </div>
             </div>
@@ -920,23 +1012,24 @@
           <div class="form-group row justify-content-center px-4">
             <label class="col-md-3 col-lg-2 col-form-label pb-0"
               style="font-size:0.9rem"
-              for="{{form.entityName.id_for_label}}">
+              for="{{form.entityname.id_for_label}}">
               企業名
             </label>
             <div class="col-md-7 col-lg-6 col-xl-4 ms-1 pb-1">
-              <input type="{{form.entityName.widget.input_type}};"
+              <input type="{{form.entityname.widget.input_type}};"
                 style="font-size:0.9rem"
                 class='form-control'
-                name='{{form.entityName.name}}'
-                value="{{form.entityName.value|default:''}}"
-                id='{{form.entityName.id_for_label}}'
+                name='{{form.entityname.name}}'
+                value="{{form.entityname.value|default:''}}"
+                id="userInput"
+                readonly
                 {% if user.canApproveAll != True and user.canApproveChg != True %} disable {% endif %}>
             </div>
           </div>
-          {% if form.entityName.errors %}
+          {% if form.entityname.errors %}
             <div class="row justify-content-center px-4">
               <div class="col-md-10 col-lg-8 col-xl-6 text-left" style="color:red;">
-                {{ form.entityName.errors.as_text }}</div>
+                {{ form.entityname.errors.as_text }}</div>
             </div>
           {% endif %}
   
@@ -953,7 +1046,8 @@
                 name="{{form.representitive.name}}"
                 value="{{form.representitive.value|default:''}}"
                 placeholder="記入例：窮仁 太郎"
-                id="{{form.representitive.id_for_label}}"
+                id="userInput"
+                readonly
                 {% if user.canApproveAll != True and user.canApproveChg != True %} disable {% endif %}>
             </div>
           </div>
@@ -977,7 +1071,8 @@
                 name="{{form.tel_entity.name}}"
                 value="{{form.tel_entity.value|default:''}}"
                 placeholder="数字のみご記載ください。"
-                id="{{form.tel_entity.id_for_label}}"
+                id="userInput"
+                readonly
                 {% if user.canApproveAll != True and user.canApproveChg != True %} disable {% endif %}>
             </div>
           </div>
@@ -1007,7 +1102,8 @@
                 name="{{form.zip_entity.name}}"
                 value="{{form.zip_entity.value|default:''}}"
                 placeholder="数字のみご記載ください。"
-                id="{{form.zip_entity.id_for_label}}"
+                id="userInput"
+                readonly
                 {% if user.canApproveAll != True and user.canApproveChg != True %} disable {% endif %}>
             </div>
           </div>
@@ -1032,7 +1128,8 @@
                 name="{{form.address1.name}}"
                 value="{{form.address1.value|default:''}}"
                 placeholder="都道府県・市町村・町"
-                id="{{form.address1.id_for_label}}"
+                id="userInput"
+                readonly
                 {% if user.canApproveAll != True and user.canApproveChg != True %} disable {% endif %}>
             </div>
           </div>
@@ -1055,7 +1152,8 @@
                 name="{{form.address2.name}}"
                 value="{{form.address2.value|default:''}}"
                 placeholder="〇丁目〇番〇号、〇-〇-〇"
-                id="{{form.address2.id_for_label}}"
+                id="userInput"
+                readonly
                 {% if user.canApproveAll != True and user.canApproveChg != True %} disable {% endif %}>
             </div>
           </div>
@@ -1078,7 +1176,8 @@
                 name="{{form.address3.name}}"
                 value="{{form.address3.value|default:''}}"
                 placeholder="建物・マンション名　フロア・号室"
-                id="{{form.address3.id_for_label}}"
+                id="userInput"
+                readonly
                 {% if user.canApproveAll != True and user.canApproveChg != True %} disable {% endif %}>
             </div>
           </div>
@@ -1100,15 +1199,15 @@
                 </a>
                 <button type="submit" class="btn btn-primary w-50 ms-1 px-2 shadow"
                   style="font-size:0.9rem"
-                  name="btnAction"
+                  name="actionBtn"
                   value="ToDropUpdate_{{corpInfo.id}}">
                   取り下げ
 
-                <button type="submit" class="btn btn-primary w-50 ms-1 px-2 shadow"
+                <button type="submit" class="btn btn-primary w-50 ms-1 px-0 shadow"
                   style="font-size:0.9rem"
-                  name="btnAction"
+                  name="actionBtn"
                   value="ToCorrectUpdate_corp_{{corpInfo.id}}">
-                  内容修正
+                  修正＆再申請
               </div>
             </div>
           </div>
@@ -1117,87 +1216,93 @@
         
           <!-- パートナー企業の担当者情報を入力するフォーム -->
           <div class="row justify-content-center mt-4 mb-2">
-            <div class="d-flex col-md-10 col-lg-8 col-xl-6 text-left">
-              <i class="bi bi-person-circle" style="font-size:1.5em; color:darkred;"></i>
-              <h6 class="text-secondary ms-3"><b>ユーザー情報</b></h6>
+            <div class="col-md-10 col-lg-8 col-xl-6">
+              <div class="d-flex text-left">
+                <i class="bi bi-file-person-fill" style="font-size:1.5em; color:deeppink;"></i>
+                <h6 class="text-secondary ms-3"><b>ユーザー情報</b></h6>
+              </div>
             </div>
           </div>  
 
           <div class="row justify-content-center px-4">
             <div class="col-6 col-md-5 col-lg-4 col-xl-3 pe-1">
-              <label for="{{form.lastName.id_for_label}}"
+              <label for="{{form.lastname.id_for_label}}"
                 style="font-size:0.9rem"
                 class="form-label mt-1 mb-0">
                 姓</label>
-              <input type="{{form.lastName.widget.input_type}}"
+              <input type="{{form.lastname.widget.input_type}}"
                 style="font-size:0.9rem"
                 class="form-control my-0"
-                name="{{form.lastName.name}}"
-                value="{{form.lastName.value|default:''}}"
-                id="{{form.lastName.id_for_label}}"
+                name="{{form.lastname.name}}"
+                value="{{form.lastname.value|default:''}}"
+                id="userInput"
+                readonly
                 placeholder="例：山田">
             </div>
 
             <div class="col-6 col-md-5 col-lg-4 col-xl-3 ps-0">
-              <label for="{{form.firstName.id_for_label}}"
+              <label for="{{form.firstname.id_for_label}}"
                 style="font-size:0.9rem"
                 class="form-label mt-1 mb-0">
                 名</label>
-              <input type="{{form.firstName.widget.input_type}}"
+              <input type="{{form.firstname.widget.input_type}}"
                 style="font-size:0.9rem"
                 class="form-control my-0"
-                name="{{form.firstName.name}}"
-                value="{{form.firstName.value|default:''}}"
-                id="{{form.firstName.id_for_label}}"
+                name="{{form.firstname.name}}"
+                value="{{form.firstname.value|default:''}}"
+                id="userInput"
+                readonly
                 placeholder="例：次郎">
             </div>
           </div> <!-- end of row -->
 
-          {% if form.lastName.errors or form.firstName.errors %}
+          {% if form.lastname.errors or form.firstname.errors %}
             <div class="row justify-content-center px-4">
               <div class="col-6 col-md-5 col-lg-4 col-xl-3 pe-1 text-left" style="color:red;">
-                {{ form.lastName.errors.as_text }}</div>
+                {{ form.lastname.errors.as_text }}</div>
               <div class="col-6 col-md-5 col-lg-4 col-xl-3 ps-0 text-left" style="color:red;">
-                {{ form.firstName.errors.as_text }}</div>
+                {{ form.firstname.errors.as_text }}</div>
             </div>
           {% endif %}
 
           <div class="row justify-content-center px-4">
             <div class="col-6 col-md-5 col-lg-4 col-xl-3 pe-1">
-              <label for="{{form.lastName_kana.id_for_label}}"
+              <label for="{{form.lastname_kana.id_for_label}}"
                 style="font-size:0.9rem"
                 class="form-label mt-1 mb-0">
                 姓（フリガナ）</label>
-              <input type="{{form.lastName_kana.widget.input_type}}"
+              <input type="{{form.lastname_kana.widget.input_type}}"
                 style="font-size:0.9rem"
                 class="form-control"
-                name="{{form.lastName_kana.name}}"
-                value="{{form.lastName_kana.value|default:''}}"
-                id="{{form.lastName_kana.id_for_label}}"
+                name="{{form.lastname_kana.name}}"
+                value="{{form.lastname_kana.value|default:''}}"
+                id="userInput"
+                readonly
                 placeholder="例：ヤマダ">
             </div>
 
             <div class="col-6 col-md-5 col-lg-4 col-xl-3 ps-0">
-              <label for="{{form.firstName_kana.id_for_label}}"
+              <label for="{{form.firstname_kana.id_for_label}}"
                 style="font-size:0.9rem"
                 class="form-label mt-1 mb-0">
                 名（フリガナ）</label>
-              <input type="{{form.firstName_kana.widget.input_type}}"
+              <input type="{{form.firstname_kana.widget.input_type}}"
                 style="font-size:0.9rem"
                 class="form-control"
-                name="{{form.firstName_kana.name}}"
-                value="{{form.firstName_kana.value|default:''}}"
-                id="{{form.firstName_kana.id_for_label}}"
+                name="{{form.firstname_kana.name}}"
+                value="{{form.firstname_kana.value|default:''}}"
+                id="userInput"
+                readonly
                 placeholder="例：ジロウ">
             </div>
           </div>
 
-          {% if form.lastName_kana.errors or form.firstName_kana.errors %}
+          {% if form.lastname_kana.errors or form.firstname_kana.errors %}
             <div class="row justify-content-center px-4">
               <div class="col-6 col-md-5 col-lg-4 col-xl-3 pe-1 text-left" style="color:red;">
-                {{ form.lastName_kana.errors.as_text }}</div>
+                {{ form.lastname_kana.errors.as_text }}</div>
               <div class="col-6 col-md-5 col-lg-4 col-xl-3 ps-0 text-left" style="color:red;">
-                {{ form.firstName_kana.errors.as_text }}</div>
+                {{ form.firstname_kana.errors.as_text }}</div>
             </div>
           {% endif %}
 
@@ -1219,7 +1324,8 @@
                 name="{{form.tel_user.name}}"
                 value="{{form.tel_user.value|default:''}}"
                 placeholder="数字のみご記載ください"
-                id="{{form.tel_user.id_for_label}}" >
+                id="userInput"
+                readonly>
             </div>
           </div>
           {% if form.tel_user.errors %}
@@ -1241,7 +1347,8 @@
                 name="{{form.department.name}}"
                 value="{{form.department.value|default:''}}"
                 placeholder=""
-                id="{{form.department.id_for_label}}" >
+                id="userInput"
+                readonly>
             </div>
           </div>
           {% if form.department.errors %}
@@ -1263,7 +1370,8 @@
                 name="{{form.title.name}}"
                 value="{{form.title.value|default:''}}"
                 placeholder=""
-                id="{{form.title.id_for_label}}" >
+                id="userInput"
+                readonly>
             </div>
           </div>
           {% if form.title.errors %}
@@ -1283,7 +1391,7 @@
                 </a>
                 <button type="submit" class="btn btn-primary w-50 ms-1 px-2 shadow"
                   style="font-size:0.9rem"
-                  name="btnAction"
+                  name="actionBtn"
                   value="ToConfirm_user">
                   ユーザー情報の更新
                 </button>
@@ -1302,7 +1410,7 @@
     {% if step_edit == 2 %}
 
       <div class="d-flex justify-content-center mt-4">
-        <h5 class="text-secondary pt-1"><b>編集内容ご確認</b></h5>
+        <h5 class="text-secondary pt-1"><b>ご編集後の内容</b></h5>
         <i class="bi bi-list-check ps-1" style="font-size:2.4em; color:deeppink;"></i>
       </div>
 
@@ -1310,7 +1418,7 @@
         <div class="col-md-9 col-lg-6">
 
           <div class="d-flex justify-content-start mt-3">
-            <i class="bi bi-building" style="font-size:1.5em; color:darkred;"></i>
+            <i class="bi bi-building-fill" style="font-size:1.5em; color:deeppink;"></i>
             <h6 class="text-secondary ms-2"><b>会社情報</b></h6>
           </div>  
 
@@ -1321,7 +1429,7 @@
               <tr>
                 <th scope="col" width="30%" class="table-primary">
                   会社名</th>
-                <td>{{ form.entityName.value }}</td></tr>
+                <td>{{ form.entityname.value }}</td></tr>
               <tr>
                 <th scope="col" width="30%" class="table-primary">
                   代表者</th>
@@ -1348,7 +1456,7 @@
           <hr>
           
           <div class="d-flex justify-content-start mt-3">
-            <i class="bi bi-person" style="font-size:1.5em; color:darkred;"></i>
+            <i class="bi bi-file-person-fill" style="font-size:1.5em; color:deeppink;"></i>
             <h6 class="text-secondary ms-2"><b>お申込者の情報</b></h6>
           </div>  
           
@@ -1360,7 +1468,7 @@
             <tbody class="text-center">
               <tr>
                 <th scope="col" width="30%" class="table-primary">お名前</th>
-                <td>{{ form.lastName.value }}　{{ form.firstName.value }}</td></tr>
+                <td>{{ form.lastname.value }}　{{ form.firstname.value }}</td></tr>
               <tr>
                 <th scope="col" width="30%" class="table-primary">電話番号</th>
                 <td>{{ form.tel_user.value }}</td></tr>
@@ -1376,16 +1484,15 @@
 
           <hr>
 
-          <form method="POST">
+          <form method="POST" id="id_PostForm">
             {% csrf_token %}
-
 
             <div class="d-flex justify-content-center mt-2">
 
               <button type="submit"
                 class="btn btn-outline-primary text-primary w-50 shadow"
                 style="font-size:0.9rem"
-                name="btnAction"
+                name="actionBtn"
                 value="BackToInput_{{user.id}}">
                 ご入力に戻る</button>
 
@@ -1393,7 +1500,7 @@
 
                 <button type="submit" class="btn btn-primary w-50 ms-1 shadow"
                   style="font-size:0.9rem"
-                  name="btnAction"
+                  name="actionBtn"
                   value="ToSelectEvidence_corp_{{user.id}}">
                   証明書のアップロードへ</button>
 
@@ -1401,7 +1508,7 @@
                 
                 <button type="submit" class="btn btn-primary ms-1 w-50 shadow"
                   style="font-size:0.9rem"
-                  name="btnAction"
+                  name="actionBtn"
                   value="ToSave_corp_{{user.id}}">
                   この内容を登録</button>
 
@@ -1422,5 +1529,76 @@
   </div> <!-- end container -->
 </div>
 
+
+{% endblock %}
+
+{% block extrajs %}
+
+<script>
+
+  document.addEventListener('DOMContentLoaded', function() {
+
+    // Submitボタンを押下後「しばらくお待ちください。」を表示する
+    document.getElementById('id_PostForm').addEventListener('submit', function() {
+      document.getElementById('loading').style.display = 'block';
+    });
+
+    // 3秒後にメッセージを消す
+    setTimeout(function() {
+      console.log('setTimeoutが認識されました');
+
+      var messages = document.querySelectorAll('.messages div');
+      messages.forEach(function(message) {
+        message.style.display = 'none';
+      });
+    }, 3000); // 3000ミリ秒 = 3秒
+
+    const userInput = document.getElementById('userInput');
+    const modeChangeBtn = document.getElementById('modeChangeBtn');
+    const additionalText = document.getElementById('id_addition_text');
+    const additionalBtn1 = document.getElementById('id_addition_actionBtn1');
+    const additionalBtn2 = document.getElementById('id_addition_actionBtn2');
+
+    modeChangeBtn.addEventListener('click', () => {
+
+      // 現在の readonly 状態を反転
+      document.querySelectorAll('[id="userInput"]').forEach(input => {
+        input.readOnly = !input.readOnly;
+      });
+
+      // ボタンの見た目とテキストを状態に合わせて変更
+      if (userInput.readOnly) {
+        modeChangeBtn.innerHTML = `編集 {% bs_icon "pencil-fill" color="white" size="0.80rem" %}`;
+        modeChangeBtn.classList.replace('btn-primary', 'btn-primary');
+      } else {
+        modeChangeBtn.innerHTML = `編集やめる {% bs_icon "pencil-fill" color="white" size="0.80rem" %}`;
+        modeChangeBtn.classList.replace('btn-primary', 'btn-primary');
+      }
+
+      if (additionalText.style.display == 'none' || additionalText.style.display === '' ) {
+        additionalText.style.display = 'block'
+      } else {
+        additionalText.style.display = 'none'
+      }
+
+      if (additionalBtn1.style.display === 'none' || additionalBtn1.style.display === '' ) {
+        console.log('pass1')
+        additionalBtn1.style.display = 'block'
+      } else {
+        console.log('pass2')
+        additionalBtn1.style.display = 'none'
+      }
+
+      if (additionalBtn2.style.display === 'none' || additionalBtn2.style.display === '' ) {
+        console.log('pass3')
+        additionalBtn2.style.display = 'block'
+      } else {
+        console.log('pass4')
+        additionalBtn2.style.display = 'none'
+      }
+    });
+  });
+
+</script>
 
 {% endblock %}

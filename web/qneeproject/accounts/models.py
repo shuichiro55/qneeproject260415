@@ -11,9 +11,12 @@ from django.core.mail import send_mail
 #from django.contrib.auth.models import AbstractUser
 #from django.contrib.auth.validators import ASCIIUsernameValidator
 
-name_validator = UnicodeUsernameValidator()
-tel_regex = RegexValidator(regex=r'^[0-9０-９ー―－‐₋⁻-]+$', message = ("数字のみご入力下さい（最大15桁）　例：09012345678."))
-zip_regex = RegexValidator(regex=r'^[0-9０-９]{7}+$', message = ("7桁の数字のみご入力ください　例: '1234567'"))
+name_validator = UnicodeUsernameValidator() #\ー\―\－\‐\₋\-\⁻
+tel_regex = RegexValidator(
+    regex=r'^[0-9０-９]{10,11}$',
+    message='数字のみ・ハイフン無しで入力してください。 例：09012345678')
+#tel_regex = RegexValidator(regex=r'^[0-9０-９ー―－‐₋⁻-]{1,20}$', message = ("数字のみご入力下さい（最大15桁）　例：09012345678."))
+zip_regex = RegexValidator(regex=r'^[0-9０-９]{1,7}$', message = ("7桁の数字のみご入力ください　例: '1234567'"))
   #「 \d → 任意の数字	[0-9]」 「 ^ → 文字列の先頭」、「 $ → 文字列の末尾」
   #取引主体が個人の場合に住所を入れるか検討（選択肢は①入力しない、②郵便番号まで、③全部入力）
 
@@ -47,7 +50,7 @@ class LegalEntity(models.Model):
   choices2 = ((1, '個人（法人組織でない）'), (2, '法人'))
   type2 = models.IntegerField(default=1, null=False, blank=True, choices=choices2)
 
-  entityName = models.CharField(
+  entityname = models.CharField(
     '取引主体名', max_length=100,
     unique=False, null=False, blank=False, default="",
     validators=[name_validator],)
@@ -110,7 +113,7 @@ class LegalEntity(models.Model):
 
 
   def __str__(self):
-    return f'{self.entityName}'
+    return f'{self.entityname}'
 
 
 # email＋パスワードでログインするためにカスタマイズ
@@ -162,39 +165,45 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
   email = models.EmailField('メールアドレス',
     unique=True, blank=False, null=False)
 
-  userName = models.CharField(
+  username = models.CharField(
     _('お名前'),max_length=100,
     unique=False, null=True, blank=True, default="",
   )
-  userName_kana = models.CharField(
-    _('お名前（カナ）'), max_length=50,
-    unique=False, null=False, blank=True, default="",
+
+  personname = models.CharField(
+    _('名前'),max_length=100,
+    unique=False, null=True, blank=True, default="",
   )
 
-  # 260430 firstNameとlastNameはユーザーに分けて入力してもらうために利用
+  personname_kana = models.CharField(
+    _('名前（カナ）'), max_length=50,
+    unique=False, null=True, blank=True, default="",
+  )
+
+  # 260430 firstnameとlastnameはユーザーに分けて入力してもらうために利用
   # ユーザー情報を変更する場合にも利用するためデータを維持
-  firstName = models.CharField('名（First Name）',                                                       
+  firstname = models.CharField('名（First Name）',                                                       
     max_length=50,
     unique=False,
     null=True,
     blank=True,
     default="",
   )
-  lastName = models.CharField('姓（Last Name）',
+  lastname = models.CharField('姓（Last Name）',
     max_length=50,
     unique=False,
     null=True,
     blank=True,
     default="",
   )
-  firstName_kana = models.CharField('名のカナ（First Name）',                                                       
+  firstname_kana = models.CharField('名のカナ（First Name）',                                                       
     max_length=50,
     unique=False,
     null=True,
     blank=True,
     default="",
   )
-  lastName_kana = models.CharField('姓のカナ（Last Name）',
+  lastname_kana = models.CharField('姓のカナ（Last Name）',
     max_length=50,
     unique=False,
     null=True,
@@ -273,6 +282,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
   def email_user(self, subject, message, from_email=None, **kwargs):
       send_mail(subject, message, from_email, [self.email], **kwargs)
 
+  # ★★　20260621 何をしていたのか要確認
   @property
   def username(self):
     """username属性のゲッター
@@ -300,12 +310,13 @@ def user_directory_path(instance, filename):
 
 """ 会社情報を更新するときの承認ステータス """
 class UpdateStatus(models.IntegerChoices):
-  DEFAULT = 1
-  UNDER_APPLICATION = 2  # 申請中
-  PENDING = 3     # 申請差戻
-  APPROVED = 4   # 承認
+  HISTORY = -1          # 過去データ（更新完了時後の旧データの保存）
+  DEFAULT = 0           # データ生成時（入力データ後、エビデンス登録前）
+  UNDER_APPLICATION = 1 # 申請中
+  PENDING = 2           # 申請差戻
+  APPROVED = 3          # 承認
 
-  DISAPPROVED = -4   # 否認
+  DISAPPROVED = -3      # 否認
   
 
 """ 会社情報を更新する場合に、Qneeに承認されるまで更新後データを維持 """
@@ -321,13 +332,13 @@ class CorpInfo(models.Model):
   # このデータがある場合、参照先（親）のデータが削除を防ぐ（ProtectedError）
 
   status = models.IntegerField(choices=UpdateStatus.choices,
-    default=1, verbose_name='更新状況')
+    default=0, verbose_name='更新状況')
   status_char = models.CharField(max_length=20, 
     null=False, blank=False, default="承認待ち", verbose_name='更新状況')
 
   #is_primary = models.BooleanField(default=False) # 「正」フラグ
 
-  entityName = models.CharField(
+  entityname = models.CharField(
     'エンティティ名', max_length=100,
     unique=False, null=True, blank=True, default="",
     validators=[name_validator],)
@@ -406,7 +417,7 @@ class CorpInfo(models.Model):
     # この段階ではインスタンスIDが存在するので、user_directory_path関数でinstance.idが使える
 
   def __str__(self):
-    return f'{self.entityName}'
+    return f'{self.entityname}'
 
 
 
@@ -427,7 +438,7 @@ ORMで自動生成される中間テーブルの代わりに利用すること�
 #    null=False, )
 #
 #  entity = models.ForeignKey("LegalEntity", on_delete=models.CASCADE)
-#  entityName = models.CharField(
+#  entityname = models.CharField(
 #    '取引主体名',
 #    max_length=150,
 #    unique=False,

@@ -1,0 +1,16 @@
+QPAYの差戻がされました。
+
+申請者（ゲスト）：{{ tx.sellEntityname }}
+差戻者（パートナー）：{{ tx.buyEntityname }}
+
+差戻理由： {{ sendbackReason }}
+申請者へのメッセージ： {{ sendbackMessage }}
+
+{% if flag_bankAccountUnset == 1 %}
+なお、{{ tx.buyEntityname }} 様は銀行口座の登録が未実施です。
+{% endif %}
+
+ログインURL
+{{ protocol}}://{{ domain }}{% url 'accounts:login_admin' %}
+
+株式会社Qnee（キユーニー）

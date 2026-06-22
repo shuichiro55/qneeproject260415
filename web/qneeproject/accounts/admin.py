@@ -5,20 +5,22 @@ from .models import BankAccount
 from .models import CorpInfo
 
 class CustomerUserAdmin(admin.ModelAdmin):
-  list_display = ('userName', 'type1', 'type2',)
-
+  #list_display = ('personname', 'type1', 'type2',)
+  list_display = ('personname', 'type1', 'type2',)
+  #pass
 
 class LegalEntityAdmin(admin.ModelAdmin):
-  list_display = ('type1', 'type2', 'entityName', 'representitive', )
+  list_display = ('type1', 'type2', 'entityname', 'representitive', )
 
 class UserEntityRelationAdmin(admin.ModelAdmin):
-  list_display = ('userName', 'entityName', 'email')
+  #list_display = ('personname', 'entityname', 'email')
+  list_display = ('personname', 'entityname', 'email')
 
 class BankAccountAdmin(admin.ModelAdmin):
   list_display = ('entity_id', 'holderName', 'bankName', 'branchName')
 
 class CorpInfoAdmin(admin.ModelAdmin):
-  list_display = ('entityName', 'status', 'created_at',)
+  list_display = ('entityname', 'status', 'created_at',)
 
 admin.site.register(CustomUser, CustomerUserAdmin)
 admin.site.register(LegalEntity, LegalEntityAdmin)

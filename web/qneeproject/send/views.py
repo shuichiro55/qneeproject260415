@@ -68,11 +68,11 @@ class InvitationSetsView(generic.UpdateView):
     # <QuerySet [('山下', 'ファルコンズ'), ('瀬戸', 'タイガース'), ]
     # values("team")は、辞書型で取得{'team', 'ファルコンズ'}
 
-    sellEntitysUsers = UserModel.objects.select_related('entity').filter(entity__pk__in=sellEntitys_pkList).values('userName','email','entity__entityName')
+    sellEntitysUsers = UserModel.objects.select_related('entity').filter(entity__pk__in=sellEntitys_pkList).values('personname','email','entity__entityname')
     # 関係しているゲストのユーザー（複数）を取得
 
     # 上記のクエリーのアウトプットを確認したうえで項目を絞る
-    # .values('id','customuser_id','customuser__userName','customuser__email')
+    # .values('id','customuser_id','customuser__personname','customuser__email')
     # https://yk5656.hatenablog.com/entry/20210410/1617980400
     # 「yuki5656 diary Djangoでデータを取得してみる(外部キー) Authorモデル側」を参考
     # 【コメント：prefetch_relatedは、多モデル側（customuser）側から隠せ巣親モデル（Foreignkeyの参照先モデル）から取得する場合のコードを参考】
@@ -167,7 +167,7 @@ class InvitationSetsView(generic.UpdateView):
       buyEntity=buyEntity).order_by('-created_at').values_list('sellEntity')
 
     sellEntitysUsers = UserModel.objects.select_related('entity').filter(
-      entity__pk__in=sellEntitys_pkList).values('userName','email','entity__entityName')
+      entity__pk__in=sellEntitys_pkList).values('personname','email','entity__entityname')
 
     mailSets = InvitationSets.objects.get(buyEntity=buyEntity)
 
@@ -900,7 +900,7 @@ class InvitationSetsView(generic.UpdateView):
       #  entityUsers = entity.entity_users.all()
       #
       #  for user in entityUsers():
-      #    writer.writerow([user.userName, user.email])
+      #    writer.writerow([user.personname, user.email])
       #
       #  return response
       #

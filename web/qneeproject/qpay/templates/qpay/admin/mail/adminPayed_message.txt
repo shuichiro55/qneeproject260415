@@ -1,6 +1,6 @@
-{{ tx.sellUser_userName }} 様 ご利用ありがとうございます。
+{{ tx.sellUser_personname }} 様 ご利用ありがとうございます。
 
-{{ tx.buyer_entityname }} 様が {{ tx.sellEntityName }} 様の申請を承認されました。
+{{ tx.buyEntityname }} 様が {{ tx.sellEntityname }} 様の申請を承認されました。
 
 {% if flag_bankAccountUnset == 1 %}
 
