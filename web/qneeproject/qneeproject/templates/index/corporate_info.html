@@ -34,10 +34,10 @@
 
 </head>
 -->
-{% block content %}
+{% block home %}
 
   <!-- START NAVBAR -->
-  <nav id="navbar" class="navbar navbar-expand-lg fixed-top sticky pt-0 pb-1">
+  <nav id="navbar" class="navbar navbar-expand-lg fixed-top sticky pt-0 pb-1 shadow-sm">
 
     <div class="container-fluid">
 
@@ -137,8 +137,7 @@
 
 
   <section id="ourStory"
-    class="about section bg-light light-background"
-    style="width: 100vw;">
+    class="about section bg-white" style="width: 100vw;">
 
     <div class="container-fluid">
 
@@ -168,39 +167,83 @@
               data-aos="fade-up"
               data-aos-delay="100">
 
-              <div class="mt-3 mx-4">
-                <p style="font-size:1.1em">
-                  これまでの人生における出会い・経験・気づきの結晶が私たちのサービス。
-                  そのサービスを通じて皆さま・社会への貢献を図っていきます。
-                </p>
+              <!-- スマホ用のサイズ調整 -->
+              <div class="d-block d-sm-none">
+                <div class="mt-3 mx-4">
+                  <p style="font-size:0.9rem">
+                    これまでの人生における出会い・経験・気づきの結晶が私たちのサービス。
+                    そのサービスを通じて皆さま・社会への貢献を図っていきます。
+                  </p>
 
-                <div class="d-flex mt-4">
-                  <span>{% bs_icon 'people' color='lightblue' size='2.5em' %}</span>
-                  <h5 class="mt-1 ms-2">きっかけ</h5>
-                </div>
-                <p class="mt-1 ms-5" style="font-size:1.1em">
-                  きっかけ映画制作においてアニメーターが報酬が受け取りまで時間があること、
-                  制作会社とフリーランスとの間で契約が結ばれないことがあったと知ったこと。
-                </p>
+                  <div class="d-flex mt-4">
+                    <span>{% bs_icon 'people' color='lightblue' size='2.0rem' %}</span>
+                    <span class="mt-2 ms-2" style="font-size:0.95rem">
+                      <b>きっかけ</b></span>
+                  </div>
+                  <p class="mt-2" style="font-size:0.8rem">
+                    きっかけ映画制作においてアニメーターが報酬が受け取りまで時間があること、
+                    制作会社とフリーランスとの間で契約が結ばれないことがあったと知ったこと。
+                  </p>
 
-                <div class="d-flex mt-4">
-                  <span>{% bs_icon 'bookmarks' color='lightblue' size='2.5em' %}</span>
-                  <h5 class="mt-1 ms-2">経験</h5>
-                </div>
-                <p class="mt-1 ms-5" style="font-size:1.1em">
-                  金融分野でのスキーム創り、スタートアップビジネスに触れた経験、
-                  親しんできたプログラミングを活かして「お役に立ちたい」が原動力。
-                </p>
+                  <div class="d-flex mt-4">
+                    <span>{% bs_icon 'bookmarks' color='lightblue' size='2.0rem' %}</span>
+                    <span class="mt-1 ms-2" style="font-size:0.95rem">
+                      <b>経験</b></span>
+                  </div>
+                  <p class="mt-2" style="font-size:0.8rem">
+                    金融分野でのスキーム創り、スタートアップビジネスに触れた経験、
+                    親しんできたプログラミングを活かして「お役に立ちたい」が原動力。
+                  </p>
 
-                <div class="d-flex mt-4">
-                  <span>{% bs_icon 'stars' color='lightblue' size='2.5em' %}</span>
-                  <h5 class="mt-1 ms-2">新たな創造へ</h5>
+                  <div class="d-flex mt-4">
+                    <span>{% bs_icon 'stars' color='lightblue' size='2.0rem' %}</span>
+                    <span class="mt-2 ms-2" style="font-size:0.95rem">
+                      <b>新たな創造へ</b></span>
+                  </div>
+                  <p class="mt-2" style="font-size:0.8rem">
+                    ご利用者の声、過去のご利用データをご参考しながら、
+                    ご利用者のニーズにより寄り添ったサービス・サービス自体の高度化を実現します。
+                  </p>
                 </div>
-                <p class="mt-1 ms-5" style="font-size:1.1em">
-                  ご利用者の声、過去のご利用データをご参考しながら、
-                  ご利用者のニーズにより寄り添ったサービス・サービス自体の高度化を実現します。
-                </p>
               </div>
+
+              <div class="d-none d-sm-block">
+
+                <div class="mt-3 mx-4">
+                  <p style="font-size:1.1em">
+                    これまでの人生における出会い・経験・気づきの結晶が私たちのサービス。
+                    そのサービスを通じて皆さま・社会への貢献を図っていきます。
+                  </p>
+
+                  <div class="d-flex mt-4">
+                    <span>{% bs_icon 'people' color='lightblue' size='2.5em' %}</span>
+                    <h5 class="mt-1 ms-2">きっかけ</h5>
+                  </div>
+                  <p class="mt-1 ms-5" style="font-size:1.1em">
+                    きっかけ映画制作においてアニメーターが報酬が受け取りまで時間があること、
+                    制作会社とフリーランスとの間で契約が結ばれないことがあったと知ったこと。
+                  </p>
+
+                  <div class="d-flex mt-4">
+                    <span>{% bs_icon 'bookmarks' color='lightblue' size='2.5em' %}</span>
+                    <h5 class="mt-1 ms-2">経験</h5>
+                  </div>
+                  <p class="mt-1 ms-5" style="font-size:1.1em">
+                    金融分野でのスキーム創り、スタートアップビジネスに触れた経験、
+                    親しんできたプログラミングを活かして「お役に立ちたい」が原動力。
+                  </p>
+
+                  <div class="d-flex mt-4">
+                    <span>{% bs_icon 'stars' color='lightblue' size='2.5em' %}</span>
+                    <h5 class="mt-1 ms-2">新たな創造へ</h5>
+                  </div>
+                  <p class="mt-1 ms-5" style="font-size:1.1em">
+                    ご利用者の声、過去のご利用データをご参考しながら、
+                    ご利用者のニーズにより寄り添ったサービス・サービス自体の高度化を実現します。
+                  </p>
+                </div>
+              </div>
+
             </div>
 
           </div> <!-- end col -->
@@ -351,6 +394,11 @@
     {% include 'partials/switcher.html' %}
   {% endblock %}
 
+{% endblock home %}
+
+
+{% block extrajs %}
+
   <!--start back-to-top-->
   <button onclick="topFunction()" id="back-to-top">
     <i class="mdi mdi-arrow-up"></i>
@@ -360,7 +408,5 @@
   <!-- JavaScript js -->
   <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
   <script src="{% static 'js/app.js' %}"></script>
-
-  {% block extrajs %}{% endblock %}
 
 {% endblock %}

@@ -58,7 +58,7 @@
           <!-- 承認者がメールからアプリに入る場合の処理 -->
           {% if request.session.flag_frWhere == 1 %}
 
-            {% if applyUser.addStatus == 1 or applyUser.addStatus == 3 %}
+            {% if applyUser.addStatus == 1 or applyUser.addStatus == -3 %}
 
               <form method="POST" action="{% url 'accounts:buyUserAdd_admin' %}"
                 class="form-group border border-top shadow p-3 bg-light rounded"
@@ -172,7 +172,7 @@
 
               </form>
 
-            {% endif %} <!-- if applyUser.addStatus == 1 or 3 -->
+            {% endif %} <!-- if applyUser.addStatus == 1 or -3 -->
 
           {% endif %} <!-- request.session.flag_frWhere == 1 -->
 
@@ -278,7 +278,12 @@
 
                 <div class="d-flex justify-content-center pb-2">
 
-                  <button type="submit" class="btn btn-primary flex-grow-1 px-0 shadow"
+                  <button type="submit" class="btn btn-outline-primary flex-grow-1 px-0 shadow"
+                    name="next"
+                    value="ToRefuseUser_{{applyUser.id}}" >
+                    否認　　</button>  
+
+                    <button type="submit" class="btn btn-primary flex-grow-1 px-0 ms-1 shadow"
                     name="next"
                     value="ToEditPermission_{{applyUser.id}}" >
                     ① 権限編集</button>
@@ -288,10 +293,6 @@
                     value="ToApproveUser_{{applyUser.id}}" >
                     ② 承認　　</button>
 
-                  <button type="submit" class="btn btn-outline-primary flex-grow-1 px-0 ms-1 shadow"
-                    name="next"
-                    value="ToRefuseUser_{{applyUser.id}}" >
-                    否認　　</button>  
 
                 </div>
 
@@ -331,22 +332,42 @@
 
 {% block extrajs %}
 
-<script defer>
+<script>
 //「defer」は、HTMLの解析と並行してJavaScriptの読み込みを裏側で進め、
 // HTMLの読み込み（パース）がすべて完了してからスクリプトを実行します。
 //deferを指定しない場合、ブラウザはJavaScriptの読み込みと実行が終わるまで
 // HTMLの読み込みを一時停止
 
-  document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {
 
-    console.log('DOMContentLoaded in buyUserAdd_admin.html が認識されました');
+  console.log('DOMContentLoaded in buyUserAdd_admin.html が認識されました');
 
-    document.getElementById('id_PostForm').addEventListener('submit', function() {
-      document.getElementById('loading').style.display = 'block';
+
+  console.log('setTimeoutが認識前');
+  // 3秒後にメッセージを消す
+  setTimeout(function() {
+    console.log('setTimeoutが認識されました');
+
+    var messages = document.querySelectorAll('.messages div');
+    messages.forEach(function(message) {
+      message.style.display = 'none';
     });
+  }, 3000); // 3000ミリ秒 = 3秒
 
 
-  });
+  // Submitボタンを押下後「しばらくお待ちください。」を表示する
+  const postForm = document.getElementById('id_PostForm');
+  if (postForm) {
+    postForm.addEventListener('submit', function() {
+      const loadingEl = document.getElementById('loading');
+      if (loadingEl) {
+        loadingEl.style.display = 'block';
+      }
+    });
+  }
+
+
+});
 
 </script>
 

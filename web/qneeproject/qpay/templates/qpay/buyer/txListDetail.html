@@ -44,7 +44,7 @@
     </div>
     
     <div class="row justify-content-center">
-      <div class="col-11 col-md-9 col-lg-6">
+      <div class="col-md-9 col-lg-6 col-xl-5">
 
         <form method="GET"
           class="form-group bg-light border border-success-subtle rounded mt-3 p-0 mx-2"
@@ -54,50 +54,30 @@
 
           <table class="table table-sm bg-light
             table-bordered border-primary-subtle
-            shadow-sm table-responsive">
+            shadow table-responsive mb-1">
 
             <tbody>
               <tr>
-                <td rowspan="2" width="25%" class="table-primary">
+                <td width="45%" class="table-primary">
                   <b>処理状況</b></td>
-                <td  width="20%" class="table-primary" style="text-align:center">
-                  <b>承認</b></td>
-                <td style="text-align:right;">
-                  {% if tx.txStatus_int == 1 %}未了{% endif %}
-                  {% if tx.txStatus_int == 2 %}未了{% endif %}
-                  {% if tx.txStatus_int >= 3 %}承認{% endif %}
-                  {% if tx.txStatus_int == -3 %}否認{% endif %}
-                </td>
-              </tr>
-              <tr>
-                <td class="table-primary" style="text-align:center">
-                  <b>支払</b></td>
-                <td style="text-align:right;">
-                  {% if tx.txStatus_int == 1 %}未了{% endif %}
-                  {% if tx.txStatus_int == 2 %}未了{% endif %}
-                  {% if tx.txStatus_int == 3 %}未了{% endif %}
-                  {% if tx.txStatus_int == 4 %}未了{% endif %}
-                  {% if tx.txStatus_int >= 5 %}済み{% endif %}
-                  {% if tx.txStatus_int == -3 %}不可{% endif %}
-                  {% if tx.txStatus_int == -5 %}不可{% endif %}
-
-                </td>
-              </tr>
+                <td class="table-danger"
+                  style="font-size:0.9rem; text-align:right;">
+                  {{ tx.txStatus_char }}</td>
               
               <tr>
-                <td colspan="2" class="table-primary"><b>ゲスト</b></td>
+                <td class="table-primary"><b>ゲスト名</b></td>
                 <td style="text-align:right;">{{ tx.sellEntityname }}</td>
               </tr>
               <tr>
-                <td colspan="2" class="table-primary"><b>申請者</b></td>
+                <td  class="table-primary"><b>申請者</b></td>
                 <td style="text-align:right;">{{ tx.sellUser_personname }}</td>
               </tr>
               <tr>
-                <td colspan="2" class="table-primary"><b>申請額</b></td>
+                <td class="table-primary"><b>申請額</b></td>
                 <td style="text-align:right;">{{ tx.requested_amount|intcomma }}</td>
               </tr>
               <tr>
-                <td colspan="2" class="table-primary"><b>証明書類</b></td>
+                <td class="table-primary"><b>証明書類</b></td>
                 <td style="text-align:center">
                   <img src="{{ tx.evidence.url }}"
                     class="img-fluid"
@@ -133,21 +113,47 @@
 
           <table class="table table-sm bg-light
             table-bordered border-primary-subtle
-            shadow-sm table-responsive">
+            shadow table-responsive">
             
             <tbody>
-              <tr class="table-danger">
-                <td colspan="2" width="45%" class="table-primary"><b>ゲストへの振込額</b></td>
-                <td style="text-align:right;">{{ tx.transfer_amount|intcomma }}</td></tr>
               <tr>
-                <td colspan="2" width="45%" class="table-primary"><b>＋Qnee前払額</b></td>
+                <td width="45%" class="table-primary"><b>ゲストへの振込額</b></td>
+                <td class="table-info" style="text-align:right;">{{ tx.transfer_amount|intcomma }}</td></tr>
+              <tr>
+                <td width="45%" class="table-primary"><b>＋Qnee前払額</b></td>
                 <td style="text-align:right;">{{ tx.advance_amount|intcomma }}</td></tr>
               <tr>
-                <td colspan="2" width="45%" class="table-primary"><b>－前払手数料</b></td>
+                <td width="45%" class="table-primary"><b>－前払手数料</b></td>
                 <td style="text-align:right;">{{ tx.advance_fee|intcomma }}</td></tr>
               <tr>
-                <td colspan="2" width="45%" class="table-primary"><b>－振込手数料</b></td>
+                <td width="45%" class="table-primary"><b>－振込手数料</b></td>
                 <td style="text-align:right;">{{ tx.transfer_fee|intcomma }}</td></tr>
+            </tbody>
+          </table>
+
+          <div class="d-flex">
+            <i class="bi bi-check-circle" style="font-size:1.5rem; color:deeppink"></i>
+            <span class="ms-2" style="font-size:1.1rem; font-style: italic;">
+              <b>承認情報</b></span></div>
+          <table class="table table-sm bg-light
+            table-bordered border-primary-subtle
+            shadow table-responsive">
+
+            <tbody>
+              <tr>
+                <td width="45%" class="table-primary"><b>パートナー名</b></td>
+                <td style="text-align:right;">{{ tx.buyEntityname }}</td>
+              </tr>
+              <tr>
+                <td  class="table-primary">
+                  <b>パートナー・ユーザー</b></td>
+                <td style="text-align:right;">
+                  {{ tx.buyUser_personname|default:'-' }}</td>
+              </tr>
+              <tr>
+                <td class="table-primary"><b>承認日時</b></td>
+                <td style="text-align:right;">{{ tx.approved_at|default:'-'|date:"y/n/j H:i" }}</td>
+              </tr>
             </tbody>
           </table>
 

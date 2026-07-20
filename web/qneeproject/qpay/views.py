@@ -2,11 +2,11 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render
 from django.contrib.auth import get_user_model
 from django.views import generic
-from .models import QpayTx
-from accounts.models import LegalEntity, BankAccount
+from .models import QpayTx, SendbackInfo, ClearingInfo
+from accounts.models import LegalEntity, BankAccount, CorpInfo
 from qpay.form import TxCreateForm, TxEvidenceForm, \
       TxApproveForm_buyer, TxPeriodSetForm, \
-      TxListForm_seller, FeedbackForm_qpay
+      TxListForm_seller, TxReapplyForm, SendbackInfoForm_qpay
 
 from django.urls import reverse, reverse_lazy
 from django.http import HttpResponseBadRequest, HttpResponseRedirect
@@ -23,10 +23,11 @@ from django.template.loader import render_to_string
 from django.core.signing import dumps, loads, BadSignature, SignatureExpired
 from django.conf import settings
 
+#from datetime import date
 import datetime
-from datetime import date
 from django.utils import timezone
 from dateutil.relativedelta import relativedelta
+import calendar
 
 #import calendar
 
@@ -277,13 +278,16 @@ class TxCreateView(generic.CreateView):
 
         tx = form.save(commit=False)
         tx.sellUser = sellUser
+        tx.sellUser_personname = sellUser.personname
         tx.sellEntity = sellEntity
+        tx.sellEntiyname = sellEntity.entityname
         
         buyEntityname = self.request.POST['buyEntityname']
         tx.buyEntityname = buyEntityname
 
         buyEntity = LegalEntity.objects.get(entityname=buyEntityname)
         tx.buyEntity = buyEntity
+
         # tx.buyUser, tx.buyUser_personnameは承認時に入力する 260515
 
         # 各種金額を計算       
@@ -357,7 +361,7 @@ class TxCreateView(generic.CreateView):
         'sellUser': sellUser,
         'sellEntity': sellEntity,
         'tx': tx,
-         'form': form,
+        'form': form,
         'temporal_buyEntityname': temporal_buyEntityname,
         'dict_buyEntityname': dict_buyEntityname,
         #'temporal_sellEntityname': temporal_sellEntityname,
@@ -431,6 +435,8 @@ class TxCreateView(generic.CreateView):
 
       tx_id = next.split('_')[3]
       tx = QpayTx.objects.get(pk=tx_id)
+      tx.txStatus = 1
+      tx.txStatus_char = 'ゲスト申請済・パートナー承認前'
       tx.requested_at = timezone.now()  # 申請した時点を記録する
 
       tx.save()
@@ -458,13 +464,13 @@ class TxCreateView(generic.CreateView):
           context = {
             'protocol': self.request.scheme,
             'domain': domain,
-            'afterLogin': 'qpayApproveApply',
+            'afterLogin': 'qpayApprove',
             'token': dumps(tx.pk),
             'tx': tx,
             'buyEntityApprover': eachUser,
           }
-          subject = render_to_string('qpay/seller/mail/qpayApproveApply_subject.txt', context)
-          message = render_to_string('qpay/seller/mail/qpayApproveApply_message.txt', context)
+          subject = render_to_string('qpay/seller/mail/qpayApply_subject.txt', context)
+          message = render_to_string('qpay/seller/mail/qpayApply_message.txt', context)
 
           from_email = 'shuichiro.tomihari.201604@gmail.com'
 
@@ -487,15 +493,238 @@ class TxCreateView(generic.CreateView):
     return TemplateResponse(self.request, 'qpay/seller/txCreate.html', {'form':form},)      #contextを見直しが必要（基本的にはあまり通らないところだが）
 
 
-  #def form_valid(self, form):
-  #  return super().form_valid(form)
-  
-  # 申請後のViewを表示する。★★mypageに行くとき何かメッセージを出せないか
-  #def get_success_url(self):
-  #  return reverse('accounts:mypage_seller')
+# ★★ 20260629 受注者が前払い申請する際に利用するビュー（工事中）
 
-  #def form_invalid(self, form):
-  #  return super().form_invalid(form)
+from django.forms import modelformset_factory
+
+class TxReapplyView_seller(generic.UpdateView):
+
+  model = QpayTx
+  template_name = 'qpay/seller/txCreate.html'
+  form_class = TxReapplyForm
+
+  def dispatch(self, request, *args, **kwargs):
+  
+    self.request.session['dict_buyEntityname'] = \
+      dict((f, f) for idx, f in enumerate(LegalEntity.objects.filter(type1=1).values_list('entityname', flat=True), 1))
+  
+    """ 初回のマイグレーションの時のみ下記を採用する """
+    #dict_buyEntityname = {'Qnee','Qnee'}
+    # 「flat=True」はリスト、「flat=False」はタプル
+  
+    return super().dispatch(request, *args, **kwargs)
+  
+
+  def get(self, request, *args, **kwargs):
+
+    sellUser_id = self.request.session.get('sellUser_id')
+    sellUser = UserModel.objects.get(pk=sellUser_id)
+    sellEntity = LegalEntity.objects.get(pk=sellUser.entity_id)
+    txQueryset = QpayTx.objects.select_related('sendbackInfo_buyer').filter(
+      Q(sellEntity=sellEntity) & Q(txStatus=2))
+    print(f'txQueryset.count={txQueryset.count()}')
+
+    TxReapplyFormSet = modelformset_factory(
+        QpayTx,
+        form = TxReapplyForm, 
+        extra = 0
+    )   
+    formset = TxReapplyFormSet(queryset=txQueryset)
+    print(f"Formset total forms: {formset.total_form_count()}") 
+
+    dict_buyEntityname = self.request.session.get('dict_buyEntityname')
+
+    context = {
+      'step_reapply': 1,
+      'flag_formset': 1,
+      'formset': formset,
+      'dict_buyEntityname': dict_buyEntityname,
+    }
+    return render(request, 'qpay/seller/txReapply.html', context)
+
+  
+  def post(self, request, *args, **kwargs):
+
+    actionBtn = self.request.POST.get('actionBtn', '')   # POST.getはミドルウェア機能
+    #actionBtn2 = self.request.POST.get('actionBtn2', '')   # POST.getはミドルウェア機能
+
+    print(f'actionBtn={actionBtn}')
+    print(f'ファイル名={request.FILES}')
+
+    # formsetを使うパターンにおいて
+    # <input type="hidden" name="tx_id" value="{{ form.instance.id }}">から取得する
+    # 但し、単独フォームの時はテンプレート上にのtx（QpayTxインスタンス）
+
+    if actionBtn.find('ToConfirm') >= 0:
+
+      print(self.request.POST)
+
+      tx_id = actionBtn.split('_')[1]
+      form_index = actionBtn.split('_')[2]
+      
+      tx = QpayTx.objects.get(pk=tx_id)
+      user = UserModel.objects.get(email=self.request.user)
+      print(f'self.request.user={self.request.user} in def post of TxReapplyView_seller')
+      print(f'user.personname={user.personname} in def post of TxReapplyView_seller')
+
+      # 2. FormSetではなく、通常の単一フォーム「TxReapplyForm」を使用する
+      # 【重要】HTML側のプレフィックス（form-0-など）を prefix 引数で指定する
+      form = TxReapplyForm(
+          self.request.POST, 
+          self.request.FILES, 
+          instance=tx,
+          prefix=f'form-{int(form_index)}'
+      )
+      """ この時点で「tx.sellUser_personname=None」の為、request.POSTを上書き """
+      """ なお、request.POSTを上書きするため設定を変更 """
+      if hasattr(form.data, '_mutable'):
+        form.data._mutable = True
+      form.data[f'form-{int(form_index)}-sellUser_personname'] = user.personname          
+   
+      if form.is_valid():
+        # 「.is_valid()」の後、フォームでのclean、clean_<field>が実行され、
+
+        # tx.buyUser, tx.buyUser_personnameは承認時に入力する 260629
+
+        # 各種金額を計算
+        tx.advance_amount = tx.requested_amount
+        tx.advance_fee = (tx.requested_amount * tx.buyEntity.advance_fee_rate) //1
+        tx.referral_fee = (tx.requested_amount * tx.buyEntity.referral_fee_rate) //1
+        tx.transfer_fee = 110
+        tx.transfer_amount = tx.advance_amount - tx.advance_fee - tx.transfer_fee
+
+        tx.save()
+
+        # print(f'メールアドレス：{tx.buyUser_email} actionBtn1==confirm in TxReapplyView')
+        print(f'tx.transfer_amount={tx.transfer_amount} def post in TxReapplyView_seller')
+        print(f'pass4 tx.buyEntityname={tx.buyEntityname} TxReapplyViewView_seller, post, next==ToConfirm')
+
+        context = {
+          'step_reapply': 2,
+          'form':form,
+          'tx': tx,
+          'sellUser_personname': user.personname,
+          #'buyEntityname': buyEntityname,
+        }
+        return render(self.request, 'qpay/seller/txReapply.html', context)
+
+      else: # 「if form.is_valid() == False」の場合
+
+        print(f'form.errors={form.errors}')
+        TxReapplyFormSet = modelformset_factory(
+          QpayTx,
+          form = TxReapplyForm, 
+          extra = 0
+        )
+        formset = TxReapplyFormSet(self.request.POST, self.request.FILES )
+
+        dict_buyEntityname = self.request.session.get('dict_buyEntityname')
+        buyEntityname = self.request.POST.get(f'form-{form_index}-buyEntityname')
+        exPayment_date = self.request.POST.get(f'form-{form_index}-exPayment_date')
+        print(f'buyEntityname={buyEntityname}')
+        print(f'exPayment_data={exPayment_date}')
+
+        #print(f"--- デバッグ開始 ---")
+        #print(f"抽出した form_index: {form_index}")
+        #print(f"届いているPOSTデータの全キー: {list(request.POST.keys())}")
+        #print(f"--- デバッグ終了 ---")
+        #print(f'form.errors={form.errors}') 
+
+        context = {
+          'step_reapply': 1,
+          'flag_formset': 1,
+          'formset': formset,
+          'tx': tx,
+          'temporal_buyEntityname': self.request.POST.get(f'form-{form_index}-buyEntityname'),
+          'dict_buyEntityname': dict_buyEntityname,
+          #'exPayment_date': exPayment_date,
+          # exPayment_dateは検証中。入力した画面に戻ると、値が「年/月/日」の表示になる（日付にならない）
+          #'buyEntityname': buyEntityname,
+        }
+        return render(self.request, 'qpay/seller/txReapply.html', context)       
+        #return HttpResponseRedirect(reverse_lazy('qpay:txReaaply_seller'))
+
+    # 申請データの編集を終え、再申請する
+    if actionBtn.find('ToReapplyQpay') >= 0:
+
+      tx_id = actionBtn.split('_')[1]
+      tx = QpayTx.objects.select_related('buyEntity').get(pk=tx_id)
+
+      tx.txStatus = 1
+      tx.txStatus_char = "ゲスト再申請済・パートナー再承認前"
+      tx.requested_at = timezone.now()  # 申請した時点を記録する
+
+      #tx.sendbackInfo = None
+
+      tx.save()
+
+      QpayTx.objects.filter(pk__lt=tx.id, requested_at=None).delete()
+      #「__lt=a」でaより小さい、[__lte=a]でa以下。AND条件は「,」でつなぐ
+
+      # メール送付の処理
+      """ 260629 「canApproveAll=True」「canApproveQpay=True」のユーザーに
+          差し戻された申請が再申請されたことを伝える """
+      sellEntityUsers = UserModel.objects.select_related('entity').filter(
+        Q(entity=tx.sellEntity)
+        & (Q(canApproveAll=True) | Q(canApproveQpay=True)))
+
+      for sellUser in sellEntityUsers:
+
+        context1 = {
+          'token': dumps(tx.pk), # tx.pkを維持する必要ないので不要か
+          'tx': tx,
+          'afterLogin': 'qpayApprove',
+        }
+        utils.sendEmail_common(
+          'qpay/seller/mail/qpayReapply', '', [sellUser.email], context1)
+
+      messages.add_message(request, messages.SUCCESS,
+        '差戻された前払い申請についてパートナー企業に再申請しました。')
+
+      context = { 'step_reapply': 3, 'tx': tx, }
+      return TemplateResponse(request, "qpay/seller/txReapply.html", context)
+
+
+    # データ確認画面から入力画面に戻る時の処理 2025/02/14
+    if actionBtn.find('BackToInput') >= 0:
+
+      return HttpResponseRedirect(reverse_lazy('qpay:txReapply_seller'))
+      #form = TxReapplyForm(self.request.POST, request.FILES)
+
+      #tx = QpayTx.objects.get(pk=tx_id)
+      #temporal_buyEntityname = self.request.POST['buyEntityname']
+      #dict_buyEntityname = self.request.session.get('dict_buyEntityname')
+
+      # ★★　20260709 初期値を設定する必要があるかは要検証
+      #context = {
+      #  'step_reapply': 1,
+      #  'flag_formset': 0,
+      #  'form': form,
+      #   'tx': tx,
+      #  'temporal_buyEntityname': temporal_buyEntityname,
+      #  'dict_buyEntityname': dict_buyEntityname,
+      #  #'temporal_sellEntityname': temporal_sellEntityname,
+      #  #'dict_sellEntityname': dict_sellEntityname,
+      #
+      #}
+      #return render(self.request, 'qpay/seller/txReapply.html', context)
+
+    # ★★　申請を取り下げる
+    if actionBtn.find('ToDropApply') >= 0:
+
+      tx.txStatus = -1;
+      tx.txStatus_char = 'ゲスト取下'
+      tx.save()
+      return HttpResponseRedirect(reverse_lazy('qpay:txReapply_seller'))
+
+
+    else: # 想定してないケースが発生
+  
+      # self.request.POST.get('actionBtn', '')が何にも該当しない場合
+      messages.add_message(request, messages.WARNING, '想定してないケースが発生しました。お手数ですがお問い合わせ頂けると有難いです。')
+      print(f'pass7 actionBtnがどれにも該当せず（エラー）（TxReapplyView_seller, post）')
+
+      return TemplateResponse(self.request, 'qpay/seller/txReapply.html', {'form':form},)      #contextを見直しが必要（基本的にはあまり通らないところだが）
 
 
 
@@ -516,16 +745,19 @@ class TxApproveView_buyer(LoginRequiredMixin, generic.UpdateView):
     TwoWeeksAgo = datetime.datetime.now() - relativedelta(weeks=2)
 
     # 承認待ちの取引を抽出する   
-    object_list = QpayTx.objects.select_related('buyUser').filter(
-      Q(buyEntity=loginUser.entity)
-      & (Q(txStatus_int__lte=2) | Q(txStatus_int=-3))
-      ).order_by('-requested_at')
+    object_list = QpayTx.objects.select_related(
+      'buyUser', 'sendbackInfo_admin', 'sendbackInfo_buyer'
+      ).filter(
+        Q(buyEntity=loginUser.entity)
+        & (Q(txStatus=1) | Q(txStatus=-3) | Q(txStatus=4))
+        ).order_by('-requested_at')
 
     # 確認用
     cnt = QpayTx.objects.select_related('buyUser').filter(
       Q(buyEntity=loginUser.entity)
-      & (Q(txStatus_int__lte=2) | Q(txStatus_int=-3))
-      ).order_by('txStatus_int', '-requested_at').count()
+      & (Q(txStatus=1) | Q(txStatus=-3) | Q(txStatus=4))
+      ).order_by('txStatus', '-requested_at').count()
+    print(f'cnt_qpaytx={cnt}')
     
     paginator = Paginator(object_list, self.paginate_by)
 
@@ -580,7 +812,9 @@ class TxApproveDetailView_buyer(LoginRequiredMixin, generic.UpdateView):
 
   def get(self, request, *args, **kwargs):
 
-    tx = QpayTx.objects.get(pk=self.kwargs['tx_id'])
+    tx = QpayTx.objects.select_related(
+      'sendbackInfo_admin','sendbackInfo_buyer').get(pk=self.kwargs['tx_id'])
+
     self.request.session['tx_id'] = tx.pk
     tx_id = self.request.session.get('tx_id')
     print(f'tx_id = {tx_id} in get of TxApproveDetailView_buyer')
@@ -605,12 +839,15 @@ class TxApproveDetailView_buyer(LoginRequiredMixin, generic.UpdateView):
     if actionBtn.find('ToApproveQpay') >= 0:
  
       # 承認された場合の処理
-      tx.txStatus_int = 3
-      tx.txStatus_char = "承認済"
-      tx.approved_at = timezone.now()
+      tx.txStatus = 3
+      if tx.sendbackInfo_buyer is None:
+        tx.txStatus_char = "ゲスト申請・パートナー承認済"
+      else:
+        tx.txStatus_char = "ゲスト再申請・パートナー再承認済"
 
       ## 一旦、リスクエスト金額を承認された金額にする 24/07/25
       tx.approved_amount = tx.requested_amount
+      tx.approved_at = timezone.now()
 
       tx.buyUser = buyUser
       tx.buyUser_personname = buyUser.personname
@@ -622,7 +859,8 @@ class TxApproveDetailView_buyer(LoginRequiredMixin, generic.UpdateView):
       """ 260620 「canApproveAll=True」「canApproveQpay=True」のユーザーに
           承認されたことを伝える """
       sellEntityUsers = UserModel.objects.select_related('entity').filter(
-        Q(entity=tx.sellEntity) & (Q(canApproveAll=True) | Q(canApproveQpay=True))).values('personname','email','entity__entityname')
+        Q(entity=tx.sellEntity)
+        & (Q(canApproveAll=True) | Q(canApproveQpay=True))).values('personname','email','entity__entityname')
       # valuesは辞書型、value_listはタプルで戻る
       # （ご参考）https://se-memorandum.com/django-values-values_list/
 
@@ -652,49 +890,58 @@ class TxApproveDetailView_buyer(LoginRequiredMixin, generic.UpdateView):
     # 差戻しした場合の処理
     elif actionBtn.find('ToSendbackQpay1') >= 0:
 
-      # 否認された場合の処理（処理状況の更新、受注者への連絡等）を行う
-      tx.txStatus_int = 2
-      tx.txStatus_char = "差戻済"
-      tx.sendbacked_at = timezone.now()
-
-      tx.buyUser = buyUser
-      tx.buyUser_personname = buyUser.personname
-
-      tx.save()
-
       context = {
         'step_process': 2,
         'tx': tx,
-        'form': FeedbackForm_qpay(),}
+        'form': SendbackInfoForm_qpay(),}
       return TemplateResponse(request, "qpay/buyer/txApproveDetail.html", context)
 
 
     elif actionBtn.find('ToSendbackQpay2') >= 0:
 
-      radioValue = self.request.POST.get('sendbackReason_radio')
-      print(f'sendbackReason_radio={radioValue}')
+      reason_radio = self.request.POST.get('reason_radio')
+      print(f'reason_radio={reason_radio}')
       
-      form = FeedbackForm_qpay(request.POST, radioValue)
+      form = SendbackInfoForm_qpay(request.POST)
+      print("=== request.POST の全中身 ===")
+      print(request.POST)
+      print("=============================")
+
       if form.is_valid(): 
 
         print(f'pass1 after if form.is_valid==True in TxApproveDetailView_buyer')
 
-        sendbackReason = form.cleaned_data['sendbackReason_radio']
-        sendbackMessage = form.cleaned_data['sendbackMessage']
+        #message = form.cleaned_data['message']
+        selectedValue = form.cleaned_data.get('reason_radio')
+        reason = dict(form.fields['reason_radio'].choices).get(selectedValue)
+        print(f'reason={reason}')
 
-        if sendbackReason == 'その他':
+        if selectedValue == 'radio4':
           print(f'pass2 after if form.is_valid==True in TxApproveDetailView_buyer')
-          sendbackReason = form.cleaned_data['sendbackReason_text']
-        else:
-          print(f'pass3 after if form.is_valid==True in TxApproveDetailView_buyer')
+          reason = form.cleaned_data['reason_text']
+        
+        message = form.cleaned_data['message']
+        print(f'message={message} if actionBtn.find(ToSendbackQpay2) of TxApproveDetailView_buyer')
+        sb = SendbackInfo.objects.create(
+          qpaytx=tx, type1_frWho=1,
+          reason=reason, message=message,
+          created_at=timezone.now())
 
-        tx.txStatus_int = 2 # 差戻のステータスに変更
-        tx.txStatus_char = "差戻"
-        tx.sendbackReason = sendbackReason
-        tx.sendbackMessage = sendbackMessage
+        sb.save()
+
+        tx.txStatus = 2
+        tx.txStatus_char = "ゲスト申請差戻・パートナー差戻済"
+        tx.sendbackInfo_buyer = sb
+      
+        tx.buyUser = buyUser
+        tx.buyUser_personname = buyUser.personname
+
+        #tx.sendbackReason = reason_radio
+        #tx.sendbackMessage = message
 
         tx.save()
-        print(f'tx.txStatus_int={tx.txStatus_int}')
+
+        print(f'tx.txStatus={tx.txStatus}')
 
 
         """ 260620 「canApproveAll=True」「canApproveQpay=True」のユーザーに
@@ -706,17 +953,17 @@ class TxApproveDetailView_buyer(LoginRequiredMixin, generic.UpdateView):
         # valuesは辞書型、value_listはタプルで戻る
         # （ご参考）https://se-memorandum.com/django-values-values_list/
 
-        for eachUser in sellEntityUsers:
+        for sellUser in sellEntityUsers:
 
           context1 = {
             'token': dumps(tx.pk), # tx.pkを維持する必要ないので不要か
             'tx': tx,
-            'sendbackReason': sendbackReason,
-            'sendbackMessage': sendbackMessage,
+            'sendbackReason': reason,
+            'sendbackMessage': message,
             'afterLogin': 'qpaySendback',
           }
           utils.sendEmail_common(
-            'qpay/buyer/mail/sendbackToSeller', '', [eachUser['email']], context1)
+            'qpay/buyer/mail/sendbackToSeller', '', [sellUser['email']], context1)
 
 
         """ 260620 「canApproveAll=True」「canApproveQpay=True」のユーザーに
@@ -726,23 +973,21 @@ class TxApproveDetailView_buyer(LoginRequiredMixin, generic.UpdateView):
         # valuesは辞書型、value_listはタプルで戻る
         # （ご参考）https://se-memorandum.com/django-values-values_list/
 
-        for eachUser in buyEntityUsers:
+        for buyUser in buyEntityUsers:
 
-          # 差戻されたことを通知する
           context2 = {
             'tx': tx,
-            'sendbackReason': sendbackReason,
-            'sendbackMessage': sendbackMessage,
+            'sendbackReason': reason,
+            'sendbackMessage': message,
           }
           utils.sendEmail_common(
-            'accounts/buyer/mail/sendbackShare', '', [eachUser['email']], context)
+            'qpay/buyer/mail/sendbackShareWithQ', '', [buyUser['email']], context2)
 
         messages.add_message(self.request,
           messages.SUCCESS, "差戻の処理が完了しました。") 
 
-        context = { 'step_process': 1, 'tx': tx, }
+        context = { 'step_process': 3, 'tx': tx, }
         return TemplateResponse(request, "qpay/buyer/txApproveDetail.html", context)
-
 
       else:
 
@@ -758,8 +1003,8 @@ class TxApproveDetailView_buyer(LoginRequiredMixin, generic.UpdateView):
       print(f'after ToRejectQpay in post of TxApproceDetailView_buyer')
 
       # 否認された場合の処理（処理状況の更新、受注者への連絡等）を行う
-      tx.txStatus_int = -3
-      tx.txStatus_char = "否認済"
+      tx.txStatus = -3
+      tx.txStatus_char = "ゲスト申請否認・パートナー否認済"
       tx.rejected_at = timezone.now()
 
       tx.buyUser = buyUser
@@ -773,8 +1018,6 @@ class TxApproveDetailView_buyer(LoginRequiredMixin, generic.UpdateView):
     print(f'pass3 other')
     
     return HttpResponseBadRequest()
-
-
 
 
 # 発注者が申請状況を確認するためのView（一覧表から個別データのボタンを押した後）  
@@ -887,9 +1130,6 @@ class TxListDetailView_admin(generic.UpdateView):
     return reverse_lazy('qpay:txList_admin')
   
 
-
-
-
 # 発注者が申請状況を確認するためのView   
 class TxInboxView_admin(generic.UpdateView):
 
@@ -899,13 +1139,14 @@ class TxInboxView_admin(generic.UpdateView):
 
   def get(self, request, *args, **kwargs):
 
-    # パートナー承認まで（Qnee支払前）のデータを抽出
-    object_list = QpayTx.objects.select_related('sellEntity').filter(
-      Q(txStatus_int__lte=2) | Q(txStatus_int=-3)).order_by('-requested_at')
+    # パートナー承認が済み、Qneeが振込を行うデータ
+    object_list = QpayTx.objects.select_related('sellEntity', 'sendbackInfo_admin').filter(
+      Q(txStatus=3) | Q(txStatus=4)).order_by('-requested_at')
     
     # 確認用
     cnt = QpayTx.objects.select_related('sellEntity').filter(
-      Q(txStatus_int__lte=2) | Q(txStatus_int=-3)).order_by('-requested_at').count()
+      Q(txStatus=3) | Q(txStatus=4)).order_by('-requested_at').count()
+
     print(f'cnt={cnt} in def get of TxInboxView')
 
     paginator = Paginator(object_list, self.paginate_by)
@@ -954,7 +1195,9 @@ class TxInboxDetailPreView_admin(LoginRequiredMixin, generic.TemplateView):
     return HttpResponseRedirect(reverse('qpay:txInboxDetail', kwargs={'tx_id': tx_id}))
 
 
-# 発注者が前払いの承認するためのView（一覧又はメール内URLから遷移）  
+""" 発注者が前払いの承認するためのView（一覧又はメール内URLから遷移）"""
+""" 承認時、パートナーの月集計の支払情報（ClearingInfo）を紐づけする """
+
 class TxInboxDetailView_admin(LoginRequiredMixin, generic.UpdateView):
 
   login_url = '/accounts/login_admin/'
@@ -970,6 +1213,236 @@ class TxInboxDetailView_admin(LoginRequiredMixin, generic.UpdateView):
     print(f'buyEntity.id={buyEntity.id} in get of TxInboxDetailView')
     print(f'sellEntity.bankAccount={sellEntity.bankAccount} in get of TxInboxDetailView')
     print(f'sellEntity.bankAccount_id={sellEntity.bankAccount_id} in get of TxInboxDetailView')
+
+    if BankAccount.objects.filter(pk=sellEntity.bankAccount_id).exists():
+
+      bankAccount = BankAccount.objects.get(pk=sellEntity.bankAccount_id)
+      return TemplateResponse(request,
+        "qpay/admin/txInboxDetail.html", {'step_process': 1, 'tx': tx, 'ba': bankAccount,}) 
+
+    else:
+      messages.add_message(request, messages.WARNING, "ゲストの受取口座が未設定です。「口座設定依頼」をお願いします。") 
+     
+      return TemplateResponse(request,
+        "qpay/admin/txInboxDetail.html",  {'step_process': 1, 'tx': tx }) 
+
+
+  def post(self, request, *args, **kwargs):
+
+    tx =QpayTx.objects.select_related('buyEntity').get(pk=self.kwargs['tx_id'])
+
+    # 口座設定がある場合とない場合に分けて処理をする
+    ba = None
+    if BankAccount.objects.filter(entity=tx.sellEntity).exists():
+        ba = BankAccount.objects.get(entity=tx.sellEntity).exists()
+
+    actionBtn = self.request.POST.get('actionBtn', None) 
+    if actionBtn.find('ToTransferMoney') >= 0:
+
+      print("「振込処理する」が押下された post in TxInboxDetailView")
+
+      if ba is not None:
+
+        tx.txStatus = 5
+        tx.txStatus_char = "Qnee前払済"
+        tx.advanced_at = timezone.now()
+
+        # Qnee支払後に差戻し情報への参照をリセット
+        tx.sendbackInfo_admin = None
+        tx.sendbackInfo_buyer = None
+
+        advancedTerm_YYYYMM = timezone.now().strftime('%Y%m')
+
+        clrdInfo, created = ClearingInfo.objects.get_or_create(
+          buyEntity=tx.buyEntity, advancedTerm_YYYYMM=advancedTerm_YYYYMM)
+      
+        if not created:
+          amount_toBeCleared = QpayTx.objects.filter(
+            buyEntity=tx.buyEntity, advancedTerm_YYYYMM=advancedTerm_YYYYMM).aggregate(sum('requested_amount'))
+        
+          clrdInfo.amount_toBeCleared = amount_toBeCleared
+
+        clrdInfo.updated_at = timezone.now()
+        tx.ClearingInfo = clrdInfo
+
+        tx.save(); clrdInfo.save()
+
+
+        ## buyer承諾後に、sellerに承諾したことをメールで伝える
+
+        """ 251103 「canApproveAll=True」「canApproveQpay=True」のユーザーに
+            承認されたことを伝える """
+        sellEntityUsers = UserModel.objects.select_related('entity').filter(
+          Q(entity=tx.sellEntity)
+          & (Q(canApproveAll=True) | Q(canApproveQpay=True))).values('personname','email','entity__entityname')
+        # valuesは辞書型、value_listはタプルで戻る
+        # （ご参考）https://se-memorandum.com/django-values-values_list/
+
+        # 口座設定がある場合とない場合に分けて処理をする
+        if ba is not None:
+
+          for sellUser in sellEntityUsers:
+
+            context1 = {
+              'tx': tx,
+              'ba': ba,
+              'token': dumps(tx.pk),
+              'sellUser': sellUser, }
+            utils.sendEmail_common('qpay/admin/mail/adminPayed', '', [sellUser.email], context1)
+    
+          return TemplateResponse(request,
+            "qpay/admin/txInboxDetail.html", {'step_process': 1,  'tx': tx, })
+          #return HttpResponseRedirect(self.get_success_url())
+      
+      else:
+
+        messages.add_message(request, messages.WARNING,
+          '口座未設定のため振込ができません。「設定依頼」のボタンを押下してください。')
+
+        return TemplateResponse(request,
+          "qpay/admin/txInboxDetail.html", {'step_process': 1,  'tx': tx, })
+
+
+    elif actionBtn.find('ToRejectTransfer') >= 0:
+
+      # 振込処理を謝絶の場合の処理
+      tx.txStatus = -5
+      tx.txStatus_char = "Qnee前払謝絶"
+      tx.sendbackInfo_admin = None
+      tx.sendbackInfo_buyer = None 
+      tx.rejected_at = timezone.now()
+      tx.save()
+
+      context = {
+        'step_process': 1, 
+        'tx': tx,
+        'ba': ba, }  
+      return TemplateResponse(request, "qpay/admin/txInboxDetail.html", context)
+
+
+    # ゲストが口座未設定の場合に依頼のメールをする
+    elif actionBtn.find('ToRequestAcctSet') >= 0:
+
+      sellEntityUsers = UserModel.objects.filter(
+        Q(entity=tx.sellEntity) & (Q(canApproveAll=True) | Q(canApproveQpay=True)))
+
+      for sellUser in sellEntityUsers:
+        context1 = {
+          'tx': tx,
+          'token': dumps(tx.pk),
+          'sellUser': sellUser,
+          'afterLogin': 'bankAccountSet',}
+      utils.sendEmail_common('qpay/admin/mail/bankAccountUnset', '', [sellUser.email], context1)
+  
+      messages.add_message(request, messages.SUCCESS,
+        'ゲストユーザーに口座設定の依頼メールを送信しました。')
+
+      return TemplateResponse(request,
+        "qpay/admin/txInboxDetail.html",  {'step_process': 1, 'tx': tx, 'ba': ba, })
+
+
+    ## ★★ 260619 工事開始
+    ## ToSendBack1で差戻理由を入力、ToSendBack2で差戻実行
+
+    if actionBtn.find('ToSendbackQpay1') >= 0:
+
+      print(f'pass ToSendbackQpay1')
+      context = {
+        'step_process': 2,
+        'tx': tx,
+        'form': SendbackInfoForm_qpay(), }
+      return TemplateResponse(request, 'qpay/admin/txInboxDetail.html', context)
+
+
+    if actionBtn.find('ToSendbackQpay2') >= 0:
+
+      # 確認用
+      radioValue = self.request.POST.get('reason_radio')
+      print(f'radioValue={radioValue}')
+      
+      form = SendbackInfoForm_qpay(self.request.POST, radioValue)
+
+      if form.is_valid(): 
+
+        print(f'pass1 after if form.is_valid==True in TxInboxDetailView_admin')
+
+        selectedValue = form.cleaned_data.get('reason_radio')
+        reason = dict(form.fields['reason_radio'].choices).get(selectedValue)
+        message = form.cleaned_data['message']
+
+        if radioValue == 'radio4':
+          print(f'pass2 after if form.is_valid==True in TxInboxDetailView_admin')
+          reason = form.cleaned_data['reason_text']
+
+        tx.txStatus = 4
+        tx.txStatus_char = 'パートナー承認差戻・Qnee差戻済'
+
+        tx.approved_at = None
+        tx.approved_amount = None
+
+        sb = SendbackInfo.objects.create(
+         qpaytx=tx, type1_frWho=3,
+         reason=reason, message=message,
+         created_at=timezone.now())
+
+        tx.sendbackInfo_admin = sb
+
+        tx.save(); sb.save()
+
+        buyEntityUsers = UserModel.objects.filter(Q(entity=tx.buyEntity)
+          & (Q(canApproveAll=True) | Q(canApproveQpay=True)))
+
+        context = {
+          'tx': tx,
+          'token': dumps(tx.id),
+          'afterLogin': 'qpaySendback',
+          'sendbackReason': reason,
+          'sendbackMessage': message,}
+
+        for eachUser in buyEntityUsers:
+          # 差戻されたことを通知する
+        
+          context['buyUser'] = eachUser
+          context['token'] = dumps(tx.id)
+
+          utils.sendEmail_common(
+            'qpay/admin/mail/qpaySendback', '', [eachUser.email], context)
+
+        messages.add_message(self.request,
+          messages.SUCCESS, tx.buyEntityname + "への差戻の処理が完了しました。") 
+
+        context = {
+          'step_process': 3,
+          'tx': tx,
+          'form': form, }
+        return TemplateResponse(request, 'qpay/admin/txInboxDetail.html', context)
+
+      else:
+        print(f'pass2 after if form.is_valid==False in TxInboxDetailVeiw_admin')
+        context = {
+          'step_process': 2,
+          'tx': tx,
+          'form': form, }
+        return TemplateResponse(request, 'qpay/admin/txInboxDetail.html', context)
+
+    return HttpResponseBadRequest()
+
+
+# ★★　開発開始 20260624 パートナーの支払状況を更新するクラス
+
+
+class ClearingListView_buyer(LoginRequiredMixin, generic.UpdateView):
+
+  login_url = '/accounts/login_buyer/'
+  model = QpayTx
+  #template_name = "qpay/admin/txInboxDetail.html"
+
+  def get(self, request, *args, **kwargs):
+
+    # ★★　全てのbuyerに対して処理する
+    tx = QpayTx.objects.get(pk=self.kwargs['tx_id'])
+    buyEntity = LegalEntity.objects.get(pk=tx.buyEntity_id)
+    sellEntity = LegalEntity.objects.get(pk=tx.sellEntity_id)
 
     if BankAccount.objects.filter(pk=sellEntity.bankAccount_id).exists():
 
@@ -1010,47 +1483,17 @@ class TxInboxDetailView_admin(LoginRequiredMixin, generic.UpdateView):
     tx =QpayTx.objects.get(pk=self.kwargs['tx_id'])
 
     actionBtn = self.request.POST.get('actionBtn', None) 
-    if actionBtn.find('ToTransferMoney') >= 0:
+    if actionBtn.find('') >= 0:
 
-      print("「振込処理する」が押下された post in TxInboxDetailView")
+      today = datetime.date.today()
+      after1M = today + relativedelta(months=1)
+      after2M = today + relativedelta(months=2)
+      after3M = today + relativedelta(months=3)
 
-      # 振込処理をした場合の処理
-      tx.txStatus_int = 5
-      tx.txStatus_char = "前払済" 
-      tx.advanced_at = timezone.now()
-      
-      tx.save()
-
-      ## buyer承諾後に、sellerに承諾したことをメールで伝える
-
-      """ 251103 「canApproveAll=True」「canApproveQpay=True」のユーザーに
-          承認されたことを伝える """
-      sellEntityUsers = UserModel.objects.select_related('entity').filter(
-        Q(entity=tx.sellEntity) & (Q(canApproveAll=True) | Q(canApproveQpay=True))).values('personname','email','entity__entityname')
-      # valuesは辞書型、value_listはタプルで戻る
-      # （ご参考）https://se-memorandum.com/django-values-values_list/
-
-      for eachUser in sellEntityUsers:
-
-        current_site = get_current_site(self.request)
-        domain = current_site.domain
-        context1 = {
-          'protocol': self.request.scheme,
-          'domain': domain,
-          'type1': 2,  # 承認された後、sellerがログインする場合の種別
-          'token': dumps(tx.pk), # tx.pkを維持する必要ないので不要か
-          'tx': tx,
-          'sellEntityUser': eachUser,
-        }
-
-        subject = render_to_string('qpay/admin/mail/adminPayed_subject.txt', context1)
-        message = render_to_string('qpay/admin/mail/adminPayed_message.txt', context1)
-
-        from_email = 'shuichiro.tomihari.201604@gmail.com'
-        recipient_list =[eachUser['email']]
-        #bcc =  ["toritoritorina@gmail.com"]  # BCCリスト
-        email = EmailMessage(subject, message, from_email, recipient_list)
-        email.send()
+      lastDay_thisMonth = calendar.monthrange(today.year, today.month)[1]
+      lastDay_after1M = calendar.monthrange(after1M.year, after1M.month)[1]
+      lastDay_after2M = calendar.monthrange(after2M.year, after2M.month)[1]
+      lastDay_after3M = calendar.monthrange(after3M.year, after3M.month)[1]
 
       return TemplateResponse(request,
         "qpay/admin/txInboxDetail.html", { 'tx': tx, })
@@ -1058,99 +1501,22 @@ class TxInboxDetailView_admin(LoginRequiredMixin, generic.UpdateView):
 
     elif actionBtn.find('RejectRemittance') >= 0:
 
-      # 振込処理を謝絶の場合の処理
-      tx.txStatus_int = -5
-      tx.txStatus_char = "前払謝絶"
-      tx.rejected_at = timezone.now()
-      tx.save()
-
       context = {
         'tx': tx,
       }  
       return TemplateResponse(request, "qpay/admin/txInboxDetail.html", context)
 
 
-    ## ★★ 260619 工事開始
-    ## ToSendBack1で差戻理由を入力、ToSendBack2で差戻実行
-
     if actionBtn.find('ToSendback1') >= 0:
       
-      print(f'actionBtn={actionBtn}')
-      corpInfo_id = actionBtn.split('_')[1]
-      #corpInfo = CorpInfo.objects.select_related('applyUser', 'applyEntity').get(pk=corpInfo_id)
       
       context = {
         'step_process': 2,
-        'corpInfo_id': corpInfo_id,
-        'FeedbackForm': FeedbackForm_qpay(), }
-      return TemplateResponse(request, 'accounts/admin/corpInfoUpdate.html', context)
-
-
-    if actionBtn.find('ToSendback2') >= 0:
-
-      corpInfo_id = actionBtn.split('_')[1]
-      print(f'corpInfo_id={corpInfo_id}')
-      corpInfo = CorpInfo.objects.select_related('applyUser', 'applyEntity').get(pk=corpInfo_id)
-
-      # 確認用
-      sendbackReason = self.request.POST.get('sendbackReason_radio')
-      print(f'sendbackReason_radio={sendbackReason}')
-      
-      form = FeedbackForm_qpay(self.request.POST)
-
-      if form.is_valid(): 
-
-        print(f'pass1 after if form.is_valid==True in CorpInfoUpdateView_admin')
-
-        sendbackReason = self.request.POST.get('sendbackReason_radio', None)
-        sendbackMessage = form.cleaned_data['sendbackMessage']
-
-        if sendbackReason == 'その他':
-          print(f'pass2 after if form.is_valid==True in CorpInfoUpdateView_admin')
-          sendbackReason = form.cleaned_data['sendbackReason_text']
-        else:
-          print(f'pass3 after if form.is_valid==True in CorpInfoUpdateView_admin')
-
-        corpInfo.status = 3 # 差戻のステータスに変更
-        corpInfo.status_char = "差戻"
-        corpInfo.sendbackReason = sendbackReason
-        corpInfo.sendbackMessage = sendbackMessage
-
-        corpInfo.save()
-        print(f'corpInfo.status={corpInfo.status}')
-        # 差戻されたことを通知する
-        context = {
-          'sendbackReasonText': sendbackReason,
-          'sendbackMessage': sendbackMessage,
-        }
-        
-        utils.sendEmail_common(
-          'accounts/admin/mail/corpInfoSendback', '', [corpInfo.applyUser.email], context)
-
-        messages.add_message(self.request,
-          messages.SUCCESS, "差戻の処理が完了しました。") 
-
-        return HttpResponseRedirect(
-          reverse_lazy('accounts:corpInfoUpdate_admin', kwargs={}))
-
-      else:
-        print(f'pass2 after if form.is_valid==False in CorpInfoUpdateView_admin')
-
-
-    #elif next == "BackToList":
-    #
-    #  object_list = QpayTx.objects.filter(
-    #    txStatus_int=2).order_by('-requested_at')
-    #
-    #  paginator = Paginator(object_list, self.paginate_by)
-    #
-    #  context = {
-    #    'object_list': object_list,
-    #    'page_obj': paginator.page(1),
-    #  }
-    #  return TemplateResponse(request, "qpay/admin/txInbox.html", context)
+        'SendbackInfoForm': SendbackInfoForm_qpay(), }
+      return TemplateResponse(request, 'qpay/admin/corpInfoUpdate.html', context)
 
     return HttpResponseBadRequest()
+  
 
 
 class utils:

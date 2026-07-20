@@ -130,81 +130,82 @@
   }
 </style>
 
-<script defer>
+<script>
 //「defer」は、HTMLの解析と並行してJavaScriptの読み込みを裏側で進め、
 // HTMLの読み込み（パース）がすべて完了してからスクリプトを実行します。
 //deferを指定しない場合、ブラウザはJavaScriptの読み込みと実行が終わるまで
 // HTMLの読み込みを一時停止
 
-  document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOMContentLoaded 1 in permissionUpate_admin.html が認識されました');
+ document.addEventListener('DOMContentLoaded', function() {
 
-    var CanApproveAll = document.getElementById("{{ form.canApproveAll.id_for_label }}");
-    var value_CanApproveAll = "{{ editedUser.canApproveAll }}"; // DjangoからJSに値を渡す
+  console.log('DOMContentLoaded 1 in permissionUpate_admin.html が認識されました');
+
+  var CanApproveAll = document.getElementById("{{ form.canApproveAll.id_for_label }}");
+  var value_CanApproveAll = "{{ editedUser.canApproveAll }}"; // DjangoからJSに値を渡す
     
-    console.log(value_CanApproveAll)
+  console.log(value_CanApproveAll)
 
-    if ("{{ editedUser.canApproveAll }}" == "True") {
-      console.log('value_CanApproveAll == on で判定されました');
+  if ("{{ editedUser.canApproveAll }}" == "True") {
+    console.log('value_CanApproveAll == on で判定されました');
 
-      CanApproveAll.checked = true;
+    CanApproveAll.checked = true;
+  } else {
+    CanApproveAll.checked = false;
+  }
+
+  var CanApproveAdd = document.getElementById("{{ form.canApproveChg.id_for_label }}");
+  var value_CanApproveAdd = "{{ editedUser.canApproveChg }}"; // DjangoからJSに値を渡す
+
+  console.log(value_CanApproveAdd)
+
+  if ("{{ editedUser.canApproveChg }}" == "True") {
+    console.log('value_CanApproveAdd == on で判定されました');
+    CanApproveAdd.checked = true;
+  } else {
+    CanApproveAdd.checked = false;
+  }
+
+  var CanApproveQpay = document.getElementById("{{ form.canApproveQpay.id_for_label }}");
+  var value_CanApproveQpay = "{{ editedUser.canApproveQpay }}"; // DjangoからJSに値を渡す
+
+  console.log(value_CanApproveQpay)
+
+  if ("{{ editedUser.canApproveQpay }}" == "True") {
+    console.log('value_CanApproveQpay == on で判定されました');
+    CanApproveQpay.checked = true;
+  } else {
+    CanApproveQpay.checked = false;
+  }
+
+  console.log('DOMContentLoaded 2 in permissionUpate_admin.html が認識されました');
+
+  const SwitchButtons = document.querySelectorAll('input[type="checkbox"]'); // チェックボックスをすべて取得
+
+  SwitchButtons.forEach(eachButton => {
+    console.log('forEachに入りました');
+    const eventLabel = document.querySelector(`label[for="${eachButton.id}"]`);
+
+    if (eachButton.checked) {
+      eventLabel.classList.add('active-underline');
     } else {
-      CanApproveAll.checked = false;
+      eventLabel.classList.remove('active-underline');
     }
+  });
 
-    var CanApproveAdd = document.getElementById("{{ form.canApproveChg.id_for_label }}");
-    var value_CanApproveAdd = "{{ editedUser.canApproveChg }}"; // DjangoからJSに値を渡す
+  SwitchButtons.forEach(eachButton => {
+    eachButton.addEventListener('change', function(event) {
+      const eventButton = event.target;
+      const eventLabel = document.querySelector(`label[for="${eventButton.id}"]`);
 
-    console.log(value_CanApproveAdd)
-
-    if ("{{ editedUser.canApproveChg }}" == "True") {
-      console.log('value_CanApproveAdd == on で判定されました');
-      CanApproveAdd.checked = true;
-    } else {
-      CanApproveAdd.checked = false;
-    }
-
-    var CanApproveQpay = document.getElementById("{{ form.canApproveQpay.id_for_label }}");
-    var value_CanApproveQpay = "{{ editedUser.canApproveQpay }}"; // DjangoからJSに値を渡す
-
-    console.log(value_CanApproveQpay)
-
-    if ("{{ editedUser.canApproveQpay }}" == "True") {
-      console.log('value_CanApproveQpay == on で判定されました');
-      CanApproveQpay.checked = true;
-    } else {
-      CanApproveQpay.checked = false;
-    }
-
-    console.log('DOMContentLoaded 2 in permissionUpate_admin.html が認識されました');
-
-    const SwitchButtons = document.querySelectorAll('input[type="checkbox"]'); // チェックボックスをすべて取得
-
-    SwitchButtons.forEach(eachButton => {
-      console.log('forEachに入りました');
-      const eventLabel = document.querySelector(`label[for="${eachButton.id}"]`);
-
-      if (eachButton.checked) {
+      if (eventButton.checked) {
         eventLabel.classList.add('active-underline');
       } else {
         eventLabel.classList.remove('active-underline');
       }
     });
-
-    SwitchButtons.forEach(eachButton => {
-      eachButton.addEventListener('change', function(event) {
-        const eventButton = event.target;
-        const eventLabel = document.querySelector(`label[for="${eventButton.id}"]`);
-
-        if (eventButton.checked) {
-          eventLabel.classList.add('active-underline');
-        } else {
-          eventLabel.classList.remove('active-underline');
-        }
-      });
-    });
-    
   });
+    
+});
 
 </script>
 

@@ -68,7 +68,8 @@ class InvitationSetsView(generic.UpdateView):
     # <QuerySet [('山下', 'ファルコンズ'), ('瀬戸', 'タイガース'), ]
     # values("team")は、辞書型で取得{'team', 'ファルコンズ'}
 
-    sellEntitysUsers = UserModel.objects.select_related('entity').filter(entity__pk__in=sellEntitys_pkList).values('personname','email','entity__entityname')
+    sellEntitysUsers = UserModel.objects.select_related('entity').filter(
+      entity__pk__in=sellEntitys_pkList).values('personname','email','entity__entityname')
     # 関係しているゲストのユーザー（複数）を取得
 
     # 上記のクエリーのアウトプットを確認したうえで項目を絞る

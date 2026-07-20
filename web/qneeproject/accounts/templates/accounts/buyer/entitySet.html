@@ -90,11 +90,11 @@
 
           <div class="row justify-content-center mt-4 px-4">
             <div class="btn-group btn-group-toggle col-md-10 col-lg-8 col-xl-6"
-              id="id_NewOrNot" data-toggle="buttons">
+              id="id_btnGroup_NewOrNot" data-toggle="buttons">
 
-              <label class="btn btn-secondary px-2" for="id_radio1">
+              <label class="btn btn-secondary px-2" for="id_NewOrNot_A">
                 <input type="radio"
-                  id="id_radio1"
+                  id="id_NewOrNot_A"
                   name="next1"
                   value="ToCreateEntity_{{user.id}}"
                   autocomplete="off">
@@ -102,14 +102,15 @@
               </label>
               <!-- autocompleteは過去の入力情報を自動的に補完する機能-->
           
-              <label class="btn btn-secondary px-2" for="id_radio2">
+              <label class="btn btn-secondary px-2" for="id_NewOrNot_B">
                 <input type="radio"
-                  id="id_radio2"
+                  id="id_NewOrNot_B"
                   name="next1"
                   value="ToAddToEntity"
-                  autocomplete="off">
+                  autocomplete="off"
+                  {% if NewOrNot == 'not' %}checked{% endif %}>
                 既存パートナーに参加
-              </label>         
+              </label> 
             </div>
 
         </div> <!-- end row -->
@@ -163,7 +164,7 @@
                   <input type="text" class="form-control"
                     id="id_SearchInput"
                     name="name_SearchInput"
-                    value="{{form.entityname.value| default:''}}"
+                    value="{{form.entityname.value|default:''}}"
                     placeholder="キーワード入力 （ex. IMAGICA or イマジ or いま）">
                   <button type="button" class="btn btn-primary shadow"
                     name="name_SearchBtn" value="searchStart">検索</button>
@@ -254,7 +255,7 @@
        
 
             <div class="row justify-content-center px-4">
-              <div class="col-6 col-md-5 col-lg-4 col-xl-3 pe-1">
+              <div class="col-6 col-md-5 col-lg-4 col-xl-3 pe-1 mt-2">
                 <label for="{{form.lastname_kana.id_for_label}}" class="form-label mt-1 mb-0">
                   姓（フリガナ）</label>
                 <input type="{{form.lastname_kana.widget.input_type}}" class="form-control"
@@ -263,7 +264,7 @@
                   id="{{form.lastname_kana.id_for_label}}"
                   placeholder="例：ヤマダ">
               </div>
-              <div class="col-6 col-md-5 col-lg-4 col-xl-3 ps-0">
+              <div class="col-6 col-md-5 col-lg-4 col-xl-3 ps-0 mt-2">
                 <label for="{{form.firstname_kana.id_for_label}}" class="form-label mt-1 mb-0">
                   名（フリガナ）</label>
                 <input type="{{form.firstname_kana.widget.input_type}}"
@@ -317,7 +318,7 @@
               <div class="col-md-7 col-lg-6 col-xl-4">
                 <input type="{{form.department.widget.input_type}}" class="form-control"
                   name="{{form.department.name}}"
-                  value="{{form.department.value| default:''}}"
+                  value="{{form.department.value|default:''}}"
                   id="{{form.department.id_for_label}}" >
               </div>
             </div>
@@ -335,7 +336,7 @@
               <div class="col-md-7 col-lg-6 col-xl-4">
                 <input type="{{form.title.widget.input_type}}" class="form-control"
                   name="{{form.title.name}}"
-                  value="{{form.title.value| default:''}}"
+                  value="{{form.title.value|default:''}}"
                   id="{{form.title.id_for_label}}" >
                 </div>
               </div>
@@ -360,7 +361,7 @@
                   value="ToConfirm_{{user.id}}">
                   入力情報の確認へ
                   <span class="ms-1">
-                    <i class="bi bi-send" style="font-size:1.0em; color:rgb(250, 139, 194)"></i>
+                    <i class="bi bi-send" style="font-size:1.0em; color:rgb(248, 211, 230)"></i>
                   </span>
                 </button>
               </div>
@@ -476,101 +477,107 @@
 
 <script>
  
-  document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {
 
-    console.log('DOMContentLoadedが認識されました');
+  console.log('DOMContentLoadedが認識されました');
 
-    var NewOrNot = document.getElementById('id_form_NewOrNot');
-    //var SelectNew = document.getElementById('id_SelectNew');
-    var SearchInput = document.getElementById('id_SearchInput');
-    var BuyerSelect = document.getElementById('id_BuyerSelect');
+  var NewOrNot = document.getElementById('id_form_NewOrNot');
+  //var SelectNew = document.getElementById('id_SelectNew');
+  var SearchInput = document.getElementById('id_SearchInput');
+  var BuyerSelect = document.getElementById('id_BuyerSelect');
 
-    let obj_buyEntityname = JSON.parse('{{ json_buyEntityname|safe }}' || "null");
+  let obj_buyEntityname = JSON.parse('{{ json_buyEntityname|safe }}' || "null");
     
-    var addition1 = document.getElementById('id_addition1');
-    var addition2 = document.getElementById('id_addition2');
+  var addition1 = document.getElementById('id_addition1');
+  var addition2 = document.getElementById('id_addition2');
 
+    
+  if(id_NewOrNot_B.checked) {
+    addition1.style.display = "none";
+    addition2.style.display = "block";
+  }
 
-    NewOrNot.addEventListener('change', (event) => {
-      console.log(event.target.value);
-      if (event.target.value.includes('ToCreateEntity')){
-        console.log('新規エンティティの登録処理.');
-        NewOrNot.submit();
-      };
-      if (event.target.value.includes('ToAddToEntity')){
-        console.log('既存エンティティへの追加処理.');
-        addition1.style.display = "none";
-        addition2.style.display = "block";
-      };
-
-    });
-
-    function normalizeText(text) {
-      console.log('inputイベント内でnormalizeTextが呼ばれました.');
-      return text
-        .normalize("NFKC") // 半角を全角文字に変換
-        .replace(/[\u30a1-\u30f6]/g, match => 
-          String.fromCharCode(match.charCodeAt(0) - 0x60)) // 全角カタカナをひらがなに変換
-        .toLowerCase(); // 英数字を小文字に変換
-    }
-
-    // ★★ 工事中 25/07/19
-    //「Javascriptで入力フォームからリストをリアルタイムで検索する方法」を参照（URLは下記）
-    //https://design-tera.com/blog/archives/6666/
-    SearchInput.addEventListener('input', function() {
-
-      console.log('inputイベントで' + SearchInput.value + 'が認識されました1');
-
-      //const HiddenBuyerOptions = document.getElementById('id_HiddenBuyerSelect').options;
-      var BuyerOptions = document.getElementById('id_BuyerSelect').options;
-      var NormalizedInput = normalizeText(SearchInput.value); // 入力されたクエリを正規化
-      var keywords = NormalizedInput.split(/[\s\u3000]+/).filter(keyword => keyword); // スペースで分割してキーワード配列を生成
-
-      console.log('nomalizeTextにより' + NormalizedInput + 'に変換されました');
-      for (let i=BuyerOptions.length-1 ; i >= 0 ; i--) {
-        BuyerOptions.remove( i );
-      }
-
-      let obj_buyEntityname = JSON.parse('{{ json_buyEntityname|safe }}' || "null");
-      //「safe」はエスケープを無効化する.Django側で''を除いた形で認識する
-      //https://se-memorandum.com/django-safe/
-
-      console.log(obj_buyEntityname);
-      console.log('forEachに入る前です');
-
-      //keyおよびobj_buyEntityname[key]には、entitynameが入る
-      Object.keys(obj_buyEntityname).forEach((key) => {
-
-        matches = keywords.some(keyword => normalizeText(obj_buyEntityname[key]).includes(keyword));
-
-        console.log(key, obj_buyEntityname[key]);
-        if(matches){
-          let option = document.createElement('option');
-          option.value = key;  //option.valueは非表示部。（key, value）のvalueと間違わないように！
-          option.text = obj_buyEntityname[key];         
-          //option.setAttribute("value", key);  //option.valueは非表示部。（key, value）のvalueと間違わないように！
-          //option.appendChild(document.createTextNode(obj_buyEntityname[key]));
-
-          console.log('BuyerOptions=', BuyerOptions);
-          console.log('option.innerHTML=', option.innerHTML);
-
-          BuyerOptions.add(option);
-        }
-      });
-    });
-
-    BuyerSelect.addEventListener('click', (event) => {
-      console.log('BuyerSelect.addEventListener(change)に入りました');
-      SearchInput.value = obj_buyEntityname[event.target.value];  
-    });
-
-
-    // Submitボタンを押下後「しばらくお待ちください。」を表示する
-    document.getElementById('id_PostForm').addEventListener('submit', function() {
-      document.getElementById('loading').style.display = 'block';
-    });
+  NewOrNot.addEventListener('change', (event) => {
+    console.log(event.target.value);
+    if (event.target.value.includes('ToCreateEntity')){
+      console.log('新規エンティティの登録処理.');
+      NewOrNot.submit();
+    };
+    if (event.target.value.includes('ToAddToEntity')){
+      console.log('既存エンティティへの追加処理.');
+      addition1.style.display = "none";
+      addition2.style.display = "block";
+    };
 
   });
+  console.log('pass3');
+
+  function normalizeText(text) {
+    console.log('inputイベント内でnormalizeTextが呼ばれました.');
+    return text
+      .normalize("NFKC") // 半角を全角文字に変換
+      .replace(/[\u30a1-\u30f6]/g, match => 
+        String.fromCharCode(match.charCodeAt(0) - 0x60)) // 全角カタカナをひらがなに変換
+      .toLowerCase(); // 英数字を小文字に変換
+  }
+
+  // ★★ 工事中 25/07/19
+  //「Javascriptで入力フォームからリストをリアルタイムで検索する方法」を参照（URLは下記）
+  //https://design-tera.com/blog/archives/6666/
+  SearchInput.addEventListener('input', function() {
+
+    console.log('inputイベントで' + SearchInput.value + 'が認識されました1');
+
+    //const HiddenBuyerOptions = document.getElementById('id_HiddenBuyerSelect').options;
+    var BuyerOptions = document.getElementById('id_BuyerSelect').options;
+    var NormalizedInput = normalizeText(SearchInput.value); // 入力されたクエリを正規化
+    var keywords = NormalizedInput.split(/[\s\u3000]+/).filter(keyword => keyword); // スペースで分割してキーワード配列を生成
+
+    console.log('nomalizeTextにより' + NormalizedInput + 'に変換されました');
+    for (let i=BuyerOptions.length-1 ; i >= 0 ; i--) {
+      BuyerOptions.remove( i );
+    }
+
+    let obj_buyEntityname = JSON.parse('{{ json_buyEntityname|safe }}' || "null");
+    //「safe」はエスケープを無効化する.Django側で''を除いた形で認識する
+    //https://se-memorandum.com/django-safe/
+
+    console.log(obj_buyEntityname);
+    console.log('forEachに入る前です');
+
+    //keyおよびobj_buyEntityname[key]には、entitynameが入る
+    Object.keys(obj_buyEntityname).forEach((key) => {
+
+      matches = keywords.some(keyword => normalizeText(obj_buyEntityname[key]).includes(keyword));
+
+      console.log(key, obj_buyEntityname[key]);
+      if(matches){
+        let option = document.createElement('option');
+        option.value = key;  //option.valueは非表示部。（key, value）のvalueと間違わないように！
+        option.text = obj_buyEntityname[key];         
+        //option.setAttribute("value", key);  //option.valueは非表示部。（key, value）のvalueと間違わないように！
+        //option.appendChild(document.createTextNode(obj_buyEntityname[key]));
+
+        console.log('BuyerOptions=', BuyerOptions);
+        console.log('option.innerHTML=', option.innerHTML);
+
+        BuyerOptions.add(option);
+      }
+    });
+  });
+
+  BuyerSelect.addEventListener('click', (event) => {
+    console.log('BuyerSelect.addEventListener(change)に入りました');
+    SearchInput.value = obj_buyEntityname[event.target.value];  
+  });
+
+
+  // Submitボタンを押下後「しばらくお待ちください。」を表示する
+  document.getElementById('id_PostForm').addEventListener('submit', function() {
+    document.getElementById('loading').style.display = 'block';
+  });
+
+});
 
 
 </script>

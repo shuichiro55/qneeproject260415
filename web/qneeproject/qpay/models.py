@@ -20,8 +20,11 @@ def user_directory_path(instance, filename):
   print(f'instance.sellerEntity_id={instance.sellEntity_id} in qpay, models.py, user_directory_path')
   return "upload/entity{0}_tx{1}/{2}".format(instance.sellEntity_id, instance.id, user_directory)
 
+
 class TxStatus(models.IntegerChoices):
   """ 状態 """
+  SELLER_DROPPED = -1     # 取下げ
+
   UNPROCESSED = 0         # 未処理
   UNDER_APPLICATION = 1   # 申請中
   BUYER_PENDING = 2       # 申請差戻
@@ -32,8 +35,8 @@ class TxStatus(models.IntegerChoices):
 
   BUYER_DISAPPROVED = -3  # 否認
   QNEE_DISAPPROVED = -5   # 前払謝絶
-
   
+
 class QpayTx(models.Model):
 
   sellEntity = models.ForeignKey(LegalEntity, verbose_name='ゲスト・エンティティ',
@@ -41,16 +44,15 @@ class QpayTx(models.Model):
     related_name='sellEntity_txs',
     on_delete=models.CASCADE)
 
-  sellEntityname = models.CharField('ゲスト・エンティティ名', max_length=150, unique=False, null=False, blank=True)
-  # sellerEntity_id = models.IntegerField('ゲスト・エンティティID', null=False, blank=False, )
+  sellEntityname = models.CharField('ゲスト・エンティティ名',
+    max_length=150, unique=False, null=False, blank=True)
 
   sellUser = models.ForeignKey(CustomUser, verbose_name='ゲスト・ユーザー',
     null=False,
     related_name='sellUser_txs', on_delete=models.CASCADE)
 
-  sellUser_personname =models.CharField('ゲスト・ユーザー名', max_length=150, unique=False, null=False,)
-  # sellerUser_id = models.IntegerField('ゲストID', null=False, blank=False, )
-  # sellUser_email = models.EmailField('ゲスト・メールアドレス', unique=False, null=False, blank=False,)
+  sellUser_personname = models.CharField('ゲスト・ユーザー名',
+    max_length=150, unique=False, null=True, blank=True)
 
   buyEntity = models.ForeignKey(LegalEntity, verbose_name='パートナー・エンティティ',
     null=False,
@@ -63,8 +65,6 @@ class QpayTx(models.Model):
     null=False,
     blank=True,
     default="")
-  #buyer_entity_choice = models.IntegerField(_('パートナー・エンティティ（選択リスト）'), choices=[(idx, f) for idx, f in enumerate(LegalEntity.objects.filter(type1=1).values_list('entityname', flat=True), 1)], default=1)
-  #buyEntity_choice = models.IntegerField(_('お支払者'), default=1)
 
   """ buyUserは、最後に承認・否認した人を登録するようにする """
   buyUser = models.ForeignKey(CustomUser, verbose_name='パートナー・ユーザー',
@@ -76,7 +76,7 @@ class QpayTx(models.Model):
 
   created_at = models.DateTimeField(_('データ作成時点'), default=timezone.now)
   requested_at = models.DateTimeField(_('ご申請時点'), null=True)
-  requested_amount = models.IntegerField(_('ご申請金額（円）'), null=False)
+  requested_amount = models.DecimalField(_('ご申請金額（円）'), max_digits=8, decimal_places=0, null=False)
   exPayment_date = models.DateField(_('当初報酬日'), null=True)
 
 
@@ -85,36 +85,46 @@ class QpayTx(models.Model):
     upload_to = user_directory_path , 
     validators=[FileExtensionValidator(['jpg', 'png', 'jpeg', 'pdf', ])], null=True, default=None) 
 
-  txStatus_int = models.IntegerField(choices=TxStatus.choices, default=1, verbose_name='処理状況 No')
+  txStatus = models.IntegerField(choices=TxStatus.choices, default=0, verbose_name='処理状況 No')
   txStatus_char = models.CharField(max_length=20, null=False, blank=False, default="未処理", verbose_name='処理状況')
   
   #applied_at = models.DateTimeField(_('申請時点'), null=True, blank=True)
   approved_at = models.DateTimeField(_('承認時点'), null=True, blank=True)
-  approved_amount = models.IntegerField(_('承認金額（円）'), null=True)
+  approved_amount = models.DecimalField(_('承認金額（円）'), max_digits=8, decimal_places=0, null=True, blank=True)
   #advancePayment_date = models.DateField(_('前払日'), null=True)
   # advanced_atがあるの不要
-
-  sendbacked_at = models.DateTimeField(_('差戻時点'), null=True, blank=True)
+ 
   rejected_at = models.DateTimeField(_('否認時点'), null=True, blank=True)
   #updated_at = models.DateTimeField(_('更新時点'), auto_now_add=True)
 
-  """ 前払いに係る項目 """
+  """ 前払い決済に係る項目 """
   advanced_at = models.DateTimeField(_('前払い時点'), null=True, blank=True)
-  advance_amount = models.IntegerField(_('前払い予定額'), null=False, default=0)
-  advance_fee =  models.IntegerField(_('前払い手数料'), null=False, default=0)
+  advance_amount = models.DecimalField(_('前払い予定額'), max_digits=8, decimal_places=0, null=False, default=0)
+  advance_fee =  models.DecimalField(_('前払い手数料'), max_digits=8, decimal_places=0, null=False, default=0)
 
-  referral_fee =  models.IntegerField(_('ご報酬（紹介料）'), null=False, default=0)
-  transfer_fee = models.IntegerField(_('振込手数料'), null=False, default=0)
-  total_fee = models.IntegerField(_('合計手数料'), null=False, default=0)
+  referral_fee =  models.DecimalField(_('ご報酬（紹介料）'), max_digits=8, decimal_places=0, null=False, default=0)
+  transfer_fee = models.DecimalField(_('振込手数料'), max_digits=8, decimal_places=0, null=False, default=0)
+  total_fee = models.DecimalField(_('合計手数料'), max_digits=8, decimal_places=0, null=False, default=0)
 
-  transfer_amount =  models.IntegerField(_('送金額'), null=False, default=0)
+  transfer_amount =  models.DecimalField(_('送金額'), max_digits=8, decimal_places=0, null=False, default=0)
 
-  sendbackReason = models.CharField(
-    '差戻理由', max_length=100, unique=False, null=True, blank=True,)
+  # 最新の差戻情報へのリンク。
+  # sendbackInfoからForeignkeyでの参照がある為、文字列で参照（循環回避）
+  sendbackInfo_admin = models.OneToOneField('SendbackInfo',
+    verbose_name='差戻情報（Qnee）',
+    null=True, blank=True, on_delete=models.SET_NULL,
+    related_name='adminSendbackInfo_qpaytx')
+
+  sendbackInfo_buyer = models.OneToOneField('SendbackInfo',
+    verbose_name='差戻情報（パートナー）',
+    null=True, blank=True, on_delete=models.SET_NULL,
+    related_name='buyerSendbackInfo_qpaytx')
   
-  sendbackMessage = models.TextField(
-    '差戻理由', max_length=200, unique=False, null=True, blank=True,)
-
+  # 最新の会社情報更新の申請情報へのリンク。
+  #   # sendbackInfoからForeignkeyでの参照がある為、文字列で参照（循環回避）
+  clearingInfo = models.ForeignKey('ClearingInfo', verbose_name='最新清算リンク',
+    null=True, blank=True, on_delete=models.SET_NULL, related_name='clearingInfo_qpaytx')
+  
 
   def save(self, *args, **kwargs):
 
@@ -139,3 +149,60 @@ class QpayTx(models.Model):
 
   def __str__(self):
     return f'{self.buyEntity}-{self.sellEntity}'
+  
+
+#class SendbackStatus(models.IntegerChoices):
+#  " 状態 "
+#  HISTORY = -1
+#  AFTER_SENDBACK = 1  # 差戻中
+#  AFTER_RESPONSE = 2  # 再申請後
+
+
+class SendbackInfo(models.Model):
+
+  qpaytx = models.ForeignKey(QpayTx, verbose_name='QPAY取引',
+    null=True, blank=True, on_delete=models.CASCADE)
+  
+  created_at = models.DateTimeField(_('差戻時点'), null=True, blank=True)
+  
+  CHOICES = ((1, 'パートナー'), (3, 'Qnee'))
+  type1_frWho = models.IntegerField(default=None, null=True, blank=True, choices=CHOICES)
+
+  #status = models.IntegerField(
+  #  choices=SendbackStatus.choices, default=1, verbose_name='処理状況 No')
+
+  reason = models.CharField(
+    '差戻理由', max_length=100,
+    unique=False, null=True, blank=True,)
+
+  message = models.TextField(
+    'メッセージ', max_length=200,
+    unique=False, null=True, blank=True,)  
+
+
+class ClrStatus(models.IntegerChoices):
+  """ 状態 """
+  TBD = 1     # 未清算
+  PENDING = 2 # 保留
+  DONE = 3    # 清算済み
+
+""" パートナーにおける前払い（Qnee立替分）の清算状況を管理 """
+class ClearingInfo(models.Model):
+
+  buyEntity = models.ForeignKey(LegalEntity,
+    verbose_name='パートナー',
+    null=True, blank=True, default=None,
+    on_delete=models.CASCADE)
+
+  advancedTerm_YYYYMM = models.CharField(
+    '前払い年月', max_length=6, unique=False, null=True, blank=True,)
+  
+  status = models.IntegerField(
+    '清算状況', choices=TxStatus.choices, default=1,)
+  
+  amount_toBeCleared = models.DecimalField(_('清算必要額（円）'), max_digits=8, decimal_places=0, null=True, default=0)
+  # 清算必要額を格納する
+
+  updated_at = models.DateTimeField(_('更新日'), null=True, default=None)
+  cleared_at = models.DateTimeField(_('清算日'), null=True, default=None)
+  # 清算（パートナー⇒Qnee）がなされた日を保存

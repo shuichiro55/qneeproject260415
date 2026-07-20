@@ -78,13 +78,14 @@
           <!-- パートナーの企業情報を入力するフォーム -->
           <div class="row justify-content-center mt-3 mb-2">
             <div class="d-flex col-md-10 col-lg-8 col-xl-6 text-left">
-              <i class="bi bi-building" style="font-size:1.5em; color:darkred;"></i>
+              <i class="bi bi-building-fill"
+                style="font-size:1.5em; color:deeppink;"></i>
               <h6 class="text-secondary ms-3"><b>会社情報</b></h6>
             </div>
           </div>  
           
           <div class="form-group row justify-content-center px-4">
-            <label class="col-md-3 col-lg-2 col-form-label"
+            <label class="col-md-3 col-lg-2 col-form-label pb-1"
               for="{{form.entityname.id_for_label}}">
               企業名
             </label>
@@ -105,7 +106,7 @@
   
 
           <div class="form-group row justify-content-center px-4">
-            <label class="col-md-3 col-lg-2 col-form-label"
+            <label class="col-md-3 col-lg-2 col-form-label pb-1"
               for="{{form.representitive.id_for_label}}" >
               代表者名
             </label>
@@ -125,7 +126,7 @@
           {% endif %}
 
           <div class="form-group row justify-content-center px-4">
-            <label class="col-md-3 col-lg-2 col-form-label"
+            <label class="col-md-3 col-lg-2 col-form-label pb-1"
               for="{{form.tel_entity.id_for_label}}" >
               電話番号（代表）
             </label>
@@ -150,7 +151,7 @@
           <span class="p-country-name" style="display:none;">Japan</span>
               
           <div class="form-group row justify-content-center px-4">
-            <label class="col-md-3 col-lg-2 col-form-label"
+            <label class="col-md-3 col-lg-2 col-form-label pb-1"
               for="{{form.zip_entity.id_for_label}}" >
               郵便番号〒
             </label>
@@ -173,7 +174,7 @@
 
           <div class="form-group row justify-content-center px-4">
             <label
-              class="col-md-3 col-lg-2 col-form-label"
+              class="col-md-3 col-lg-2 col-form-label pb-1"
               for="{{form.address1.id_for_label}}" >
               住所
             </label>
@@ -194,7 +195,7 @@
           {% endif %}
 
           <div class="form-group row justify-content-center px-4">
-            <label class="col-md-3 col-lg-2 col-form-label"
+            <label class="col-md-3 col-lg-2 col-form-label py-0"
               for="{{form.address2.id_for_label}}" >
             </label>
             <div class="col-md-7 col-lg-6 col-xl-4">
@@ -213,7 +214,7 @@
           {% endif %}
 
           <div class="form-group row justify-content-center px-4">
-            <label class="col-md-3 col-lg-2 col-form-label"
+            <label class="col-md-3 col-lg-2 col-form-label py-0"
               for="{{form.address3.id_for_label}}" >
             </label>
             <div class="col-md-7 col-lg-6 col-xl-4">
@@ -237,14 +238,15 @@
           <!-- パートナー企業の担当者情報を入力するフォーム -->
           <div class="row justify-content-center mt-4 mb-2">
             <div class="d-flex col-md-10 col-lg-8 col-xl-6 text-left">
-              <i class="bi bi-person-circle" style="font-size:1.5em; color:darkred;"></i>
+              <i class="bi bi-file-person-fill"
+                style="font-size:1.5em; color:deeppink;"></i>
               <h6 class="text-secondary ms-3"><b>お申込者の情報</b></h6>
             </div>
           </div>  
 
           <div class="row justify-content-center px-4">
             <div class="col-6 col-md-5 col-lg-4 col-xl-3 pe-1">
-              <label for="{{form.lastname.id_for_label}}" class="form-label mt-1">
+              <label for="{{form.lastname.id_for_label}}" class="form-label mb-0">
                 姓</label>
               <input type="{{form.lastname.widget.input_type}}"
                 class="form-control"
@@ -255,29 +257,30 @@
             </div>
 
             <div class="col-6 col-md-5 col-lg-4 col-xl-3 ps-0">
-              <label for={{form.firstName.id_for_label}} class="form-label mt-1">
+              <label for={{form.firstname.id_for_label}} class="form-label mb-0">
                 名</label>
-              <input type="{{form.firstName.widget.input_type}}" class="form-control"
-                name="{{form.firstName.name}}"
-                value="{{form.firstName.value|default:''}}"
-                id="{{form.firstName.id_for_label}}"
+              <input type="{{form.firstname.widget.input_type}}"
+                class="form-control"
+                name="{{form.firstname.name}}"
+                value="{{form.firstname.value|default:''}}"
+                id="{{form.firstname.id_for_label}}"
                 placeholder="例：次郎">
             </div>
           </div> <!-- end of row -->
 
-          {% if form.lastname.errors or form.firstName.errors %}
+          {% if form.lastname.errors or form.firstname.errors %}
             <div class="row justify-content-center px-4">
               <div class="col-6 col-md-5 col-lg-4 col-xl-3 pe-1 text-left" style="color:red;">
                 {{ form.lastname.errors.as_text }}</div>
               <div class="col-6 col-md-5 col-lg-4 col-xl-3 ps-0 text-left" style="color:red;">
-                {{ form.firstName.errors.as_text }}</div>
+                {{ form.firstname.errors.as_text }}</div>
             </div>
           {% endif %}
 
 
           <div class="row justify-content-center px-4">
-            <div class="col-6 col-md-5 col-lg-4 col-xl-3 pe-1">
-              <label for="{{form.lastname_kana.id_for_label}}" class="form-label mt-1">
+            <div class="col-6 col-md-5 col-lg-4 col-xl-3 pe-1 mt-2">
+              <label for="{{form.lastname_kana.id_for_label}}" class="form-label mb-0">
                 姓（フリガナ）</label>
               <input type="{{form.lastname_kana.widget.input_type}}" class="form-control"
                 name="{{form.lastname_kana.name}}"
@@ -286,23 +289,23 @@
                 placeholder="例：ヤマダ">
             </div>
 
-            <div class="col-6 col-md-5 col-lg-4 col-xl-3 ps-0">
-              <label for={{form.firstName_kana.id_for_label}} class="form-label mt-1">
+            <div class="col-6 col-md-5 col-lg-4 col-xl-3 ps-0 mt-2">
+              <label for={{form.firstname_kana.id_for_label}} class="form-label mb-0">
                 名（フリガナ）</label>
-              <input type="{{form.firstName_kana.widget.input_type}}" class="form-control"
-                name="{{form.firstName_kana.name}}"
-                value="{{form.firstName_kana.value|default:''}}"
-                id="{{form.firstName_kana.id_for_label}}"
+              <input type="{{form.firstname_kana.widget.input_type}}" class="form-control"
+                name="{{form.firstname_kana.name}}"
+                value="{{form.firstname_kana.value|default:''}}"
+                id="{{form.firstname_kana.id_for_label}}"
                 placeholder="例：ジロウ">
             </div>
           </div>
 
-          {% if form.lastname_kana.errors or form.firstName_kana.errors %}
+          {% if form.lastname_kana.errors or form.firstname_kana.errors %}
             <div class="row justify-content-center px-4">
               <div class="col-6 col-md-5 col-lg-4 col-xl-3 pe-1 text-left" style="color:red;">
                 {{ form.lastname_kana.errors.as_text }}</div>
               <div class="col-6 col-md-5 col-lg-4 col-xl-3 ps-0 text-left" style="color:red;">
-                {{ form.firstName_kana.errors.as_text }}</div>
+                {{ form.firstname_kana.errors.as_text }}</div>
             </div>
           {% endif %}
 
@@ -314,7 +317,7 @@
 
 
           <div class="form-group row justify-content-center px-4">
-            <label class="col-md-3 col-lg-2 col-form-label"
+            <label class="col-md-3 col-lg-2 col-form-label pb-1"
               for="{{form.tel_user.id_for_label}}" >
               あなたの電話番号</label>
             <div class="col-md-7 col-lg-6 col-xl-4">
@@ -333,7 +336,7 @@
           {% endif %}
 
           <div class="form-group row justify-content-center px-4">
-            <label class="col-md-3 col-lg-2 col-form-label"
+            <label class="col-md-3 col-lg-2 col-form-label pb-1"
               for='{{form.department.id_for_label}}' >
               部署</label>
             <div class="col-md-7 col-lg-6 col-xl-4">
@@ -352,7 +355,7 @@
           {% endif %}
 
           <div class="form-group row justify-content-center px-4">
-            <label class="col-md-3 col-lg-2 col-form-label"
+            <label class="col-md-3 col-lg-2 col-form-label pb-1"
               for="{{form.title.id_for_label}}" >
               役職</label>
             <div class="col-md-7 col-lg-6 col-xl-4">
@@ -407,11 +410,13 @@
         <div class="col-md-9 col-lg-6">
 
           <div class="d-flex justify-content-start mt-3">
-            <i class="bi bi-building" style="font-size:1.5em; color:darkred;"></i>
+            <i class="bi bi-building-fill"
+              style="font-size:1.5em; color:deeppink;"></i>
             <h6 class="text-secondary ms-2"><b>会社情報</b></h6>
           </div>  
 
-          <table class="table table-sm bg-light bg-light table-bordered border-primary-subtle bg-light">
+          <table class="table table-sm bg-light
+            table-bordered border-primary-subtle shadow ms-1">
             <tbody class="text-center">
               <tr>
                 <th scope="col" width="33%" class="table-primary">会社名</th>
@@ -434,15 +439,17 @@
           <hr>
           
           <div class="d-flex justify-content-start mt-3">
-            <i class="bi bi-person" style="font-size:1.5em; color:darkred;"></i>
+            <i class="bi bi-file-person-fill"
+              style="font-size:1.5em; color:deeppink;"></i>
             <h6 class="text-secondary ms-2"><b>お申込者の情報</b></h6>
           </div>  
           
-          <table class="table table-sm bg-light table-bordered border-primary-subtle table-responsive bg-light">
+          <table class="table table-sm bg-light
+            table-bordered border-primary-subtle table-responsive shadow ms-1">
             <tbody class="text-center">
               <tr>
                 <th scope="col" width="33%" class="table-primary">お名前</th>
-                <td>{{ form.lastname.value }}　{{ form.firstName.value }}</td></tr>
+                <td>{{ form.lastname.value }}　{{ form.firstname.value }}</td></tr>
               <tr>
                 <th scope="col" width="33%" class="table-primary">電話番号</th>
                 <td>{{ form.tel_user.value }}</td></tr>

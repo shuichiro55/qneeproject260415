@@ -1,0 +1,323 @@
+{% extends "seller/index/base_qconnect.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="d-flex gap-1 position-fixed bottom-0 start-50 translate-middle-x mb-4"
+  style="z-index:1000;; margin-left:-6px;">
+
+  <a href="{% url 'accounts:login_seller' %}"
+    class="btn btn-primary btn-lg rounded-1 text-center px-0 mx-0 shadow"
+    style="font-size:1.05m; max-height:45px; min-width:180px;"
+    data-bs-toggle="modal"
+    data-bs-target="#imageModal">
+    何が違うの？</a>
+
+  <a href="{% url 'accounts:login_seller' %}"
+    class="btn btn-primary btn-lg rounded-1 px-0 mx-0 shadow"
+    style="font-size:1.05em; max-height:45px; min-width:210px">
+    キユーニーを利用する</a>
+</div>
+
+<!-- モーダル・ダイアログ -->
+<div class="modal fade"
+  id="imageModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog"> <!-- 大きさ指定なしは「Medium」 -->
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h6 class="modal-title">ファクタリングとどこが違うの？</h6>
+          <!-- 閉じるボタン: data-bs-dismiss="modal" が重要 -->
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body p-0">
+        <img src="{% static 'images/aboutQneePay_forGuest_1_20260504.png' %}"
+          class="img-fluid py-0" alt="拡大画像">
+      </div>
+
+      <div class="modal-body mt-1 p-0">
+        <img src="{% static 'images/aboutQneePay_forGuest_2_20260504.png' %}"
+          class="img-fluid" alt="拡大画像">
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="container-fluid p-0 m-0 position-relative">
+
+<!-- <section class="home-slider" id="home"> -->
+  
+  <div class="ParaImage-left bg1 p-0 m-0 text-center" style="width:100vw">
+
+    <div class="bg-overlay2"></div>
+
+    <div class="container" style="height:100%;">
+      <div class="row mt-4 pt-2 px-3" 
+        id="page1-copy-head"
+        style="color: #fff;
+        display: inline-block;
+        font-size: clamp(1.2em, 1.0em + 0.7vh, 2.0em);
+        background-image: linear-gradient(90deg, rgb(150, 127, 195), rgb(147, 171, 226) 50%, #fff 50%, #fff);
+        background-size: 200% 100%;">
+        <p class="text-center"><b>
+          取引先がキユーニー会員なら<br>
+          報酬を早く受け取れます</b></p>
+      </div>
+
+      <div class="container mt-3" style="height:100%;">
+        <div class="row text-center pt-5"
+          style="color: #fff;
+            font-size: clamp(1.0em, 0.9em + 0.7vh, 2.0em);"
+          id="page1-copy-body1">
+
+          <p class="text-center">
+            報酬がもっと早くほしい！ <br>
+            そんなときはありませんか？<br>
+            <br>
+            フリーランスの方にとって、<br>
+            カードや銀行の審査が厳しい、<br>
+            ファクタリングは手数料が高い、<br>
+            そんなご経験があるかもしれません。<br>
+            <br>
+          </p>
+        </div>
+
+        <div class="row text-center"
+          style="color: #fff;
+          font-size: clamp(1.0em, 0.9em + 0.7vh, 2.0em);"
+          id="page1-copy-body2" >
+          <p class="text-center">
+            お取引先はキユーニー会員であれば、<br>
+            すぐに報酬を手にすることができます。<br>
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="ParaContent">
+    <div class="container">
+      <!-- <h3>Lorem ipsum dolor sit amet</h3>
+      <p>Sed ut perspiciatis unde omnis iste natus error sit volupt</p>
+      -->
+    </div>
+  </div>
+
+  <div class="ParaVideo">
+    <video class="w-100" id="paravideo" autoplay muted loop>
+      <source 
+        src="static/images/qconnect/bg-productLP-buyer2_2.mp4"
+        type="video/mp4">
+    </video>
+    <!-- <h2>Vedio Background Parallax</h2>-->
+
+    <div class="row justify-content-center text-white pt-5">
+      <div class="copy-wrapper px-0 ">
+
+        <div class="copy">
+          <div class="container text-center pt-5">
+            <p class="copy-head"
+              id="page2-copy-head1" 
+              style="color: #fff;
+                display:inline-block;
+                background-image: linear-gradient(90deg, rgb(150, 127, 195), rgb(147, 171, 226) 50%, #fff 50%, #fff);
+                background-size:200% 100%;
+                padding:.5rem 1rem;">
+              取引先に弱みを握られる？
+            </p>
+          </div>
+  
+          <!-- <p class="copy-head" id="page2-copy-head" style="line-height:45px;" >
+            皆さまへのお願い
+          </p> -->
+
+          <p class="copy-body-m" id="page2-copy-body1">
+            <br>
+            いえいえ、そうはなりません！<br>
+            <br>
+            取引先はあなたの働く環境を支援して、<br>
+            よい関係を築きたいと思っています<br>
+            <br>
+          </p>
+
+          <div class="container text-center">
+            <p class="copy-head"
+              id="page2-copy-head2" 
+              style="color: #fff;
+                display:inline-block;
+                background-image: linear-gradient(90deg, rgb(150, 127, 195), rgb(147, 171, 226) 50%, #fff 50%, #fff);
+                background-size:200% 100%;
+                padding:.5rem 1rem;">
+              あなたは報酬の存在を示すだけ
+            </p>
+          </div>
+
+          <!-- <p class="copy-head" id="page2-copy-head2">
+            Qneeが報酬を立て替えます
+          </p> -->
+
+          <p class="copy-body-m" id="page2-copy-body2">
+            <br>
+            あなたはゲスト登録し、<br>
+            報酬があること示すだけで<br>
+            すぐに報酬を手にすることができます<br>
+            <br><br><br><br>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ParaContent">
+    <div class="container">
+      <!--
+      <h3>Lorem ipsum dolor sit amet</h3>
+      <p>Sed ut perspiciatis unde omnis iste natus error sit volupt</p>
+      -->
+    </div>
+  </div>
+
+  <div class="ParaImage-center bg2" style="width:100vw"  id="bg2">
+    <div class="bg-overlay2"></div>
+
+    <div class="copy-wrapper align-items-start pt-5">
+
+      <div class="container">
+        <div class="row justify-content-center mt-5">
+          <div class="col mt-5">
+            <p class="copy-head"
+              id="page3-copy-head"
+              style="line-height:50px;">ご利用にかかる手数料</p>
+            <p class="copy-body-m" id="page3-copy-body1">
+
+              次のご利用手数料を設定しています。<br>
+              初回は優待特典として手数料はゼロ<br>
+            </p>
+            <p class="copy-body-m" id="page3-copy-body2">
+              皆さまのご利用はサービス向上の機会、<br>
+              その御礼として手数料を下げています<br>
+              
+            </p>
+            <p class="copy-body-m" id="page3-copy-body3">
+            </p>
+          </div>
+        </div>
+
+        <div class="row justify-content-center mt-4">
+          <div class="col-md-8 col-lg-8 col-xl-6">
+            <table class="table table-sm table-striped table-bordered table-responsive bg-light">
+
+              <tbody class="text-center">
+                <thead>
+                  <tr class="table-primary" style="text-align:center">
+                    <th width="30%"></th>
+                    <th width="37%" style="text-align:center; vertical-align:middle;">
+                      利用手数料</th>
+                    <th width="38%" style="text-align:center; vertical-align:middle;">
+                      基本料金</th>
+                  </tr>
+                </thead>
+                <tr class="table-danger">
+                  <td width="25%" style="vertical-align:middle;">
+                    初回</td>
+                  <td width="37%" style="text-align:center; vertical-align:middle;">
+                    なし</td>
+                  <td width="38%" style="text-align:center; vertical-align:middle;">
+                    なし</td>
+                </tr>
+                <tr>
+                  <td width="25%" style="vertical-align:middle;">
+                    試運転期<br>～2027年</td>
+                  <td width="37%" style="text-align:center; vertical-align:middle;">
+                    前払い額の3.0%</td>
+                  <td width="38%" style="text-align:center; vertical-align:middle;">
+                    なし</td>
+                </tr>
+                <tr>
+                  <td width="25%" style="vertical-align:middle;">通常価格</td>
+                  <td width="37%" style="text-align:center; vertical-align:middle;">前払い額の5.0%</td>
+                  <td width="38%" style="text-align:center; vertical-align:middle;">なし</td>
+                </tr>
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}
+
+{% block extrajs %}
+
+<script>
+
+  const page1_head = document.querySelector('#page1-copy-head');
+  const page1_body1 = document.querySelector('#page1-copy-body1');
+  const page1_body2 = document.querySelector('#page1-copy-body2');
+
+  const keyframes = {
+    color:['transparent', '#fff'], backgroundPosition: ['100% 0', '0 0'],
+  }
+  const options = {
+    duration: 1000, easing: 'ease',
+  }
+  const options2 = {
+    duration: 1000, delay: 1000, easing: 'ease-in',
+  }
+
+  page1_head.animate(keyframes, options);
+  page1_body1.animate({opacity: [0, 1], translate: ['0 30px',0]}, 2000);
+  page1_body2.animate({opacity: [0, 1], translate: ['0 25px',0]}, 2000);
+
+
+  const page2_head1 = document.querySelector('#page2-copy-head1');
+  const page2_head2 = document.querySelector('#page2-copy-head2');
+  const page2_body1 = document.querySelector('#page2-copy-body1');
+  const page2_body2 = document.querySelector('#page2-copy-body2');
+
+  const showPage2 = () => {
+
+    page2_head1.animate(keyframes, options);  
+    page2_body1.animate({opacity:[0, 1], translate:['0 30px',0], }, 2000);
+
+    page2_head2.animate(keyframes, options2);
+    page2_body2.animate({opacity:[0, 1], translate:['0 30px',0], }, 3000);
+  };
+
+  const page2_Observer = new IntersectionObserver(showPage2);
+  page2_Observer.observe(document.querySelector('#page2-copy-body1'));
+
+
+  const page3_body1 = document.querySelector('#page3-copy-body1');
+  const page3_body2 = document.querySelector('#page3-copy-body2');
+  const page3_body3 = document.querySelector('#page3-copy-body3');
+
+  const showPage3 = () => {
+
+    page3_body1.animate({opacity:[0, 1], translate:['0 30px',0], }, 2000);
+    page3_body2.animate({opacity:[0, 1], translate:['0 30px',0], }, 2000);
+    page3_body3.animate({opacity:[0, 1], translate:['0 30px',0], }, 3000);
+
+    console.log('見出しの背景を伸ばす');
+  };
+
+  const bg2_Observer = new IntersectionObserver(showPage3);
+  bg2_Observer.observe(document.querySelector('#bg2'));
+
+  let tooltipTriggerList = [].slice.call(document.querySelectorAll('{data-bs-toggle="tooltip"}'));
+  let tooltipList = tooltipTriggerList.map(function (tooltipTriggerElem){
+    return new bootstrap.Tooltip(tooltipTriggerElem)
+  });
+
+</script>
+
+{% endblock %}

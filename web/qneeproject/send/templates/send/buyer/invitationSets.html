@@ -358,200 +358,199 @@
 
       {% csrf_token %}
 
-    <!-- 未登録ユーザーのファイル入力を選択後、ファイルタイプを選択するパーツ -->
-    <span id="id_addition_Who5" style="display: none;">
+      <!-- 未登録ユーザーのファイル入力を選択後、ファイルタイプを選択するパーツ -->
+      <span id="id_addition_Who5" style="display: none;">
 
-      <div class="row justify-content-center mt-1">
-        <div class="triangle triangle-bottom">
+        <div class="row justify-content-center mt-1">
+          <div class="triangle triangle-bottom">
+          </div>
         </div>
-      </div>
 
-      {% if step_fileUp == 1 %}
-        <div class="row justify-content-center mt-1 mx-2">
-          <div class="col-md-8 col-lg-6">
+        {% if step_fileUp == 1 %}
+          <div class="row justify-content-center mt-1 mx-2">
+            <div class="col-md-8 col-lg-6">
 
-           <div class="col-md-8 col-lg-6">
-              <h6 class="control-label text-secondary"><b>ファイルタイプ</b></h6>
-            </div>
-
-            <div class="bg-light border border-secondary-subtle rounded mx-4 px-5 py-1 mb-1 ">
-
-              <div class="form-group" id="id_FileType">
-                <div class="d-flex justify-content-center">
-                  <div class="radio me-4">
-                    <input class="radio" type="radio"
-                      id="id_FileType_A"
-                      name="{{addFileUpForm.fileType.name}}"
-                      value="excel"
-                      {% if FileType == 'excel' %}checked{% endif %}>
-
-                      <!-- 補足ServInfoMailSetsviewでrequest.POST.get('name_FileType')で取得 -->
-                      <!-- 選択されているもののvalueで設定されている値を取得される -->
-
-                    <label class="radio text-secondary ms-2" for="id_FileType_A">
-                      エクセル
-                    </label>
-                  </div>
-                  <div class="radio ms-4">
-                    <input class="radio" type="radio"
-                      id="id_FileType_B"
-                      name="{{addFileUpForm.fileType.name}}"
-                      value="csv"
-                      {% if FileType == 'csv' %}checked{% endif %}>
-                    <label class="radio text-secondary ms-2" for="id_FileType_B">
-                      ＣＳＶ
-                    </label>
-                  </div> <!-- end of form-check -->
-                </div> <!-- end of d-flex -->
-              </div> <!-- end of form-group -->
-            </div>
-          </div> <!-- end of col -->
-        </div> <!-- end of row -->
-      {% endif %}
-    </span>
-
-
-    <span id="id_addition_Who6" style="display: none;">
-
-      {% if step_fileUp == 1 %}
-
-        <div class="row justify-content-center mt-2 mx-2">
-          <div class="col-md-8 col-lg-6">
-
-            {% if addFileUpForm.addFile.errors %}
-              <div style="color:red;">{{ addFileUpForm.addFile.errors.as_text }}<br></div>
-            {% endif %}
-
-            <div class="row justify-content-center mx-4">
-              <input type="file" class="form-control"
-                name="{{addFileUpForm.addFile.name}}"
-                value="{{addFileUpForm.addFile.value|default:''}}"
-                placeholder="アップロードするファイルを指定してください"
-                id="{{addFileUpForm.addFile.id_for_label}}" >
-            </div>
-
-            <div class="d-flex justify-content-center mt-3 pt-3">
-              <!--
-              <button type="submit" class="btn btn-outline-primary ms-1"
-                name="next1"
-                value="ToPreviewAddFile"
-                data-bs-toggle="modal"
-                data-bs-target="#uploadPreviewModal">
-                プレビュー
-              </button>
-              -->
-              <button type="submit" class="btn btn-primary ms-1"
-                name="nextWho_fileInput"
-                value="ToUploadAddFile">
-                内容を確認したうえで保存します
-              </button>
-            </div> <!-- end of d-flex -->
-          </div> <!-- end of col -->
-        </div> <!-- end of row -->
-
-      {% endif %}  
-
-      {% if step_fileUp == 2 %}
-
-        <div class="row justify-content-center mt-3 mx-2">
-          <div class="col-md-8 col-lg-6">
-
-            <div class="d-flex justify-content-start">
-              <i class="bi bi-record2-fill" style="font-size:1.5em; color:deeppink;"></i>
-              <h6 class="text-secondary ms-1 me-2"><b>名前を付けてリストを保存</b></h6>
-              <i class="bi bi-save-fill" style="font-size:1.3em; color:hsl(327, 98%, 65%);"></i>
-            </div>
-
-            <div class="form-group row justify-content-start mt-1 ms-2">
-              <label class="col-md-4 col-form-label pt-1"
-                for="{{addListNameForm1.listName.id_for_label}}" >
-                <b class="text-secondary">✓ メールリスト名</b></label>
-              <div class="col-md-8">
-                <input type="{{addListNameForm1.listName.widget.input_type}}"
-                  class='form-control pt-1'
-                  name="{{addListNameForm1.listName.name}}"
-                  value="{{addListNameForm1.listName.value|default:''}}"
-                  placeholder=""
-                  id="{{addListNameForm1.listName.id_for_label}}" >
+             <div class="col-md-8 col-lg-6">
+                <h6 class="control-label text-secondary"><b>ファイルタイプ</b></h6>
               </div>
-            </div>
-  
-            {% if addListNameForm1.listName.errors %}
-              <div style="color:red; font-size: 0.8rem;">
-                {{ addListNameForm1.listName.errors.as_text }}<br>
-              </div>
-            {% endif %}
 
-            <div class="row justify-content-end ms-2 mt-3">
-              <div class="col-6 d-grid pe-0 pb-0">
-                <button type="submit" class="btn btn-primary me-1"
-                  name="nextWho_fileInput"
-                  value="ToSaveAddList">
-                  リストを保存
-                  <span class="ms-2">
-                    <i class="bi bi-save"
-                      style="font-size:1.2em; color:rgb(254, 162, 208)"></i>
-                  </span>
-                </button>
+              <div class="bg-light border border-secondary-subtle rounded mx-4 px-5 py-1 mb-1 ">
+
+                <div class="form-group" id="id_FileType">
+                  <div class="d-flex justify-content-center">
+                    <div class="radio me-4">
+                      <input class="radio" type="radio"
+                        id="id_FileType_A"
+                        name="{{addFileUpForm.fileType.name}}"
+                        value="excel"
+                        {% if FileType == 'excel' %}checked{% endif %}>
+
+                        <!-- 補足ServInfoMailSetsviewでrequest.POST.get('name_FileType')で取得 -->
+                        <!-- 選択されているもののvalueで設定されている値を取得される -->
+
+                      <label class="radio text-secondary ms-2" for="id_FileType_A">
+                        エクセル
+                      </label>
+                    </div>
+                    <div class="radio ms-4">
+                      <input class="radio" type="radio"
+                        id="id_FileType_B"
+                        name="{{addFileUpForm.fileType.name}}"
+                        value="csv"
+                        {% if FileType == 'csv' %}checked{% endif %}>
+                      <label class="radio text-secondary ms-2" for="id_FileType_B">
+                        ＣＳＶ
+                      </label>
+                    </div> <!-- end of form-check -->
+                  </div> <!-- end of d-flex -->
+                </div> <!-- end of form-group -->
               </div>
-              <div class="col-6 d-grid ps-0 pe-2">
+            </div> <!-- end of col -->
+          </div> <!-- end of row -->
+        {% endif %}
+      </span>
+
+
+      <span id="id_addition_Who6" style="display: none;">
+
+        {% if step_fileUp == 1 %}
+
+          <div class="row justify-content-center mt-2 mx-2">
+            <div class="col-md-8 col-lg-6">
+
+              {% if addFileUpForm.addFile.errors %}
+                <div style="color:red;">{{ addFileUpForm.addFile.errors.as_text }}<br></div>
+              {% endif %}
+
+              <div class="row justify-content-center mx-4">
+                <input type="file" class="form-control"
+                  name="{{addFileUpForm.addFile.name}}"
+                  value="{{addFileUpForm.addFile.value|default:''}}"
+                  placeholder="アップロードするファイルを指定してください"
+                  id="{{addFileUpForm.addFile.id_for_label}}" >
+              </div>
+
+              <div class="d-flex justify-content-center mt-3 pt-3">
+                <!--
                 <button type="submit" class="btn btn-outline-primary ms-1"
-                  name="nextWho_fileInput"
-                  value="ToUploadAddListAgain">
-                  再アップロード
+                  name="next1"
+                  value="ToPreviewAddFile"
+                  data-bs-toggle="modal"
+                  data-bs-target="#uploadPreviewModal">
+                  プレビュー
                 </button>
+                -->
+                <button type="submit" class="btn btn-primary ms-1"
+                  name="nextWho_fileInput"
+                  value="ToUploadAddFile">
+                  内容を確認したうえで保存します
+                </button>
+              </div> <!-- end of d-flex -->
+            </div> <!-- end of col -->
+          </div> <!-- end of row -->
+
+        {% endif %}  
+
+        {% if step_fileUp == 2 %}
+
+          <div class="row justify-content-center mt-3 mx-2">
+            <div class="col-md-8 col-lg-6">
+
+              <div class="d-flex justify-content-start">
+                <i class="bi bi-record2-fill" style="font-size:1.5em; color:deeppink;"></i>
+                <h6 class="text-secondary ms-1 me-2"><b>名前を付けてリストを保存</b></h6>
+                <i class="bi bi-save-fill" style="font-size:1.3em; color:hsl(327, 98%, 65%);"></i>
               </div>
-              <hr class="mt-1 mb-0 p-0">
-            </div>
 
-            <div class="bg-light mt-2 ms-3 p-1 rounded-1">
-              <div class="table-responsive">
-                <table class="table table-sm bg-light table-bordered border-primary-subtle table-responsive mb-0">
-                  <thead>
-                    <tr class="table-primary" style="font-size:13px">
-                      <th style="text-align:center">No.</th>
-                      <th style="text-align:center">メール</th>
-                      <th style="text-align:center">宛先名</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {% for add in adds %}
-                      <tr style="font-size:13px">
-                        <td style="text-align:center">{{ add.add_id }}</td>
-                        <td style="text-align:left">{{ add.address }}</td>
-                        <td style="text-align:left">{{ add.name }}</td>
+              <div class="form-group row justify-content-start mt-1 ms-2">
+                <label class="col-md-4 col-form-label pt-1"
+                  for="{{addListNameForm1.listName.id_for_label}}" >
+                  <b class="text-secondary">✓ メールリスト名</b></label>
+                <div class="col-md-8">
+                  <input type="{{addListNameForm1.listName.widget.input_type}}"
+                    class='form-control pt-1'
+                    name="{{addListNameForm1.listName.name}}"
+                    value="{{addListNameForm1.listName.value|default:''}}"
+                    placeholder=""
+                    id="{{addListNameForm1.listName.id_for_label}}" >
+                </div>
+              </div>
+  
+              {% if addListNameForm1.listName.errors %}
+                <div style="color:red; font-size: 0.8rem;">
+                  {{ addListNameForm1.listName.errors.as_text }}<br>
+                </div>
+              {% endif %}
+
+              <div class="row justify-content-end ms-2 mt-3">
+                <div class="col-6 d-grid pe-0 pb-0">
+                  <button type="submit" class="btn btn-primary me-1"
+                    name="nextWho_fileInput"
+                    value="ToSaveAddList">
+                    リストを保存
+                    <span class="ms-2">
+                      <i class="bi bi-save"
+                        style="font-size:1.2em; color:rgb(254, 162, 208)"></i>
+                    </span>
+                  </button>
+                </div>
+                <div class="col-6 d-grid ps-0 pe-2">
+                  <button type="submit" class="btn btn-outline-primary ms-1"
+                    name="nextWho_fileInput"
+                    value="ToUploadAddListAgain">
+                    再アップロード
+                  </button>
+                </div>
+                <hr class="mt-1 mb-0 p-0">
+              </div>
+
+              <div class="bg-light mt-2 ms-3 p-1 rounded-1">
+                <div class="table-responsive">
+                  <table class="table table-sm bg-light table-bordered border-primary-subtle table-responsive mb-0">
+                    <thead>
+                      <tr class="table-primary" style="font-size:13px">
+                        <th style="text-align:center">No.</th>
+                        <th style="text-align:center">メール</th>
+                        <th style="text-align:center">宛先名</th>
                       </tr>
-                    {% empty %}
-                      <tr><td colspan="2" class="text-muted">対象がありません。</td></tr>
-                    {% endfor %}
+                    </thead>
+                    <tbody>
+                      {% for add in adds %}
+                        <tr style="font-size:13px">
+                          <td style="text-align:center">{{ add.add_id }}</td>
+                          <td style="text-align:left">{{ add.address }}</td>
+                          <td style="text-align:left">{{ add.name }}</td>
+                        </tr>
+                      {% empty %}
+                        <tr><td colspan="2" class="text-muted">対象がありません。</td></tr>
+                      {% endfor %}
 
-                  </tbody>
-                </table>
-              </div> <!-- end of table-reaponsive -->
+                    </tbody>
+                  </table>
+                </div> <!-- end of table-reaponsive -->
+              </div>
             </div>
           </div>
-        </div>
 
-      {% endif %}
+        {% endif %}
 
-      {% if step_fileUp == 3 %}
+        {% if step_fileUp == 3 %}
 
-        <div class="row justify-content-center mx-2">
-          <div class="col-md-8 col-lg-6">
-            <div class="text-center text-secondary">
-              <br>
-              アドレスリストのデータを保存しました。
-              <br>
-              「リストを選ぶ」で選択すると適用されます。
+          <div class="row justify-content-center mx-2">
+            <div class="col-md-8 col-lg-6">
+              <div class="text-center text-secondary">
+                <br>
+                アドレスリストのデータを保存しました。
+                <br>
+                「リストを選ぶ」で選択すると適用されます。
+              </div>
             </div>
           </div>
-        </div>
 
-      {% endif %}
-    </span>
+        {% endif %}
+      </span>
 
-  </form>
-
+    </form>
 
 
     <!-- 未登録ユーザーの手入力を選択後、入力画面を表示 -->
@@ -729,7 +728,7 @@
                       <tr style="font-size:13px">
                         <td style="text-align:center">{{ add.add_id }}</td>
                         <td style="text-align:left">{{ add.address }}</td>
-                        <td style="text-align:center">{{ add.nam|default:'ー' }}</td>
+                        <td style="text-align:center">{{ add.name|default:'-' }}</td>
                       </tr>
                     {% empty %}
                       <tr><td colspan="2" class="text-muted">対象がありません。</td></tr>
@@ -1092,319 +1091,326 @@
   }
 </style>
 
-<script defer>
+<script>
 //「defer」は、HTMLの解析と並行してJavaScriptの読み込みを裏側で進め、
 // HTMLの読み込み（パース）がすべて完了してからスクリプトを実行します。
 //deferを指定しない場合、ブラウザはJavaScriptの読み込みと実行が終わるまで
 // HTMLの読み込みを一時停止
 
 
-  document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {
 
-    // 3秒後にメッセージを消す
-    setTimeout(function() {
-      console.log('setTimeoutが認識されました');
+  // 3秒後にメッセージを消す
+  setTimeout(function() {
+    console.log('setTimeoutが認識されました');
 
-      var messages = document.querySelectorAll('.messages div');
-      messages.forEach(function(message) {
-        message.style.display = 'none';
-      });
-    }, 3000); // 3000ミリ秒 = 3秒
+    var messages = document.querySelectorAll('.messages div');
+    messages.forEach(function(message) {
+      message.style.display = 'none';
+    });
+  }, 3000); // 3000ミリ秒 = 3秒
 
-    console.log('DOMContentLoadedが認識されました');
+  // Submitボタンを押下後「しばらくお待ちください。」を表示する
+  const postForm = document.getElementById('id_PostForm');
+  if (postForm) {
+    postForm.addEventListener('submit', function() {
+      const loadingEl = document.getElementById('loading');
+      if (loadingEl) {
+        loadingEl.style.display = 'block';
+      }
+    });
+  }
+  
+  console.log('DOMContentLoadedが認識されました');
 
-    var WhoWhenWhat = document.getElementById('id_WhoWhenWhat');
+  var WhoWhenWhat = document.getElementById('id_WhoWhenWhat');
 
-    var MakeOrSelect = document.getElementById('id_MakeOrSelect');
-    //var InputOrSelect = document.getElementById('id_InputOrSelect');
-    var FileOrManual = document.getElementById('id_FileOrManual');
-    var FileType = document.getElementById('id_FileType');
-    var ToUploadAgain = document.getElementById('id_ToUploadAgain');
+  var MakeOrSelect = document.getElementById('id_MakeOrSelect');
+  //var InputOrSelect = document.getElementById('id_InputOrSelect');
+  var FileOrManual = document.getElementById('id_FileOrManual');
+  var FileType = document.getElementById('id_FileType');
+  var ToUploadAgain = document.getElementById('id_ToUploadAgain');
 
-    var NewItemInput = document.getElementById('id_NewItemInput');
-    var NewItemAddBtn = document.getElementById('id_NewItemAddBtn');
-    var FormList = document.getElementById('id_FormList');
-    var ListOfListName = document.getElementById('id_ListOfListName');
-    var SelectedListTBody = document.getElementById('id_SelectedListTableBody');
+  var NewItemInput = document.getElementById('id_NewItemInput');
+  var NewItemAddBtn = document.getElementById('id_NewItemAddBtn');
+  var FormList = document.getElementById('id_FormList');
+  var ListOfListName = document.getElementById('id_ListOfListName');
+  var SelectedListTBody = document.getElementById('id_SelectedListTableBody');
 
     
-    //var NewOrNot2 = document.getElementById('id_NewOrNot2');
-    var RepeatOnOff = document.getElementById('id_RepeatOnOff');
+  //var NewOrNot2 = document.getElementById('id_NewOrNot2');
+  var RepeatOnOff = document.getElementById('id_RepeatOnOff');
 
-    var flag_appliedList = "{{flag_appliedList}}" /* 適用中のリスト有無（0:なし、1:あり） */     
-    var flag_manualInput = "{{flag_manualInput}}" /* 手入力処理の段階（1:入力、2:確認） */     
+  var flag_appliedList = "{{flag_appliedList}}" /* 適用中のリスト有無（0:なし、1:あり） */     
+  var flag_manualInput = "{{flag_manualInput}}" /* 手入力処理の段階（1:入力、2:確認） */     
 
-    var addition_Who1 = document.getElementById('id_addition_Who1'); /* 適用中のリストの表示 */
-    var addition_Who2 = document.getElementById('id_addition_Who2'); /* 「登録ユーザー」選択後⇒データから取得 */
-    var addition_Who4 = document.getElementById('id_addition_Who4'); /* 「未登録ユーザー」選択後⇒「手入力／ファイル入力」選択 */
-    var addition_Who5 = document.getElementById('id_addition_Who5'); /* 「手入力」選択後⇒「手入力画面」 */
-    var addition_Who6 = document.getElementById('id_addition_Who6'); /* 「ファイル入力」選択後⇒「エクセル／CSV」選択 */
-    var addition_Who7_1 = document.getElementById('id_addition_Who7_1'); /* 「ファイルアップロード」 */
-    var addition_Who7_2 = document.getElementById('id_addition_Who7_2'); /* 「ファイルアップロード」 */
-    var addition_Who8 = document.getElementById('id_addition_Who8'); /* 「登録ユーザー」選択後⇒データから取得 */
+  var addition_Who1 = document.getElementById('id_addition_Who1'); /* 適用中のリストの表示 */
+  var addition_Who2 = document.getElementById('id_addition_Who2'); /* 「登録ユーザー」選択後⇒データから取得 */
+  var addition_Who4 = document.getElementById('id_addition_Who4'); /* 「未登録ユーザー」選択後⇒「手入力／ファイル入力」選択 */
+  var addition_Who5 = document.getElementById('id_addition_Who5'); /* 「手入力」選択後⇒「手入力画面」 */
+  var addition_Who6 = document.getElementById('id_addition_Who6'); /* 「ファイル入力」選択後⇒「エクセル／CSV」選択 */
+  var addition_Who7_1 = document.getElementById('id_addition_Who7_1'); /* 「ファイルアップロード」 */
+  var addition_Who7_2 = document.getElementById('id_addition_Who7_2'); /* 「ファイルアップロード」 */
+  var addition_Who8 = document.getElementById('id_addition_Who8'); /* 「登録ユーザー」選択後⇒データから取得 */
 
-    var addition_When1 = document.getElementById('id_addition_When1'); /* いつ送るかの前に対象を選択する */
-    var addition_When2 = document.getElementById('id_addition_When2'); /* いつ送るかの前に対象を選択する */
-    var addition_What1 = document.getElementById('id_addition_What1'); /* メール内容を編集する */
+  var addition_When1 = document.getElementById('id_addition_When1'); /* いつ送るかの前に対象を選択する */
+  var addition_When2 = document.getElementById('id_addition_When2'); /* いつ送るかの前に対象を選択する */
+  var addition_What1 = document.getElementById('id_addition_What1'); /* メール内容を編集する */
 
-    function hideAllDisplay() {
-      addition_Who1.style.display = "none";
-      addition_Who2.style.display = "none";
-      addition_Who4.style.display = "none";
-      addition_Who5.style.display = "none";
-      addition_Who6.style.display = "none"; 
-      addition_Who7_1.style.display = "none";
-      addition_Who7_2.style.display = "none";
-      addition_Who8.style.display = "none";
-      addition_When1.style.display = "none";
-      addition_When2.style.display = "none";
-      addition_What1.style.display = "none";
-    };
+  function hideAllDisplay() {
+    addition_Who1.style.display = "none";
+    addition_Who2.style.display = "none";
+    addition_Who4.style.display = "none";
+    addition_Who5.style.display = "none";
+    addition_Who6.style.display = "none"; 
+    addition_Who7_1.style.display = "none";
+    addition_Who7_2.style.display = "none";
+    addition_Who8.style.display = "none";
+    addition_When1.style.display = "none";
+    addition_When2.style.display = "none";
+    addition_What1.style.display = "none";
+  };
 
-    hideAllDisplay();
+  hideAllDisplay();
 
-    if (id_WhoWhenWhat_A.checked) { addition_Who1.style.display = "block";}
+  if (id_WhoWhenWhat_A.checked) { addition_Who1.style.display = "block";}
 
-    if (id_WhoWhenWhat_B.checked) { addition_When1.style.display = "block";}
-    if (id_WhoWhenWhat_C.checked) { addition_What1.style.display = "block";}
+  if (id_WhoWhenWhat_B.checked) { addition_When1.style.display = "block";}
+  if (id_WhoWhenWhat_C.checked) { addition_What1.style.display = "block";}
 
-    if (id_MakeOrSelect_A.checked) { addition_Who4.style.display = "block";}
-    if (id_MakeOrSelect_B.checked) { addition_Who2.style.display = "block";}
+  if (id_MakeOrSelect_A.checked) { addition_Who4.style.display = "block";}
+  if (id_MakeOrSelect_B.checked) { addition_Who2.style.display = "block";}
 
-    /*
-    if (id_InputOrSelect_A.checked) {
-      console.log('pass id_InuputOrSelect_A.checked')
-      addition_Who4.style.display = "block";
-    }*/
+  /*
+  if (id_InputOrSelect_A.checked) {
+    console.log('pass id_InuputOrSelect_A.checked')
+    addition_Who4.style.display = "block";
+  }*/
 
-    if (id_FileOrManual_A.checked) {
-      console.log('pass id_FileOrManual_A.checked')
-      addition_Who5.style.display = "block";
-      addition_Who6.style.display = "block";
-    } else {
-      console.log('pass id_FileOrManual_A.checkedは該当しない')      
+  if (id_FileOrManual_A.checked) {
+    console.log('pass id_FileOrManual_A.checked')
+    addition_Who5.style.display = "block";
+    addition_Who6.style.display = "block";
+  } else {
+    console.log('pass id_FileOrManual_A.checkedは該当しない')      
+  }
+
+  if (id_FileOrManual_B.checked) {
+    if (flag_manualInput == 1) {addition_Who7_1.style.display = "block";}
+    if (flag_manualInput == 2) {addition_Who7_2.style.display = "block";}}
+
+  //if (id_InputOrSelect_B.checked) { addition_Who8.style.display = "block";}
+  if (id_RepeatOnOff_A.checked) { addition_When2.style.display = "block";}
+
+  const json_listsData = JSON.parse('{{request.session.json_listsData|safe}}' || 'null');
+  //「safe」はエスケープを無効化する.HTML上で''がない状態で認識する
+  //https://se-memorandum.com/django-safe/
+
+  ListOfListName.addEventListener('click', (e) => {
+
+    console.log('ListOfListName.addEventListenerのclickが認識されました');
+    console.log('pass1 e.target.value='+e.target.value)
+
+    let rowsLength = SelectedListTBody.rows.length;
+    console.log('pass2 e.target.value='+e.target.value)
+
+    for (i = rowsLength; i >= 1 ; i--) {
+      console.log('for文の中'); 
+      console.log(i)
+      SelectedListTBody.deleteRow(0);
+    }
+      
+    let indvDatas = json_listsData[e.target.value]
+    console.log('e.target.value='+e.target.value)
+    for (i = 0; i < indvDatas.length ; i++) {
+      var tr = document.createElement("tr");
+      var td1 = document.createElement("td");
+      var td2 = document.createElement("td");
+ 
+      td1.textContent = indvDatas[i].address;
+      td2.textContent = indvDatas[i].name;
+      //tr.setAtribute("style", "font-size:13px")      
+      tr.appendChild(td1);
+      tr.appendChild(td2);
+      SelectedListTBody.appendChild(tr);
     }
 
-    if (id_FileOrManual_B.checked) {
-      if (flag_manualInput == 1) {addition_Who7_1.style.display = "block";}
-      if (flag_manualInput == 2) {addition_Who7_2.style.display = "block";}}
-
-    //if (id_InputOrSelect_B.checked) { addition_Who8.style.display = "block";}
-    if (id_RepeatOnOff_A.checked) { addition_When2.style.display = "block";}
-
-    const json_listsData = JSON.parse('{{request.session.json_listsData|safe}}' || 'null');
-    //「safe」はエスケープを無効化する.HTML上で''がない状態で認識する
-    //https://se-memorandum.com/django-safe/
-
-    ListOfListName.addEventListener('click', (e) => {
-
-      console.log('ListOfListName.addEventListenerのclickが認識されました');
-      console.log('pass1 e.target.value='+e.target.value)
-      let rowsLength = SelectedListTBody.rows.length;
-
-      console.log('pass2 e.target.value='+e.target.value)
-
-      for (i = rowsLength; i >= 1 ; i--) {
-        console.log('for文の中'); 
-        console.log(i)
-        SelectedListTBody.deleteRow(0);
-
-      }
-      
-      let indvDatas = json_listsData[e.target.value]
-      console.log('e.target.value='+e.target.value)
-      for (i = 0; i < indvDatas.length ; i++) {
-        var tr = document.createElement("tr");
-        var td1 = document.createElement("td");
-        var td2 = document.createElement("td");
- 
-        td1.textContent = indvDatas[i].address;
-        td2.textContent = indvDatas[i].name;
-        //tr.setAtribute("style", "font-size:13px")      
-        tr.appendChild(td1);
-        tr.appendChild(td2);
-        SelectedListTBody.appendChild(tr);
-      }
-
-    });
+  });
 
 
-    WhoWhenWhat.addEventListener('click', function(){
+  WhoWhenWhat.addEventListener('click', function(){
 
-      console.log('WhoWhenWhat.addEventListenerのclickが認識されました');
-      hideAllDisplay();
+    console.log('WhoWhenWhat.addEventListenerのclickが認識されました');
+    hideAllDisplay();
 
-      if (id_WhoWhenWhat_A.checked) { /* 送り先を設定 */
-        addition_Who1.style.display = "block";
-        document.getElementById('id_MakeOrSelect_A').checked = false;
-        document.getElementById('id_MakeOrSelect_B').checked = false;
-      }
-      if (id_WhoWhenWhat_B.checked) { /* いつ送信するかを設定 */
-        addition_When1.style.display = "block";
-        if (id_RepeatOnOff_A) {
-          addition_When2.style.display = "block";
-        }
-      }
-      if (id_WhoWhenWhat_C.checked) { /* メール内容を編集 */
-        addition_What1.style.display = "block";
-      }        
-    });
-
-    //「リストを作る」が選択されたときの対応
-    id_MakeOrSelect_A.addEventListener('click', function(){
-
-      console.log('id_MakeOrSelect_A.addEventListenerのclickが認識されました');
-      hideAllDisplay();
-
-      console.log('id_MakeOrSelect_A.checkedが認識されました');
-      document.getElementById('id_MakeOrSelectForm').submit();
-      //addition_Who1.style.display = "block";
-      //addition_Who4.style.display = "block";
-    });
-
-    //「リストを選ぶ」が選択されたときの対応
-    //Aとは分けた。AとBを纏めると、A選択時にsubmit()が２回発行
-    // （label経由＋input経由）され、Bでもsubmit()が自動的に送付されたため
-    id_MakeOrSelect_B.addEventListener('click', function(){
-
-      console.log('id_MakeOrSelect_B.addEventListenerのclickが認識されました');
-      hideAllDisplay();
-
-      console.log('id_MakeOrSelect_B.checkedが認識されました');
+    if (id_WhoWhenWhat_A.checked) { /* 送り先を設定 */
       addition_Who1.style.display = "block";
-      addition_Who2.style.display = "block";
-    });
-  
-    var itemNum = 0;
-
-    NewItemAddBtn.addEventListener('click', function(){
-      console.log('NewItemAddBtn.addEventListenerのclickが認識されました');
-  
-      itemNum = itemNum + 1;    
-      
-      var item = document.createElement('div');
-      item.setAttribute('id', 'id_Item_' + itemNum);
-      item.setAttribute('name', 'name_Item_' + itemNum);
-    
-      var item_input = document.createElement('input');
-      item_input.setAttribute('class', 'col-9');
-      item_input.setAttribute('type', 'MailInput');
-      item_input.setAttribute('id', 'id_ItemInput_' + itemNum);
-      item_input.setAttribute('name', 'name_ItemInput_' + itemNum);
-      //newItem_input.setAttribute('placeholder', 'フォーム-' + itemNum);
-      item_input.setAttribute('value', NewItemInput.value);
-
-      console.log('NewItemAddBtn.addEventListener内 pass1');
-
-      var item_btn = document.createElement('button');  
-      item_btn.appendChild(document.createTextNode('削除'));     
-      //item_btn.setAttribute('class', 'col-3');
-      //item_btn.setAttribute('class', 'justify-content-start');
-      item_btn.setAttribute('type', 'button');
-      item_btn.setAttribute('onclick', 'deleteEachItem("id_Item_' + itemNum + '");');
-
-      console.log('NewItemAddBtn.addEventListener内 pass2');
-
-      item.appendChild(item_input);
-      item.appendChild(item_btn);
-      FormList.appendChild(item);
-
-    });
-    
-
-    FileOrManual.addEventListener('click', function(){
-      console.log('FileOrManual.addEventListenerのclickが認識されました');
-      hideAllDisplay();
-
-      if (id_FileOrManual_A.checked) {
-        console.log('id_FileOrManual_Aが認識されました');
-        addition_Who1.style.display = "block";
-        addition_Who4.style.display = "block";
-        addition_Who5.style.display = "block";
-        document.getElementById('id_FileType_A').checked = false;
-        document.getElementById('id_FileType_B').checked = false;
-      }
-
-      /*
-      if (id_FileOrManual_A.checked) {
-        console.log('id_FileOrManual_Aが認識されました');
-        addition_Who1.style.display = "block";
-        addition_Who4.style.display = "block";
-        if ("{{step_fileUp}}" == 2) {
-          addition_Who5.style.display = "block";}
-        if ("{{step_fileUp}}" == 3) {
-          addition_Who5.style.display = "block";
-          addition_Who6.style.display = "block";}
-        if ("{{step_fileUp}}" == 4) {
-          addition_Who5.style.display = "block";
-          addition_Who6.style.display = "block";}*/
-
-      if (id_FileOrManual_B.checked) { /* 未登録⇒手入力 */
-        console.log('id_FileOrManual_Bが認識されました');
-        addition_Who1.style.display = "block";
-        addition_Who4.style.display = "block";
-        addition_Who7_1.style.display = "block";
-      }
-    });
-
-
-    FileType.addEventListener('click', function(){
-      console.log('FileType.addEventListenerのclickが認識されました');
-      hideAllDisplay();
-
-      if (id_FileType_A.checked) { /* 未登録⇒ファイル入力⇒エクセル取り込み */
-        console.log('id_FileType_Aが認識されました');
-        addition_Who1.style.display = "block";
-        /*addition_Who3.style.display = "block";*/
-        addition_Who4.style.display = "block";
-        addition_Who5.style.display = "block";
-        addition_Who6.style.display = "block";
-      }
-
-      if (id_FileType_B.checked) { /* 未登録⇒ファイル入力⇒CSV取り込み */      
-        console.log('id_FileType_Bが認識されました');
-        addition_Who1.style.display = "block";
-        /*addition_Who3.style.display = "block";*/
-        addition_Who4.style.display = "block";
-        addition_Who5.style.display = "block";
-        addition_Who6.style.display = "block";
-      }
-
-    });
-
-    RepeatOnOff.addEventListener('click', function(){
-
-      console.log('RepeatOnOff.addEventListenerのclickが認識されました');
-      hideAllDisplay();
-
-      if (id_RepeatOnOff_A.checked) { /* 送信先＝未登録先 */
-        console.log('id_RepeatOnOff_Aが認識されました');
-        addition_When1.style.display = "block";
+      document.getElementById('id_MakeOrSelect_A').checked = false;
+      document.getElementById('id_MakeOrSelect_B').checked = false;
+    }
+    if (id_WhoWhenWhat_B.checked) { /* いつ送信するかを設定 */
+      addition_When1.style.display = "block";
+      if (id_RepeatOnOff_A) {
         addition_When2.style.display = "block";
       }
-      if (id_RepeatOnOff_B.checked) { /* 送信先＝登録者 */
-        console.log('id_RepeatOnOff_Bが認識されました');
-        addition_When1.style.display = "block";
-        addition_When2.style.display = "none";
-      }
-    });
+    }
+    if (id_WhoWhenWhat_C.checked) { /* メール内容を編集 */
+      addition_What1.style.display = "block";
+    }        
+  });
+
+  //「リストを作る」が選択されたときの対応
+  id_MakeOrSelect_A.addEventListener('click', function(){
+
+    console.log('id_MakeOrSelect_A.addEventListenerのclickが認識されました');
+    hideAllDisplay();
+
+    console.log('id_MakeOrSelect_A.checkedが認識されました');
+    document.getElementById('id_MakeOrSelectForm').submit();
+    //addition_Who1.style.display = "block";
+    //addition_Who4.style.display = "block";
+  });
+
+  //「リストを選ぶ」が選択されたときの対応
+  //Aとは分けた。AとBを纏めると、A選択時にsubmit()が２回発行
+  // （label経由＋input経由）され、Bでもsubmit()が自動的に送付されたため
+  id_MakeOrSelect_B.addEventListener('click', function(){
+
+    console.log('id_MakeOrSelect_B.addEventListenerのclickが認識されました');
+    hideAllDisplay();
+
+    console.log('id_MakeOrSelect_B.checkedが認識されました');
+    addition_Who1.style.display = "block";
+    addition_Who2.style.display = "block";
+  });
+  
+  var itemNum = 0;
+
+  NewItemAddBtn.addEventListener('click', function(){
+    console.log('NewItemAddBtn.addEventListenerのclickが認識されました');
+  
+    itemNum = itemNum + 1;    
+      
+    var item = document.createElement('div');
+    item.setAttribute('id', 'id_Item_' + itemNum);
+    item.setAttribute('name', 'name_Item_' + itemNum);
+    
+    var item_input = document.createElement('input');
+    item_input.setAttribute('class', 'col-9');
+    item_input.setAttribute('type', 'MailInput');
+    item_input.setAttribute('id', 'id_ItemInput_' + itemNum);
+    item_input.setAttribute('name', 'name_ItemInput_' + itemNum);
+    //newItem_input.setAttribute('placeholder', 'フォーム-' + itemNum);
+    item_input.setAttribute('value', NewItemInput.value);
+
+    console.log('NewItemAddBtn.addEventListener内 pass1');
+
+    var item_btn = document.createElement('button');  
+    item_btn.appendChild(document.createTextNode('削除'));     
+    //item_btn.setAttribute('class', 'col-3');
+    //item_btn.setAttribute('class', 'justify-content-start');
+    item_btn.setAttribute('type', 'button');
+    item_btn.setAttribute('onclick', 'deleteEachItem("id_Item_' + itemNum + '");');
+
+    console.log('NewItemAddBtn.addEventListener内 pass2');
+
+    item.appendChild(item_input);
+    item.appendChild(item_btn);
+    FormList.appendChild(item);
+
+  });
+    
+
+  FileOrManual.addEventListener('click', function(){
+    console.log('FileOrManual.addEventListenerのclickが認識されました');
+    hideAllDisplay();
+
+    if (id_FileOrManual_A.checked) {
+      console.log('id_FileOrManual_Aが認識されました');
+      addition_Who1.style.display = "block";
+      addition_Who4.style.display = "block";
+      addition_Who5.style.display = "block";
+      document.getElementById('id_FileType_A').checked = false;
+      document.getElementById('id_FileType_B').checked = false;
+    }
+
+    /*
+    if (id_FileOrManual_A.checked) {
+      console.log('id_FileOrManual_Aが認識されました');
+      addition_Who1.style.display = "block";
+      addition_Who4.style.display = "block";
+      if ("{{step_fileUp}}" == 2) {
+        addition_Who5.style.display = "block";}
+      if ("{{step_fileUp}}" == 3) {
+        addition_Who5.style.display = "block";
+        addition_Who6.style.display = "block";}
+      if ("{{step_fileUp}}" == 4) {
+        addition_Who5.style.display = "block";
+        addition_Who6.style.display = "block";}*/
+
+    if (id_FileOrManual_B.checked) { /* 未登録⇒手入力 */
+      console.log('id_FileOrManual_Bが認識されました');
+      addition_Who1.style.display = "block";
+      addition_Who4.style.display = "block";
+      addition_Who7_1.style.display = "block";
+    }
+  });
 
 
-    ToUploadAgain.addEventListener('click', function(){
+  FileType.addEventListener('click', function(){
+    console.log('FileType.addEventListenerのclickが認識されました');
+    hideAllDisplay();
 
-      console.log('id_ToUploadAgainが認識されました');
-      hideAllDisplay();
-
+    if (id_FileType_A.checked) { /* 未登録⇒ファイル入力⇒エクセル取り込み */
+      console.log('id_FileType_Aが認識されました');
+      addition_Who1.style.display = "block";
       /*addition_Who3.style.display = "block";*/
       addition_Who4.style.display = "block";
       addition_Who5.style.display = "block";
       addition_Who6.style.display = "block";
-    });
+    }
 
-    
+    if (id_FileType_B.checked) { /* 未登録⇒ファイル入力⇒CSV取り込み */      
+      console.log('id_FileType_Bが認識されました');
+      addition_Who1.style.display = "block";
+      /*addition_Who3.style.display = "block";*/
+      addition_Who4.style.display = "block";
+      addition_Who5.style.display = "block";
+      addition_Who6.style.display = "block";
+    }
+
+  });
+
+  RepeatOnOff.addEventListener('click', function(){
+
+    console.log('RepeatOnOff.addEventListenerのclickが認識されました');
+    hideAllDisplay();
+
+    if (id_RepeatOnOff_A.checked) { /* 送信先＝未登録先 */
+      console.log('id_RepeatOnOff_Aが認識されました');
+      addition_When1.style.display = "block";
+      addition_When2.style.display = "block";
+    }
+    if (id_RepeatOnOff_B.checked) { /* 送信先＝登録者 */
+      console.log('id_RepeatOnOff_Bが認識されました');
+      addition_When1.style.display = "block";
+      addition_When2.style.display = "none";
+    }
+  });
+
+  ToUploadAgain.addEventListener('click', function(){
+
+    console.log('id_ToUploadAgainが認識されました');
+    hideAllDisplay();
+
+    /*addition_Who3.style.display = "block";*/
+    addition_Who4.style.display = "block";
+    addition_Who5.style.display = "block";
+    addition_Who6.style.display = "block";
   });
 
   function deleteEachItem(name) {
+
     console.log('functionはDOMContentLoadedの外');
 
     // 対象フォームの削除
@@ -1432,47 +1438,7 @@
     }
   };
 
-  //小原さんが作成したもので利用していない
-  // クエリ文字列付きのリンクもモーダル内で動くよう、モーダル内のクリックは Ajax で差し替える
-  async function loadIntoModal(url) {
-    const body = document.getElementById('recipientsModalBody');
-    body.innerHTML = '<div class="text-muted">読み込み中...</div>';
-
-    const res = await fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" }});
-    body.innerHTML = await res.text();
-
-    //小原さんが作成したもので利用していない
-    // モーダル内の <a> クリック（ページネーション、検索）をキャッチして再読込
-    body.querySelectorAll('a.page-link').forEach(a => {
-      a.addEventListener('click', (e) => {
-        e.preventDefault();
-        const nextUrl = a.getAttribute('href');
-        const base = document.getElementById('openRecipientsBtn').dataset.popupUrl;
-        // 相対の ?q=... をエンドポイントに連結
-        
-       console.log('loadIntoModaの引数＝' + base + (nextUrl.startsWith('?') ? nextUrl : ''));
-       loadIntoModal(base + (nextUrl.startsWith('?') ? nextUrl : ''));
-      });
-    });
-
-    // 検索フォームの送信も Ajax
-    const form = body.querySelector('form');
-    if (form) {
-      form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const params = new URLSearchParams(new FormData(form));
-        const base = document.getElementById('openRecipientsBtn').dataset.popupUrl;
-        loadIntoModal(`${base}?${params.toString()}`);
-      });
-    }
-  }
-
-  document.getElementById('openRecipientsBtn').addEventListener('click', async (event) => {
-    const url = event.currentTarget.dataset.popupUrl;
-    await loadIntoModal(url);
-    const modal = new bootstrap.Modal(document.getElementById('recipientsModal'));
-    modal.show();
-  });
+});
 
 </script>
 

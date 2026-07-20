@@ -49,7 +49,7 @@
           <!-- 承認者がメールからアプリに入る場合の処理 -->
           {% if request.session.flag_frWhere == 1 %}
 
-            {% if applyUser.addStatus == 1 or applyUser.addStatus == 3 %}
+            {% if applyUser.addStatus == 1 or applyUser.addStatus == -3 %}
 
             <form method="POST" action="{% url 'accounts:userAdd_seller' %}"
               class="form-group border border-top shadow-sm p-3 bg-light rounded mt-2">
@@ -252,41 +252,53 @@
 
 {% block extrajs %}
 
-<script defer>
+<script>
 //「defer」は、HTMLの解析と並行してJavaScriptの読み込みを裏側で進め、
 // HTMLの読み込み（パース）がすべて完了してからスクリプトを実行します。
 //deferを指定しない場合、ブラウザはJavaScriptの読み込みと実行が終わるまで
-// HTMLの読み込みを一時停止
+// HTMLの読み込みを一時停止.deferは外部ファイルを読み込むときに使用
 
-  document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {
 
-    console.log('DOMContentLoaded in userAdd_seller.html が認識されました');
+  console.log('DOMContentLoaded in userAdd_seller.html が認識されました');
 
-    const SwitchButtons = document.querySelectorAll('input[type="checkbox"]'); // チェックボックスをすべて取得
-
-    SwitchButtons.forEach(eachButton => {
-      console.log('forEachに入りました');
-
-      if (eachButton.checked) {
-        eachButton.classList.add('active-underline');
-      } else {
-        eachButton.classList.remove('active-underline');
+  // Submitボタンを押下後「しばらくお待ちください。」を表示する
+  const postForm = document.getElementById('id_PostForm');
+  if (postForm) {
+    postForm.addEventListener('submit', function() {
+      const loadingEl = document.getElementById('loading');
+      if (loadingEl) {
+        loadingEl.style.display = 'block';
       }
     });
+  }
+  
+  const SwitchButtons = document.querySelectorAll('input[type="checkbox"]'); // チェックボックスをすべて取得
 
-    SwitchButtons.forEach(eachButton => {
-      eachButton.addEventListener('change', function(event) {
-        const eventButton = event.target;
-        const eventLabel = document.querySelector(`label[for="${eventButton.id}"]`);
+  SwitchButtons.forEach(eachButton => {
+    console.log('forEachに入りました');
 
-        if (eventButton.checked) {
-          eventLabel.classList.add('active-underline');
-        } else {
-          eventLabel.classList.remove('active-underline');
-        }
-      });
+    if (eachButton.checked) {
+      eachButton.classList.add('active-underline');
+    } else {
+      eachButton.classList.remove('active-underline');
+    }
+  });
+
+  SwitchButtons.forEach(eachButton => {
+    eachButton.addEventListener('change', function(event) {
+      const eventButton = event.target;
+      const eventLabel = document.querySelector(`label[for="${eventButton.id}"]`);
+
+      if (eventButton.checked) {
+        eventLabel.classList.add('active-underline');
+      } else {
+        eventLabel.classList.remove('active-underline');
+      }
     });
   });
+
+});
 
 </script>
 

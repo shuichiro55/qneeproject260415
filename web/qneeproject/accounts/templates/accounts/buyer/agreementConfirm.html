@@ -163,7 +163,10 @@
       <div class="row justify-content-center text-center mt-5 text-secondary">
         <br><br>
         手続きが終わり、パートナー企業に参加申請しました。<br>
-        承認結果はメールでご案内いたします。
+        承認結果はメールでご案内いたします。<br>
+        <span class="mt-5">
+          {% bs_icon 'send' color='cornflowerblue' size='4rem' %}
+        </span>
       </div>
 
     {% endif %}
@@ -177,38 +180,45 @@
 
 {% block extrajs %}
 
-  <script>
-  document.addEventListener('DOMContentLoaded', function() {
+<script>
 
-    // 3秒後にメッセージを消す
-    setTimeout(function() {
-      console.log('setTimeoutが認識されました');
+document.addEventListener('DOMContentLoaded', function() {
 
-      var messages = document.querySelectorAll('.messages div');
-      messages.forEach(function(message) {
-        message.style.display = 'none';
-      });
-    }, 3000); // 3000ミリ秒 = 3秒
+  // 3秒後にメッセージを消す
+  setTimeout(function() {
+    console.log('setTimeoutが認識されました');
 
-
-    document.getElementById('id_PostForm').addEventListener('submit', function() {
-      document.getElementById('loading').style.display = 'block';
+    var messages = document.querySelectorAll('.messages div');
+    messages.forEach(function(message) {
+      message.style.display = 'none';
     });
-  
-        const isAgreed = document.querySelector('#checkbox');
-    const btn = document.querySelector('#next2');
+  }, 3000); // 3000ミリ秒 = 3秒
 
-    isAgreed.addEventListener('change', () => {
-      if(isAgreed.checked){
-        btn.disabled = false;
-      } else {
-        btn.disabled = true;
+
+  // Submitボタンを押下後「しばらくお待ちください。」を表示する
+  const postForm = document.getElementById('id_PostForm');
+  if (postForm) {
+    postForm.addEventListener('submit', function() {
+      const loadingEl = document.getElementById('loading');
+      if (loadingEl) {
+        loadingEl.style.display = 'block';
       }
     });
+  }
 
+  
+  const isAgreed = document.querySelector('#checkbox');
+  const btn = document.querySelector('#next2');
+
+  isAgreed.addEventListener('change', () => {
+    if(isAgreed.checked){
+      btn.disabled = false;
+    } else {
+      btn.disabled = true;
+    }
   });
 
-
+});
 
 </script>
 

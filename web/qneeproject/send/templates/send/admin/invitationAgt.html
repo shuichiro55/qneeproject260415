@@ -1,4 +1,4 @@
-{% extends "buyer/index/base_qconnect.html" %}
+{% extends "admin/index/base_qconnect.html" %}
 
 {% load humanize %}
 {% load form_tags %}
@@ -99,17 +99,17 @@
 
 {% block extrajs %}
 
-<script defer>
+<script>
 //「defer」は、HTMLの解析と並行してJavaScriptの読み込みを裏側で進め、
 // HTMLの読み込み（パース）がすべて完了してからスクリプトを実行します。
 //deferを指定しない場合、ブラウザはJavaScriptの読み込みと実行が終わるまで
 // HTMLの読み込みを一時停止
 
-  document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {
 
-    console.log('DOMContentLoadedが認識されました');
+  console.log('DOMContentLoadedが認識されました');
 
-  });
+});
 
 </script>
 

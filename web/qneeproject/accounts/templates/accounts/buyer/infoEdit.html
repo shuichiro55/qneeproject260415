@@ -36,96 +36,99 @@
       <span class="ms-3">{% bs_icon 'gear-fill' color='deeppink' size='2.0em' %}</span>
     </div>
 
-    <div class="bg-light border border-top shadow rounded mt-3 p-5 mx-3">
 
-      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3" >
+    <div class="row justify-content-center mt-3">
+      <div class="col-lg-9 p-5 mx-3 bg-light border border-top rounded shadow">
 
-        {% if cnt_toBeApproved_add >= 1 %}
+        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3" >
+
+          {% if cnt_toBeApproved_add >= 1 %}
         
-          <form method="GET" action="{% url 'accounts:userAdd_buyer' %}">
+            <form method="GET" action="{% url 'accounts:userAdd_buyer' %}">
+              {% csrf_token %}
+
+
+              <button type="submit"
+                class="MenuBtn2 color-9 w-100 rounded-1 shadow"
+                name="next"
+                value="Permission">
+
+                <span class="MenuBtn2IconCircle">
+                  <i class="bi bi-person-add" style="font-size:2.2em; color:cornflowerblue"></i>
+                </span>
+                ユーザー参加承認
+
+                {% if cnt_toBeApproved_add >= 1 %}
+                  　
+                  <span class="badge bg-danger text-light rounded-1">
+                    {{ cnt_toBeApproved_add }}
+                  </span>
+                  <span class="visually-hidden">未承認データ</span>
+                {% endif %}
+
+              </button>
+            </form> <!-- end col -->
+          {% endif %}
+        
+          <form method="GET" action="{% url 'accounts:profileEdit_buyer' %}">
             {% csrf_token %}
 
+            <button type="submit"
+              class="MenuBtn2 color-9 w-100 rounded-1 shadow"
+              name="next"
+              value="History">
+            
+              <span class="MenuBtn2IconCircle pt-1">
+                <i class="bi bi-pencil-square" style="font-size:2.0em; color:cornflowerblue"></i>
+              </span>
+              登録情報変更
 
+              {% if flag_sendback == 1 %}
+                　
+                <span class="badge bg-danger text-light rounded-1">
+                  1
+                </span>
+                <span class="visually-hidden">未承認データ</span>
+              {% endif %}
+
+            </button>
+          </form>
+
+          <form method="GET" action="{% url 'accounts:passwordChange_buyer' %}">
+            {% csrf_token %}
+
+            <button type="submit"
+              class="MenuBtn2 color-9 w-100 rounded-1 shadow"
+              name="next"
+              value="History">
+            
+              <span class="MenuBtn2IconCircle">
+                <i class="bi bi-key" style="font-size:2.2em; color:cornflowerblue"></i>
+              </span>
+              パスワード変更
+            </button>
+          </form>
+
+          <form method="GET" action="{% url 'accounts:permissionSets_buyer' %}">
+            {% csrf_token %}
+            
             <button type="submit"
               class="MenuBtn2 color-9 w-100 rounded-1 shadow"
               name="next"
               value="Permission">
 
               <span class="MenuBtn2IconCircle">
-                <i class="bi bi-person-add" style="font-size:2.2em; color:cornflowerblue"></i>
+                <i class="bi bi-people" style="font-size:2.2em; color:cornflowerblue"></i>
               </span>
-              ユーザー参加承認
-
-              {% if cnt_toBeApproved_add >= 1 %}
-                　
-                <span class="badge bg-danger text-light rounded-1">
-                  {{ cnt_toBeApproved_add }}
-                </span>
-                <span class="visually-hidden">未承認データ</span>
-              {% endif %}
+              ユーザー権限設定
 
             </button>
+
           </form> <!-- end col -->
-        {% endif %}
-        
-        <form method="GET" action="{% url 'accounts:profileEdit_buyer' %}">
-          {% csrf_token %}
-
-          <button type="submit"
-            class="MenuBtn2 color-9 w-100 rounded-1 shadow"
-            name="next"
-            value="History">
-            
-            <span class="MenuBtn2IconCircle pt-1">
-              <i class="bi bi-pencil-square" style="font-size:2.0em; color:cornflowerblue"></i>
-            </span>
-            登録情報変更
-
-            {% if flag_sendback == 1 %}
-              　
-              <span class="badge bg-danger text-light rounded-1">
-                1
-              </span>
-              <span class="visually-hidden">未承認データ</span>
-            {% endif %}
-
-          </button>
-        </form>
-
-        <form method="GET" action="{% url 'accounts:passwordChange_buyer' %}">
-          {% csrf_token %}
-
-          <button type="submit"
-            class="MenuBtn2 color-9 w-100 rounded-1 shadow"
-            name="next"
-            value="History">
-            
-            <span class="MenuBtn2IconCircle">
-              <i class="bi bi-key" style="font-size:2.2em; color:cornflowerblue"></i>
-            </span>
-            パスワード変更
-          </button>
-        </form>
-
-        <form method="GET" action="{% url 'accounts:permissionSets_buyer' %}">
-          {% csrf_token %}
-            
-          <button type="submit"
-            class="MenuBtn2 color-9 w-100 rounded-1 shadow"
-            name="next"
-            value="Permission">
-
-            <span class="MenuBtn2IconCircle">
-              <i class="bi bi-people" style="font-size:2.2em; color:cornflowerblue"></i>
-            </span>
-            ユーザー権限設定
-
-          </button>
-
-        </form> <!-- end col -->
     
-      </div> <!-- end row row-cols-->
-    </div>
+        </div> <!-- end row row-cols-->
+      </div>
+    </div> <!-- end row -->
   </div> <!-- end container-->
 </div>
 

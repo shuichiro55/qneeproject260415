@@ -55,16 +55,15 @@
       
           {% csrf_token %}
 
-          <table class="table table-sm bg-light table-bordered border-primary-subtle table-responsive">
+          <table class="table table-sm bg-light
+            table-bordered border-primary-subtle table-responsive">
+
             <tbody>
               <tr class="table-info">
                 <td width="40%" class="table-primary"><b>処理状況</b></td>
-                <td style="text-align:right;">
-                  {% if tx.txStatus_int == 1 %}パートナ承認前{% endif %}
-                  {% if tx.txStatus_int == 2 %}パートナ承認済<br>Qnee支払い前{% endif %}
-                  {% if tx.txStatus_int == 3 %}パートナ承認前{% endif %}
-                  {% if tx.txStatus_int == 4 %}パートナ承認済<br>Qnee支払い済{% endif %}
-                </td>
+                <td class="table-danger"
+                  style="font-size:0.9rem; text-align:right;">
+                  {{ tx.txStatus_char}}</td>
               </tr>
 
               <tr>
@@ -73,7 +72,7 @@
               </tr>
               <tr>
                 <td class="table-primary" width="40%"><b>申請者</b></td>
-                <td style="text-align:right;">{{ tx.sellUser_personname }}</td>
+                <td style="text-align:right;">{{ tx.sellUser_personname|default:'-' }}</td>
               </tr>
               <tr>
                 <td class="table-primary"width="40%"><b>申請額</b></td>
@@ -125,20 +124,28 @@
               
               <tbody>
                 <tr>
-                  <td width="40%" class="table-primary"><b>受取り金額</b></td>
-                  <td style="text-align:right;">{{ tx.transfer_amount|intcomma }}</td>
+                  <td width="40%" class="table-primary">
+                    <b>受取り金額</b></td>
+                  <td class="table-info" style="text-align:right;">
+                    {{ tx.transfer_amount|intcomma }}</td>
                 </tr>
                 <tr>
-                  <td width="40%" class="table-primary">＋前払額</td>
-                  <td style="text-align:right;">{{ tx.advance_amount|intcomma }}</td>
+                  <td width="40%" class="table-primary">
+                    　＋前払額</td>
+                  <td style="text-align:right;">
+                    {{ tx.advance_amount|intcomma }}</td>
                 </tr>
                 <tr>
-                  <td width="40%" class="table-primary">－前払手数料</td>
-                  <td style="text-align:right;">{{ tx.advance_fee|intcomma }}</td>
+                  <td width="40%" class="table-primary">
+                    　－前払手数料</td>
+                  <td style="text-align:right;">
+                    {{ tx.advance_fee|intcomma }}</td>
                 </tr>
                 <tr>
-                  <td width="40%" class="table-primary">－振込手数料</td>
-                  <td style="text-align:right;">{{ tx.transfer_fee|intcomma }}</td>
+                  <td width="40%" class="table-primary">
+                    　－振込手数料</td>
+                  <td style="text-align:right;">
+                    {{ tx.transfer_fee|intcomma }}</td>
                 </tr>
               </tbody>
             </table>
@@ -164,7 +171,7 @@
 
 </style>
 
-<script defer>
+<script>
 
 //  document.addEventListener('DOMContentLoaded', function() {
 //

@@ -266,50 +266,50 @@
 
 <script>
 
-  document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {
 
-    console.log('DOMContentLoaded in userAdd_buyer.html が認識されました');
+  console.log('DOMContentLoaded in userAdd_buyer.html が認識されました');
 
-    document.getElementById('id_PostForm').addEventListener('submit', function() {
-      document.getElementById('loading').style.display = 'block';
+  document.getElementById('id_PostForm').addEventListener('submit', function() {
+    document.getElementById('loading').style.display = 'block';
+  });
+
+  // 3秒後にメッセージを消す
+  setTimeout(function() {
+    console.log('setTimeoutが認識されました');
+
+    var messages = document.querySelectorAll('.messages div');
+    messages.forEach(function(message) {
+      message.style.display = 'none';
     });
-
-    // 3秒後にメッセージを消す
-    setTimeout(function() {
-      console.log('setTimeoutが認識されました');
-
-      var messages = document.querySelectorAll('.messages div');
-      messages.forEach(function(message) {
-        message.style.display = 'none';
-      });
-    }, 3000); // 3000ミリ秒 = 3秒
+  }, 3000); // 3000ミリ秒 = 3秒
 
 
-    const SwitchButtons = document.querySelectorAll('input[type="checkbox"]'); // チェックボックスをすべて取得
+  const SwitchButtons = document.querySelectorAll('input[type="checkbox"]'); // チェックボックスをすべて取得
 
-    SwitchButtons.forEach(eachButton => {
-      console.log('forEachに入りました');
+  SwitchButtons.forEach(eachButton => {
+    console.log('forEachに入りました');
 
-      if (eachButton.checked) {
-        eachButton.classList.add('active-underline');
+    if (eachButton.checked) {
+      eachButton.classList.add('active-underline');
+    } else {
+      eachButton.classList.remove('active-underline');
+    }
+  });
+
+  SwitchButtons.forEach(eachButton => {
+    eachButton.addEventListener('change', function(event) {
+      const eventButton = event.target;
+      const eventLabel = document.querySelector(`label[for="${eventButton.id}"]`);
+
+      if (eventButton.checked) {
+        eventLabel.classList.add('active-underline');
       } else {
-        eachButton.classList.remove('active-underline');
+        eventLabel.classList.remove('active-underline');
       }
     });
-
-    SwitchButtons.forEach(eachButton => {
-      eachButton.addEventListener('change', function(event) {
-        const eventButton = event.target;
-        const eventLabel = document.querySelector(`label[for="${eventButton.id}"]`);
-
-        if (eventButton.checked) {
-          eventLabel.classList.add('active-underline');
-        } else {
-          eventLabel.classList.remove('active-underline');
-        }
-      });
-    });
   });
+});
 
 </script>
 

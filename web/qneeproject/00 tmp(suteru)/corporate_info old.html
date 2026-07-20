@@ -1,0 +1,369 @@
+{% extends 'index/base_corporate.html' %}
+
+{% load static %}
+
+<!--{% load bootstrap_icons %}-->
+
+<!--
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Qnee | Copporate Page</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="制作会社やフリーランスの方に「より便利な環境」を。
+  負担の少ない報酬先払い、契約書締結の代行、本当に大事なもの以外は手間や費用を
+  かけないような環境構築を目指します。" />
+<meta name="keywords" content="フリーランス新法, プロダクション, 制作会社, ファクタリング, freelance, " />
+<meta name="author" content="富張周一郎" />
+
+<link rel="shortcut icon" href="{% static 'images/qnee.ico' %}">
+
+  {% block css %}
+  不要か確認して削除
+  <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" type="text/css" />
+  <link href="{% static 'css/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet" />
+  <link rel="stylesheet" href="{% static 'css/materialdesignicons.min.css' %}" type="text/css" />
+  <link rel="stylesheet" href="{% static 'css/swiper-bundle.min.css' %}" type="text/css" />
+  <link href="{% static 'css/style.min.css' %}" rel="stylesheet" type="text/css" />
+  <link href="{% static 'css/colors/default.css' %}" rel="stylesheet" type="text/css" id="color-opt" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <link href="{% static 'css/main.css' %}" rel="stylesheet">
+    {% endblock %}
+
+</head>
+-->
+{% block home %}
+
+  <!-- START NAVBAR -->
+  <nav id="navbar" class="navbar navbar-expand-lg fixed-top sticky pt-0 pb-1">
+
+    <div class="container-fluid">
+
+      <a class="navbar-brand mt-1 ms-3" href="/">
+        <img src="{% static 'images/logo_text_lovebird.png' %}" alt="" height="60"></a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+        data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false"
+        aria-label="Toggle navigation">
+        <i class="mdi mdi-menu text-secondary me-4" style="font-size:1.4em;"></i>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarContent">
+
+        <div class="d-none d-lg-block ms-5">
+
+          <ul class="navbar-nav" id="navbar-navlist">
+            <li class="nav-item">
+              <a class="nav-link" href="/?#home">HOME</a>
+            </li>
+
+
+            <li class="nav-item">
+              <a class="nav-link" href="#mission">ミッション</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#ourStory">ストーリー</a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="#overview">会社概要</a>
+            </li>
+            
+            <li class="nav-item">
+              <a class="nav-link" href="/?#faq">FAQ</a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="/#contact">お問い合わせ</a>
+            </li>
+          </ul> <!--end navbar-nav-->
+        </div> <!-- end d-none -->
+
+        <div
+          class="d-block d-lg-none ms-2 rounded-2"
+          style="background-color:rgba(241, 236, 236, 0.95) !important;">
+
+          <ul class="navbar-nav" id="navbar-navlist">
+            <div class="row">
+              <div class="col-3 ps-3 pe-0">
+                <li class="nav-item"><a class="nav-link" href="/?#home">HOME</a> </li>
+              </div>
+              <div class="col-3 px-0">
+                <li class="nav-item"><a class="nav-link" href="#mission">ミッション</a></li>
+              </div>
+              <div class="col-3 px-0">
+                <li class="nav-item"><a class="nav-link" href="#outStory">ストーリー</a></li>
+              </div>
+              <div class="col-3 px-0">
+                <li class="nav-item"><a class="nav-link" href="#overview">会社情報</a></li>
+              </div>
+
+            </div>
+          </ul>
+            
+        </div>
+
+      </div><!--end collapse-->
+    </div><!--end container-->
+  </nav>
+  
+  <!-- END NAVBAR -->
+
+  <!-- START HERO -->
+  <section class="align-items-center position-relative"
+    style="background-image: url('static/images/bg-mission.jpg');
+      background-size:cover;
+      background-repeat: no-repeat;
+      background-position: center;
+      height: 100vh; width: 100vw;"
+    id="mission">
+
+    <div class="bg-overlay"></div>
+
+    <div class="position-absolute top-50 start-50 translate-middle">
+      <div class="bg-dark text-white text-center"
+        style="background-color: transparent !important;">
+            <h2>FIRST MISSION</h2>
+            <p class="home-desc pt-3">
+              「日本の創る」を支えるフリーランスとそれを支える企業のインフラとなる。
+            </p>
+      </div>
+    </div>
+    <!--end container-->
+  </section>
+
+  <!-- END HERO -->
+
+
+  <section id="ourStory"
+    class="about section bg-light light-background"
+    style="width: 100vw;">
+
+    <div class="container-fluid">
+
+      <div class="row justify-content-center">
+        <div class="text-center">
+          <h3 class="text-secondary"><b>わたしたちのストーリー</b></h3>
+          <p class="text-muted"></p>
+        </div>
+      </div> <!--end row-->
+
+
+      <div class="d-block d-md-none mt-1">
+
+        <div class="row justify-content-center">
+          
+          <div class="col-12 card-img bg-dark text-white border-0 align-self-start mx-4 px-0"
+            style="width:85%; height:auto; object-fit:cover"
+            data-aos="fade-up"
+            data-aos-delay="200">
+            <img src="{% static 'images/top_message_image.jpg' %}"
+              class="img-fluid"
+              style="width:100%; height:auto; max-height:650px"
+              alt="">
+
+            <div class="card-img-overlay align-items-center"
+              style="background-color: rgba(0, 0, 0, 0.27);"
+              data-aos="fade-up"
+              data-aos-delay="100">
+
+              <div class="mt-3 mx-4">
+                <p style="font-size:1.1em">
+                  これまでの人生における出会い・経験・気づきの結晶が私たちのサービス。
+                  そのサービスを通じて皆さま・社会への貢献を図っていきます。
+                </p>
+
+                <div class="d-flex mt-4">
+                  <span>{% bs_icon 'people' color='lightblue' size='2.5em' %}</span>
+                  <h5 class="mt-1 ms-2">きっかけ</h5>
+                </div>
+                <p class="mt-1 ms-5" style="font-size:1.1em">
+                  きっかけ映画制作においてアニメーターが報酬が受け取りまで時間があること、
+                  制作会社とフリーランスとの間で契約が結ばれないことがあったと知ったこと。
+                </p>
+
+                <div class="d-flex mt-4">
+                  <span>{% bs_icon 'bookmarks' color='lightblue' size='2.5em' %}</span>
+                  <h5 class="mt-1 ms-2">経験</h5>
+                </div>
+                <p class="mt-1 ms-5" style="font-size:1.1em">
+                  金融分野でのスキーム創り、スタートアップビジネスに触れた経験、
+                  親しんできたプログラミングを活かして「お役に立ちたい」が原動力。
+                </p>
+
+                <div class="d-flex mt-4">
+                  <span>{% bs_icon 'stars' color='lightblue' size='2.5em' %}</span>
+                  <h5 class="mt-1 ms-2">新たな創造へ</h5>
+                </div>
+                <p class="mt-1 ms-5" style="font-size:1.1em">
+                  ご利用者の声、過去のご利用データをご参考しながら、
+                  ご利用者のニーズにより寄り添ったサービス・サービス自体の高度化を実現します。
+                </p>
+              </div>
+            </div>
+
+          </div> <!-- end col -->
+        </div> <!-- end row -->
+
+      </div> <!-- end d-block -->
+
+
+      <div class="d-none d-md-block d-lg-none mt-1">
+
+        <div class="row justify-content-center">
+          
+          <div class="col-12 card-img bg-dark text-white border-0 align-self-start mx-4 px-0"
+            style="width:85%; height:auto; object-fit:cover"
+            data-aos="fade-up"
+            data-aos-delay="200">
+            <img src="{% static 'images/top_message_image.jpg' %}"
+              class="img-fluid"
+              style="width:100%; max-height:650px"
+              alt="">
+              
+            <br>
+
+            <div class="card-img-overlay align-items-center"
+              style="background-color: rgba(0, 0, 0, 0.27);"
+              data-aos="fade-up"
+              data-aos-delay="100">
+
+              <div class="mt-4 mx-4">
+                <p style="font-size:1.1em">
+                  これまでの人生における出会い・経験・気づきの結晶が私たちのサービス。
+                  そのサービスを通じて皆さま・社会への貢献を図っていきます。
+                </p>
+
+
+                <div class="d-flex mt-5">
+                  <span>{% bs_icon 'people' color='lightblue' size='2.5em' %}</span>
+                  <h5 class="mt-1 ms-2">きっかけ</h5>
+                </div>
+                <p class=" ms-4" style="font-size:1.1em">
+                  きっかけは映画制作においてアニメーターが報酬が受け取りまで時間があること、
+                  制作会社とフリーランスとの間で契約が結ばれないことがあったと知ったこと。
+                </p>
+
+                <div class="d-flex mt-5">
+                  <span>{% bs_icon 'bookmarks' color='lightblue' size='2.5em' %}</span>
+                  <h5 class="mt-1 ms-2">経験</h5>
+                </div>
+                <p class=" ms-4" style="font-size:1.1em">
+                  金融分野でのスキーム創り、スタートアップビジネスに触れた経験、
+                  親しんできたプログラミングを活かして「お役に立ちたい」が原動力。
+                </p>
+
+                <div class="d-flex mt-5">
+                  <span>{% bs_icon 'stars' color='lightblue' size='2.5em' %}</span>
+                  <h5 class="mt-1 ms-2">新たな創造へ</h5>
+                </div>
+                <p class=" ms-4" style="font-size:1.1em">
+                  ご利用者の声だけでなく、過去のご利用の仕方もご参考にさせていただき、
+                  ご利用者のニーズに、より寄り添ったサービス・サービス自体の高度化をしていきます。
+                </p>
+              </div>
+            </div>
+          </div> <!-- end col -->
+        </div> <!-- end row -->
+
+      </div> <!-- end d-block -->
+
+
+      <div class="d-none d-lg-block mt-1">
+
+        <div class="row justify-content-center">
+
+          <div class="col-5 mt-2 px-5"
+            data-aos="fade-up"
+            data-aos-delay="200">
+            <img src="{% static 'images/top_message_image.jpg' %}"
+              class="img-fluid"
+              style="height:600px; width:auto;"
+              alt="">
+          </div>
+
+          <div class="col-7 mt-2 pe-5 text-left "
+            data-aos="fade-up"
+            data-aos-delay="100">
+            <p style="margin-right:3em; font-size:1.1em ">
+              これまでの人生における出逢い・経験・気づきの結晶が私たちのサービス。
+              そのサービスを通じて皆さま・社会への貢献を図っていきます。
+            </p>
+
+            <br class="d-none d-xl-inline">
+
+            <div class="d-flex mt-4">
+              <span>{% bs_icon 'people' color='deeppink' size='2.5em' %}</span>
+              <h5 class="mt-1 ms-3">きっかけ</h5>
+            </div>
+
+            <p class="mt-1 ms-5"
+              style="margin-right:3em; font-size:1.1em ">
+              きっかけは映画制作においてアニメーターが報酬が受け取りまで時間があること、
+              制作会社とフリーランスとの間で契約が結ばれないことがあったと知ったこと。
+            </p>
+
+            <br class="d-none d-xl-inline">
+
+            <div class="d-flex mt-3">
+              <span>{% bs_icon 'bookmarks' color='deeppink' size='2.5em' %}</span>
+              <h5 class="mt-1 ms-3">経験</h5>
+            </div>
+
+            <p class="mt-1 ms-5"
+              style="margin-right:3em; font-size:1.1em ">
+              金融分野でのスキーム創り、スタートアップビジネスに触れた経験、
+              親しんできたプログラミングを活かして「お役に立ちたい」が原動力。
+            </p>
+
+            <br class="d-none d-xl-inline">
+
+            <div class="d-flex mt-3">
+              <span>{% bs_icon 'stars' color='deeppink' size='2.5em' %}</span>
+              <h5 class="mt-1 ms-3">新たな創造へ</h5>
+            </div>
+
+            <p class="mt-1 ms-5"
+              style="margin-right:2em; font-size:1.1em ">
+              ご利用者の声だけでなく、過去のご利用の仕方もご参考にさせていただき、
+              ご利用者のニーズに、より寄り添ったサービス・サービス自体の高度化をしていきます。
+            </p>
+
+          </div>
+        </div>
+      </div> <!-- end d-none -->
+
+    </div>
+
+  </section><!-- /About Section -->
+
+
+  {% block overview %}
+    {% include 'partials/overview.html' %}
+  {% endblock %}
+
+  {% block footer %}
+    {% include 'partials/footer.html' %}
+  {% endblock %}
+
+  {% block switcher %}
+    {% include 'partials/switcher.html' %}
+  {% endblock %}
+
+{% endblock home %}
+
+
+{% block extrajs %}
+
+  <!--start back-to-top-->
+  <button onclick="topFunction()" id="back-to-top">
+    <i class="mdi mdi-arrow-up"></i>
+  </button>
+  <!--end back-to-top-->
+        
+  <!-- JavaScript js -->
+  <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'js/app.js' %}"></script>
+
+{% endblock %}

@@ -240,17 +240,25 @@
             <table class="table table-sm bg-light table-bordered border-primary-subtle table-responsive">
               <tbody class="text-center">
                 <tr>
-                  <th scope="col" width="45%" class="table-primary">パートナー</th>
-                  <td style="text-align: right;">{{ form.buyEntityname.value }}　様</td></tr>
+                  <th scope="col" width="45%" class="table-primary" style="text-align:left;">
+                    パートナー名</th>
+                  <td style="text-align: right;">
+                    {{ form.buyEntityname.value }}　様</td></tr>
                 <tr>
-                  <th scope="col" width="45%" class="table-primary">報酬を貰う人</th>
-                  <td style="text-align: right;">{{ sellEntity.entityname }}　様</td></tr>
+                  <th scope="col" width="45%" class="table-primary" style="text-align:left;">
+                    報酬を貰う人</th>
+                  <td style="text-align: right;">
+                    {{ sellEntity.entityname }}　様</td></tr>
                 <tr>
-                  <th scope="col" width="45%" class="table-primary">ご申請者</th>
-                  <td style="text-align: right;">{{ sellUser.personname }}　様</td></tr>
+                  <th scope="col" width="45%" class="table-primary" style="text-align:left;">
+                    ご申請者</th>
+                  <td style="text-align: right;">
+                    {{ sellUser.personname }}　様</td></tr>
                 <tr>
-                  <th scope="col" width="45%" class="table-primary">ご申請額</th>
-                  <td style="text-align: right;">{{ form.requested_amount.value|intcomma }}</td></tr>
+                  <th scope="col" width="45%" class="table-primary" style="text-align:left;">
+                    ご申請額</th>
+                  <td style="text-align: right;">
+                    {{ form.requested_amount.value|intcomma }}</td></tr>
               </tbody>
             </table>
 

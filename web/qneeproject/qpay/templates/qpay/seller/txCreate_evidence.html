@@ -19,6 +19,15 @@
     </div>
     {% endif %}
 
+    <div id="loading">
+      <div class="spinner-border text-primary"
+        style="width: 3rem; height: 3rem;"
+        role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-5">処理中です... しばらくお待ちください</p>
+    </div>
+    
     <nav class="mt-2 bg-light rounded-3 border-top shadow-sm"
       aria-label="breadcrumb" role="navigation">
       <ol class="breadcrumb px-2" style="font-size: 0.85rem !important">
@@ -54,7 +63,8 @@
           <form method="POST"
             action="{% url 'qpay:txCreate' %}"
             class="form-group bg-light border border-top shadow rounded-1 p-2 mt-2"
-            enctype="multipart/form-data">
+            enctype="multipart/form-data"
+            id="id_PostForm">
         
             {% csrf_token %}
 
@@ -106,7 +116,7 @@
                     name="next"
                     value="ToEvidenceSelect_{{sellUser.id}}_{{sellEntity.id}}_{{tx.id}}">
                     再アップロード</button>
-                  <button type="submit" class="btn btn-primary w-50 ms-2"
+                  <button type="submit" class="btn btn-primary w-50 ms-1"
                     name="next"
                     value="Complete_{{sellUser.id}}_{{sellEntity.id}}_{{tx.id}}">
                     パートナーに申請</button>
@@ -137,13 +147,24 @@
 
 {% block extrajs %}
 
-  <script defer>
-    console.log('スクリプトは認識しているようです。')
+<script>
 
-    document.getElementById('id_PostForm').addEventListener('submit', function() {
-      document.getElementById('loading').style.display = 'block';
+document.addEventListener('DOMContentLoaded', function() {
+
+  console.log('スクリプトは認識しているようです。')
+
+  // Submitボタンを押下後「しばらくお待ちください。」を表示する
+  const postForm = document.getElementById('id_PostForm');
+  if (postForm) {
+    postForm.addEventListener('submit', function() {
+      const loadingEl = document.getElementById('loading');
+      if (loadingEl) {
+        loadingEl.style.display = 'block';
+      }
     });
-  
-  </script>
+  }
+});
+
+</script>
 
 {% endblock %}

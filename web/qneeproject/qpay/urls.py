@@ -15,6 +15,8 @@ urlpatterns = [
   path('<int:user_id>/txCreate/', views.TxCreateView.as_view(), name='txCreate'), # テスト用
   #path('<int:user_id>/<int:tx_id>/txCreate/', views.TxCreateView.as_view(), name='txCreate'),
 
+  path('txReapply_seller/', views.TxReapplyView_seller.as_view(), name='txReapply_seller'),
+
   #path('txlist_buyer_approve_before/<token>/', views.TxListView_buyer_approve_before.as_view(), name='txlist_buyer_approve_before'),
 
   path('txList_buyer/', views.TxListView_buyer.as_view(), name='txList_buyer'),
@@ -48,6 +50,7 @@ urlpatterns = [
 
   path('txInboxDetailPre/<token>/', views.TxInboxDetailPreView_admin.as_view(), name='txInboxDetailPre'),
 
+  # path('txInboxDetail/', views.TxInboxDetailView_admin.as_view(), name='txInboxDetail'),
   path('<int:tx_id>/txInboxDetail/', views.TxInboxDetailView_admin.as_view(), name='txInboxDetail'),
   path('<int:tx_id>/<int:page_number>/txInboxDetail/', views.TxInboxDetailView_admin.as_view(), name='txInboxDetail'),
   # 「int:page_number」は承認後、txInboxにおいて結果を確認するときに使う

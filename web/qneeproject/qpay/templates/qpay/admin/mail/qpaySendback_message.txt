@@ -1,0 +1,15 @@
+{{ buyUser.personname }} 様
+
+次のご承認いただいた下記のQPAY取引について
+QPAY取引について、キユーニーから差し戻しがありました。
+
+ゲスト：{{ tx.sellEntity.entityname }}さま
+パートナー：{{ tx.buyEntity.entityname }}さま
+
+差戻理由：  {{sendbackReason}}
+メッセージ：{{sendbackMessage}}
+
+ログインURL
+{{ protocol}}://{{ domain }}{% url 'accounts:login_buyer' afterLogin token %}
+
+株式会社Qnee（キユーニー）

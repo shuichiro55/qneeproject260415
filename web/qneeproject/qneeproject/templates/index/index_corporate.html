@@ -10,96 +10,246 @@
 
   <!--START HOME-->
   <section class="home-slider position-relative" id="home">
-    <div class="swiper-container homeslider">
-      <div class="swiper-wrapper">
 
-        <div class="swiper-slide"
-          style="background-image: url('static/images/home/bg-home3-1.jpg');
-            background-size:cover;
-            background-position:center; height: 100vh;">
-
-          <div class="bg-overlay">
-          </div>
-        
-          <div class="container">
-            <div class="row justify-content-center">
-              <div class="col-lg-12">
-                <div class="text-center text-white">
-                  <h6 class="home-subtitle mb-4">VISION</h6>
-                  <h1>あなたの思いを大切なものに</h1>
-                  <p class="home-desc pt-3">私たちが考える「便利」を提供することにより、あなたの思いや時間をほんとうに大切なものに使ってもらいたい。</p>
-                  <div class="d-grid gap-5 d-md-flex justify-content-md-center mt-5 pt-5 mx-5">
-                    <a href="{% url 'index_qconnect_seller' %}" class="btn btn-primary" role="button" 
-                      data-bs-toggle="tooltip" data-bs-placement="bottom" title="受注者向けWebアプリ準備中">仕事を受注する方</a>
-                    <a href="{% url 'index_qconnect_buyer' %}" class="btn btn-primary" role="button"
-                      data-bs-toggle="tooltip" data-bs-placement="bottom" title="発注者向けWebアプリ準備中">仕事を発注する方</a>
-                  </div>
-                </div>
-              </div> <!--end col-->
-            </div> <!--end row-->
-          </div> <!--end container-->
-        </div> <!--end swiper-slide-->
+    <div id="qneeCarousel" class="carousel slide vh-100" data-bs-ride="carousel">
   
-        <div class="swiper-slide"
-          style="background-image: url('static/images/home/bg-home3-2.jpg');background-size:cover; background-position: bottom; height: 100vh;">
-          
+      <!-- インジケーター（ページネーション） -->
+      <div class="carousel-indicators" style="bottom: 7px;">
+        <button type="button" data-bs-target="#qneeCarousel" data-bs-slide-to="0"
+          class="active" aria-current="true" aria-label="Slide 1"></button>
+        <button type="button" data-bs-target="#qneeCarousel" data-bs-slide-to="1"
+          aria-label="Slide 2"></button>
+        <button type="button" data-bs-target="#qneeCarousel" data-bs-slide-to="2"
+          aria-label="Slide 3"></button>
+      </div>
+
+      <!-- スライドする画像 -->
+      <div class="carousel-inner h-100">
+
+        <div class="carousel-item active h-100" data-bs-interval="5000">
           <div class="bg-overlay"></div>
       
-          <div class="container">
-            <div class="row justify-content-center">
-              <div class="col-lg-12">
-                <div class="text-center text-white">
-                  <h6 class="home-subtitle mb-4">FOCUS</h6>
-                  <h1>「日本の創る」を支えたい</h1>
-                  <p class="home-desc pt-3">フリーランスなどの受託側と、発注側の関係に目を向け、私たちが提供できるサービスに取り組んでいきます。</p>
-                  <div class="d-grid gap-5 d-md-flex justify-content-md-center mt-5 pt-5 mx-5">
-                    <a href="{% url 'index_qconnect_seller' %}" class="btn btn-primary" role="button" 
-                      data-bs-toggle="tooltip" data-bs-placement="bottom" title="受注者向けWebアプリ準備中">
-                      仕事を受注する方</a>
-                    <a href="{% url 'index_qconnect_buyer' %}" class="btn btn-primary" role="button"
-                      data-bs-toggle="tooltip" data-bs-placement="bottom" title="発注者向けWebアプリ準備中">
-                      仕事を発注する方</a>
-                  </div>
+          <img src='static/images/home/bg-home3-1.jpg' class="d-block w-100 h-100" alt="スライド1"
+            style="object-fit:cover;">
+        
+          <!-- 重ねる文字とボタンのエリア -->
+          <div class="carousel-caption d-flex flex-column justify-content-center align-items-center
+            h-100 bottom-0 start-0 end-0 pt-5">
+            <!-- 真ん中の文字 -->
+            <div class="my-auto">
+              <div class="d-block d-sm-none">
+                <h6 class="home-subtitle mb-4">VISION</h6>
+                <h2>あなたの思いを大切なものに</h2>
+                <p class="mt-4" style="font-size:1rem ;color: rgba(255, 255, 255, 0.7)">
+                  私たちが創る「便利」を考えるのは<br>
+                  あなたが描いている思いや時間を<br>
+                  ほんとうに大切なものに充てて欲しいから
+              </div>
+              <div class="d-none d-sm-block">
+                <h6 class="home-subtitle mb-4">VISION</h6>
+                <h1>あなたの思いを大切なものに</h1>
+                <p class="home-desc pt-3">
+                  私たちが考える「便利」を提供することにより、<br>
+                  あなたの思いや時間をほんとうに大切なことに使って欲しい。
+              </div>
+
+            </div>
+
+            <!-- 下の方のボタン（下部に余白を持たせる） -->
+            <div class="mb-5 w-100">
+              <div class="d-block d-sm-none">
+                <div class="d-flex flex-column mx-5 gap-4 align-items-center">
+
+                  <a href="{% url 'index_qconnect_seller' %}"
+                    class="btn btn-primary w-100" role="button" 
+                    data-bs-toggle="tooltip" data-bs-placement="bottom" title="受注者向けWebアプリ準備中">
+                    仕事を受注する方</a>
+                  <a href="{% url 'index_qconnect_buyer' %}"
+                    class="btn btn-primary w-100" role="button"
+                    data-bs-toggle="tooltip" data-bs-placement="bottom" title="発注者向けWebアプリ準備中">
+                    仕事を発注する方</a>
                 </div>
-              </div> <!--end col-->
-            </div> <!--end row-->
-          </div> <!--end container-->
-        </div> <!--end swiper-slide-->
 
-        <div class="swiper-slide"
-          style="background-image: url('static/images/home/bg-home3-3.jpg');background-size:cover; background-position: top; height: 100vh;">
-          <div class="bg-overlay">
-          </div>
+              </div>
 
-          <div class="container">
-            <div class="row justify-content-center">
-              <div class="col-lg-12">
-                <div class="text-center text-white">
-                  <h6 class="home-subtitle mb-4">SOLUTION</h6>
-                  <h1>新しい価値創造へ</h1>
-                  <p class="home-desc pt-3">オペレーション簡略化、行動や結果のデータ化による信用創造・マッチングなどの未来型のサービスを目指します。</p>
-                  <div class="d-grid gap-5 d-md-flex justify-content-md-center mt-5 pt-5 mx-5">
-                    <a href="{% url 'index_qconnect_seller' %}" class="btn btn-primary" role="button" 
-                      data-bs-toggle="tooltip" data-bs-placement="bottom" title="受注者向けWebアプリ準備中">
-                      仕事を受注する方</a>
-                    <a href="{% url 'index_qconnect_buyer' %}" class="btn btn-primary" role="button"
-                      data-bs-toggle="tooltip" data-bs-placement="bottom" title="発注者向けWebアプリ準備中">
-                      仕事を発注する方</a>
-                  </div>
+              <div class="d-none d-sm-block">
+                <div class="d-flex justify-content-center mx-4 gap-5">
+
+                  <a href="{% url 'index_qconnect_seller' %}"
+                    class="btn btn-primary px-5" role="button" 
+                    data-bs-toggle="tooltip" data-bs-placement="bottom" title="受注者向けWebアプリ準備中">
+                    仕事を受注する方</a>
+                  <a href="{% url 'index_qconnect_buyer' %}"
+                    class="btn btn-primary px-5" role="button"
+                    data-bs-toggle="tooltip" data-bs-placement="bottom" title="発注者向けWebアプリ準備中">
+                    仕事を発注する方</a>
                 </div>
-              </div> <!--end col-->
-            </div> <!--end row-->
-          </div> <!--end container-->
-        </div> <!--end swiper-slide-->
-  
-      </div> <!--end swiper-wrapper-->
+              </div> <!-- end d-none -->
+            </div> <!-- end mt-5 -->
 
-      <div class="swiper-button-next"></div>
-      <div class="swiper-button-prev"></div>
-      <div class="swiper-pagination"></div>
+          </div> <!-- end carousel-caption -->
+        </div> <!-- end carousel item -->
 
-    </div> <!--end homeslider-->
+
+        <div class="carousel-item h-100" data-bs-interval="5000">
+          <div class="bg-overlay"></div>
+
+          <img src='static/images/home/bg-home3-2.jpg' class="d-block w-100 h-100" alt="スライド2"
+            style="object-fit: cover;">
+
+          <!-- 重ねる文字とボタンのエリア -->
+          <div class="carousel-caption d-flex flex-column justify-content-center align-items-center
+            h-100 bottom-0 start-0 end-0">
+
+            <!-- 真ん中の文字 -->
+            <div class="my-auto">
+
+              <div class="d-block d-sm-none">
+                <h6 class="home-subtitle mb-4">FOCUS</h6>
+                <h2>「日本の創る」を支えたい</h2>
+                <p class="mt-4" style="font-size:1rem ;color: rgba(255, 255, 255, 0.7)">
+                  フリーランスなどの受託側と発注側など、<br>
+                  「もの創り」で発生する関係に目を向け、<br>
+                  私たちがサポートする仕組みを創造します。
+              </div>
+
+              <div class="d-none d-sm-block">
+                <h6 class="home-subtitle mb-4">FOCUS</h6>
+                <h1>「日本の創る」を支えたい</h1>
+                <p class="home-desc pt-3">
+                  フリーランスなどの受託側と発注側などの関係に目を向け、<br>
+                  私たちにできる最大限のサービスに取り組んでいきます。</p>
+              </div>
+
+            </div>
+
+            <!-- 上下中央に配置された文章の下に配置される -->
+            <!-- 下の方のボタン（下部に余白を持たせる） -->
+            <div class="mb-5 w-100">
+              <div class="d-block d-sm-none w-100">
+                <div class="d-flex flex-column align-items-center mx-5 gap-4">
+
+                  <a href="{% url 'index_qconnect_seller' %}"
+                    class="btn btn-primary w-100" role="button" 
+                    data-bs-toggle="tooltip" data-bs-placement="bottom" title="受注者向けWebアプリ準備中">
+                    仕事を受注する方</a>
+                  <a href="{% url 'index_qconnect_buyer' %}"
+                    class="btn btn-primary w-100" role="button"
+                    data-bs-toggle="tooltip" data-bs-placement="bottom" title="発注者向けWebアプリ準備中">
+                    仕事を発注する方</a>
+                </div>
+
+              </div>
+
+              <div class="d-none d-sm-block">
+                <div class="d-flex justify-content-center mx-4 gap-5">
+
+                  <a href="{% url 'index_qconnect_seller' %}"
+                    class="btn btn-primary px-5" role="button" 
+                    data-bs-toggle="tooltip" data-bs-placement="bottom" title="受注者向けWebアプリ準備中">
+                    仕事を受注する方</a>
+                  <a href="{% url 'index_qconnect_buyer' %}"
+                    class="btn btn-primary px-5" role="button"
+                    data-bs-toggle="tooltip" data-bs-placement="bottom" title="発注者向けWebアプリ準備中">
+                    仕事を発注する方</a>
+                </div>
+                
+              </div>
+            </div>
+
+          </div> <!-- end carousel caption -->
+        </div> <!-- end carousel-item -->
+
+        <div class="carousel-item h-100" data-bs-interval="5000">
+          <div class="bg-overlay"></div>
+          <img src='static/images/home/bg-home3-3.jpg' class="d-block w-100 h-100" alt="スライド3"
+            style="object-fit: cover;">
+
+          <!-- 重ねる文字とボタンのエリア -->
+          <div class="carousel-caption d-flex flex-column
+            justify-content-center align-items-center h-100 bottom-0 start-0 end-0">
+
+            <!-- 真ん中の文字 -->
+            <div class="my-auto">
+
+              <div class="d-block d-sm-none">
+                <h6 class="home-subtitle mb-4">SOLUTION</h6>
+                <h2>新しい価値創造へ</h2>
+                <p class="mt-4" style="font-size:1rem ;color: rgba(255, 255, 255, 0.7)">
+                  行動のデータ化やオペレーション簡略化など<br>
+                  わたしたちにできることに真剣に考え、<br>
+                  新たな信用・マッチングを創造していきます。
+                </p>
+              </div>
+
+              <div class="d-none d-sm-block">
+                <h6 class="home-subtitle mb-4">SOLUTION</h6>
+                <h1>新しい価値創造へ</h1>
+                 <p class="home-desc pt-3">
+                  オペレーション簡略化、行動や結果のデータ化による<br>
+                  信用創造・マッチングなどの未来型のサービスを目指します。
+              </div>
+            </div> <!-- carousel-caption -->
+
+            <!-- 下の方のボタン（下部に余白を持たせる） -->
+            <div class="mb-5 w-100">
+              <div class="d-block d-sm-none">
+                <div class="d-flex flex-column align-items-center mx-5 gap-4">
+
+                  <a href="{% url 'index_qconnect_seller' %}"
+                    class="btn btn-primary w-100" role="button" 
+                    data-bs-toggle="tooltip" data-bs-placement="bottom" title="受注者向けWebアプリ準備中">
+                    仕事を受注する方</a>
+                  <a href="{% url 'index_qconnect_buyer' %}"
+                    class="btn btn-primary w-100" role="button"
+                    data-bs-toggle="tooltip" data-bs-placement="bottom" title="発注者向けWebアプリ準備中">
+                    仕事を発注する方</a>
+                </div>
+              </div> <!-- end d-block -->
+
+              <div class="d-none d-sm-block">
+                <div class="d-flex justify-content-center mx-4 gap-5">
+
+                  <a href="{% url 'index_qconnect_seller' %}"
+                    class="btn btn-primary px-5" role="button" 
+                    data-bs-toggle="tooltip" data-bs-placement="bottom" title="受注者向けWebアプリ準備中">
+                    仕事を受注する方</a>
+                  <a href="{% url 'index_qconnect_buyer' %}"
+                    class="btn btn-primary px-5" role="button"
+                    data-bs-toggle="tooltip" data-bs-placement="bottom" title="発注者向けWebアプリ準備中">
+                    仕事を発注する方</a>
+                </div>
+              </div> <!-- end d-none -->
+            </div> <!-- end mt-5 -->
+
+          </div> <!-- end carousel-caption -->
+        </div> <!-- end carousel-item -->
+
+      </div> <!-- end carousel inner -->
+
+      <!-- 左右のコントロール（戻る・進むボタン） -->
+      <button class="carousel-control-prev" type="button"
+        data-bs-target="#qneeCarousel" data-bs-slide="prev"
+        style="top: 15%; left:-0.7rem;">
+        <span class="carousel-control-prev-icon"
+          style="width:2.5rem; height:2.5rem;"
+          aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+      </button>
+
+      <button class="carousel-control-next" type="button"
+        data-bs-target="#qneeCarousel" data-bs-slide="next"
+        style="top: 15%; right:-0.7rem;">
+        <span class="carousel-control-next-icon"
+          style="width:2.5rem; height:2.5rem;"
+          aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+      </button>
+
+    </div> <!-- carousel slide -->
+
   </section> <!--end home-->
+
 
   {% block features %}
     {% include 'partials/features.html' %}

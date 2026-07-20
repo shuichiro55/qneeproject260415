@@ -26,7 +26,7 @@ from .form import \
   ContactForm, BankSelectForm, BankAccountForm, \
   AgreementConfirmForm_buyer, AgreementConfirmForm_seller, \
   MyPasswordChangeForm, ProfileEditForm_buyer, ProfileEditForm1_seller, ProfileEditForm2_seller, \
-  InfoEvidenceForm, FeedbackForm_corpInfo
+  InfoEvidenceForm, SendbackInfoForm_corpInfo
 
 from qpay.form import TxCreateForm, TxApproveForm_buyer
 
@@ -66,6 +66,143 @@ from django.core.paginator import Paginator
 
 UserModel = get_user_model()  #get_user_model は、settings.py で AUTH_USER_MODEL に指定されているモデルを取得する関数
 
+
+class utils:
+    
+  def sendEmail_common(path, from_email, addList, context=None):
+
+    if context == None: context ={}
+    context['protocol'] = settings.PROTOCOL
+    context['domain'] = settings.DOMAIN
+
+    subject = render_to_string(path + '_subject.txt', context)
+    message = render_to_string(path + '_message.txt', context)
+
+    # .email_user(subject, message)
+    if from_email is None or from_email == '':
+      from_email = settings.DEFAULT_FROM_EMAIL
+
+    recipient_list = addList
+    #bcc =  ["toritoritorina@gmail.com"]  # BCCリスト
+    email = EmailMessage(subject, message, from_email, recipient_list)
+    email.send()
+
+    return True
+
+  def MakeBanksBranchesDict():
+
+    dict_banks = {} 
+    dict_bankCode_branches = {} 
+
+    for bankCode in Bank.all:
+      dict_banks.update({bankCode : Bank[bankCode].name})
+
+      dict_branches = {} 
+      for branchCode in Bank[bankCode].branches:
+        dict_element = {
+        'name': Bank[bankCode].branches[branchCode].name,
+        'kana': Bank[bankCode].branches[branchCode].kana,
+        'hira': Bank[bankCode].branches[branchCode].hira,
+        'roma': Bank[bankCode].branches[branchCode].roma,
+        }
+        dict_branches.update({branchCode : dict_element})
+
+      #dict_branches = dict(sorted(dict_branches.items()))
+
+      #if bankCode == "0001" or bankCode == 1:
+      #  print(dict_branches)
+
+      dict_bankCode_branches.update({bankCode : dict_branches})
+
+    return dict_bankCode_branches
+
+
+  def MakeBanksDict():
+
+    dict_banks = {} 
+
+    for bankCode in Bank.all:
+      dict_element = {
+        'name': Bank[bankCode].name,
+        'kana': Bank[bankCode].kana,
+        'hira': Bank[bankCode].hira,
+        'roma': Bank[bankCode].roma,
+      }
+      dict_banks.update({bankCode : dict_element})
+
+      #dict_banks = sorted(dict_banks.items)
+    #if bankCode == '0001':
+    #  print(f'dict_banks={dict_banks}')
+
+    return dict_banks
+  
+
+  def BankSearch(keyword):
+  
+    keyword = unicodedata.normalize('NFKC', keyword)
+
+    dict_MatchedBank = {}
+    
+    for bankCode in Bank.all:
+      #bank = Bank[code]
+      bank = Bank[bankCode]
+
+      if re.match(keyword, bankCode) or \
+        bank.name.find(keyword) >= 0 or \
+        bank.kana.find(keyword) >= 0 or \
+        bank.hira.find(keyword) >= 0 or \
+        bank.roma.find(keyword) >= 0: 
+
+        dict_MatchedBank.update({ bankCode: bank.name })
+
+    return dict_MatchedBank
+  
+
+  def BranchSearch(bankCode, keyword):
+    
+    keyword = unicodedata.normalize('NFKC', keyword)
+    dict_MatchedBranch = {}
+    
+    branches = Bank[bankCode].branches
+
+    for code in branches:
+      #bank = Bank[code]
+      branch = branches[code]
+
+      if re.match(keyword, code) or\
+        branch.name.find(keyword) >= 0 or\
+        branch.kana.find(keyword) >= 0 or\
+        branch.hira.find(keyword) >= 0 or\
+        branch.roma.find(keyword) >= 0: 
+        
+        dict_MatchedBranch.update({ code: branch.name })
+
+    return dict_MatchedBranch
+
+
+  def BankCodeSearch(bankCode):
+    
+    for eachCode in Bank.all:
+      #bank = Bank[code]
+      bank = Bank[eachCode]
+
+      if re.match(bankCode, eachCode): return bank.name
+      
+    return '該当データなし'
+
+  def BranchCodeSearch(bankCode, branchCode):
+    
+    branches = Bank[bankCode].branches
+  
+    for eachCode in branches:
+      #bank = Bank[code]
+      branch = branches[eachCode]
+
+      if re.match(branchCode, eachCode): return branch.name
+
+    return '該当データなし'
+
+
 # MyLoginView_sellerでロインした場合に通る想定
 # MyLoginView_buyerでログインしたListViewに遷移される
 def MyLoginRedirect(request):
@@ -90,7 +227,7 @@ class MyLoginView_buyer(LoginView):
 
   def get_context_data(self, **kwargs):
     context = super().get_context_data(**kwargs)
-    print(f'self.kwargs={self.kwargs} in get_context_data')
+    print(f'self.kwargs={self.kwargs} in get_context_data of MyLoginView_buyer')
     if 'afterLogin' in self.kwargs: context['afterLogin'] = self.kwargs['afterLogin']
     if 'token' in self.kwargs: context['token'] = self.kwargs['token']
     return context
@@ -124,7 +261,7 @@ class MyLoginView_buyer(LoginView):
     afterLogin = self.request.POST.get('afterLogin', None)
     if afterLogin is not None and afterLogin != '':
 
-      if self.request.POST['afterLogin'] == 'qpayApproveApply':
+      if self.request.POST['afterLogin'] == 'qpayApprove':
         return reverse_lazy(
           'qpay:txApproveDetailPre_buyer',
           kwargs={'token': self.request.POST['token']})
@@ -134,6 +271,12 @@ class MyLoginView_buyer(LoginView):
         return reverse_lazy(
           'accounts:userAddPre_buyer',
           kwargs={'token':self.request.POST['token']})
+
+      if self.request.POST['afterLogin'] == 'qpaySendback':
+        return reverse_lazy(
+          'qpay:txApproveDetailPre_buyer',
+          kwargs={'token':self.request.POST['token']})
+      
     else:
 
       return reverse_lazy('accounts:mypage_buyer')
@@ -185,7 +328,7 @@ class MyLoginView_seller(LoginView):
     afterLogin = self.request.POST.get('afterLogin', None)
     if afterLogin is not None and afterLogin != '':
 
-      #if self.request.POST['afterLogin'] == 'qpayApproveApply':
+      #if self.request.POST['afterLogin'] == 'qpayApprove':
       #  return reverse_lazy(
       #    'qpay:txApproveDetailPre_seller',
       #    kwargs={'token': self.request.POST['token']})
@@ -195,10 +338,10 @@ class MyLoginView_seller(LoginView):
           'accounts:userAddPre_seller',
           kwargs={'token':self.request.POST['token']})
 
+      ## ★★ 20260720 テストが必要、txApproveDetail⇒tx
       if self.request.POST['afterLogin'] == 'qpaySendback':
         return reverse_lazy(
-          'qpay:txApproveDetailPre_buyer',
-          kwargs={'token':self.request.POST['token']})
+          'qpay:txReapply_seller', kwargs={})
 
       if self.request.POST['afterLogin'] == 'bankAccountSet':
         return reverse_lazy(
@@ -268,17 +411,20 @@ class MyLoginView_admin(LoginView):
 
 
 def MyLogoutView_buyer(request, **kwargs):
+  print(f'pass in MyLogoutView_buyer')
   request.session.flush()
   logout(request)
   #return redirect('login_buyer')
   return HttpResponseRedirect(reverse('accounts:login_buyer'))
 
 def MyLogoutView_seller(request, **kwargs):
+  print(f'pass in MyLogoutView_seller')
   request.session.flush()
   logout(request)
   return HttpResponseRedirect(reverse('accounts:login_seller'))
 
 def MyLogoutView_admin(request, **kwargs):
+  print(f'pass in MyLogoutView_admin')
   request.session.flush()
   logout(request)
   return HttpResponseRedirect(reverse('accounts:login_admin'))
@@ -827,13 +973,14 @@ class EntityCreateView_buyer(generic.CreateView):
       if next1.find('BackToInput') >= 0:
 
         user = UserModel.objects.get(pk=next1.split('_')[1]) 
+        form = self.form_class(request.POST)
 
         context = {
-          'user': user,
           'flag_step': 1,
+          'user': user,
           'form': form,
         }
-        return TemplateResponse(self.request, 'accounts/buyer/.html', context)
+        return TemplateResponse(self.request, 'accounts/buyer/entityCreate.html', context)
 
 
       if next1.find('ToSave') >= 0: # 確認した内容をデータベースに登録
@@ -967,9 +1114,10 @@ class EntityCreateView_buyer(generic.CreateView):
         dict_buyEntityname = self.request.session.get('dict_buyEntityname')
 
         context = {
+          'flag_step': 1,
+          'NewOrNot': 'not', # new側は使っていない
           'user': user,
           'entity': entity,
-          'flag_step': 1,
           'form': form,
           'temporal_buyEntityname': entity.entityname,
           # Note(25/06/08)：選択済み内容をページ移動後も維持するために使う（初期は空欄）
@@ -1084,17 +1232,22 @@ class AgreementConfirmView_buyer(generic.CreateView):
 
       if checkValue == 'ToAgree': # 規約同意にチェックされた場合
 
-        buyEntity.membershipConsent_boolean = True
-        buyEntity.membershipConsent_at = timezone.now()
-        buyEntity.sourcingConsent_boolean = True
-        buyEntity.sourcingConsent_at = timezone.now()
+        if buyEntity.termsConsent == False:
+          buyEntity.termsConsent =  True
+          buyEntity.termsConsent_at = timezone.now()
 
-        buyEntity.joined_at = timezone.now()
-        buyEntity.save()
+        if buyEntity.sourcingConsent == False:
+          buyEntity.sourcingConsent =  True
+          buyEntity.sourcingConsent_at = timezone.now()
+
+
+        applyUser.termsConsent = True
+        applyUser.termsConsent_at = timezone.now()
 
         applyUser.addStatus = 1
         applyUser.addStatus_char = '承認待ち'
-        applyUser.save()
+
+        buyEntity.save(); applyUser.save()
 
         """ ★★ 25/02/19編集（テストは未済み）""" 
         """ 「canApproveAll=True」「canApproveChg=True」の人に承認依頼する """
@@ -1727,7 +1880,6 @@ class AgreementConfirmView_seller(generic.UpdateView):
 
     checkValue = request.POST.get('checkConsent', None)  
     buttonValue = self.request.POST.get('next', None) 
-    print(f'entity.membershipConsent_boolean={checkValue}')
 
     if buttonValue.find('ToAgree') >= 0:
 
@@ -1737,13 +1889,16 @@ class AgreementConfirmView_seller(generic.UpdateView):
 
       if checkValue == 'ToAgree':  # 規約同意にチェックされた場合
 
-        sellEntity.membershipConsent_boolean = True
-        sellEntity.membershipConsent_at = timezone.now()
+        if sellEntity.termsConsent == False:
+          sellEntity.termsConsent = True
+          sellEntity.termsConsent = timezone.now()
 
-        sellEntity.joined_at = timezone.now()
+        applyUser.termsConsent = True
+        applyUser.termsConsent_at = timezone.now()
+
         #entity.email = user.email
 
-        sellEntity.save()
+        applyUsersellEntity.save()
 
         if applyUser.type2 == 1: # 個人ゲストの場合は承認受けず
 
@@ -1751,7 +1906,7 @@ class AgreementConfirmView_seller(generic.UpdateView):
           applyUser.canApproveChg = True
           applyUser.canApproveQpay = True
 
-          applyUser.addStatus = 2 # （承認不要なため、）承認済みにする
+          applyUser.addStatus = 3 # （承認不要なため、）承認済みにする
           applyUser.addStatus_char = '承認不要'
 
           applyUser.entity = sellEntity
@@ -1779,7 +1934,7 @@ class AgreementConfirmView_seller(generic.UpdateView):
             applyUser.canApproveChg = True
             applyUser.canApproveQpay = True
 
-            applyUser.addStatus = 2 # 承認不要なので
+            applyUser.addStatus = 3 # 承認不要なので
             applyUser.addStatus_char = '承認不要'
             applyUser.is_active = True #ここでログインできるようになる
 
@@ -1911,12 +2066,12 @@ class UserAddView_buyer(LoginRequiredMixin, generic.TemplateView):
       self.request.session['flag_frWhere'] = 2
 
       applyUsers =UserModel.objects.filter(
-        Q(entity=loginUser.entity) & (Q(addStatus=1) | Q(addStatus=3))
+        Q(entity=loginUser.entity) & (Q(addStatus=1) | Q(addStatus=-3))
         ).order_by('-created_at')
       
       # 確認用
       cnt_applyUsers =UserModel.objects.filter(
-        Q(entity=loginUser.entity) & (Q(addStatus=1) | Q(addStatus=3))
+        Q(entity=loginUser.entity) & (Q(addStatus=1) | Q(addStatus=-3))
         ).count()
       print(f'cnt_applyUsers={cnt_applyUsers} in UserAddView_buyer')
 
@@ -1951,9 +2106,9 @@ class UserAddView_buyer(LoginRequiredMixin, generic.TemplateView):
       applyUser = UserModel.objects.get(pk=next.split('_')[1])
       #buyEntity = LegalEntity.objects.get(pk=applyUser.entity_id)
 
-      if applyUser.addStatus == 1 or applyUser.addStatus == 3:
+      if applyUser.addStatus == 1 or applyUser.addStatus == -3:
 
-        applyUser.addStatus = 2
+        applyUser.addStatus = 3
         applyUser.addStatus_char = '承認済み'
 
         applyUser.is_active = True #ここでログインできるようになる
@@ -1982,7 +2137,7 @@ class UserAddView_buyer(LoginRequiredMixin, generic.TemplateView):
 
           applyUsers =UserModel.objects.filter(
             Q(entity=loginUser.entity)
-            & (Q(addStatus=1) | Q(addStatus=3))).order_by('-created_at')
+            & (Q(addStatus=1) | Q(addStatus=-3))).order_by('-created_at')
           # 申請中＋否認済みのものが対象
 
           context = {
@@ -2011,7 +2166,7 @@ class UserAddView_buyer(LoginRequiredMixin, generic.TemplateView):
 
           applyUsers =UserModel.objects.filter(
             Q(entity=loginUser.entity)
-            & (Q(addStatus=1) | Q(addStatus=3))).order_by('-created_at')
+            & (Q(addStatus=1) | Q(addStatus=-3))).order_by('-created_at')
           # 申請中＋否認済みのものが対象
 
           context = {
@@ -2028,7 +2183,7 @@ class UserAddView_buyer(LoginRequiredMixin, generic.TemplateView):
       applyUser = UserModel.objects.get(pk=next.split('_')[1])
       #buyEntity = LegalEntity.objects.get(pk=applyUser.entity_id)
 
-      applyUser.addStatus = 3
+      applyUser.addStatus = -3
       applyUser.addStatus_char = "否認済み"
 
       applyUser.save()
@@ -2052,7 +2207,7 @@ class UserAddView_buyer(LoginRequiredMixin, generic.TemplateView):
 
         applyUsers =UserModel.objects.filter(
           Q(entity=loginUser.entity)
-          & (Q(addStatus=1) | Q(addStatus=3))).order_by('-created_at')
+          & (Q(addStatus=1) | Q(addStatus=-3))).order_by('-created_at')
 
         context = {
           'loginUser': loginUser,
@@ -2126,7 +2281,7 @@ class UserAddView_seller(LoginRequiredMixin, generic.CreateView):
 
       applyUsers =UserModel.objects.filter(
         Q(entity=loginUser.entity)
-        & (Q(addStatus=1) | Q(addStatus=3))).order_by('-created_at')
+        & (Q(addStatus=1) | Q(addStatus=-3))).order_by('-created_at')
 
 
       context = {
@@ -2160,9 +2315,9 @@ class UserAddView_seller(LoginRequiredMixin, generic.CreateView):
 
       #sellEntity = LegalEntity.objects.get(pk=applyUser.entity_id)
 
-      if applyUser.addStatus == 1 or applyUser.addStatus == 3:
+      if applyUser.addStatus == 1 or applyUser.addStatus == -3:
 
-        applyUser.addStatus = 2    # パートナー内でユーザー追加が承認された時点
+        applyUser.addStatus = 3    # パートナー内でユーザー追加が承認された時点
         applyUser.addStatus_char = '承認済み'
         applyUser.is_active = True #ここでログインできるようになる
 
@@ -2192,7 +2347,7 @@ class UserAddView_seller(LoginRequiredMixin, generic.CreateView):
 
           applyUsers =UserModel.objects.filter(
             Q(entity=loginUser.entity)
-            & (Q(addStatus=1) | Q(addStatus=3))).order_by('-created_at')
+            & (Q(addStatus=1) | Q(addStatus=-3))).order_by('-created_at')
 
           context = {
             'loginUser': loginUser,
@@ -2207,7 +2362,7 @@ class UserAddView_seller(LoginRequiredMixin, generic.CreateView):
       applyUser = UserModel.objects.get(pk=next.split('_')[1])
       #sellEntity = LegalEntity.objects.get(pk=applyUser.entity_id)
 
-      applyUser.addStatus = 3
+      applyUser.addStatus = -3
       applyUser.addStatus_char = "否認済み"
       applyUser.save()
 
@@ -2228,7 +2383,7 @@ class UserAddView_seller(LoginRequiredMixin, generic.CreateView):
 
         applyUsers =UserModel.objects.filter(
           Q(entity=loginUser.entity)
-          & (Q(addStatus=1) | Q(addStatus=3))).order_by('-created_at')
+          & (Q(addStatus=1) | Q(addStatus=-3))).order_by('-created_at')
 
         context = {
           #'form': self.form_class(),
@@ -2242,7 +2397,7 @@ class UserAddView_seller(LoginRequiredMixin, generic.CreateView):
 class BuyUserAddPreView_admin(LoginRequiredMixin, generic.TemplateView):
 
   " 案内されたメールからアプリに入ってユーザー追加の承認をする場合の入口 "
-  " tokenをapplyUser_idに変換して、UserAddView_buyerを呼ぶ "
+  " tokenをapplyUser_idに変換して、BuyUserAddView_adminを呼ぶ "
 
   login_url = '/accounts/login_admin/'
   timeout_seconds = getattr(settings,  'ACTIVATION_TIMEOUT_SECONDS', 60*60*24)
@@ -2302,11 +2457,11 @@ class BuyUserAddView_admin(LoginRequiredMixin, generic.TemplateView):
       self.request.session['flag_frWhere'] = 2
 
       applyUsers =UserModel.objects.select_related('entity').filter(
-        Q(type1=1) & (Q(addStatus=1) | Q(addStatus=3))).order_by('-created_at')
+        Q(type1=1) & (Q(addStatus=1) | Q(addStatus=-3))).order_by('-created_at')
       
       # 確認用
       cnt_applyUsers =UserModel.objects.filter(
-        Q(type1=1) & (Q(addStatus=1) | Q(addStatus=3))).count()
+        Q(type1=1) & (Q(addStatus=1) | Q(addStatus=-3))).count()
       print(f'cnt_applyUsers={cnt_applyUsers} in BuyUserAddView_admin')
       print(f'applyUsers={applyUsers} in BuyUserAddView_admin')
 
@@ -2337,12 +2492,12 @@ class BuyUserAddView_admin(LoginRequiredMixin, generic.TemplateView):
     if next.find('ToApproveUser') >= 0:
       print(f'pass1 ここ通っているのか in BuyUserAddView_admin')
 
-      applyUser = UserModel.objects.get(pk=next.split('_')[1])
+      applyUser = UserModel.objects.select_related('entity').get(pk=next.split('_')[1])
       #buyEntity = LegalEntity.objects.get(pk=applyUser.entity_id)
 
-      if applyUser.addStatus == 1 or applyUser.addStatus == 3:
+      if applyUser.addStatus == 1 or applyUser.addStatus == -3:
 
-        applyUser.addStatus = 2
+        applyUser.addStatus = 3
         applyUser.addStatus_char = '承認済み'
 
         applyUser.is_active = True #ここでログインできるようになる
@@ -2353,10 +2508,27 @@ class BuyUserAddView_admin(LoginRequiredMixin, generic.TemplateView):
         # ここからは申請者に参加が認められたことを伝えるメール送信
         utils.sendEmail_common('accounts/admin/mail/buyUserAddReplyYes', '', [applyUser.email])
 
-        messages.add_message(self.request,
-          messages.SUCCESS, "新しいパートナーが加わりました。") 
-        
-        return TemplateResponse(request, 'accounts/admin/mypage.html')
+        messages.add_message(self.request, messages.SUCCESS,
+          applyUser.entity.entityname + "が、新しいパートナーとなりました。") 
+
+        if self.request.session.get('flag_frWhere') == 1:
+          context = {
+            'applyUser': applyUser,
+          }     
+          return TemplateResponse(request, 'accounts/admin/buyUserAdd.html', context)
+
+
+        if self.request.session.get('flag_frWhere') == 2:
+          #loginUser = UserModel.objects.get(email=self.request.user)
+
+          applyUsers =UserModel.objects.filter(
+            Q(type1=1) & (Q(addStatus=1) | Q(addStatus=-3))).order_by('-created_at')
+
+          context = {
+           'applyUsers': applyUsers,
+          }
+          return TemplateResponse(request, 'accounts/admin/buyUserAdd.html', context)
+        #return TemplateResponse(request, 'accounts/admin/mypage.html')
 
       else: # ここは通らないはず
 
@@ -2374,7 +2546,7 @@ class BuyUserAddView_admin(LoginRequiredMixin, generic.TemplateView):
           #loginUser = UserModel.objects.get(email=self.request.user)
 
           applyUsers =UserModel.objects.filter(
-            Q(type1=1) & (Q(addStatus=1) | Q(addStatus=3))).order_by('-created_at')
+            Q(type1=1) & (Q(addStatus=1) | Q(addStatus=-3))).order_by('-created_at')
 
           context = {
            'applyUsers': applyUsers,
@@ -2388,7 +2560,7 @@ class BuyUserAddView_admin(LoginRequiredMixin, generic.TemplateView):
       loginUser = UserModel.objects.get(email=self.request.user)
       applyUser = UserModel.objects.get(pk=next.split('_')[1])
 
-      applyUser.addStatus = 3
+      applyUser.addStatus = -3
       applyUser.addStatus_char = "否認済み"
 
       applyUser.save()
@@ -2410,7 +2582,7 @@ class BuyUserAddView_admin(LoginRequiredMixin, generic.TemplateView):
         #loginUser = UserModel.objects.get(email=self.request.user)
 
         applyUsers =UserModel.objects.filter(
-          Q(type1=1) & (Q(addStatus=1) | Q(addStatus=3))).order_by('-created_at')
+          Q(type1=1) & (Q(addStatus=1) | Q(addStatus=-3))).order_by('-created_at')
 
         context = {
           'loginUser': loginUser,
@@ -2435,7 +2607,7 @@ class PermissionSetsView_buyer(generic.View):
 
     #entityUsers = entity.entity_users.all()
     entityUsers = UserModel.objects.filter(
-      Q(entity=entity) & (Q(addStatus=2) | Q(addStatus=3)))
+      Q(entity=entity) & (Q(addStatus=3) | Q(addStatus=-3)))
     # 既にユーザー追加が承認・否認されたデータを抽出
 
     context = {
@@ -2498,7 +2670,7 @@ class PermissionSetsView_buyer(generic.View):
               'editedUser': editedUser,
               'form': PermissionUpdateForm_buyer(),
             }
-            return TemplateResponse(request, 'accounts/seller/permissionUpdate.html', context)
+            return TemplateResponse(request, 'accounts/buyer/permissionUpdate.html', context)
 
 
         if char_canApproveAll == "True":
@@ -2530,7 +2702,7 @@ class PermissionSetsView_buyer(generic.View):
             'loginUser': loginUser,  # 承認・変更の権限があるかを確認
             'entityUsers': entityUsers,
           }
-          return TemplateResponse(request, 'accounts/admin/permissionList.html', context)
+          return TemplateResponse(request, 'accounts/buyer/permissionList.html', context)
 
         else: # ユーザー参加承認時の権限設定の場合
     
@@ -2549,7 +2721,7 @@ class PermissionSetsView_seller(generic.View):
     print(f'loginUser.entity_id={loginUser.entity_id}')
     #entityUsers = entity.entity_users.all()
     entityUsers = UserModel.objects.filter(
-      Q(entity=entity) & (Q(addStatus=2) | Q(addStatus=3)))
+      Q(entity=entity) & (Q(addStatus=3) | Q(addStatus=-3)))
     # 既にユーザー追加が承認・否認されたデータを抽出
 
     context = {
@@ -2637,7 +2809,7 @@ class PermissionSetsView_seller(generic.View):
             'loginUser': loginUser,
             'entityUsers': entityUsers,
           }
-          return TemplateResponse(request, 'accounts/admin/permissionList.html', context)
+          return TemplateResponse(request, 'accounts/seller/permissionList.html', context)
 
         else:  # ユーザー参加承認時の権限設定の場合
     
@@ -2648,7 +2820,6 @@ class PermissionSetsView_seller(generic.View):
 
 """ mypageから「ユーザーごとの権限」を確認・編集する """
 class PermissionSetsView_admin(generic.View):
-# ★★★ 2509025作成開始
 
   def get(self, request, **kwargs):  #selfはメソッドを呼んだインスタンス自体
 
@@ -2659,7 +2830,7 @@ class PermissionSetsView_admin(generic.View):
 
     #entityUsers = entity.entity_users.all()
     entityUsers = UserModel.objects.filter(
-      Q(entity=entity), (Q(addStatus=2) | Q(addStatus=3)))
+      Q(entity=entity), (Q(addStatus=3) | Q(addStatus=-3)))
     # ユーザー追加のステータスが承認・否認のものを抽出
 
     context = {
@@ -2688,13 +2859,13 @@ class PermissionSetsView_admin(generic.View):
         }
         context = {
           'editedUser': editedUser,
-          'form': PermissionUpdateForm_seller(initial=init_dict),
+          'form': PermissionUpdateForm_admin(initial=init_dict),
         }
         return TemplateResponse(request, 'accounts/admin/permissionUpdate.html', context)
 
 
     next2 = self.request.POST.get('next2', None)
-    form = PermissionUpdateForm_seller(self.request.POST)
+    form = PermissionUpdateForm_admin(self.request.POST)
     form.is_valid() # canApproveAll=Trueの人が一人はいるかバリデーションする
 
     if next2 != None:
@@ -2720,7 +2891,7 @@ class PermissionSetsView_admin(generic.View):
 
             context = {
               'editedUser': editedUser,
-              'form': PermissionUpdateForm_seller(),
+              'form': PermissionUpdateForm_admin(),
             }
             return TemplateResponse(request, 'accounts/admin/permissionUpdate.html', context)
 
@@ -2798,13 +2969,11 @@ class MyPageView_admin(generic.DetailView):
         logout(request)
         return HttpResponseRedirect(reverse('accounts:login', 2))
 
-    TwoWeeksAgo = datetime.datetime.now() - datetime.timedelta(days=14)
 
-    # ①前払い未処理（送金待ち）の件数を抽出
+    # ①前払い未処理の件数を抽出
     if adminUser.canApproveAll == True or adminUser.canApproveQpay == True:
-      cnt_toBePayed_qpay = QpayTx.objects.filter(
-        (Q(txStatus_int=1) | Q(txStatus_int=2) | Q(txStatus_int=3))
-        & Q(created_at__gte=TwoWeeksAgo)).count()
+      cnt_toBePayed_qpay = QpayTx.objects.filter(Q(txStatus=3)).count()
+      
     else: cnt_toBePayed_qpay = 0
 
     print(f'cnt_toBePayed_qpay={cnt_toBePayed_qpay} in MyPageView_admin')
@@ -2813,7 +2982,7 @@ class MyPageView_admin(generic.DetailView):
     # パートナーからのユーザー追加の承認依頼の件数を抽出
     if adminUser.canApproveAll == True or adminUser.canApproveChg == True:
       cnt_toBeApproved_add = UserModel.objects.filter(
-        Q(type1=1) & (Q(addStatus=1) | Q(addStatus=3))).count()
+        Q(type1=1) & (Q(addStatus=1) | Q(addStatus=-3))).count()
     else: cnt_toBeApproved_add = 0
     print(f'cnt_toBeApproved_add={cnt_toBeApproved_add}')
 
@@ -2869,14 +3038,13 @@ class MyPageView_buyer(generic.DetailView):
         logout(request)
         return TemplateResponse(request, "accounts/admin/login.html", {'form':MyLoginForm})
 
-    #TwoWeeksAgo = datetime.datetime.now() - datetime.timedelta(days=14)
 
-    # 前払いの「承認待ち」「否認」のデータの件数を抽出
+    " 前払いの「承認待ち」のデータの件数を抽出 "
     if loginUser.canApproveAll == True or loginUser.canApproveQpay == True:
 
       cnt_toBeApproved_qpay = QpayTx.objects.filter(
         Q(buyEntity=loginUser.entity)
-        & (Q(txStatus_int=1) | Q(txStatus_int=3))).count()
+        & (Q(txStatus=1) | Q(txStatus=-3) | Q(txStatus=4))).count()
       
     else: cnt_toBeApproved_qpay = 0
 
@@ -2884,7 +3052,7 @@ class MyPageView_buyer(generic.DetailView):
     if loginUser.canApproveAll == True or loginUser.canApproveChg == True:
       cnt_toBeApproved_add = UserModel.objects.filter(
         Q(entity=loginUser.entity)
-        & (Q(addStatus=1) | Q(addStatus=3))).count()
+        & (Q(addStatus=1) | Q(addStatus=-3))).count()
       
     else: cnt_toBeApproved_add = 0
 
@@ -2899,12 +3067,13 @@ class MyPageView_buyer(generic.DetailView):
     print(f'cnt_toBeApproved_add = {cnt_toBeApproved_add} in get of MypageView_buyer')
     print(f'flag_sendback = {flag_sendback} in get of MypageView_buyer')
 
+    " 今月、どのくらい前払いされた件数・金額がるかを表示するため "
     firstOfThisMonth = date.today().replace(day=1)
     firstOfNextMonth = firstOfThisMonth + relativedelta(months=+1)
 
     query_tx = QpayTx.objects.filter(
       buyEntity=loginUser.entity,
-      txStatus_int = 2,
+      txStatus__gte = 5,
       advanced_at__gte = firstOfThisMonth,
       advanced_at__lt = firstOfNextMonth)
 
@@ -2963,13 +3132,25 @@ class MyPageView_seller(generic.DetailView):
         logout(request)
         return TemplateResponse(request, "accounts/admin/login.html", {'form':MyLoginForm})
 
-    #TwoWeeksAgo = datetime.datetime.now() - datetime.timedelta(days=14)
+    " 前払いの「承認待ち」のデータの件数を抽出 "
+    if loginUser.canApproveAll == True or loginUser.canApproveQpay == True:
+
+      cnt_toBeReapplied_qpay = QpayTx.objects.filter(
+        Q(sellEntity=loginUser.entity) & Q(txStatus=2)).count()
+      
+    else: cnt_toBeReapplied_qpay = 0
+    print(f'loginUser.Entity={loginUser.entity}')
+    print(f'cnt_toBeReapplied_qpay={cnt_toBeReapplied_qpay}')
+
+    txs = QpayTx.objects.filter(Q(sellEntity=loginUser.entity))
+    for tx in txs:
+      print(f'tx.txStatus={tx.txStatus}')
 
     # ユーザー追加の未処理（承認待ち）データを抽出
     if loginUser.canApproveAll == True or loginUser.canApproveChg == True:
       cnt_toBeApproved_add = UserModel.objects.filter(
         Q(entity=loginUser.entity)
-        & (Q(addStatus=1) | Q(addStatus=3))).count()
+        & (Q(addStatus=1) | Q(addStatus=-3))).count()
     else: cnt_toBeApproved_add = 0
 
     return TemplateResponse(
@@ -2978,6 +3159,7 @@ class MyPageView_seller(generic.DetailView):
         'loginUser': loginUser,
         #'sellEntity': sellEntity,
         'cnt_toBeApproved_add': cnt_toBeApproved_add,
+        'cnt_toBeReapplied_qpay': cnt_toBeReapplied_qpay,
       }
     ) 
 
@@ -3052,115 +3234,7 @@ class ContactView_seller(generic.FormView):
     
     return super().form_valid(form)
   
-class BankAccount:
 
-  def MakeBanksBranchesDict():
-
-    dict_banks = {} 
-    dict_bankCode_branches = {} 
-
-    for bankCode in Bank.all:
-      dict_banks.update({bankCode : Bank[bankCode].name})
-
-      dict_branches = {} 
-      for branchCode in Bank[bankCode].branches:
-        dict_element = {
-        'name': Bank[bankCode].branches[branchCode].name,
-        'kana': Bank[bankCode].branches[branchCode].kana,
-        'hira': Bank[bankCode].branches[branchCode].hira,
-        'roma': Bank[bankCode].branches[branchCode].roma,
-        }
-        dict_branches.update({branchCode : dict_element})
-
-      dict_bankCode_branches.update({bankCode : dict_branches})
-
-    return dict_bankCode_branches
-
-
-  def MakeBanksDict():
-
-    dict_banks = {} 
-
-    for bankCode in Bank.all:
-      dict_element = {
-        'name': Bank[bankCode].name,
-        'kana': Bank[bankCode].kana,
-        'hira': Bank[bankCode].hira,
-        'roma': Bank[bankCode].roma,
-      }
-      dict_banks.update({bankCode : dict_element})
-
-      #dict_banks = sorted(dict_banks.items)
-    if bankCode == '0001':
-      print(f'dict_banks={dict_banks}')
-
-    return dict_banks
-  
-
-  def BankSearch(keyword):
-  
-    keyword = unicodedata.normalize('NFKC', keyword)
-
-    dict_MatchedBank = {}
-    
-    for bankCode in Bank.all:
-      #bank = Bank[code]
-      bank = Bank[bankCode]
-
-      if re.match(keyword, bankCode) or \
-        bank.name.find(keyword) >= 0 or \
-        bank.kana.find(keyword) >= 0 or \
-        bank.hira.find(keyword) >= 0 or \
-        bank.roma.find(keyword) >= 0: 
-
-        dict_MatchedBank.update({ bankCode: bank.name })
-
-    return dict_MatchedBank
-  
-
-  def BranchSearch(bankCode, keyword):
-    
-    keyword = unicodedata.normalize('NFKC', keyword)
-    dict_MatchedBranch = {}
-    
-    branches = Bank[bankCode].branches
-
-    for code in branches:
-      #bank = Bank[code]
-      branch = branches[code]
-
-      if re.match(keyword, code) or\
-        branch.name.find(keyword) >= 0 or\
-        branch.kana.find(keyword) >= 0 or\
-        branch.hira.find(keyword) >= 0 or\
-        branch.roma.find(keyword) >= 0: 
-        
-        dict_MatchedBranch.update({ code: branch.name })
-
-    return dict_MatchedBranch
-
-
-  def BankCodeSearch(bankCode):
-    
-    for eachCode in Bank.all:
-      #bank = Bank[code]
-      bank = Bank[eachCode]
-
-      if re.match(bankCode, eachCode): return bank.name
-      
-    return '該当データなし'
-
-  def BranchCodeSearch(bankCode, branchCode):
-    
-    branches = Bank[bankCode].branches
-  
-    for eachCode in branches:
-      #bank = Bank[code]
-      branch = branches[eachCode]
-
-      if re.match(branchCode, eachCode): return branch.name
-
-    return '該当データなし'
 
 
 """ ゲストがメールにあるリンクから口座登録する場合に利用するビュー """
@@ -3191,10 +3265,10 @@ class BankAccountCreateView(generic.CreateView):
 
   login_url = '/accounts/login_seller/'
   model = BankAccount
-  form_class = BankAccountForm
+  #form_class = BankSelectForm
   #template_name='accounts/seller/bankAccountCreate1.html'
-  dict_banks = BankAccount.MakeBanksDict()
-  dict_bankCode_branches = BankAccount.MakeBanksBranchesDict()
+  dict_banks =utils.MakeBanksDict()
+  dict_bankCode_branches = utils.MakeBanksBranchesDict()
 
   def get(self, request, *args, **kwargs):
 
@@ -3214,7 +3288,6 @@ class BankAccountCreateView(generic.CreateView):
     try:
       tx_id = self.kwargs.get('tx_id')
       tx = QpayTx.objects.get(pk=tx_id)
-      init_dict.update(temporal_tx_id=tx_id)
 
       sellEntity = tx.sellEntity
     
@@ -3222,44 +3295,39 @@ class BankAccountCreateView(generic.CreateView):
       sellEntity = LegalEntity.objects.get(pk=sellUser.entity_id)
 
 
-    if sellEntity.bankAccount_flag == 1: # 受取口座が未設定の場合
+    print(f'pass1 def get in BankAccountV')
+    if BankAccount.objects.filter(entity=sellEntity).exists(): # 受取口座が設定済みの場合
 
-      ba = sellEntity.bankAccount
+      cnt = BankAccount.objects.filter(entity=sellEntity).count()
+      print(f'bankaccount count = {cnt}')
+      print(f'pass2 def get in BankAccountV')
+      ba = BankAccount.objects.get(entity=sellEntity)
+      print(f'ba.bankCode={ba.bankCode}')
       print(f'ba.bankName={ba.bankName}')
+      print(f'ba.branchCode={ba.branchCode}')
       print(f'ba.branchName={ba.branchName}')
-      init_dict.update(bankCode=ba.bankCode)
-      init_dict.update(bankName=ba.bankName)
-      init_dict.update(branchCode=ba.branchCode)
-      init_dict.update(branchName=ba.branchName)
-      init_dict.update(holderName=ba.holderName)
-      init_dict.update(accountNumber=ba.accountNumber)
-
-      form = self.form_class(initial=init_dict)
 
       context = {
         'sellUser': sellUser,
         'sellEntity': sellEntity,
-        'form' : form,
+        'ba': ba,
       }
       # 既存口座を表示のうえ、新しい口座を設定を選択する画面をレンダリング
       return render(request, 'accounts/seller/bankAccountCreate1.html', context)
 
     else:
-    # entity.bankAccount_flag == 1のとき（受取口座が設定済み場合）
-    # 既に口座設定がなされている場合は、表示するようフォームに初期値セット
-      form = self.form_class(initial=init_dict)
+    # entity.bankAccount_flag == 0のとき（受取口座が未設定の場合）
 
       context = {
         'flag_step': 1,
         'sellUser': sellUser,
         'sellEntity': sellEntity,
 
-        'form' : form,
+        'form_bankSelect' : BankSelectForm(),
         'json_banks': json.dumps(self.dict_banks),
         'json_bankCode_branches': json.dumps(self.dict_bankCode_branches),
       }
-      # bankAccountCreate1.htmlは（あれば）既設定口座を表示し、①登録済み口座を利用、②新規口座の設定か選択
-      # bankAccountCreate2.htmlは、新規口座を登録
+
       return render(request, 'accounts/seller/bankAccountCreate2.html', context)
       
 
@@ -3285,7 +3353,7 @@ class BankAccountCreateView(generic.CreateView):
           'sellUser': sellUser,
           'sellEntity': sellEntity,
 
-          'form' : BankSelectForm(),
+          'form_bankSelect' : BankSelectForm(),
           'json_banks': json.dumps(self.dict_banks),
           'json_bankCode_branches': json.dumps(self.dict_bankCode_branches),
         }
@@ -3298,149 +3366,160 @@ class BankAccountCreateView(generic.CreateView):
   
     if search != None:
 
-      if search.find('BankSearch') >= 0:
+      if search.find('BankSearch') >= 0 or search.find('BranchSearch') >= 0:
 
         sellUser = UserModel.objects.get(pk=search.split('_')[1]) 
         sellEntity = LegalEntity.objects.get(pk=search.split('_')[2])
 
         bankSearchInput = self.request.POST['name_bankSearchInput']
-        print(f'ここ来る３ name_bankSearchInput={bankSearchInput}')
-        dict_MatchedBank = BankAccount.BankSearch(bankSearchInput)
-
-        init_dict = {
-          'bankCode': self.request.POST.get('bankCode', None),
-          'branchCode': self.request.POST.get('branchCode', None),
-        }
-        context = {
-          'flag_step': 1,
-          'sellUser': sellUser,
-          'sellEntity': sellEntity,
-
-          'form' : BankSelectForm(initial=init_dict),
-          'bankCode': self.request.POST.get('bankCode', None),
-          'bankSearchInput': bankSearchInput,
-          'dict_MatchedBank': dict_MatchedBank,
-          'json_banks': json.dumps(self.dict_banks),
-          'json_bankCode_branches': json.dumps(self.dict_bankCode_branches),
-        }
-        return render(request, "accounts/seller/bankAccountCreate2.html", context)
-
-
-      if search.find('BranchSearch') >= 0:
-
-        sellUser = UserModel.objects.get(pk=search.split('_')[1]) 
-        sellEntity = LegalEntity.objects.get(pk=search.split('_')[2])
-      
-        bankCode = self.request.POST.get('bankCode', None)
-        print(f'bankCode={bankCode}')
-
-        bankSearchInput = self.request.POST.get('name_bankSearchInput', None)
         branchSearchInput = self.request.POST.get('name_branchSearchInput', None)
+        bankCode = self.request.POST.get('bankSelect')
+        branchCode = self.request.POST.get('branchSelect')
 
-        if bankCode is None or bankCode == "":
-          dict_MatchedBranch = ""
-          messages.info(request, '金融機関を選択してください')
+        dict_MatchedBank = {}; choices_bank = None
+        #print(f'pass0 dict_MatchedBank={dict_MatchedBank}')
+        if bankSearchInput != "":
+          dict_MatchedBank = utils.BankSearch(bankSearchInput)
+          choices_bank = [('', '金融機関を選択してください')] + [
+            (code, f'{code} {name}') for code, name in dict_MatchedBank.items()]
+          #print(f'pass1 dict_MatchedBank={dict_MatchedBank}')
         else:
-          # 金融機関が選択され、支店の検索文字が入力されて初めて検索できる
-          dict_MatchedBranch = BankAccount.BranchSearch(bankCode, branchSearchInput)
+          messages.add_message(request, messages.WARNING, "キーワードが設定されていません。")
 
-        # テンプレートで表示されているものを再現するため
-        dict_MatchedBank = BankAccount.BankSearch(bankSearchInput)
-
+        dict_MatchedBranch = {}; choices_branch = None
+        if bankCode and bankCode != "":        
+          dict_MatchedBranch = utils.BranchSearch(bankCode, branchSearchInput)
+          choices_branch = [('', '支店を選択してください')] + [
+            (code, f'{code} {name}') for code, name in dict_MatchedBranch.items()]
+        else:
+          messages.add_message(request, messages.WARNING, "金融機関と支店を選択してください。")
+ 
         init_dict = {
-          'bankCode': bankCode,
-          'branchCode': self.request.POST.get('branchCode', None),
+          'bankSelect': bankCode,
+          'branchSelect': branchCode,
         }
+        form_bankSelect = BankSelectForm(initial=init_dict)
+
+        if choices_bank: form_bankSelect.fields['bankSelect'].choices = choices_bank
+        if choices_branch: form_bankSelect.fields['branchSelect'].choices = choices_branch
+
         context = {
           "flag_step": 1,
           'sellUser': sellUser,
           'sellEntity': sellEntity,
 
-          'form' : BankSelectForm(initial=init_dict),
-          'bankCode': bankCode,
+          'form_bankSelect': form_bankSelect,
+          #'bankCode': bankCode,
+          #'bankCode': self.request.POST.get('bankCode', None),
           'bankSearchInput': bankSearchInput,
           'branchSearchInput': branchSearchInput,
           'dict_MatchedBank': dict_MatchedBank,
           'dict_MatchedBranch': dict_MatchedBranch,
-          'bankCode': self.request.POST.get('bankCode', None),
           'json_banks': json.dumps(self.dict_banks),
           'json_bankCode_branches': json.dumps(self.dict_bankCode_branches),
         }
-        return  TemplateResponse(request, "accounts/seller/bankAccountCreate2.html", context)
+        return  TemplateResponse(self.request, "accounts/seller/bankAccountCreate2.html", context)
 
 
     next = self.request.POST.get('next', '')   # POST.getはミドルウェア機能 
     if next:
 
-      if next.find('ToInput') >= 0: # 口座名義・番号を入力する処理
+      if next.find('ToInputAccount') >= 0: # 口座名義・番号を入力する処理
 
         sellUser = UserModel.objects.get(pk=next.split('_')[1]) 
         sellEntity = LegalEntity.objects.get(pk=next.split('_')[2])
 
-        print(f'pass1 if next==ToInput post/form.is_valid in BankAccountCreateView')
+        form_bankSelect = BankSelectForm(self.request.POST)
+        print(f'self.request.POST={self.request.POST}')
 
-        form = BankSelectForm(self.request.POST)
-        if form.is_valid():
+        #bankCode = self.request.POST.get('bankSelect-bankSelect')
+        #branchCode = self.request.POST.get('bankSelect-branchSelect')
+        #print(f'bankSelect-bankSelect={bankCode} bankSelect-branchSelect={branchCode}')
+
+        bankCode = self.request.POST.get('bankSelect')
+        branchCode = self.request.POST.get('branchSelect')
+        print(f'bankSelect={bankCode} branchSelect={branchCode}')
+
+        if bankCode and bankCode != "":
+          dict_MatchedBank = utils.BankSearch(self.request.POST['name_bankSearchInput'])
+          choices_bank = [('', '金融機関を選択してください')] + [
+            (code, f'{code} {name}') for code, name in dict_MatchedBank.items()
+          ]
+          form_bankSelect.fields['bankSelect'].choices = choices_bank
+          #print(f'dict_MatchedBank={dict_MatchedBank}')
+          #print(f'choices_bank={choices_bank}')
+
+        if bankCode and bankCode != "" and \
+           branchCode and branchCode != "" :
+
+          branchSearchInput = self.request.POST['name_branchSearchInput']
+          dict_MatchedBranch = {}
+          dict_MatchedBranch = utils.BranchSearch(bankCode, branchSearchInput)
+          choices_branch = [('', '支店を選択してください')] + [
+            (code, f'{code} {name}') for code, name in dict_MatchedBranch.items()
+          ]
+          form_bankSelect.fields['branchSelect'].choices = choices_branch
+
+        print(f'pass0 next=ToInputAccount if form_bankSelect.is_valid')
+        if form_bankSelect.is_valid():
+
+          print(f'pass1 next=ToInputAccount if form_bankSelect.is_valid==True')
+          cleaned_data = form_bankSelect.cleaned_data
+          bankCode = cleaned_data['bankSelect']
+          branchCode = cleaned_data['branchSelect']
           
-          cleaned_data = form.cleaned_data
-          bankCode = cleaned_data['bankCode']
-          branchCode = cleaned_data['branchCode']
-
-          print(f'pass2 bankCode={bankCode}, branchCode={branchCode} if next==ToInput post/form.is_valid in BankAccountCreateView')
-
-          #bankCode = self.request.POST['name_bankSelect']
-          #branchCode = self.request.POST['name_branchSelect']
-
-          bankName = BankAccount.BankCodeSearch(bankCode)
-          branchName = BankAccount.BranchCodeSearch(bankCode, branchCode)
+          bankName = utils.BankCodeSearch(bankCode)
+          branchName = utils.BranchCodeSearch(bankCode, branchCode)
 
           print(f'bankCode={bankCode} BankAccountCreateV, post, next==ToInput')
           print(f'branchCode={branchCode} BankAccountCreateV, post, next==ToInput')
           print(f'bankName={bankName} BankAccountCreateV, post, next==ToInput')
           print(f'branchName={branchName} BankAccountCreateV, post, next==ToInput')
 
-          init_dict = {         
+          init_dict = {
             'bankCode': bankCode,
-            'branchCode': branchCode,
             'bankName': bankName,
+            'branchCode': branchCode,
             'branchName': branchName,
           }
-          form = self.form_class(initial=init_dict)
+          form_bankAccount = BankAccountForm(initial=init_dict)
 
           context = {
             'flag_step': 2,
             'sellUser': sellUser,
             'sellEntity': sellEntity,
-            'form': form,
+            'form_bankAccount': form_bankAccount,
           }
-          return render(request, "accounts/seller/bankAccountCreate2.html", context)
+          return render(self.request, "accounts/seller/bankAccountCreate2.html", context)
         
-        else:  # 「form.is_valid() == False」のとき
+        else:  # 「form_bankSelect.is_valid() == False」のとき
 
-          bankCode = self.request.POST.get('bankCode', None)
-          branchCode = self.request.POST.get('branchCode', None)
+          print(form_bankSelect.errors)
 
           bankSearchInput = self.request.POST.get('name_bankSearchInput', None)
+          dict_MatchedBank = {}
+          if bankSearchInput != "":
+            dict_MatchedBank = utils.BankSearch(bankSearchInput)
+
           branchSearchInput = self.request.POST.get('name_branchSearchInput', None)
+          dict_MatchedBranch = {}
+          if branchSearchInput != "":
+            dict_MatchedBranch = utils.BranchSearch(bankCode, branchSearchInput)
 
-          dict_MatchedBank = BankAccount.BankSearch(bankSearchInput)
-          dict_MatchedBranch = BankAccount.BranchSearch(bankCode, branchSearchInput)
-
-          init_dict = {
-            'bankCode': bankCode,
-            'branchCode': branchCode,
-          }
           context = {
             'flag_step': 1,
             'sellUser': sellUser,
             'sellEntity': sellEntity,
 
-            'form' : BankSelectForm(initial=init_dict),
+            'form_bankSelect' : form_bankSelect,
             'bankSearchInput': bankSearchInput,
             'branchSearchInput': branchSearchInput,
             'dict_MatchedBank': dict_MatchedBank,
+            'dict_MatchedBranch': dict_MatchedBranch,
+            'json_banks': json.dumps(self.dict_banks),
+            'json_bankCode_branches': json.dumps(self.dict_bankCode_branches),
           }
-          return render(request, "accounts/seller/bankAccountCreate2.html", context)
+          return render(self.request, "accounts/seller/bankAccountCreate2.html", context)
 
 
       if next.find('ToConfirm') >= 0:
@@ -3449,15 +3528,15 @@ class BankAccountCreateView(generic.CreateView):
         sellEntity = LegalEntity.objects.get(pk=next.split('_')[2])
         print(f'next={next}')
 
-        form = self.form_class(self.request.POST)
+        form_bankAccount = BankAccountForm(self.request.POST)
 
-        if form.is_valid():
+        if form_bankAccount.is_valid():
 
           context = {
             'flag_step': 3,
             'sellUser': sellUser,
             'sellEntity': sellEntity,
-            'form': form,
+            'form_bankAccount': form_bankAccount,
           }
           return TemplateResponse(request, "accounts/seller/bankAccountCreate2.html", context)
 
@@ -3467,7 +3546,7 @@ class BankAccountCreateView(generic.CreateView):
             'flag_step': 2,
             'sellUser': sellUser,
             'sellEntity': sellEntity,
-            'form': form,
+            'form_bankAccount': form_bankAccount,
           }
           return render(request, "accounts/seller/bankAccountCreate2.html", context)
 
@@ -3477,21 +3556,28 @@ class BankAccountCreateView(generic.CreateView):
         sellUser = UserModel.objects.get(pk=next.split('_')[1]) 
         sellEntity = LegalEntity.objects.get(pk=next.split('_')[2])
 
-        form = self.form_class(self.request.POST)
+        #init_dict = {         
+        #  'bankSelect': self.request.POST.get('bankSelect', None),
+        #  'branchSelect': self.request.POST.get('branchSelect', None),
+        #}
 
         bankCode = self.request.POST.get('bankCode', None)
         branchCode = self.request.POST.get('branchCode', None)
-        dict_MatchedBank = BankAccount.BankSearch(bankCode)
-        dict_MatchedBranch = BankAccount.BranchSearch(bankCode, branchCode)
+
+        init_dict = {
+          'bankSelect': bankCode,
+          'branchSelect': branchCode,
+        }
+        print(f'bankCode={bankCode} if next.find(BackToSelect) BankAccountCreageView')
+        dict_MatchedBank = utils.BankSearch(bankCode) 
+        dict_MatchedBranch = utils.BranchSearch(bankCode, branchCode)
 
         context = {
           'flag_step': 1,
           'sellUser': sellUser,
           'sellEntity': sellEntity,
 
-          'form' : form,
-          'bankCode': bankCode,
-          'branchCode': branchCode,
+          'form_bankSelect' : BankSelectForm(initial=init_dict),
           'dict_MatchedBank': dict_MatchedBank,
           'dict_MatchedBranch': dict_MatchedBranch,
           'json_banks': json.dumps(self.dict_banks),
@@ -3505,29 +3591,28 @@ class BankAccountCreateView(generic.CreateView):
         sellUser = UserModel.objects.get(pk=next.split('_')[1]) 
         sellEntity = LegalEntity.objects.get(pk=next.split('_')[2])
 
-        form = self.form_class(self.request.POST)
-
-        if form.is_valid():
+        form_bankAccount = BankAccountForm(self.request.POST)
+        
+        if form_bankAccount.is_valid():
 
           ba_tmp = BankAccount()
-          ba_tmp = form.save(commit=False)
-          ba_tmp.temporal_tx_id = 0
+          ba_tmp = form_bankAccount.save(commit=False)
 
           try:
 
             # 既存口座データがある場合の処理
-            ba = self.model.objects.get(pk=sellEntity.bankAccount_id)
+            ba = BankAccount.objects.get(entity=sellEntity)
             ba.bankCode = ba_tmp.bankCode
             ba.bankName = ba_tmp.bankName
             ba.branchCode = ba_tmp.branchCode
             ba.branchName = ba_tmp.branchName
             ba.holderName = ba_tmp.holderName
             ba.accountNumber = ba_tmp.accountNumber
-            ba.temporal_tx_id = 0
+            ba.entity = sellEntity
 
             ba.save()
 
-            sellEntity.bankAccount_flag = 1
+            sellEntity.bankAccount_flag = 1 
             sellEntity.bankAccount = ba
             sellEntity.save()
 
@@ -3537,6 +3622,7 @@ class BankAccountCreateView(generic.CreateView):
 
             # 既存口座データがない場合の処理
             # ＝（ba = self.model.objects.get(entity_id=ba_tmp.entity_id)がデータ取得できない場合）
+            ba_tmp.entity = sellEntity
             ba_tmp.save()
             sellEntity.bankAccount_flag = 1
             sellEntity.bankAccount = ba_tmp
@@ -3544,48 +3630,54 @@ class BankAccountCreateView(generic.CreateView):
 
             messages.add_message(request, messages.INFO, "受け取り口座は設定されました。") 
 
-
-          return TemplateResponse(request, 'accounts/seller/mypage.html')
-
-        else: #「if form.is_valid() == False」のとき
-          
-          messages.add_message(request, messages.WARING, "口座情報の入力にエラーがあります。")
           context = {
-            'flag_step': 1,
-            'form': form,
+            'flag_step': 4,  
+          }
+          return render(self.request, 'accounts/seller/bankAccountCreate2.html', context)
+          #return TemplateResponse(request, 'accounts/seller/mypage.html')
+
+        else: #「if form_bankAccount.is_valid() == False」のとき
+          
+          print(f'form_bankAccount.errors={form_bankAccount.errors}')
+          messages.add_message(request, messages.WARNING, "口座情報の入力にエラーがあります。")
+          context = {
+            'flag_step': 2,
+            'form_bankAccount': form_bankAccount,
           } 
           return render(self.request, 'accounts/seller/bankAccountCreate2.html', context)
 
-
+      """ 口座名義・番号の入力に戻る（flag_step：3 ⇒ 2） """
       if next.find('BackToInput') >= 0:
 
         sellUser = UserModel.objects.get(pk=next.split('_')[1]) 
         sellEntity = LegalEntity.objects.get(pk=next.split('_')[2])
 
-        form = self.form_class(self.request.POST)
+        bankCode = self.request.POST.get('bankCode')
+        bankName = self.request.POST.get('bankName')
+        branchCode = self.request.POST.get('branchCode')
+        branchName = self.request.POST.get('branchName')
+
+        init_dict = {
+          'bankCode': bankCode,
+          'bankName': bankName,
+          'branchCode': branchCode,
+          'branchName': branchName,
+        }
+        form_bankAccount = BankAccountForm(initial=init_dict)
 
         print(f'ここまで来てる（def post if next==back after form.is_valid in class BankAccountCreateView）')
         context = {
           'flag_step': 2,  
           'sellUser': sellUser,
           'sellEntity': sellEntity,
-          'form': form,
+          'form_bankAccount': form_bankAccount,
+
           'json_banks': json.dumps(self.dict_banks),
           'json_bankCode_branches': json.dumps(self.dict_bankCode_branches),
         }
         return render(self.request, 'accounts/seller/bankAccountCreate2.html', context)
   
     return HttpResponseBadRequest()
-
-  def form_invalid(self, form):
-
-    print(f'ここ来てる2（form_invalid in class BankAccountCreateView）')
-    print(form.errors)
-    form.instance.user = self.request.user
-    return super().form_invalid(form)
-
-  def get_success_url(self):
-    return reverse('accounts:mypage_seller')
 
 
 
@@ -3602,7 +3694,7 @@ class InfoEditView_buyer(generic.DetailView):
       if buyUser.canApproveAll == True or buyUser.canApproveChg == True:
         cnt_toBeApproved_add = UserModel.objects.filter(
           Q(entity=buyUser.entity)
-          & (Q(addStatus=1) | Q(addStatus=3))).count()
+          & (Q(addStatus=1) | Q(addStatus=-3))).count()
       else: cnt_toBeApproved_add = 0
 
       # 会社情報の申請に「差戻」があった場合にフラグを立てる
@@ -3613,8 +3705,9 @@ class InfoEditView_buyer(generic.DetailView):
           flag_sendback = 1
       
       # 確認用
-      corpInfo_tmp = CorpInfo.objects.get(applyEntity=buyUser.entity)
-      print(f'corpInfo_tmp={corpInfo_tmp} status={corpInfo_tmp.status}')
+      if CorpInfo.objects.filter(applyEntity=buyUser.entity, status=2).exists():
+        corpInfo_tmp = CorpInfo.objects.get(applyEntity=buyUser.entity, status=2)
+        print(f'corpInfo_tmp={corpInfo_tmp} status={corpInfo_tmp.status}')
 
     except UserModel.DoesNotExist:
 
@@ -3643,7 +3736,7 @@ class InfoEditView_seller(generic.DetailView):
         #TwoWeeksAgo = datetime.datetime.now() - datetime.timedelta(days=14)
         cnt_toBeApproved_add = UserModel.objects.filter(
         Q(entity=sellUser.entity)
-        & (Q(addStatus=1) | Q(addStatus=3))).count()
+        & (Q(addStatus=1) | Q(addStatus=-3))).count()
 
       else: cnt_toBeApproved_add = 0
       
@@ -3671,7 +3764,7 @@ class InfoEditView_admin(generic.DetailView):
       # パートナーからのユーザー追加の承認依頼の件数を抽出する 
       if adminUser.canApproveAll == True or adminUser.canApproveChg == True:
         cnt_toBeApproved_add = UserModel.objects.filter(
-          Q(type1=1) & (Q(addStatus=1) | Q(addStatus=3))).count()
+          Q(type1=1) & (Q(addStatus=1) | Q(addStatus=-3))).count()
       else: cnt_toBeApproved_add = 0
 
       # 会社情報の更新申請中（CorpInfo.status=1）の件数を抽出
@@ -4006,7 +4099,6 @@ class ProfileEditView_buyer(generic.UpdateView):
           for eachUser in qneeUsers:
 
             context1 = {
-              'afterLogin': 'corpInfoApply',
               'token': dumps(corpInfo.pk), 
               'qneeUser': eachUser,
               'applyEntityname': corpInfo.applyEntity.entityname,
@@ -4412,7 +4504,7 @@ class ProfileEditView_seller(generic.UpdateView):
 class CorpInfoUpdatePreView_admin(LoginRequiredMixin, generic.TemplateView):
 
   " 案内されたメールからアプリに入ってユーザー追加の承認をする場合の入口 "
-  " tokenをapplyUser_idに変換して、CorpInfoUpdateView_buyerを呼ぶ "
+  " tokenをapplyUser_idに変換して、CorpInfoUpdateView_adminを呼ぶ "
 
   login_url = '/accounts/login_admin/'
   timeout_seconds = getattr(settings,  'ACTIVATION_TIMEOUT_SECONDS', 60*60*72)
@@ -4573,7 +4665,7 @@ class CorpInfoUpdateView_admin(LoginRequiredMixin, generic.TemplateView):
       context = {
         'step_process': 2,
         'corpInfo_id': corpInfo_id,
-        'FeedbackForm': FeedbackForm_corpInfo(), }
+        'SendbackInfoForm': SendbackInfoForm_corpInfo(), }
       return TemplateResponse(request, 'accounts/admin/corpInfoUpdate.html', context)
 
 
@@ -4583,29 +4675,29 @@ class CorpInfoUpdateView_admin(LoginRequiredMixin, generic.TemplateView):
       print(f'corpInfo_id={corpInfo_id}')
       corpInfo = CorpInfo.objects.select_related('applyUser', 'applyEntity').get(pk=corpInfo_id)
 
-      form = FeedbackForm_corpInfo(request.POST)
+      form = SendbackInfoForm_corpInfo(request.POST)
 
-      sendbackReason = self.request.POST.get('sendbackReason_radio')
-      print(f'sendbackReason_radio={sendbackReason}')
+      reason_radio = self.request.POST.get('reason_radio')
+      print(f'reason_radio={reason_radio}')
       
-      form = FeedbackForm_corpInfo(self.request.POST)
+      form = SendbackInfoForm_corpInfo(self.request.POST)
       if form.is_valid(): 
 
         print(f'pass1 after if form.is_valid==True in CorpInfoUpdateView_admin')
 
-        sendbackReason = form.cleaned_data['sendbackReason_radio']
-        sendbackMessage = form.cleaned_data['sendbackMessage']
+        reason_radio = form.cleaned_data['reason_radio']
+        message = form.cleaned_data['message']
 
-        if sendbackReason == 'その他':
+        if reason_radio == 'その他':
           print(f'pass2 after if form.is_valid==True in CorpInfoUpdateView_admin')
-          sendbackReason = form.cleaned_data['sendbackReason_text']
+          reason_radio = form.cleaned_data['reason_text']
         else:
           print(f'pass3 after if form.is_valid==True in CorpInfoUpdateView_admin')
 
         corpInfo.status = 2 # 差戻のステータスに変更
         corpInfo.status_char = "差戻"
-        corpInfo.sendbackReason = sendbackReason
-        corpInfo.sendbackMessage = sendbackMessage
+        corpInfo.sendbackReason = reason_radio
+        corpInfo.sendbackMessage = message
 
         corpInfo.save()
         print(f'corpInfo.status={corpInfo.status}')
@@ -4613,8 +4705,8 @@ class CorpInfoUpdateView_admin(LoginRequiredMixin, generic.TemplateView):
         context = {
           'applyUser': corpInfo.applyUser,
           'applyEntity': corpInfo.applyEntity,
-          'sendbackReason': sendbackReason,
-          'sendbackMessage': sendbackMessage,
+          'sendbackReason': reason_radio,
+          'sendbackMessage': message,
         }
         utils.sendEmail_common(
           'accounts/admin/mail/corpInfoSendback', '', [corpInfo.applyUser.email], context)
@@ -4633,31 +4725,9 @@ class CorpInfoUpdateView_admin(LoginRequiredMixin, generic.TemplateView):
           'form': form, }
         return TemplateResponse(request, 'accounts/admin/corpInfoUpdate.html', context)
 
-
-    
+   
     print(f'pass2 本当はここは通らないんだけど！ in CorpInfoUpdateView_admin')
     return HttpResponseRedirect(
       reverse_lazy('accounts:corpInfoUpdate_admin', kwargs={}))
 
 
-class utils:
-    
-  def sendEmail_common(path, from_email, addList, context=None):
-
-    if context == None: context ={}
-    context['protocol'] = settings.PROTOCOL
-    context['domain'] = settings.DOMAIN
-
-    subject = render_to_string(path + '_subject.txt', context)
-    message = render_to_string(path + '_message.txt', context)
-
-    # .email_user(subject, message)
-    if from_email is None or from_email == '':
-      from_email = settings.DEFAULT_FROM_EMAIL
-
-    recipient_list = addList
-    #bcc =  ["toritoritorina@gmail.com"]  # BCCリスト
-    email = EmailMessage(subject, message, from_email, recipient_list)
-    email.send()
-
-    return True

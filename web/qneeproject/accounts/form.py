@@ -238,8 +238,8 @@ class EntitySetForm_buyer(forms.Form):
 class EntityCreateForm_buyer(forms.Form):
 
   """ パートナー情報 """
-  entityname = forms.CharField(label='取引主体名', max_length=100)
-  representitive = forms.CharField(label='代表者名', max_length=100)
+  entityname = forms.CharField(label='取引主体名', max_length=100, validators=[name_validator])
+  representitive = forms.CharField(label='代表者名', max_length=100, validators=[name_validator])
   tel_entity = forms.CharField(label='電話番号（代表）', max_length=30)
 
   zip_entity = forms.CharField(label='郵便番号', max_length=15)
@@ -567,8 +567,10 @@ class EntityCreateForm_seller(forms.Form):
   address3 = forms.CharField(label='住所3', max_length=30)
 
   """ 法人だけの項目 """
-  entityname = forms.CharField(label='取引主体名', max_length=100, required=False)  # 個人の場合はpersonnameと同じ情報となる
-  representitive = forms.CharField(label='代表者名', max_length=100, required=False)
+  entityname = forms.CharField(
+    label='取引主体名', max_length=100, required=False, validators=[name_validator])  # 個人の場合はpersonnameと同じ情報となる
+  representitive = forms.CharField(
+    label='代表者名', max_length=100, required=False, validators=[name_validator])
   tel_entity = forms.CharField(label='電話番号（代表）', max_length=30, required=False)
   zip_entity = forms.CharField(label='郵便番号', max_length=15, required=False)
 
@@ -755,38 +757,42 @@ class ContactForm(forms.Form):
     #self.fields['message'].widget.attrs['placeholder'] = 'メッセージををご入力してください。'
     self.fields['message'].widget.attrs['class'] = 'form-control'
 
-class BankSelectForm(forms.ModelForm):
 
-  class Meta:
-    model = BankAccount
-    fields = (
-      'bankCode',
-      'branchCode',
-    ) 
+class BankSelectForm(forms.Form):
+
+  bankSelect = forms.ChoiceField(
+    choices=[],  # ビュー側で動的に割り当てる場合は空で初期化
+    error_messages={
+      'required': '金融機関を選択してください。'})
+
+  branchSelect = forms.ChoiceField(
+    choices=[],  # ビュー側で動的に割り当てる場合は空で初期化
+    error_messages={
+      'required': '金融機関と支店を選択してください。'})
 
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
 
-    for field in self.fields.values():
-      field.widget.attrs['class'] = 'form-control'
 
-  def clean_bankCode(self):
-    bankCode = self.cleaned_data.get('bankCode')
-    bankCode = unicodedata.normalize('NFKC', bankCode)
-    print(f'pass1 self.cleaned_data[bankCode]={bankCode} (in BankSelectForm)')
-    if re.match(r"^\d{4}$", bankCode) is None:
-      print(f'pass2 self.cleaned_data[bankCode]={bankCode} (bankCode is None or blank in BankSelectForm)')
-      raise forms.ValidationError('銀行が選択されていません') 
-    return bankCode
+  def clean_bankSelect(self):
+    bankCode = self.cleaned_data.get('bankSelect')
+    print(f'self.cleaned_data[bankCode]={bankCode} (in BankSelectForm)')
   
-  def clean_branchCode(self):
-    branchCode = self.cleaned_data.get('branchCode')
-    branchCode = unicodedata.normalize('NFKC', branchCode)
-    print(f'pass1 self.cleaned_data[branchCode]={branchCode} (in BankSelectForm)')
-    if re.match(r"^\d{3}$", branchCode) is None:
-      print(f'pass2 self.cleaned_data[branchCode]={branchCode} (branchCode is None or blank inBankSelectForm)')
-      raise forms.ValidationError('支店が選択されていません')
+    # 未選択（初期値の空白）の場合のエラーチェック
+    if not bankCode:
+      raise forms.ValidationError('金融機関を選択してください')
+    return bankCode
+
+
+  def clean_branchSelect(self):
+    branchCode = self.cleaned_data.get('branchSelect')
+    print(f'self.cleaned_data[branchCode]={branchCode} (in BankSelectForm)')
+
+    # 未選択（初期値の空白）の場合のエラーチェック
+    if not branchCode:
+      raise forms.ValidationError('金融機関と支店を選択してください')
     return branchCode
+
 
 # 24/07/14作成
 class BankAccountForm(forms.ModelForm):
@@ -1272,38 +1278,41 @@ CHOICES = [
     ('その他', 'その他'),
 ]
 
-class FeedbackForm_corpInfo(forms.Form):
+class SendbackInfoForm_corpInfo(forms.Form):
 
-  sendbackReason_radio = forms.ChoiceField(
+  reason_radio = forms.ChoiceField(
+    label="差戻理由",
     choices=CHOICES,
     widget=forms.RadioSelect(attrs={'class': 'form-check-input'}), # 基本のBootstrapクラス
-    label="差戻理由"
+    required=True,
   )
 
   # その他理由の場合の記載
-  sendbackReason_text = forms.CharField(
+  reason_text = forms.CharField(
     max_length=100, required=False, label="その他理由")
     
   # ゲストへのメッセージ
-  sendbackMessage = forms.CharField(
+  message = forms.CharField(
     max_length=200, widget=forms.Textarea(), required=False, label="メッセージ")
 
 
+  def clean_reason_radio(self):
+    reason_radio = self.cleaned_data['reason_radio']
+    print(f'self.cleaned_data[reason_radio]={reason_radio} (clean_reason_radio in SendbackInfo_corpInfo)')
 
-  def clean_sendbackReason_radio(self):
-    sendbackReason_radio = self.cleaned_data['sendbackReason_radio']
-    print(f'self.cleaned_data[sendbackReason_radio]={sendbackReason_radio} (clean_department in FeedbackForm)')
-
-    if sendbackReason_radio is None:
+    if reason_radio is None or reason_radio != '':
       raise forms.ValidationError('必ず差戻の理由を選択してください。')
-    return unicodedata.normalize('NFKC', sendbackReason_radio)
+    return unicodedata.normalize('NFKC', reason_radio)
 
-  def clean_sendbackReason_text(self):
-    sendbackReason_text = self.cleaned_data['sendbackReason_text']
-    print(f'self.cleaned_data[sendbackReason_text]={sendbackReason_text} (clean_department in FeedbackForm)')
-    return unicodedata.normalize('NFKC', sendbackReason_text)
+  def clean_reason_text(self):
+    print(f'self.cleaned_data[reason_text]={reason_text} (clean_reason_text in SendbackInfoForm_corpInfo)')
+    if self.cleaned_data['reason_radio'] == 'その他':
+      if reason_text is None or reason_text != '':
+        raise forms.ValidationError('その他をご選択された場合は、理由をご記載ください。')
+    else:
+      return unicodedata.normalize('NFKC', reason_text)
 
-  def clean_sendbackMessage(self):
-    sendbackMessage = self.cleaned_data['sendbackMessage']
-    print(f'self.cleaned_data[sendbackMessage]={sendbackMessage} (clean_department in FeedbackForm)')
-    return unicodedata.normalize('NFKC', sendbackMessage)
+  def clean_message(self):
+    message = self.cleaned_data['message']
+    print(f'self.cleaned_data[message]={message} (clean_message in SendbackInfoForm_corpInfo)')
+    return unicodedata.normalize('NFKC', message)

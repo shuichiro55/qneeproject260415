@@ -499,7 +499,7 @@
 
 {% block extrajs %}
 
-<script defer>
+<script>
 //「defer」は、HTMLの解析と並行してJavaScriptの読み込みを裏側で進め、
 // HTMLの読み込み（パース）がすべて完了してからスクリプトを実行します。
 //deferを指定しない場合、ブラウザはJavaScriptの読み込みと実行が終わるまで
@@ -507,43 +507,50 @@
 
 document.addEventListener('DOMContentLoaded', function() {
 
-    console.log('スクリプトは認識しているようです。');
+  console.log('スクリプトは認識しているようです。');
 
-    var Radio1 = document.getElementById('radio1');
-    var Radio2 = document.getElementById('radio2');
-    var Radio3 = document.getElementById('radio3');
-    var Radio4 = document.getElementById('radio4');
-    var addition_sendbackReason = document.getElementById('id_addition_sendbackReason');
+  console.log('setTimeoutが認識前');
 
-    // 修正後（すべてのラジオボタンを監視する）
-    document.querySelectorAll('input[name="sendbackReason_radio"]').forEach(function(radio) {
-      radio.addEventListener('change', function() {
-        addition_sendbackReason.style.display = "none";
-        console.log('radioが変わったことを認識しています。');
-        if (Radio4.checked) {
-            addition_sendbackReason.style.display = "block";
-        }
-      });
+  // 3秒後にメッセージを消す
+  setTimeout(function() {
+    console.log('setTimeoutが認識されました');
+
+    var messages = document.querySelectorAll('.messages div');
+    messages.forEach(function(message) {
+      message.style.display = 'none';
     });
-
-    console.log('setTimeoutが認識前');
-    // 3秒後にメッセージを消す
-    setTimeout(function() {
-      console.log('setTimeoutが認識されました');
-
-      var messages = document.querySelectorAll('.messages div');
-      messages.forEach(function(message) {
-        message.style.display = 'none';
-      });
-    }, 3000); // 3000ミリ秒 = 3秒
+  }, 3000); // 3000ミリ秒 = 3秒
 
 
-    // Submitボタンを押下後「しばらくお待ちください。」を表示する
-    document.getElementById('id_PostForm').addEventListener('submit', function() {
-      document.getElementById('loading').style.display = 'block';
+  // Submitボタンを押下後「しばらくお待ちください。」を表示する
+  const postForm = document.getElementById('id_PostForm');
+  if (postForm) {
+    postForm.addEventListener('submit', function() {
+      const loadingEl = document.getElementById('loading');
+      if (loadingEl) {
+        loadingEl.style.display = 'block';
+      }
     });
+  }
 
+  var Radio1 = document.getElementById('radio1');
+  var Radio2 = document.getElementById('radio2');
+  var Radio3 = document.getElementById('radio3');
+  var Radio4 = document.getElementById('radio4');
+  var addition_sendbackReason = document.getElementById('id_addition_sendbackReason');
+
+  // 修正後（すべてのラジオボタンを監視する）
+  document.querySelectorAll('input[name="sendbackReason_radio"]').forEach(function(radio) {
+    radio.addEventListener('change', function() {
+      addition_sendbackReason.style.display = "none";
+      console.log('radioが変わったことを認識しています。');
+      if (Radio4.checked) {
+        addition_sendbackReason.style.display = "block";
+      }
+    });
   });
+
+});
 
   
 </script>

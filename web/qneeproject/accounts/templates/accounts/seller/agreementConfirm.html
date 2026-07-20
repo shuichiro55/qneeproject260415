@@ -167,24 +167,29 @@
 
 {% block extrajs %}
 
-  <script defer>
-    console.log('スクリプトは認識しているようです。')
+<script>
 
-    const isAgreed = document.querySelector('#checkbox');
-    const btn = document.querySelector('#next2');
+document.addEventListener('DOMContentLoaded', function() {
 
-    isAgreed.addEventListener('change', () => {
-      if(isAgreed.checked){
-        btn.disabled = false;
-      } else {
-        btn.disabled = true;
-      }   
-    });
+  console.log('スクリプトは認識しているようです。')
 
-    document.getElementById('id_PostForm').addEventListener('submit', function() {
-      document.getElementById('loading').style.display = 'block';
-    });
-  
-  </script>
+  const isAgreed = document.querySelector('#checkbox');
+  const btn = document.querySelector('#next2');
+
+  isAgreed.addEventListener('change', () => {
+    if(isAgreed.checked){
+      btn.disabled = false;
+    } else {
+      btn.disabled = true;
+    }   
+  });
+
+  document.getElementById('id_PostForm').addEventListener('submit', function() {
+    document.getElementById('loading').style.display = 'block';
+  });
+
+});
+
+</script>
 
 {% endblock %}

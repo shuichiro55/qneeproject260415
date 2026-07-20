@@ -1,0 +1,10 @@
+{{ tx.buyUser.personname }} 様 
+
+{{ tx.buyEntityname }} 様宛に、{{ tx.sellEntityname }} 様から前払いの申請が届いております。
+
+下記URLよりサイトにアクセスの上、お手続きをお願いいたします。
+
+お手続き用URL
+{{ protocol}}://{{ domain }}{% url 'accounts:login_buyer' afterLogin token %}
+
+株式会社Qnee（キユーニー）

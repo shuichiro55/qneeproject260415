@@ -88,25 +88,25 @@
 
 {% block extrajs %}
 
-<script defer>
+<script>
 //「defer」は、HTMLの解析と並行してJavaScriptの読み込みを裏側で進め、
 // HTMLの読み込み（パース）がすべて完了してからスクリプトを実行します。
 //deferを指定しない場合、ブラウザはJavaScriptの読み込みと実行が終わるまで
 // HTMLの読み込みを一時停止
 
-  document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {
 
-    // 3秒後にメッセージを消す
-    setTimeout(function() {
-      console.log('setTimeoutが認識されました');
+  // 3秒後にメッセージを消す
+  setTimeout(function() {
+    console.log('setTimeoutが認識されました');
 
-      var messages = document.querySelectorAll('.messages div');
-      messages.forEach(function(message) {
-        message.style.display = 'none';
-      });
-    }, 3000); // 3000ミリ秒 = 3秒
+    var messages = document.querySelectorAll('.messages div');
+    messages.forEach(function(message) {
+      message.style.display = 'none';
+    });
+  }, 3000); // 3000ミリ秒 = 3秒
 
-  });
+});
   
 </script>
 

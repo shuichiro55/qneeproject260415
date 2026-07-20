@@ -1536,68 +1536,74 @@
 
 <script>
 
-  document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {
 
-    // Submitボタンを押下後「しばらくお待ちください。」を表示する
-    document.getElementById('id_PostForm').addEventListener('submit', function() {
-      document.getElementById('loading').style.display = 'block';
+  // 3秒後にメッセージを消す
+  setTimeout(function() {
+    console.log('setTimeoutが認識されました');
+
+    var messages = document.querySelectorAll('.messages div');
+    messages.forEach(function(message) {
+      message.style.display = 'none';
     });
+  }, 3000); // 3000ミリ秒 = 3秒
 
-    // 3秒後にメッセージを消す
-    setTimeout(function() {
-      console.log('setTimeoutが認識されました');
-
-      var messages = document.querySelectorAll('.messages div');
-      messages.forEach(function(message) {
-        message.style.display = 'none';
-      });
-    }, 3000); // 3000ミリ秒 = 3秒
-
-    const userInput = document.getElementById('userInput');
-    const modeChangeBtn = document.getElementById('modeChangeBtn');
-    const additionalText = document.getElementById('id_addition_text');
-    const additionalBtn1 = document.getElementById('id_addition_actionBtn1');
-    const additionalBtn2 = document.getElementById('id_addition_actionBtn2');
-
-    modeChangeBtn.addEventListener('click', () => {
-
-      // 現在の readonly 状態を反転
-      document.querySelectorAll('[id="userInput"]').forEach(input => {
-        input.readOnly = !input.readOnly;
-      });
-
-      // ボタンの見た目とテキストを状態に合わせて変更
-      if (userInput.readOnly) {
-        modeChangeBtn.innerHTML = `編集 {% bs_icon "pencil-fill" color="white" size="0.80rem" %}`;
-        modeChangeBtn.classList.replace('btn-primary', 'btn-primary');
-      } else {
-        modeChangeBtn.innerHTML = `編集やめる {% bs_icon "pencil-fill" color="white" size="0.80rem" %}`;
-        modeChangeBtn.classList.replace('btn-primary', 'btn-primary');
-      }
-
-      if (additionalText.style.display == 'none' || additionalText.style.display === '' ) {
-        additionalText.style.display = 'block'
-      } else {
-        additionalText.style.display = 'none'
-      }
-
-      if (additionalBtn1.style.display === 'none' || additionalBtn1.style.display === '' ) {
-        console.log('pass1')
-        additionalBtn1.style.display = 'block'
-      } else {
-        console.log('pass2')
-        additionalBtn1.style.display = 'none'
-      }
-
-      if (additionalBtn2.style.display === 'none' || additionalBtn2.style.display === '' ) {
-        console.log('pass3')
-        additionalBtn2.style.display = 'block'
-      } else {
-        console.log('pass4')
-        additionalBtn2.style.display = 'none'
+  // Submitボタンを押下後「しばらくお待ちください。」を表示する
+  const postForm = document.getElementById('id_PostForm');
+  if (postForm) {
+    postForm.addEventListener('submit', function() {
+      const loadingEl = document.getElementById('loading');
+      if (loadingEl) {
+        loadingEl.style.display = 'block';
       }
     });
+  }
+
+  const userInput = document.getElementById('userInput');
+  const modeChangeBtn = document.getElementById('modeChangeBtn');
+  const additionalText = document.getElementById('id_addition_text');
+  const additionalBtn1 = document.getElementById('id_addition_actionBtn1');
+  const additionalBtn2 = document.getElementById('id_addition_actionBtn2');
+
+  modeChangeBtn.addEventListener('click', () => {
+
+    // 現在の readonly 状態を反転
+    document.querySelectorAll('[id="userInput"]').forEach(input => {
+      input.readOnly = !input.readOnly;
+    });
+
+    // ボタンの見た目とテキストを状態に合わせて変更
+    if (userInput.readOnly) {
+      modeChangeBtn.innerHTML = `編集 {% bs_icon "pencil-fill" color="white" size="0.80rem" %}`;
+      modeChangeBtn.classList.replace('btn-primary', 'btn-primary');
+    } else {
+      modeChangeBtn.innerHTML = `編集やめる {% bs_icon "pencil-fill" color="white" size="0.80rem" %}`;
+      modeChangeBtn.classList.replace('btn-primary', 'btn-primary');
+    }
+
+    if (additionalText.style.display == 'none' || additionalText.style.display === '' ) {
+      additionalText.style.display = 'block'
+    } else {
+      additionalText.style.display = 'none'
+    }
+
+    if (additionalBtn1.style.display === 'none' || additionalBtn1.style.display === '' ) {
+      console.log('pass1')
+      additionalBtn1.style.display = 'block'
+    } else {
+      console.log('pass2')
+      additionalBtn1.style.display = 'none'
+    }
+
+    if (additionalBtn2.style.display === 'none' || additionalBtn2.style.display === '' ) {
+      console.log('pass3')
+      additionalBtn2.style.display = 'block'
+    } else {
+      console.log('pass4')
+      additionalBtn2.style.display = 'none'
+    }
   });
+});
 
 </script>
 

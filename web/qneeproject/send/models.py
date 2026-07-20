@@ -105,3 +105,4 @@ class InvitationSets(models.Model):
   # 更新日時
   updated_at = models.DateTimeField(_('更新日'), 
     null=True, auto_now=True)
+

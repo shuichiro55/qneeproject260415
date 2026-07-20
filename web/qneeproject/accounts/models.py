@@ -20,27 +20,6 @@ zip_regex = RegexValidator(regex=r'^[0-9０-９]{1,7}$', message = ("7桁の数�
   #「 \d → 任意の数字	[0-9]」 「 ^ → 文字列の先頭」、「 $ → 文字列の末尾」
   #取引主体が個人の場合に住所を入れるか検討（選択肢は①入力しない、②郵便番号まで、③全部入力）
 
-class BankAccount(models.Model):
-
-  holderName =  models.CharField(
-    '口座名義', max_length=100,
-    unique=False, null=False, blank=False, default="",
-  )
-
-  entity_id = models.IntegerField('エンティティID', null=False, blank=True, default=0)
-
-  bankCode =  models.CharField('金融機関コード', max_length=4, null=False, blank=False)
-  bankName =  models.CharField('金融機関名', max_length=25, null=False, blank=False, default="")
-
-  branchCode = models.CharField('支店コード', max_length=3, null=False, blank=False, default="")
-  branchName = models.CharField('支店名', max_length=25, null=False, blank=False, default="")
-
-  accountNumber_regex = RegexValidator(regex=r'^[0-9]+$', message = _("口座番号は数字でご入力ください。ex '1234567'"))
-  accountNumber = models.CharField('口座番号', max_length=10, null=False, blank=False, default="", validators=[accountNumber_regex])
-
-  temporal_tx_id = models.IntegerField(_('取引ID'), null=False, blank=True, default=0)
-  # 取引口座を設定していない取引がある場合に使う一時的な要素（ユーザーには見せない）
-
 
 class LegalEntity(models.Model):
 
@@ -93,23 +72,22 @@ class LegalEntity(models.Model):
   referral_fee_rate = models.DecimalField(max_digits=11, decimal_places=10, default=0.015) # 紹介手数料（Qnee⇒Buyer）
 
   # 前払い申請者の受領口座
-  bankAccount = models.OneToOneField(BankAccount,
+  bankAccount = models.OneToOneField('BankAccount',
     null=True, verbose_name='振込口座', on_delete=models.PROTECT)
-  bankAccount_flag = models.IntegerField(_('口座設定フラグ'), null=False, blank=False, default=0)
+  bankAccount_flag = models.IntegerField(_('口座設定フラグ'), null=True, blank=True, default=0)
   # 0：設定なし、1：設定済み
 
-  # パートナー規約、ゲスト規約の同意状況、同意日時
-  membershipConsent_boolean = models.BooleanField(_('規約同意'),default=False)  
-  membershipConsent_at = models.DateTimeField(
-    _('規約同意の日時'), null=True, blank=True,)
-
   # 業務委託契約の同意状況、同意日時
-  sourcingConsent_boolean = models.BooleanField(_('委託契約の合意'),default=False)  
+  sourcingConsent = models.BooleanField(_('委託契約の合意'),default=False)  
   sourcingConsent_at = models.DateTimeField(
     _('委託契約の合意日時'), null=True, blank=True,)
-  
-  # 会員登録した日時 規約に同意したタイミングで管理するので不要
-  #joined_at = models.DateTimeField(_('登録日'), null=True, blank=True)
+
+  termsConsent = models.BooleanField(_('規約同意'),default=False)  
+  termsConsent_at = models.DateTimeField(
+    _('規約同意の日時'), null=True, blank=True,)
+
+  " 参加が承認された日を記録 "
+  joined_at = models.DateTimeField(_('登録日'), null=True, blank=True)
 
 
   def __str__(self):
@@ -149,6 +127,32 @@ class CustomUserManager(UserManager):
 
     return self._create_user(email, password, **extra_fields)
 
+
+class BankAccount(models.Model):
+
+  holderName =  models.CharField(
+    '口座名義', max_length=100,
+    unique=False, null=False, blank=False, default="",
+  )
+
+  # ★★ 20260628 entiy_idを持つ形からこちらに切り替える
+  entity = models.OneToOneField(LegalEntity,
+    verbose_name='取引主体',
+    null=True, blank=True, default=None,
+    on_delete=models.CASCADE,)
+
+  #entity_id = models.IntegerField('エンティティID', null=False, blank=True, default=0)
+
+  bankCode =  models.CharField('金融機関コード', max_length=4, null=False, blank=False)
+  bankName =  models.CharField('金融機関名', max_length=25, null=False, blank=False, default="")
+
+  branchCode = models.CharField('支店コード', max_length=3, null=False, blank=False, default="")
+  branchName = models.CharField('支店名', max_length=25, null=False, blank=False, default="")
+
+  accountNumber_regex = RegexValidator(regex=r'^[0-9]+$', message = _("口座番号は数字でご入力ください。ex '1234567'"))
+  accountNumber = models.CharField('口座番号', max_length=10, null=False, blank=False, default="", validators=[accountNumber_regex])
+
+
 """ ユーザーが参加する場合の承認ステータス """
 """ パートナーの一人目の承認はQneeが行い、二人目以降はパートナーの権限者が行う """
 """ ゲスト一人目の承認はパートナーが行い、二人目はゲスト内で行う """
@@ -157,8 +161,9 @@ class AddStatus(models.IntegerChoices):
   """ 承認された参加者かを判定するフラグ """
   UNPROCCESSED = 0  # 初期値
   APPLIED = 1       # 申請済み（承認前）
-  APPROVED = 2      # 承認済み
-  DISAPPROVED = 3   # 否認済み
+
+  APPROVED = 3      # 承認済み
+  DISAPPROVED = -3   # 否認済み
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
 
@@ -267,7 +272,16 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
   # Qneeからのサービスの案内を受信可能か
 
   created_at = models.DateTimeField(_('作成日時'), default=timezone.now,)
-  joined_at = models.DateTimeField(_('加入日'), null=True, )
+
+  " パートナー規約、ゲスト規約の同意状況、同意日時 "
+  " パートナーとゲストにユーザーが複数存在するケースがあるため、"
+  " エンティティとユーザーと双方で同意を確認する建付けとする "
+  termsConsent = models.BooleanField(_('規約同意'),default=False)  
+  termsConsent_at = models.DateTimeField(
+    _('規約同意の日時'), null=True, blank=True,)
+
+  " 参加が承認された日を記録 "
+  joined_at = models.DateTimeField(_('登録日'), null=True, blank=True)
 
   objects = CustomUserManager()
 
@@ -294,6 +308,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
   def __str__(self):
     return f'{self.email}'
 
+
 from django.core.validators import FileExtensionValidator
 import os
 import datetime
@@ -308,8 +323,10 @@ def user_directory_path(instance, filename):
   print(f'instance.entity_id={instance.applyEntity_id} in accounts, models.py, user_directory_path')
   return "upload/entity{0}/{1}".format(instance.applyEntity_id, user_directory)
 
+
+
 """ 会社情報を更新するときの承認ステータス """
-class UpdateStatus(models.IntegerChoices):
+class InfoUpdateStatus(models.IntegerChoices):
   HISTORY = -1          # 過去データ（更新完了時後の旧データの保存）
   DEFAULT = 0           # データ生成時（入力データ後、エビデンス登録前）
   UNDER_APPLICATION = 1 # 申請中
@@ -331,7 +348,7 @@ class CorpInfo(models.Model):
   # 「on_delete=models.PROTECT」 
   # このデータがある場合、参照先（親）のデータが削除を防ぐ（ProtectedError）
 
-  status = models.IntegerField(choices=UpdateStatus.choices,
+  status = models.IntegerField(choices=InfoUpdateStatus.choices,
     default=0, verbose_name='更新状況')
   status_char = models.CharField(max_length=20, 
     null=False, blank=False, default="承認待ち", verbose_name='更新状況')
@@ -418,42 +435,3 @@ class CorpInfo(models.Model):
 
   def __str__(self):
     return f'{self.entityname}'
-
-
-
-""" CustomUserとLegalentityの中間テーブル 25/06/08に追加 """
-
-""" CustomUserのManyToManyFieldのthrough引数で指定することで、
-ORMで自動生成される中間テーブルの代わりに利用することができる。
-情報を追加することができる（email、tel）。 """
-
-#class UserEntityRelation(models.Model):
-#
-#  user = models.ForeignKey("CustomUser", on_delete=models.CASCADE)  
-#  name = models.CharField(
-#    'お名前（個人）',
-#    blank=False,
-#    max_length=150,
-#    unique=False,
-#    null=False, )
-#
-#  entity = models.ForeignKey("LegalEntity", on_delete=models.CASCADE)
-#  entityname = models.CharField(
-#    '取引主体名',
-#    max_length=150,
-#    unique=False,
-#    default="",
-#    null=False,
-#    blank=True,
-#    validators=[name_validator],)
-#    #error_messages={'unique':_("ご入力の名前は既に存在します。次のリストからお選び下さい。")},)
-#
-#  email = models.EmailField('メールアドレス', unique=True, blank=False, null=False)
-#  tel_direct = models.CharField(_('電話番号'), max_length=30, default="", null=False, validators=[tel_regex])
-#  #「 \d → 任意の数字	[0-9]」 「 ^ → 文字列の先頭」、「 $ → 文字列の末尾」
-#
-#  #######################################
-#  ##  取引主体が法人の場合に入力する項目 **
-#  #######################################
-#  department = models.CharField(_('部署名'), max_length=150, default="", blank=True, null=False)   # Entityが法人の場合
-#  title = models.CharField(_('役職名'), max_length=150, default="", blank=True, null=False)        # Entityが法人の場合

@@ -655,99 +655,99 @@
 
 {% block extrajs %}
 
-<script defer>
+<script>
 //「defer」は、HTMLの解析と並行してJavaScriptの読み込みを裏側で進め、
 // HTMLの読み込み（パース）がすべて完了してからスクリプトを実行します。
 //deferを指定しない場合、ブラウザはJavaScriptの読み込みと実行が終わるまで
 // HTMLの読み込みを一時停止
 
-  document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {
 
-    console.log('DOMContentLoadedが認識されました');
+  console.log('DOMContentLoadedが認識されました');
 
-    var NewOrNot = document.getElementById('id_form_NewOrNot');
-    //var SelectNew = document.getElementById('id_SelectNew');
-    var SelectNew = document.getElementById('id_SelectNew');
-    var SearchInput = document.getElementById('id_SearchInput');
-    var SellerSelect = document.getElementById('id_SellerSelect');
+  var NewOrNot = document.getElementById('id_form_NewOrNot');
+  //var SelectNew = document.getElementById('id_SelectNew');
+  var SelectNew = document.getElementById('id_SelectNew');
+  var SearchInput = document.getElementById('id_SearchInput');
+  var SellerSelect = document.getElementById('id_SellerSelect');
 
-    let obj_sellEntityname = JSON.parse('{{ json_sellEntityname|safe }}' || "null");
+  let obj_sellEntityname = JSON.parse('{{ json_sellEntityname|safe }}' || "null");
     
-    var addition1 = document.getElementById('id_addition1');
-    var addition2 = document.getElementById('id_addition2');
+  var addition1 = document.getElementById('id_addition1');
+  var addition2 = document.getElementById('id_addition2');
 
-    NewOrNot.addEventListener('change', (event) => {
-      console.log(event.target.value);
-      if (event.target.value.includes('ToCreateEntity')){
-        console.log('新規エンティティの登録処理.');
-        NewOrNot.submit();
-      };
-      if (event.target.value.includes('ToAddToEntity')){
-        console.log('既存エンティティへの追加処理.');
-        addition1.style.display = "none";
-        addition2.style.display = "block";
-      };
-    });
+  NewOrNot.addEventListener('change', (event) => {
+    console.log(event.target.value);
+    if (event.target.value.includes('ToCreateEntity')){
+      console.log('新規エンティティの登録処理.');
+      NewOrNot.submit();
+    };
+    if (event.target.value.includes('ToAddToEntity')){
+      console.log('既存エンティティへの追加処理.');
+      addition1.style.display = "none";
+      addition2.style.display = "block";
+    };
+  });
 
-    function normalizeText(text) {
-      console.log('inputイベント内でnormalizeTextが呼ばれました.');
-      return text
-        .normalize("NFKC") // 半角を全角文字に変換
-        .replace(/[\u30a1-\u30f6]/g, match => 
-          String.fromCharCode(match.charCodeAt(0) - 0x60)) // 全角カタカナをひらがなに変換
-        .toLowerCase(); // 英数字を小文字に変換
+  function normalizeText(text) {
+    console.log('inputイベント内でnormalizeTextが呼ばれました.');
+    return text
+      .normalize("NFKC") // 半角を全角文字に変換
+      .replace(/[\u30a1-\u30f6]/g, match => 
+        String.fromCharCode(match.charCodeAt(0) - 0x60)) // 全角カタカナをひらがなに変換
+      .toLowerCase(); // 英数字を小文字に変換
+  }
+
+  // ★★ 工事中 25/07/19
+  //「Javascriptで入力フォームからリストをリアルタイムで検索する方法」を参照（URLは下記）
+  //https://design-tera.com/blog/archives/6666/
+  SearchInput.addEventListener('input', function() {
+
+    console.log('inputイベントで' + SearchInput.value + 'が認識されました1');
+
+    //const HiddenSellerOptions = document.getElementById('id_HiddenSellerSelect').options;
+    const SellerOptions = document.getElementById('id_SellerSelect').options;
+    const NormalizedInput = normalizeText(SearchInput.value); // 入力されたクエリを正規化
+    const keywords = NormalizedInput.split(/[\s\u3000]+/).filter(keyword => keyword); // スペースで分割してキーワード配列を生成
+
+    console.log('nomalizeTextにより' + NormalizedInput + 'に変換されました');
+    for (let i=SellerOptions.length-1 ; i >= 0 ; i--) {
+      SellerOptions.remove( i );
     }
 
-    // ★★ 工事中 25/07/19
-    //「Javascriptで入力フォームからリストをリアルタイムで検索する方法」を参照（URLは下記）
-    //https://design-tera.com/blog/archives/6666/
-    SearchInput.addEventListener('input', function() {
+    let obj_sellEntityname = JSON.parse('{{ json_sellEntityname|safe }}' || "null");
+    //「safe」はエスケープを無効化する.Django側で''を除いた形で認識する
+    //https://se-memorandum.com/django-safe/
 
-      console.log('inputイベントで' + SearchInput.value + 'が認識されました1');
+    console.log(obj_sellEntityname);
+    console.log('forEachに入る前です');
 
-      //const HiddenSellerOptions = document.getElementById('id_HiddenSellerSelect').options;
-      const SellerOptions = document.getElementById('id_SellerSelect').options;
-      const NormalizedInput = normalizeText(SearchInput.value); // 入力されたクエリを正規化
-      const keywords = NormalizedInput.split(/[\s\u3000]+/).filter(keyword => keyword); // スペースで分割してキーワード配列を生成
+    //keyおよびobj_sellEntityname[key]には、entitynameが入る
+    Object.keys(obj_sellEntityname).forEach((key) => {
 
-      console.log('nomalizeTextにより' + NormalizedInput + 'に変換されました');
-      for (let i=SellerOptions.length-1 ; i >= 0 ; i--) {
-        SellerOptions.remove( i );
+      matches = keywords.some(keyword => normalizeText(obj_sellEntityname[key]).includes(keyword));
+
+      console.log(key, obj_sellEntityname[key]);
+      if(matches){
+        let option = document.createElement('option');
+        option.value = key;  //option.valueは非表示部。（key, value）のvalueと間違わないように！
+        option.text = obj_sellEntityname[key];         
+        //option.setAttribute("value", key);  //option.valueは非表示部。（key, value）のvalueと間違わないように！
+        //option.appendChild(document.createTextNode(obj_sellEntityname[key]));
+
+        console.log('SellerOptions=', SellerOptions);
+        console.log('option.innerHTML=', option.innerHTML);
+
+        SellerOptions.add(option);
       }
-
-      let obj_sellEntityname = JSON.parse('{{ json_sellEntityname|safe }}' || "null");
-      //「safe」はエスケープを無効化する.Django側で''を除いた形で認識する
-      //https://se-memorandum.com/django-safe/
-
-      console.log(obj_sellEntityname);
-      console.log('forEachに入る前です');
-
-      //keyおよびobj_sellEntityname[key]には、entitynameが入る
-      Object.keys(obj_sellEntityname).forEach((key) => {
-
-        matches = keywords.some(keyword => normalizeText(obj_sellEntityname[key]).includes(keyword));
-
-        console.log(key, obj_sellEntityname[key]);
-        if(matches){
-          let option = document.createElement('option');
-          option.value = key;  //option.valueは非表示部。（key, value）のvalueと間違わないように！
-          option.text = obj_sellEntityname[key];         
-          //option.setAttribute("value", key);  //option.valueは非表示部。（key, value）のvalueと間違わないように！
-          //option.appendChild(document.createTextNode(obj_sellEntityname[key]));
-
-          console.log('SellerOptions=', SellerOptions);
-          console.log('option.innerHTML=', option.innerHTML);
-
-          SellerOptions.add(option);
-        }
-      });
-    });
-
-    SellerSelect.addEventListener('click', (event) => {
-      console.log('SellerSelect.addEventListener(change)に入りました');
-      SearchInput.value = obj_sellEntityname[event.target.value];  
     });
   });
+
+  SellerSelect.addEventListener('click', (event) => {
+    console.log('SellerSelect.addEventListener(change)に入りました');
+    SearchInput.value = obj_sellEntityname[event.target.value];  
+  });
+});
 
 </script>
 

@@ -1,4 +1,4 @@
-{{ tx.sellUser_personname }} 様 ご利用ありがとうございます。
+{{ sellUser.personname }} 様 ご利用ありがとうございます。
 
 {{ tx.buyEntityname }} 様が {{ tx.sellEntityname }} 様の申請を承認されました。
 
@@ -7,8 +7,15 @@
   下記に移った先から銀行口座をご登録お願いいたします。
 
   銀行口座登録用URL
-  {{ protocol}}://{{ domain }}{% url 'accounts:login_seller' token %}
+  {{ protocol}}://{{ domain }}{% url 'accounts:login_seller' afterLogin token %}
 
+{% else %}
+
+  キユーニーにより前払い処理がされます。
+  処理の結果は下記URLにログインしてご確認ください。
+  
+  ログインURL
+  {{ protocol}}://{{ domain }}{% url 'accounts:login_seller'%}
 {% endif %}
 
 株式会社Qnee（キユーニー）

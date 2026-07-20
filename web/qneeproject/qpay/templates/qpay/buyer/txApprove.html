@@ -60,69 +60,115 @@
                   shadow-sm table-responsive">
 
                   <thead style="font-size:0.9rem">
-                    <tr class="table-primary" style="text-align:center;">
-                      <th rowspan="2" style="vertical-align:middle; text-align:center">#</th>
-                      <th colspan="2" style="vertical-align:top">申請法人</th>
+                    <tr class="table-primary" style="text-align:center;">       
+                      <th rowspan="1" style="vertical-align:middle; text-align:center">#</th>
+                      <th colspan="1" style="vertical-align:top">対応者</th>
+                      <th rowspan="1" style="vertical-align:top">申請額</th>
+                      <th colspan="1" style="vertical-align:top">状況</th>
+                      <th colspan="1" style="vertical-align:top">対応時点</th>
                       <!-- <th rowspan="2" style="vertical-align:top">証明書</th> -->
-                      <th colspan="2" style="vertical-align:top">承認ユーザー</th>
-                      <th rowspan="2" style="vertical-align:top">承認画面</th>
+                      <th rowspan="1" style="vertical-align:top">承認画面</th>
                     </tr>
-                    <tr class="table-primary" style="text-align:center;">
-                      <th style="vertical-align:top">申請額</th>
-                      <th style="vertical-align:top">申請時</th>
-                      <th style="vertical-align:top">状況</th>
-                      <th style="vertical-align:top">承認時</th>
-                    </tr>
-
                   </thead>
 
                   <tbody style="font-size:0.9rem">
               
                     {% for item in page_obj %}
 
-                      <!-- データ抽出時に「txStatus_int=1 or txStatus_int=3」としている為、念のための条件 -->
-                      {% if item.txStatus_int <= 3 %}
+                      <!-- データ抽出時に「txStatus=1 or txStatus=-3 or txStatus=4」としている -->
+                      <!-- この部分を見て対象データが分かるように敢えての明示 -->
+                      {% if item.txStatus == 1 or item.txStatus == -3 or item.txStatus == 4 %}
 
-                       <tr>
-                          <td rowspan="2" style="vertical-align:middle; text-align:center">
-                            {{ page_obj.start_index|add:forloop.counter0 }}</td>
-                          <td colspan="2" style="text-align:center">
-                            {{ item.sellEntityName }}</td>
-                          <td colspan="2" style="text-align:center">
-                            {{ item.buyUser_personname | default:'ー' }}</td>
+                        <tr>
+                          {% if item.sendbackInfo_admin is None %}
+                            <th rowspan="2" class="table-primary"
+                              style="vertical-align:middle; text-align:center">
+                              {{ page_obj.start_index|add:forloop.counter0 }}</th>
+                            <th colspan="1" class="table-primary"
+                              style="text-align:left">
+                              {{ item.sellEntityname }}</th>
+                            <td rowspan="2" style="text-align:center; vertical-align:middle;">
+                              {{ item.requested_amount|intcomma }}</td>
+                          {% else %}
+                            <td rowspan="3" class="table-primary"
+                              style="text-align:center; vertical-align:middle;">
+                              {{ page_obj.start_index|add:forloop.counter0 }}</td>
+                            <th colspan="1" class="table-primary"
+                              style="text-align:left">
+                              {{ item.sellEntityname }}</th>
+                            <td rowspan="3" style="text-align:center; vertical-align:middle;">
+                              {{ item.requested_amount|intcomma }}</td>
+                          {% endif %}
 
-                            <!-- <td rowspan="2" style="text-align:center">
+                          {% if item.txStatus == 2 %}
+                            <td style="vertical-align:middle; text-align:center">-</td>
+                            <td style="vertical-align:middle; text-align:center">-</td>
+                          {% else %}
+                            <td style="vertical-align:middle; text-align:center">
+                              申請済</td>
+                            <td style="vertical-align:middle; text-align:center;
+                              font-size:0.75rem">
+                                {{ item.requested_at|default:'-'|date:"y/n/j H:i" }}</td>
+                          {% endif %}
+
+                          <!-- <td rowspan="2" style="text-align:center">
                             <img src="{{ item.evidence.url }}" class="img-evidence" style="width:50;height:auto" /></td> -->
 
-                            <td class="p-1" rowspan="2" style="vertical-align:middle; text-align:center">
+                          {% if item.sendbackInfo_admin is None %}
+                            <td class="p-1" rowspan="2"
+                              style="width:75px; vertical-align:middle; text-align:center">
+                          {% else %}
+                            <td class="p-1" rowspan="3"
+                              style="width:75px; vertical-align:middle; text-align:center">
+                          {% endif %}
                             <a href="{% url 'qpay:txApproveDetail_buyer' item.pk %}"
                               class="btn btn-outline-primary w-100 px-2">移る</a>
                           </td>
                         </tr>
-                        <tr>
-                          <td style="text-align:center">{{ item.requested_amount|intcomma }}</td>
-                          <td style="text-align:center">{{ item.requested_at|date:"y/n/j H:i"| default:'ー' }}</td>
-                            {% if item.txStatus_int == 1 %}
-                              <td style="vertical-align:middle; text-align:center">未了</td>
-                            {% endif %}
-                            {% if item.txStatus_int == 2 %}
-                              <td style="vertical-align:middle; text-align:center">差戻</td>
-                            {% endif %}
-                            {% if item.txStatus_int >= 3 %}
-                              <td style="vertical-align:middle; text-align:center">承認</td>
-                            {% endif %}
-                            {% if item.txStatus_int == -3 %}
-                              <td class="table-danger" style="vertical-align:middle; text-align:center">
-                                否認</td>
-                            {% endif %}
 
-                          <td style="vertical-align:middle; text-align:center">
-                            {% if item.txStatus_int == 1 %}ー{% endif %}
-                            {% if item.txStatus_int == 2 %}ー{% endif %}
-                            {% if item.txStatus_int >= 3 %}{{ item.approved_at|date:"y/n/j H:i"| default:'ー' }}{% endif %}
-                            {% if item.txStatus_int == -3 %}{{ item.rejected_at|date:"y/n/j H:i"| default:'ー' }}{% endif %}
+                        <tr>
+                          <th colspan="1" class="table-primary"
+                            style="text-align:left">
+                            {{ item.buyEntityname|default:'-' }}</th>
+                          
+                            {% if item.txStatus == 1 or item.txStatus == 4 %}
+                              <td style="vertical-align:middle; text-align:center">-</td>
+                              <td style="vertical-align:middle; text-align:center;
+                                  font-size:0.75rem">-</td>
+
+                            {% elif item.txStatus == 2 %}
+                              <td style="vertical-align:middle; text-align:center">差戻</td>
+                              <td style="vertical-align:middle; text-align:center;
+                                font-size:0.75rem">
+                                {{ item.sendbackInfo_buyer.created_at|default:'-'|date:"y/n/j H:i" }}</td>
+
+                            {% elif item.txStatus == 3 or item.txStatus == 5 %}
+                              <td style="vertical-align:middle; text-align:center">
+                                承認済</td>
+                              <td style="vertical-align:middle; text-align:center;
+                                font-size:0.75rem">
+                                {{ item.approved_at|default:'-'|date:"y/n/j H:i" }}</td>
+
+                            {% else %}
+                              <td style="vertical-align:middle; text-align:center">未承認</td>
+                              <td style="vertical-align:middle; text-align:center">-</td>
+                            {% endif %}
                           </td>
+
                         </tr>
+
+                        {% if item.sendbackInfo_admin is None %}
+                        {% else %}
+                          <tr>
+                            <th colspan="1" class="table-primary"
+                              style="text-align:left">
+                               (株)キユーニー</th>
+                            <td style="vertical-align:middle; text-align:center">差戻</td>
+                            <td style="vertical-align:middle; text-align:center;
+                              font-size:0.75rem">
+                                {{ item.sendbackInfo_buyer.created_at|default:'-'|date:"y/n/j H:i" }}</td>
+                            </tr>
+                        {% endif %}
 
                       {% endif %}
 
@@ -136,115 +182,147 @@
 
 
               <div class="d-none d-lg-block">
+
+                <div class="row justify-content-center">
+                  <div class="col-lg-9">
               
-                <table class="table table-sm bg-light
-                  table-bordered border-primary-subtle
-                  shadow-sm table-responsive">
+                    <table class="table table-sm bg-light
+                      table-bordered border-primary-subtle
+                      shadow-sm table-responsive">
+                      <thead style="font-size:0.9rem">
+                        <tr class="table-primary" style="text-align:center;">       
+                          <th rowspan="1" style="vertical-align:middle; text-align:center">#</th>
+                          <th colspan="1" style="vertical-align:top">対応者</th>
+                          <th rowspan="1" style="vertical-align:top">申請額</th>
+                          <th colspan="1" style="vertical-align:top">状況</th>
+                          <th colspan="1" style="vertical-align:top">対応時点</th>
+                          <th rowspan="2" style="vertical-align:top">証明<br>書類</th>
+                         <th rowspan="1" style="vertical-align:top">承認画面</th>
+                        </tr>
+                      </thead>
 
-                  <thead style="font-size:0.9rem">
-                    <tr class="table-primary" style="text-align:center;">
-                      <th rowspan="2" style="vertical-align:middle; text-align:center">#</th>
-                      <th colspan="2" style="vertical-align:top">申請者</th>
-                      <th rowspan="2" style="vertical-align:top">証明<br>書類</th>
-                      <th colspan="2" style="vertical-align:top">承認ユーザー</th>
-                      <th rowspan="2" style="vertical-align:top">承認画面</th>
-                    </tr>
-                    <tr class="table-primary" style="text-align:center;">
-                      <th style="vertical-align:top">申請額</th>
-                      <th style="vertical-align:top">申請時</th>
-                      <th style="vertical-align:top">状況</th>
-                      <th style="vertical-align:top">承認時</th>
-                    </tr>
-
-                  </thead>
-
-                  <tbody style="font-size:0.9rem">
+                      <tbody style="font-size:0.9rem">
               
-                    {% for item in page_obj %}
+                        {% for item in page_obj %}
 
-                      <!-- データ抽出時に「txStatus_int=1 or txStatus_int=3」としている為、念のための条件 -->
-                      {% if item.txStatus_int <= 3 %}
+                          <!-- データ抽出時に「txStatus=1 or txStatus=-3 or txStatus=4」としている -->
+                          <!-- この部分を見て対象データが分かるように敢えての明示 -->
+                          {% if item.txStatus == 1 or item.txStatus == -3 or item.txStatus == 4 %}
 
-                       <tr>
-                          <td rowspan="2" style="vertical-align:middle; text-align:center">
-                            {{ page_obj.start_index|add:forloop.counter0 }}</td>
-                          <td colspan="2" style="vertical-align:middle; text-align:center">
-                            {{ item.sellEntityName }}</td>
-                          <td rowspan="2" style="vertical-align:middle; text-align:center;">
-                            <img src="{{ item.evidence.url }}"
-                              class="img-fluid"
-                              style="max-height:55; width:auto; cursor:zoom-in;"
-                              data-bs-toggle="modal"
-                              data-bs-target="#imageModal{{ forloop.counter }}"/>
-                          </td>
-                          <!-- モーダルウィンドウ外枠 -->
-                          <div class="modal fade"
-                            id="imageModal{{ forloop.counter }}" tabindex="-1" aria-hidden="true">
-                            <div class="modal-dialog"> <!-- modal-sm/lg/xl/xxl 大きさ指定なしは「Medium」 -->
-                              <div class="modal-content">
-                                <div class="modal-header">
-                                  <h6 class="modal-title">証明書類</h6>
-                                  <!-- 閉じるボタン: data-bs-dismiss="modal" が重要 -->
-                                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                  <img src="{{ item.evidence.url }}" class="img-fluid" alt="拡大画像">
+                            <tr>
+                              <th {% if item.sendbackInfo_admin is None %} rowspan="2" {% else %} rowspan="3" {% endif %}
+                                class="table-primary"
+                                style="vertical-align:middle; text-align:center">
+                                {{ page_obj.start_index|add:forloop.counter0 }}</th>
+                              <th colspan="1" class="table-primary"
+                                style="text-align:left">
+                                {{ item.sellEntityname }}</th>
+                              <td {% if item.sendbackInfo_admin is None %} rowspan="2" {% else %} rowspan="3" {% endif %}
+                                style="text-align:center; vertical-align:middle;">
+                                {{ item.requested_amount|intcomma }}</td>
+
+                          {% if item.txStatus == 2 %}
+                            <td style="vertical-align:middle; text-align:center">-</td>
+                            <td style="vertical-align:middle; text-align:center">-</td>
+                          {% else %}
+                            <td style="vertical-align:middle; text-align:center">
+                              申請済</td>
+                            <td style="vertical-align:middle; text-align:center;
+                              font-size:0.75rem">
+                                {{ item.requested_at|default:'-'|date:"y/n/j H:i" }}</td>
+                          {% endif %}
+
+                              <td {% if item.sendbackInfo_admin is None %} rowspan="2" {% else %} rowspan="3" {% endif %}
+                                style="vertical-align:middle; text-align:center;">
+
+                                <img src="{{ item.evidence.url }}"
+                                  class="img-fluid"
+                                  style="max-height:55; width:auto; cursor:zoom-in;"
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#imageModal{{ forloop.counter }}"/>
+                              </td>
+                              <!-- モーダルウィンドウ外枠 -->
+                              <div class="modal fade"
+                                id="imageModal{{ forloop.counter }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog"> <!-- modal-sm/lg/xl/xxl 大きさ指定なしは「Medium」 -->
+                                  <div class="modal-content">
+                                    <div class="modal-header">
+                                      <h6 class="modal-title">証明書類</h6>
+                                      <!-- 閉じるボタン: data-bs-dismiss="modal" が重要 -->
+                                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                      <img src="{{ item.evidence.url }}" class="img-fluid" alt="拡大画像">
+                                    </div>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
+
+                              <td  {% if item.sendbackInfo_admin is None %} rowspan="2" {% else %} rowspan="3" {% endif %}
+                                class="p-1" style="width:75px; vertical-align:middle; text-align:center">
+                                <a href="{% url 'qpay:txApproveDetail_buyer' item.pk %}"
+                                  class="btn btn-outline-primary w-100 px-2">移る</a>
+                              </td>
+                            </tr>
+
+                            <tr>
+                              <th colspan="1" class="table-primary"
+                                style="text-align:left">
+                                {{ item.buyEntityname|default:'-' }}</th>
+                          
+                                {% if item.txStatus == 1 or item.txStatus == 4 %}
+                                  <td style="vertical-align:middle; text-align:center">-</td>
+                                 <td style="vertical-align:middle; text-align:center;
+                                      font-size:0.75rem">-</td>
+
+                                {% elif item.txStatus == 2 %}
+                                  <td style="vertical-align:middle; text-align:center">差戻</td>
+                                  <td style="vertical-align:middle; text-align:center;
+                                    font-size:0.75rem">
+                                    {{ item.sendbackInfo_buyer.created_at|default:'-'|date:"y/n/j H:i" }}</td>
+
+                                {% elif item.txStatus == 3 or item.txStatus == 5 %}
+                                  <td style="vertical-align:middle; text-align:center">
+                                    承認済</td>
+                                  <td style="vertical-align:middle; text-align:center;
+                                    font-size:0.75rem">
+                                    {{ item.approved_at|default:'-'|date:"y/n/j H:i" }}</td>
+
+                                {% else %}
+                                  <td style="vertical-align:middle; text-align:center">未承認</td>
+                                  <td style="vertical-align:middle; text-align:center">-</td>
+                                {% endif %}
+                              </td>
+
+                            </tr>
+
+                            {% if item.sendbackInfo_admin is None %}
+                            {% else %}
+                              <tr>
+                                <th colspan="1" class="table-primary"
+                                  style="text-align:left">
+                                   (株)キユーニー</th>
+                                <td style="vertical-align:middle; text-align:center">差戻</td>
+                                <td style="vertical-align:middle; text-align:center;
+                                  font-size:0.75rem">
+                                    {{ item.sendbackInfo_buyer.created_at|default:'-'|date:"y/n/j H:i" }}</td>
+                                </tr>
+                            {% endif %}
+
+                          {% endif %}
+
+                        {% empty %}
+
+                          <div class="row justify-content-center text-secondary mt-5">
+                            対象データはありません。
                           </div>
 
-                          <td colspan="2" style="vertical-align:middle; text-align:center">
-                            {{ item.buyUser_personname |default:'ー' }}</td>
+                        {% endfor %}
 
-                          <td rowspan="2" class="p-1" style="vertical-align:middle; text-align:center;">
-                            <a href="{% url 'qpay:txApproveDetail_buyer' item.pk %}"
-                              class="btn btn-outline-primary w-100 px-2">
-                              移る</a>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td style="vertical-align:middle; text-align:center">
-                            {{ item.requested_amount|intcomma }}</td>
-                          <td style="vertical-align:middle; text-align:center">
-                            {{ item.requested_at|date:"y/n/j H:i"| default:'ー' }}</td>
-                          
-                            {% if item.txStatus_int == 1 %}
-                              <td style="vertical-align:middle; text-align:center">未了</td>
-                            {% endif %}
-                            {% if item.txStatus_int == 2 %}
-                              <td style="vertical-align:middle; text-align:center">差戻</td>
-                            {% endif %}
-                            {% if item.txStatus_int >= 3 %}
-                              <td style="vertical-align:middle; text-align:center">承認</td>
-                            {% endif %}
-                            {% if item.txStatus_int == -3 %}
-                              <td class="table-danger" style="vertical-align:middle; text-align:center">
-                                否認</td>
-                            {% endif %}
-
-                          <td style="vertical-align:middle; text-align:center">
-                            {% if item.txStatus_int == 1 %}ー{% endif %}
-                            {% if item.txStatus_int == 2 %}{{ item.approved_at|date:"y/n/j H:i" |default:'ー' }}{% endif %}
-                            {% if item.txStatus_int == 3 %}{{ item.rejected_at|date:"y/n/j H:i" |default:'ー' }}{% endif %}
-                            {% if item.txStatus_int == 4 %}{{ item.approved_at|date:"y/n/j H:i" |default:'ー' }}{% endif %}
-
-                          </td>
-                        </tr>
-
-                      {% endif %}
-
-                    {% empty %}
-
-                      <div class="row justify-content-center text-secondary mt-5">
-                        対象データはありません。
-                      </div>
-
-                    {% endfor %}
-
-                  </tbody>
-                </table>
-             
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
               </div>
 
               <!-- <input type="hidden" name="next" value="{{ next }}" /> -->

@@ -51,40 +51,63 @@
 
     {% if step_process == 1 %}
 
-      <div class="d-flex justify-content-center mt-5">
-        <h5 class="text-secondary pt-1"><b>承認処理</b></h5>
-        <span class="ms-3">{% bs_icon 'person-check' color='deeppink' size='2.2em' %}</span>
-      </div>
+      {% if tx.txStatus != 4 %}
+        <div class="d-flex justify-content-center mt-5">
+          <h5 class="text-secondary pt-1"><b>承認処理</b></h5>
+          <span class="ms-3">{% bs_icon 'person-check' color='deeppink' size='2.2em' %}</span>
+        </div>
+
+      {% else %}
+      
+        <div class="d-flex justify-content-center mt-5">
+          <h5 class="text-secondary pt-1"><b>承認処理</b></h5>
+          <span class="ms-3">{% bs_icon 'person-check' color='deeppink' size='2.2em' %}</span>
+        </div>
+
+        <div class="row justify-content-center mt-3 px-3 mb-3">
+          <div class="col-md-9 col-lg-7 col-xl-5 text-left">
+            <div class="text-left">
+              <span class="text-danger" style="font-size:0.75rem">
+              ※キユーニーにご承認が差戻されました。ご対応ををお願いします
+              </span>
+            </div>
+
+            <div class="border bg-warning-subtle shadow mx-1 py-2 px-3"
+              style="font-size:0.9rem">
+              {% bs_icon 'feather' color='forestgreen' size='1rem' %}
+              差戻理由：　　{{ tx.sendbackInfo_admin.reason }}<br>
+              {% bs_icon 'feather' color='forestgreen' size='1rem' %}
+              メッセージ：　{{ tx.sendbackInfo_admin.message }}
+            </div>
+          </div>
+        </div>
+
+      {% endif %}
+
 
       <div class="row justify-content-center mt-2 mx-2">
-        <div class="col-md-9 col-lg-6">
-
+        <div class="col-md-9 col-lg-7 col-xl-5">
+  
           <table class="table table-sm bg-light
             table-bordered border-primary-subtle
-            shadow table-responsive mt-1 mb-1">
+            shadow table-responsive mt-1 mb-1"
+            >
 
             <tbody>
-              <tr class="table-info">
-                <td width="40%" class="table-primary"><b>承認処理</b></td>
-                {% if tx.txStatus_int == 1 %}
-                  <td style="text-align:right;"> パートナー承認未了</td>{% endif %}               
-                {% if tx.txStatus_int == 2 %}
-                  <td class="table-danger" style="text-align:right;">パートナー差戻</td>{% endif %}
-                {% if tx.txStatus_int >= 3 %}
-                  <td style="text-align:right;">パートナー承認済み<br>Qnee前払い前</td>{% endif %}
-                {% if tx.txStatus_int == -3 %}
-                  <td class="table-danger" style="text-align:right;">
-                  パートナー否認{{ tx.rejected_at|date:"y/n/j H:i"| default:'ー' }}</td>{% endif %}
+              <tr class="table-danger">
+                <td width="40%" class="table-primary"><b>取引状況</b></td>
+                <td style="text-align:right; font-size:0.9rem">
+                  {{ tx.txStatus_char }}</td>
               </tr>
 
               <tr>
-                <td class="table-primary"><b>受注者</b></td>
+                <td class="table-primary"><b>ゲスト名</b></td>
                 <td style="text-align:right;">{{ tx.sellEntityname }}</td></tr>
               <tr>
-                <td class="table-primary"><b>申請者</b></td>
-                <td style="text-align:right;">{{ tx.sellUser_personname }}</td></tr>
+                <td class="table-primary"><b>ゲスト・ユーザー</b></td>
+                <td style="text-align:right;">{{ tx.sellUser_personname|default:'-' }}</td></tr>
               <tr>
-                <td class="table-primary"><b>申請額</b></td>
+                <td class="table-primary"><b>QPAY申請額</b></td>
                 <td style="text-align:right;">{{ tx.requested_amount|intcomma }}</td></tr>
               <tr>
                 <td class="table-primary"><b>証明書類</b></td>
@@ -128,15 +151,22 @@
             <tbody>
               <tr class="table-info">
                 <td width="40%" class="table-primary"><b>ゲスト受取り</b></td>
-                <td style="text-align:right;">{{ tx.transfer_amount|intcomma }}</td></tr>
+                <td style="text-align:right;">
+                  {{ tx.transfer_amount|intcomma }}</td></tr>
               <tr>
                 <td width="40%" class="table-primary" >　＋Qnee前払額</td>
-                <td style="text-align:right;">{{ tx.advance_amount|intcomma }}</td></tr>
+                <td style="text-align:right;">
+                  {{ tx.advance_amount|intcomma }}</td></tr>
               <tr>
-                <td width="40%" class="table-primary" >　－前払手数料</td>
-                <td style="text-align:right;">{{ tx.advance_fee|intcomma }}</td></tr>
+                <td width="40%" class="table-primary" >
+                  　－前払手数料</td>
+                <td style="text-align:right;">
+                  {{ tx.advance_fee|intcomma }}</td></tr>
               <tr>
-                <td width="40%" class="table-primary" >　－振込手数料</td><td style="text-align:right;">{{ tx.transfer_fee|intcomma }}</td></tr>
+                <td width="40%" class="table-primary" >
+                  　－振込手数料</td>
+                <td style="text-align:right;">
+                  {{ tx.transfer_fee|intcomma }}</td></tr>
             </tbody>
           </table>
 
@@ -146,7 +176,8 @@
               <form method="GET"
                 action="{% url 'qpay:txApprove_buyer' %}"
                 class="m-0 p-0"
-                style="background-color: transparent !important; border-color:transparent !important;">
+                style="background-color: transparent !important;
+                  border-color:transparent !important;">
                 {% csrf_token %}
 
                 <button
@@ -162,7 +193,8 @@
                 action="{% url 'qpay:txApproveDetail_buyer' tx.pk %}"
                 id="id_PostForm"
                 class="p-0 m-0"
-                style="background-color: transparent !important; border-color:transparent !important;">
+                style="background-color: transparent !important;
+                  border-color:transparent !important;">
   
                 {% csrf_token %}
 
@@ -170,15 +202,19 @@
 
                   <button type="submit"
                     class="btn btn-primary p-2 w-100 ms-1"
-                    name="actionBtn" value="ToSendbackQpay1"
-                    {% if tx.txStatus_int == 2 %}disabled{% endif %}>
+                    name="actionBtn"
+                    value="ToSendbackQpay1"
+                    {% if tx.txStatus == 2 %}disabled{% endif %}>
+
                     <span class="btn-text">差戻</span>
                   </button>
 
                   <button type="submit" 
                     class="btn btn-primary p-2 w-100 ms-1"
                     name="actionBtn"
-                    value="ToApproveQpay">
+                    value="ToApproveQpay"
+                    {% if tx.txStatus == 2 %}disabled{% endif %}>
+
                     <span class="btn-text">
                       <i class="bi bi-hand-thumbs-up-fill" style="font-size:1.4em; color:deeppink"></i>
                       承認
@@ -187,7 +223,8 @@
                   <button type="submit"
                     class="btn btn-primary p-2 w-100 ms-1"
                     name="actionBtn"
-                    value="ToRejectQpay">
+                    value="ToRejectQpay"
+                    {% if tx.txStatus == 2 %}disabled{% endif %}>
                     <span class="btn-text">否認</span>
                   </button>
                 </div> <!-- btn-group d-flex -->
@@ -208,13 +245,15 @@
         </span>
       </div>
 
-      <div class="row justify-content-center mt-2 mx-2">
-        <div class="col-md-9 col-lg-6">
+      <div class="row justify-content-center mt-2">
+        <div class="col-md-10 col-lg-8 col-xl-6">
 
           <form method="POST"
             action="{% url 'qpay:txApproveDetail_buyer' tx.pk %}"
-            class="form-group bg-light border border-top shadow-sm rounded-2 p-3 mb-0 ">
+            class="form-group bg-light border border-top shadow-sm rounded-2 p-3 mb-0 "
+            id="id_PostForm">
             {% csrf_token %}
+
 
             <div class="mx-4">
 
@@ -223,91 +262,82 @@
                 <span class="ms-2" style="font-size:1.1rem">
                   <b>差戻の理由</b></span>
               </div>
-              {% if form.sendbackReason_radio.errors %}
+              {% if form.reason_radio.errors %}
                 <span style="color:red;">
-                  {{ form.sendbackReason_radio.errors.as_text }}</span>
+                  {{ form.reason_radio.errors.as_text }}</span>
               {% endif %}
 
-              <div class="ms-4" id="id_radioGroup">
-                <div class="form-check mt-3">
-                  <input class="form-check-input" type="radio"
-                    name="{{form.sendbackReason_radio.name}}"
-                    id="radio1" value="当初報酬日が誤っている">
-                  <label class="form-check-label" for="radio1">
-                    当初報酬日が誤っている
-                  </label>
-                </div>
-
-                <div class="form-check mt-2">
-                  <input class="form-check-input" type="radio"
-                    name="{{form.sendbackReason_radio.name}}"
-                    id="radio2" value="証明書類（画像）が違う">
-                  <label class="form-check-label" for="radio2">
-                    証明書類（画像）が違う
-                  </label>
-                </div>
-
-                <div class="form-check mt-2">
-                  <input class="form-check-input" type="radio"
-                    name="{{form.sendbackReason_radio.name}}"
-                    id="radio3" value="証明書類の画像が不鮮明">
-                  <label class="form-check-label" for="radio3">
-                    証明書類の画像が不鮮明
-                  </label>
-                </div>
-
-                <div class="form-check mt-2">
-                  <input class="form-check-input" type="radio"
-                    name="{{form.sendbackReason_radio.name}}"
-                    id="radio4" value="その他">
-                  <label class="form-check-label" for="radio4">
-                    その他
-                  </label>
-                </div>
-
-                <span id="id_addition_sendbackReason" style="display:none;">
+              <!-- ラジオボタンのループ出力に修正 -->
+              <div class="mb-3">
+                {% for radio in form.reason_radio %}
+                  <div class="form-check my-2"> <!-- 縦並び用のラッパー -->
+                    {{ radio.tag }} <!-- <input type="radio"> が入ります -->
+                    <label for="{{ radio.id_for_label }}" class="form-check-label ms-1">
+                      {{ radio.choice_label }}
+                    </label>
+                  </div>
+                {% endfor %}
+              </div>
+                
+                <span id="id_addition_otherReason" style="display:none;">
 
                   <input type="text" class='form-control'
-                    name='{{form.sendbackReason_text.name}}'
-                    value="{{form.sendbackReason_text.value| default:''}}"
+                    name='{{form.reason_text.name}}'
+                    value="{{form.reason_text.value| default:''}}"
                     placeholder="差戻の理由を記載">
                 </span>
 
+
+
+                <div class="mt-4 mb-2">
+                  <label for="textarea" class="d-flex form-label">
+                    <span>{% bs_icon 'envelope-fill' color='deeppink' size='1.5rem' %}</span>
+                    <span class="ms-2" style="font-size:1.1rem;">
+                      <b>申請者へのメッセージ</b>（任意）</span>
+                  </label>
+                  <textarea class="form-control" id="textarea" rows="3"
+                    name="{{form.message.name}}"
+                    value="{{form.massage.value| default:''}}"></textarea>
+                </div>
+
+                <hr>
+
+                <div class="d-flex gap-1">
+
+                  <a href="{% url 'qpay:txApprove_buyer' %}"
+                    type="button" class="btn btn-outline-primary w-50 shadow-sm">
+                    戻る</a>
+
+                  <button type="submit"
+                    class="btn btn-primary w-50 shadow-sm"
+                    name="actionBtn"
+                    value="ToSendbackQpay2_{{tx.id}}">
+                    差戻を実行</button>
+
+                </div>
               </div>
 
-              <div class="mt-4 mb-2">
-                <label for="textarea" class="d-flex form-label">
-                  <span>{% bs_icon 'envelope-fill' color='deeppink' size='1.5rem' %}</span>
-                  <span class="ms-2" style="font-size:1.1rem;">
-                    <b>申請者へのメッセージ</b>（任意）</span>
-                </label>
-                <textarea class="form-control" id="textarea" rows="3"
-                  name="{{form.sendbackMessage.name}}"
-                  value="{{form.sendbackMessage.value| default:''}}"></textarea>
-              </div>
-
-              <hr>
-
-              <div class="d-flex gap-1">
-
-              <a href="{% url 'qpay:txApprove_buyer' %}"
-                type="button" class="btn btn-outline-primary w-50 shadow-sm">
-                戻る</a>
-
-              <button type="submit"
-                class="btn btn-primary w-50 shadow-sm"
-                name="actionBtn"
-                value="ToSendbackQpay2_{{tx.id}}">
-                差戻を実行</button>
-
-              </div>
-            </div>
-
-          </form>
+            </form>
+          </div>
 
         </div> <!-- end of col -->
       </div> <!-- end of row -->
-    
+
+
+    {% elif step_process == 3 %}
+
+      <div class="row justify-content-center text-center text-secondary mt-5">
+        <br><br>
+        ゲストに対する差戻処理が完了いたしました。<br>
+        ゲストが再度申請した場合の対応をお願いいたします。
+
+        <div class="d-flex justify-content-center mt-5">
+          <span>
+            {% bs_icon 'skip-backward-circle' color='cornflowerblue' size='4rem' %}</span>
+        </div>
+
+      </div>
+
     {% endif %}
 
   </div>
@@ -330,50 +360,66 @@
 
 {% block extrajs %}
 
-<script defer>
+<script>
 //「defer」は、HTMLの解析と並行してJavaScriptの読み込みを裏側で進め、
 // HTMLの読み込み（パース）がすべて完了してからスクリプトを実行します。
 //deferを指定しない場合、ブラウザはJavaScriptの読み込みと実行が終わるまで
-// HTMLの読み込みを一時停止
+// HTMLの読み込みを一時停止。外部ファイルを読み込むとき使う
 
-  document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {
 
-    console.log('スクリプトは認識しているようです。');
+  console.log('スクリプトは認識しているようです。');
 
-    var Radio1 = document.getElementById('radio1');
-    var Radio2 = document.getElementById('radio2');
-    var Radio3 = document.getElementById('radio3');
-    var Radio4 = document.getElementById('radio4');
-    var addition_sendbackReason = document.getElementById('id_addition_sendbackReason');
+  // 3秒後にメッセージを消す
+  setTimeout(function() {
+    console.log('setTimeoutが認識されました');
 
-    // 修正後（すべてのラジオボタンを監視する）
-    document.querySelectorAll('input[name="sendbackReason_radio"]').forEach(function(radio) {
-      radio.addEventListener('change', function() {
-        addition_sendbackReason.style.display = "none";
-        console.log('radioが変わったことを認識しています。');
-        if (Radio4.checked) {
-            addition_sendbackReason.style.display = "block";
-        }
-      });
+    var messages = document.querySelectorAll('.messages div');
+    messages.forEach(function(message) {
+      message.style.display = 'none';
     });
+  }, 3000); // 3000ミリ秒 = 3秒
 
-    console.log('setTimeoutが認識前');
-    // 3秒後にメッセージを消す
-    setTimeout(function() {
-      console.log('setTimeoutが認識されました');
-
-      var messages = document.querySelectorAll('.messages div');
-      messages.forEach(function(message) {
-        message.style.display = 'none';
-      });
-    }, 3000); // 3000ミリ秒 = 3秒
-
-
-    document.getElementById('id_PostForm').addEventListener('submit', function() {
-      document.getElementById('loading').style.display = 'block';
+  // Submitボタンを押下後「しばらくお待ちください。」を表示する
+  const postForm = document.getElementById('id_PostForm');
+  if (postForm) {
+    postForm.addEventListener('submit', function() {
+      const loadingEl = document.getElementById('loading');
+      if (loadingEl) {
+        loadingEl.style.display = 'block';
+      }
     });
+  }
 
+  //document.getElementById('id_PostForm').addEventListener('submit', function() {
+  //  document.getElementById('loading').style.display = 'block';
+  //});
+
+  var Radio0 = document.getElementById('id_reason_radio_0');
+  var Radio1 = document.getElementById('id_reason_radio_1');
+  var Radio2 = document.getElementById('id_reason_radio_2');
+  var Radio3 = document.getElementById('id_reason_radio_3');
+  var Radio4 = document.getElementById('id_reason_radio_4');
+  var addition_otherReason = document.getElementById('id_addition_otherReason');
+
+  //このページに戻ったた場合に「その他」にチェックされているとき入力フォーム表示
+  if(Radio4.checked) {
+    addition_otherReason.style.display = "block";
+  };
+    
+  // 修正後（すべてのラジオボタンを監視する）
+  document.querySelectorAll('input[name="reason_radio"]').forEach(function(radio) {
+    radio.addEventListener('change', function() {
+      addition_otherReason.style.display = "none";
+      console.log('radioが変わったことを認識しています。');
+      if (Radio4.checked) {
+          addition_otherReason.style.display = "block";
+      }
+    });
   });
+
+  console.log('スクリプトは最後まで来ています。');
+});
 
 </script>
 

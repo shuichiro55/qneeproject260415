@@ -945,88 +945,95 @@
 
 {% block extrajs %}
 
-<script defer>
+<script>
 //「defer」は、HTMLの解析と並行してJavaScriptの読み込みを裏側で進め、
 // HTMLの読み込み（パース）がすべて完了してからスクリプトを実行します。
 //deferを指定しない場合、ブラウザはJavaScriptの読み込みと実行が終わるまで
 // HTMLの読み込みを一時停止
 
-  document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {
 
-    document.getElementById('id_PostForm').addEventListener('submit', function() {
-      document.getElementById('loading').style.display = 'block';
-    });
-    
-    // 個人の場合の処理
-    const userInput1 = document.getElementById('userInput1');
-    const modeChangeBtn1 = document.getElementById('modeChangeBtn1');
-    const addition1_actionBtn = document.getElementById('id_addition1_actionBtn');
-
-    modeChangeBtn1.addEventListener('click', () => {
-
-      // 現在の readonly 状態を反転
-      document.querySelectorAll('[id="userInput1"]').forEach(input => {
-        input.readOnly = !input.readOnly;
-      });
-
-      // ボタンの見た目とテキストを状態に合わせて変更
-      if (userInput1.readOnly) {
-        modeChangeBtn1.innerHTML = `編集 {% bs_icon "pencil-fill" color="white" size="0.80rem" %}`;
-        modeChangeBtn1.classList.replace('btn-primary', 'btn-primary');
-      } else {
-        modeChangeBtn1.innerHTML = `編集やめる {% bs_icon "pencil-fill" color="white" size="0.80rem" %}`;
-        modeChangeBtn1.classList.replace('btn-primary', 'btn-primary');
-      }
-
-      if (addition1_actionBtn.style.display === 'none' || addition1_actionBtn.style.display === '' ) {
-        console.log(addition1_actionBtn)
-        addition1_actionBtn.style.display = 'block'
-      } else {
-        console.log(addition1_actionBtn)
-        addition1_actionBtn.style.display = 'none'
+  // Submitボタンを押下後「しばらくお待ちください。」を表示する
+  const postForm = document.getElementById('id_PostForm');
+  if (postForm) {
+    postForm.addEventListener('submit', function() {
+      const loadingEl = document.getElementById('loading');
+      if (loadingEl) {
+        loadingEl.style.display = 'block';
       }
     });
+  }
 
-    
-    // 法人の場合の処理
-    const userInput2 = document.getElementById('userInput2');
-    const modeChangeBtn2 = document.getElementById('modeChangeBtn2');
-    const addition2_actionBtn1 = document.getElementById('id_addition2_actionBtn1');
-    const addition2_actionBtn2 = document.getElementById('id_addition2_actionBtn2');
+  // 個人の場合の処理
+  const userInput1 = document.getElementById('userInput1');
+  const modeChangeBtn1 = document.getElementById('modeChangeBtn1');
+  const addition1_actionBtn = document.getElementById('id_addition1_actionBtn');
 
-    modeChangeBtn2.addEventListener('click', () => {
+  modeChangeBtn1.addEventListener('click', () => {
 
-      // 現在の readonly 状態を反転
-      document.querySelectorAll('[id="userInput2"]').forEach(input => {
-        input.readOnly = !input.readOnly;
-      });
-
-      // ボタンの見た目とテキストを状態に合わせて変更
-      if (userInput2.readOnly) {
-        modeChangeBtn2.innerHTML = `編集 {% bs_icon "pencil-fill" color="white" size="0.80rem" %}`;
-        modeChangeBtn2.classList.replace('btn-primary', 'btn-primary');
-      } else {
-        modeChangeBtn2.innerHTML = `編集やめる {% bs_icon "pencil-fill" color="white" size="0.80rem" %}`;
-        modeChangeBtn2.classList.replace('btn-primary', 'btn-primary');
-      }
-
-      if (addition2_actionBtn1.style.display === 'none' || addition2_actionBtn1.style.display === '' ) {
-        console.log(addition2_actionBtn1)
-        addition2_actionBtn1.style.display = 'block'
-      } else {
-        console.log(addition2_actionBtn1)
-        addition2_actionBtn1.style.display = 'none'
-      }
-
-      if (addition2_actionBtn2.style.display === 'none' || addition2_actionBtn2.style.display === '' ) {
-        console.log(addition2_actionBtn2)
-        addition2_actionBtn2.style.display = 'block'
-      } else {
-        console.log(addition2_actionBtn2)
-        addition2_actionBtn2.style.display = 'none'
-      }
+    // 現在の readonly 状態を反転
+    document.querySelectorAll('[id="userInput1"]').forEach(input => {
+      input.readOnly = !input.readOnly;
     });
+
+    // ボタンの見た目とテキストを状態に合わせて変更
+    if (userInput1.readOnly) {
+      modeChangeBtn1.innerHTML = `編集 {% bs_icon "pencil-fill" color="white" size="0.80rem" %}`;
+      modeChangeBtn1.classList.replace('btn-primary', 'btn-primary');
+    } else {
+      modeChangeBtn1.innerHTML = `編集やめる {% bs_icon "pencil-fill" color="white" size="0.80rem" %}`;
+      modeChangeBtn1.classList.replace('btn-primary', 'btn-primary');
+    }
+
+    if (addition1_actionBtn.style.display === 'none' || addition1_actionBtn.style.display === '' ) {
+      console.log(addition1_actionBtn)
+      addition1_actionBtn.style.display = 'block'
+    } else {
+      console.log(addition1_actionBtn)
+      addition1_actionBtn.style.display = 'none'
+    }
   });
+
+    
+  // 法人の場合の処理
+  const userInput2 = document.getElementById('userInput2');
+  const modeChangeBtn2 = document.getElementById('modeChangeBtn2');
+  const addition2_actionBtn1 = document.getElementById('id_addition2_actionBtn1');
+  const addition2_actionBtn2 = document.getElementById('id_addition2_actionBtn2');
+
+  modeChangeBtn2.addEventListener('click', () => {
+
+    // 現在の readonly 状態を反転
+    document.querySelectorAll('[id="userInput2"]').forEach(input => {
+      input.readOnly = !input.readOnly;
+    });
+
+    // ボタンの見た目とテキストを状態に合わせて変更
+    if (userInput2.readOnly) {
+      modeChangeBtn2.innerHTML = `編集 {% bs_icon "pencil-fill" color="white" size="0.80rem" %}`;
+      modeChangeBtn2.classList.replace('btn-primary', 'btn-primary');
+    } else {
+      modeChangeBtn2.innerHTML = `編集やめる {% bs_icon "pencil-fill" color="white" size="0.80rem" %}`;
+      modeChangeBtn2.classList.replace('btn-primary', 'btn-primary');
+    }
+
+    if (addition2_actionBtn1.style.display === 'none' || addition2_actionBtn1.style.display === '' ) {
+      console.log(addition2_actionBtn1)
+      addition2_actionBtn1.style.display = 'block'
+    } else {
+      console.log(addition2_actionBtn1)
+      addition2_actionBtn1.style.display = 'none'
+    }
+
+    if (addition2_actionBtn2.style.display === 'none' || addition2_actionBtn2.style.display === '' ) {
+      console.log(addition2_actionBtn2)
+      addition2_actionBtn2.style.display = 'block'
+    } else {
+      console.log(addition2_actionBtn2)
+      addition2_actionBtn2.style.display = 'none'
+    }
+  });
+});
 
 </script>
 

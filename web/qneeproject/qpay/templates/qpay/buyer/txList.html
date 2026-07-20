@@ -143,197 +143,269 @@
 
         <div class="row justify-content-center mt-3 mx-1 px-0">
  
-          <form method="POST" class="p-0"
-            style="background-color: transparent !important; border-color:transparent !important;">
-          
-            {% csrf_token %}
+          <div class="col-lg-9 p-0">
 
             <div class="d-block d-lg-none">
 
+              <table class="table table-sm bg-light
+                table-bordered border-primary-subtle table-responsive mb-1">
 
-              {% for item in page_obj %}
+                <tbody style="font-size:0.9rem">
 
-                {% if forloop.first %}
+                  <tr class="table-primary" style="text-align:center;">
+                    <th style="vertical-align:top"></th>
+                    <th style="vertical-align:top">対応者</th>
+                    <th style="vertical-align:top">金額</th>
+                    <th style="vertical-align:top">処理状況</th>
+                    <th style="vertical-align:top">対応日時</th>
+
+                    <th style="vertical-align:top">詳細</th>
+                  </tr>
+
+                  {% for item in page_obj %}
+
+                    <tr>
+                      <th rowspan="3"
+                        class="table-primary" style="vertical-align:middle; text-align:center">
+                          {{ page_obj.start_index|add:forloop.counter0 }}</th>
+          
+                      <th class="table-primary" style="vertical-align:middle; text-align:start">
+                        {{ item.sellEntityname }}</th>
+
+                      <td rowspan="3"
+                        style="vertical-align:middle; text-align:center">
+                        {{ item.requested_amount|intcomma }}</td>
+
+
+                      <!-- ゲストに関する取引状況を表示 -->
+                      {% if item.txStatus == 2 %}
+                        <td style="vertical-align:middle; text-align:center">-</td>
+                        <td style="vertical-align:middle; text-align:center">-</td>
+                      {% else %}
+                        <td style="vertical-align:middle; text-align:center">
+                          申請済</td>
+                        <td style="vertical-align:middle; text-align:center;
+                          font-size:0.75rem">
+                            {{ item.requested_at|default:'-'|date:"y/n/j H:i" }}</td>
+                      {% endif %}
+
+                      <td rowspan="3" 
+                        style="width:70px;
+                        vertical-align:middle; text-align:center">
+                        <a href="{% url 'qpay:txListDetail_buyer' item.id page_obj.number %}"
+                          class="btn btn-outline-primary px-1 w-100">表示</a>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <th class="table-primary" style="text-align:start">
+                        {{ item.buyEntityname }}</th>
+
+                      <!-- パートナーに関する取引状況を表示 -->
+                      {% if item.txStatus == 1 or item.txStatus == 4 %}
+                        <td style="vertical-align:middle; text-align:center">-</td>
+                        <td style="vertical-align:middle; text-align:center">-</td>
+
+                      {% elif item.txStatus == 2 %}
+                        <td style="vertical-align:middle; text-align:center">差戻</td>
+                        <td style="vertical-align:middle; text-align:center;
+                          font-size:0.75rem">
+                          {{ item.sendbackInfo_buyer.created_at|default:'-'|date:"y/n/j H:i" }}</td>
+
+                      {% elif item.txStatus == 3 or item.txStatus == 5 %}
+                        <td style="vertical-align:middle; text-align:center">
+                          承認済</td>
+                        <td style="vertical-align:middle; text-align:center;
+                          font-size:0.75rem">
+                          {{ item.approved_at|default:'-'|date:"y/n/j H:i" }}</td>
+
+                      {% else %}
+                        <td style="vertical-align:middle; text-align:center">-</td>
+                        <td style="vertical-align:middle; text-align:center">-</td>
+                      {% endif %}
+  
+                    </tr>
+
+                    <!-- Qneeに関わる取引進捗の表示 -->
+                    <tr>
+                      <th class="table-primary" style="text-align:start">(株)キユーニー</th>
+
+                      {% if item.txStatus == 4 %} 
+                        <td style="font-size:0.9rem; vertical-align:middle; text-align:center">
+                          Qnee差戻</td>
+                        <td style="font-size:0.75rem; vertical-align:middle; text-align:center">
+                          {{ item.sendbackInfo_admin.created_at|default:'-'|date:"n/j H:i" }}</td>
+
+                      {% elif item.txStatus == 5 %}
+                        <td style="font-size:0.9rem; vertical-align:middle; text-align:center">
+                          Qnee前払済み</td>
+                        <td style="font-size:0.75rem; vertical-align:middle; text-align:center">
+                          {{ item.advanced_at|default:'-'|date:"n/j H:i" }}</td>
+
+                      {% else %}
+                        <td style="font-size:0.9rem; vertical-align:middle; text-align:center">
+                          -</td>
+                        <td style="font-size:0.75rem; vertical-align:middle; text-align:center">
+                          -</td>
+                      {% endif %}
+  
+                    </tr>
+
+                  {% empty %}
+                    <p>QPAY取引はありません。</p>
+                  {% endfor %}
+            
+                </tbody>
+              </table>
+            </div>
+
+            
+            <div class="d-none d-lg-block">
 
               <table class="table table-sm bg-light
-                table-bordered border-primary-subtle
-                shadow-sm table-responsive">
+                table-bordered border-primary-subtle table-responsive mb-1">
 
-                <thead style="font-size:0.8em">
+                <tbody style="font-size:0.9rem">
+
                   <tr class="table-primary" style="text-align:center;">
-                    <th rowspan="2"style="vertical-align:top" class="px-0">#</th>
-                    <th rowspan="1" style="vertical-align:top"></th>
-                    <th rowspan="1" style="vertical-align:top">申請額</th>
-                    <th colspan="1" style="vertical-align:top">関係者</th>
-                    <th rowspan="1" style="vertical-align:top">対応状況</th>
-                    <th rowspan="1" style="vertical-align:top">詳細</th>
+                    <th style="vertical-align:top"></th>
+                    <th style="vertical-align:top">対応者</th>
+                    <th style="vertical-align:top">金額</th>
+                    <th style="vertical-align:top">処理状況</th>
+                    <th style="vertical-align:top">対応日時</th>
+                    <th style="vertical-align:top">証明書類</th>
+                    <th style="vertical-align:top">詳細</th>
                   </tr>
 
-                </thead>
+                  {% for item in page_obj %}
+
+                    <tr>
+                      <th rowspan="3"
+                        class="table-primary" style="vertical-align:middle; text-align:center">
+                          {{ page_obj.start_index|add:forloop.counter0 }}</th>
           
-                <tbody style="font-size:0.8em">
+                      <th class="table-primary" style="vertical-align:middle; text-align:start">
+                        {{ item.sellEntityname }}</th>
 
-                {% endif %}
-                    
-                  <tr>
-                    <td rowspan="3" style="vertical-align:middle; text-align:center;" class="table-primary px-0">
-                      {{ page_obj.start_index|add:forloop.counter0 }}</td>
-                    <td colspan="1" style="text-align:center" class="table-primary">
-                      申請</td>
-                    <td rowspan="3" style="text-align:center">
-                      {{ item.requested_amount|intcomma }}</td>
-                    <td colspan="1" style="text-align:center">
-                      {{ item.sellEntityname }}</td>
-                    <td colspan="1" style="text-align:center">
-                      {{ item.requested_at| date:"y.n.j H:i" |default:'ー' }}</td>
-                    <td rowspan="3" class="p-1" style="vertical-align:middle; text-align:center">
-                      <a href="{% url 'qpay:txListDetail_buyer' item.id page_obj.number %}"
-                        class="btn btn-outline-primary w-100 h-100 px-1"
-                        style="font-size:0.9em">表示</a>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td colspan="1" style="text-align:center" class="table-primary">
-                      承認</td>
-                    <td colspan="1" style="vertical-align:middle; text-align:center" class="px-0">
-                      {{ item.buyUser_personname |default:'ー' }}</td>
-                    <td colspan="1" style="text-align:center" class="px-0">
-                      {{ item.approved_at| date:"y.n.j H:i" |default:'ー' }}
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td colspan="1" style="text-align:center" class="table-primary">
-                      送金</td>
-                    <td colspan="1" style="vertical-align:middle; text-align:center">
-                      Qnee</td>
-                    <td rowspan="1" style="vertical-align:middle; text-align:center" class="px-0">
-                      {{ item.advanced_at |date:"y.n.j H:i" |default:'ー' }}</td>
-                  </tr>
-
-              {% empty %}
-
-                <div class="row justify-content-center text-center mt-5">
-                  該当する取引データはありません。
-                </div>
-              
-              {% endfor %}
-                
-            </tbody>
-
-          </table>
-        </div>
+                      <td rowspan="3"
+                        style="vertical-align:middle; text-align:center">
+                        {{ item.requested_amount|intcomma }}</td>
 
 
-        <div class="d-none d-lg-block">
+                        <!-- ゲストに関する取引状況を表示 -->
+                      {% if item.txStatus == 2 %}
+                        <td style="vertical-align:middle; text-align:center">-</td>
+                        <td style="vertical-align:middle; text-align:center">-</td>
+                      {% else %}
+                        <td style="vertical-align:middle; text-align:center">
+                          申請済</td>
+                        <td style="vertical-align:middle; text-align:center;
+                          font-size:0.75rem">
+                            {{ item.requested_at|default:'-'|date:"y/n/j H:i" }}</td>
+                      {% endif %}
 
-          {% for item in page_obj %}
-
-            {% if forloop.first %}
-
-          <table class="table table-sm bg-light table-bordered border-primary-subtle table-responsive mx-2">
-            <thead style="font-size:0.9rem">
-              <tr class="table-primary" style="text-align:center;">
-                <th rowspan="2"style="vertical-align:top">#</th>
-                <th colspan="2" style="vertical-align:top">申請法人</th>
-                <th rowspan="2" style="vertical-align:top">証明<br>書類</th>
-                <th colspan="2" style="vertical-align:top">承認ユーザー</th>
-                <th rowspan="2" style="vertical-align:top">Qnee<br>送金</th>
-                <th rowspan="2" style="vertical-align:top">詳細</th>
-              </tr>
-
-              <tr class="table-primary" style="text-align:center;">
-                <th style="vertical-align:top">申請額</th>
-                <th style="vertical-align:top">申請時</th>
-                <th style="vertical-align:top">状況</th>
-                <th style="vertical-align:top">承認時</th>
-              </tr>
-
-            </thead>
-          
-            <tbody style="font-size:0.9rem">
-
-            {% endif %}
-
-              <tr>
-                <td rowspan="2" style="vertical-align:middle; text-align:center;">
-                  {{ page_obj.start_index|add:forloop.counter0 }}</td>
-                <td colspan="2" style="text-align:center">
-                  {{ item.sellEntityname }}
-                </td>
-
-                <td rowspan="2" style="text-align:center; vertical-align:middle;">
-                  <img src="{{ item.evidence.url }}"
-                    class="img-fluid"
-                    style="max-height:49; width:auto; cursor:zoom-in;"
-                    data-bs-toggle="modal"
-                    data-bs-target="#imageModal{{ forloop.counter }}"/>
-                </td>
-
-                <!-- モーダル・ダイアログ -->
-                <div class="modal fade"
-                  id="imageModal{{ forloop.counter }}" tabindex="-1" aria-hidden="true">
-                  <div class="modal-dialog"> <!-- modal-sm/lg/xl/xxl 指定なしは「medium」 -->
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h6 class="modal-title">証明書類</h6>
-                        <!-- 閉じるボタン: data-bs-dismiss="modal" が重要 -->
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      <td rowspan="3"
+                        style="text-align:center; vertical-align:middle;">
+                        <img src="{{ item.evidence.url }}"
+                          class="img-fluid"
+                          style="max-height:55; width:auto; cursor:zoom-in;"
+                          data-bs-toggle="modal"
+                          data-bs-target="#imageModal2_{{ forloop.counter }}"/>
+                      </td>
+                      <!-- モーダルウィンドウ外枠 -->
+                      <div class="modal fade"
+                        id="imageModal2_{{ forloop.counter }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-sm"> <!-- 大きさ指定なしは「Medium」 -->
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h6 class="modal-title">証明書類</h6>
+                              <!-- 閉じるボタン: data-bs-dismiss="modal" が重要 -->
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                              <img src="{{ item.evidence.url }}" class="img-fluid" alt="拡大画像">
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                      <div class="modal-body">
-                        <img src="{{ item.evidence.url }}" class="img-fluid" alt="拡大画像">
-                      </div>
-                    </div>
-                  </div>
-                </div> 
 
-                <td colspan="2" style="vertical-align:middle; text-align:center">
-                  {{ item.buyUser_personname |default:'-' }}
-                </td>
-                <td rowspan="2" style="vertical-align:middle; text-align:center">
-                  {{ item.payed_at |date:"y.n.j H:i" |default:'-' }}
-                </td>
-                <td rowspan="2" class="p-1" style="vertical-align:middle; text-align:center">
-                  <a href="{% url 'qpay:txListDetail_buyer' item.id page_obj.number %}"
-                    class="btn btn-outline-primary w-100 px-2">表示</a>
-                </td>
-              </tr>
-              <tr>
-                <td style="text-align:center">{{ item.requested_amount|intcomma }}</td>
-                <td style="text-align:center">{{ item.requested_at|date:"y.n.j H:i"| default:'ー' }}</td>
-                <td style="vertical-align:middle; text-align:center">
-                  {% if item.txStatus_int == 1 %}未了{% endif %}
-                  {% if item.txStatus_int == 2 %}未了{% endif %}
-                  {% if item.txStatus_int >= 3 %}承認{% endif %}
-                  {% if item.txStatus_int == -3 %}否認{% endif %}
-                </td>
-                <td style="vertical-align:middle; text-align:center">
-                  {% if item.txStatus_int == 1 %}ー{% endif %}
-                  {% if item.txStatus_int == 2 %}ー{% endif %}
-                  {% if item.txStatus_int >= 3 %}{{ item.approved_at|date:"y/n/j H:i"|default:'ー' }}{% endif %}
-                  {% if item.txStatus_int == -3 %}{{ item.rejected_at|date:"y/n/j H:i"|default:'ー' }}{% endif %}
-                </td>
-              </tr>
+                      <td rowspan="3" 
+                        style="width:70px;
+                        vertical-align:middle; text-align:center">
+                        <a href="{% url 'qpay:txListDetail_buyer' item.id page_obj.number %}"
+                          class="btn btn-outline-primary px-1 w-100">表示</a>
+                      </td>
+                    </tr>
 
-          {% empty %}
+                    <tr>
+                      <th class="table-primary" style="text-align:start">
+                        {{ item.buyEntityname }}</th>
 
-            <div class="row justify-content-center text-center mt-5">
-              該当する取引データはありません。
+                      <!-- パートナーに関する取引状況を表示 -->
+                      {% if item.txStatus == 1 or item.txStatus == 4 %}
+                        <td style="vertical-align:middle; text-align:center">-</td>
+                        <td style="vertical-align:middle; text-align:center">-</td>
+
+                      {% elif item.txStatus == 2 %}
+                        <td style="vertical-align:middle; text-align:center">差戻</td>
+                        <td style="vertical-align:middle; text-align:center;
+                          font-size:0.75rem">
+                          {{ item.sendbackInfo_buyer.created_at|default:'-'|date:"y/n/j H:i" }}</td>
+
+                      {% elif item.txStatus == 3 or item.txStatus == 5 %}
+                        <td style="vertical-align:middle; text-align:center">
+                          承認済</td>
+                        <td style="vertical-align:middle; text-align:center;
+                          font-size:0.75rem">
+                          {{ item.approved_at|default:'-'|date:"y/n/j H:i" }}</td>
+
+                      {% else %}
+                        <td style="vertical-align:middle; text-align:center">-</td>
+                        <td style="vertical-align:middle; text-align:center">-</td>
+                      {% endif %}
+  
+                    </tr>
+
+                    <!-- Qneeが差し戻した場合の表示 -->
+                    <tr>
+                      <th class="table-primary" style="text-align:start">(株)キユーニー</th>
+
+                      {% if item.txStatus == 4 %} 
+                        <td style="font-size:0.9rem; vertical-align:middle; text-align:center">
+                          Qnee差戻</td>
+                        <td style="font-size:0.75rem; vertical-align:middle; text-align:center">
+                          {{ item.sendbackInfo_admin.created_at|default:'-'|date:"n/j H:i" }}</td>
+
+                      {% elif item.txStatus == 5 %}
+                        <td style="font-size:0.9rem; vertical-align:middle; text-align:center">
+                          Qnee前払済み</td>
+                        <td style="font-size:0.75rem; vertical-align:middle; text-align:center">
+                          {{ item.advanced_at|default:'-'|date:"n/j H:i" }}</td>
+
+                      {% else %}
+                        <td style="font-size:0.9rem; vertical-align:middle; text-align:center">
+                          -</td>
+                        <td style="font-size:0.75rem; vertical-align:middle; text-align:center">
+                          -</td>
+                      {% endif %}
+  
+                    </tr>
+
+                  {% empty %}
+                    <p>QPAY取引はありません。</p>
+                  {% endfor %}
+            
+                </tbody>
+              </table>
+            
             </div>
-                   
-          {% endfor %}
 
-            </tbody>
+            {% include "partials/pagination.html" %}
 
-          </table>
-        </div>
+            <input type="hidden" name="next" value="{{ next }}" />
 
-        {% include "partials/pagination.html" %}
-
-        <input type="hidden" name="next" value="{{ next }}" />
-
-      </form>
-    </div> <!-- end row -->
+          </div>
+        </div> <!-- end row -->
 
       {% else %}
 
