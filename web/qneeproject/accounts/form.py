@@ -5,17 +5,15 @@ from django.contrib.auth.forms import \
 from .models import CustomUser, LegalEntity, BankAccount, CorpInfo
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
-
+from .models import CustomUnicodeUsernameValidator
 #from .models import LegalEntity, UserEntityRelation
 
 import unicodedata, re
 from django.core.validators import RegexValidator
-from django.contrib.auth.validators import UnicodeUsernameValidator
 
 UserModel = get_user_model()
 
-
-name_validator = UnicodeUsernameValidator()
+name_validator = CustomUnicodeUsernameValidator()
 
 tel_regex = RegexValidator(
     regex=r'^[0-9０-９]{10,11}$',

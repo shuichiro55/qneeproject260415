@@ -11,7 +11,15 @@ from django.core.mail import send_mail
 #from django.contrib.auth.models import AbstractUser
 #from django.contrib.auth.validators import ASCIIUsernameValidator
 
-name_validator = UnicodeUsernameValidator() #\ー\―\－\‐\₋\-\⁻
+class CustomUnicodeUsernameValidator(UnicodeUsernameValidator):
+  # 元の正規表現の末尾に 全角スペース（　）を追加
+  regex =  r"^[\w.@+- 　（）()]+$"
+  message = _(
+    "有効なユーザー名をご入力ください。"
+    "文字と数字、@/ ./ +/ -/ _/ 　/ （/ ）/ が入力可能です。"
+  )
+
+name_validator = CustomUnicodeUsernameValidator() #\ー\―\－\‐\₋\-\⁻
 tel_regex = RegexValidator(
     regex=r'^[0-9０-９]{10,11}$',
     message='数字のみ・ハイフン無しで入力してください。 例：09012345678')

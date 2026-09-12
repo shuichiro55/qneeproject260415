@@ -23,9 +23,11 @@
 
 
       <!-- スライドする画像１ -->
-      <div class="carousel-item active h-100" data-bs-interval="5000">
-        <img src='static/images/qconnect/bg-productLP-buyer1_6.jpg' class="d-block w-100 h-100" alt="スライド1"
-          style="object-fit:cover; object-position: left;">
+      <div id="page1" class="carousel-item active h-100" data-bs-interval="5000">
+        <img src='static/images/qconnect/bg-productLP-buyer1_6.jpg' class="d-block w-100 h-100"
+          loading="eager" decoding="sync"
+          style="object-fit:cover; object-position: left;"
+          alt="スライド1">
 
         <div class="bg-overlay2"></div>
 
@@ -76,10 +78,9 @@
                 報酬を早く受け取れます</b>
               </p>
               <p class="mt-3"
-                style="color:#fff; font-size:1.1rem;"
+                style="color:#fff; font-size:1.0rem;"
                 id="page1_copy_body1">
-                報酬がもっと早くほしい！ <br>
-                そんなときはありませんか？<br>
+                報酬がもっと早くほしい！ そんなときはありませんか？<br>
                 <br>
                 カードや銀行の審査が厳しい、<br>
                 ファクタリングは手数料が高かったりします。
@@ -124,7 +125,7 @@
               </p>
               <p class="mt-3"
                 id="page1_copy_body2" 
-                style="font-size:1.1rem;">
+                style="font-size:1.0rem;">
                 いえいえ、そんなことはありません。<br>
                 あなたを支援して、よい関係でありたいと思います。
               </p>
@@ -177,7 +178,7 @@
 
 
       <!-- スライドする画像２ -->
-      <div class="carousel-item h-100" data-bs-interval="5000">
+      <div id="page2" class="carousel-item h-100" data-bs-interval="5000">
         
         <video class="d-block w-100 h-100"
            style="object-fit:cover;"
@@ -252,7 +253,7 @@
               </p>
               <p class="mt-4"
                 id="page2_copy_body1"
-                style="font-size:1.1rem">
+                style="font-size:1.0rem">
                 取引先をご紹介いただけませんか？<br>
                 取引先はあなたの働く環境をサポートしたいはず。
               </p> 
@@ -271,7 +272,7 @@
                 キユーニーが報酬を立て替えます。
               </p>
 
-              <p class="mt-4" style="font-size:1.1rem"
+              <p class="mt-4" style="font-size:1.0rem"
                 id="page2_copy_body2">
                 ゲスト登録し、報酬があること示すだけ。<br>
                 すぐに報酬を手にすることができます。
@@ -326,7 +327,7 @@
 
 
       <!-- スライドする画像３ -->
-      <div class="carousel-item h-100" data-bs-interval="5000">
+      <div id="page3" class="carousel-item h-100" data-bs-interval="5000">
         
         <img src='static/images/qconnect/bg-productLP-buyer2_6.jpg' class="d-block w-100 h-100" alt="スライド1"
           style="object-fit:cover; object-position: left;">
@@ -419,17 +420,17 @@
                   padding:0.5em 1.5em;">
                 ご利用手数料
               </p>
-              <p class="copy-body-m mt-4" style="font-size:1.1rem"
+              <p class="copy-body-m mt-4" style="font-size:1.0rem"
                 id="page3_copy_body1">
                 次のご利用手数料を設定しています。<br>
                 初回は優待特典として手数料はゼロ
               </p>
-              <p class="" style="font-size:1.1rem"
+              <p class="" style="font-size:1.0rem"
                 id="page3_copy_body2">
-                私たちは皆さまのご利用を「サービス向上の機会」、<br>
-                「サービスの普及」の機会として考えています。
+                私たちは皆さまのご利用を①サービス向上の機会、<br>
+                ②サービスの普及の機会として考えています。
               </p>
-              <p class="" style="font-size:1.1rem"
+              <p class="" style="font-size:1.0rem"
                 id="page3_copy_body3">
                 そんななか初回とβ版運用期間はご優待価格としています。
               </p>
@@ -578,80 +579,101 @@
 
 <script>
 
-  document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {
 
-    const page1_head1 = document.querySelectorAll('#page1_copy_head1');
-    const page1_head2 = document.querySelectorAll('#page1_copy_head2');
-    const page1_body1 = document.querySelectorAll('#page1_copy_body1');
-    const page1_body2 = document.querySelectorAll('#page1_copy_body2');
+  // アニメーションの共通設定
+  const keyframes = {
+    color: ['transparent', '#fff'],
+    backgroundPosition: ['100% 0', '0 0'],
+  };
+  const options = { duration: 1000, easing: 'ease' };
+  const options2 = { duration: 1000, delay: 1000, easing: 'ease-in' };
 
-    const keyframes = {
-      color:['transparent', '#fff'], backgroundPosition: ['100% 0', '0 0'],
-    }
-    const options = {
-      duration: 1000, easing: 'ease',
-    }
-    const options2 = {
-      duration: 1000, delay: 1000, easing: 'ease-in',
-    }
+  // IntersectionObserverの共通オプション（一度だけ実行させる）
+  const observerOptions = {
+    root: null, // ビューポートを基準にする
+    threshold: 0.1 // 10%交差したら実行
+  };
 
-    const showPage1 = () => {
-      page1_head1.forEach(function(head1) { head1.animate(keyframes, options)});
-      page1_head2.forEach(function(head2) { head2.animate(keyframes, options2)});
-      page1_body1.forEach(function(body1) {
-        body1.animate({opacity: [0, 1], translate: ['0 30px',0]}, 2000)});
-      page1_body2.forEach(function(body2) {
-        body2.animate({opacity: [0, 1], translate: ['0 25px',0]}, 2000)});
-    };
-
-    const page1_Observer = new IntersectionObserver(showPage1);
-    page1_Observer.observe(document.querySelector('#page1_copy_body1'));
-
-
-    const page2_head1 = document.querySelectorAll('#page2_copy_head1');
-    const page2_head2 = document.querySelectorAll('#page2_copy_head2');
-    const page2_body1 = document.querySelectorAll('#page2_copy_body1');
-    const page2_body2 = document.querySelectorAll('#page2_copy_body2');
-
-    const showPage2 = () => {
-
-      page2_head1.forEach(function(head1) { head1.animate(keyframes, options)});  
-      page2_body1.forEach(function(body1) {
-        body1.animate({opacity:[0, 1], translate:['0 30px',0], }, 2000)});
-
-      page2_head2.forEach(function(head2) { head2.animate(keyframes, options2)});
-      page2_body2.forEach(function(body2) {
-        body2.animate({opacity:[0, 1], translate:['0 30px',0], }, 3000)});
-    };
-    const page2_Observer = new IntersectionObserver(showPage2);
-    page2_Observer.observe(document.querySelector('#page2_copy_body1'));
-
-
-    const page3_head1 = document.querySelectorAll('#page3_copy_head1');
-    const page3_body1 = document.querySelectorAll('#page3_copy_body1');
-    const page3_body2 = document.querySelectorAll('#page3_copy_body2');
-    const page3_body3 = document.querySelectorAll('#page3_copy_body3');
-
-    const showPage3 = () => {
-
-      page3_head1.forEach(function(head1) { head1.animate(keyframes, options)});
-      page3_body1.forEach(function(body1) {
-        body1.animate({opacity:[0, 1], translate:['0 30px',0], }, 2000)});
-      page3_body2.forEach(function(body2) {
-        body2.animate({opacity:[0, 1], translate:['0 30px',0], }, 2000)});
-      page3_body3.forEach(function(body3) {
-        body3.animate({opacity:[0, 1], translate:['0 30px',0], }, 3000)});
-
-      console.log('見出しの背景を伸ばす');
-    };
-    const pg3_Observer = new IntersectionObserver(showPage3);
-    pg3_Observer.observe(document.querySelector('#page3_copy_body1'));
-
-    let tooltipTriggerList = [].slice.call(document.querySelectorAll('{data-bs-toggle="tooltip"}'));
-    let tooltipList = tooltipTriggerList.map(function (tooltipTriggerElem){
-      return new bootstrap.Tooltip(tooltipTriggerElem)
+  // --- ページ1の処理 ---
+  const showPage1 = (entries, observer) => {
+    entries.forEach(entry => {
+      // 画面内に入った時だけ実行
+      if (entry.isIntersecting) {
+        document.querySelectorAll('#page1_copy_head1').forEach(el => el.animate(keyframes, options));
+        document.querySelectorAll('#page1_copy_head2').forEach(el => el.animate(keyframes, options2));
+        document.querySelectorAll('#page1_copy_body1').forEach(el => el.animate({opacity:[0, 1], translate: ['0 30px', 0]}, 2000));
+        document.querySelectorAll('#page1_copy_body2').forEach(el => el.animate({opacity:[0, 1], translate: ['0 25px', 0]}, 2000));
+        
+        // 一度実行したら監視を解除（重複防止）
+        observer.unobserve(entry.target);
+      }
     });
+  };
+      
+  const page1_Observer = new IntersectionObserver(showPage1, observerOptions);
+  
+  // 【修正点】監視対象をbody1ではなく、コンテンツ全体を囲む親要素（例: #page1）にする
+  // ※HTML側に id="page1" を持つコンテナがある前提です
+  const target1 = document.querySelector('#page1') || document.querySelector('#page1_copy_body1'); 
+  if (target1) {
+    page1_Observer.observe(target1);
+  }
+  
+
+  // --- ページ2の処理 ---
+  const showPage2 = (entries, observer) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        document.querySelectorAll('#page2_copy_head1').forEach(el => el.animate(keyframes, options));
+        document.querySelectorAll('#page2_copy_head2').forEach(el => el.animate(keyframes, options2));
+        document.querySelectorAll('#page2_copy_body1').forEach(el => el.animate({opacity:[0, 1], translate: ['0 30px', 0]}, 2000));
+        document.querySelectorAll('#page2_copy_body2').forEach(el => el.animate({opacity:[0, 1], translate: ['0 30px', 0]}, 3000));
+        
+        observer.unobserve(entry.target);
+      }
+    });
+  };
+  const page2_Observer = new IntersectionObserver(showPage2, observerOptions);
+  
+  // 【修正点】監視対象をbody1ではなく、コンテンツ全体を囲む親要素（例: #page2）にする
+  // ※HTML側に id="page2" を持つコンテナがある前提です
+  const target2 = document.querySelector('#page2') || document.querySelector('#page2_copy_body1'); 
+  if (target2) {
+    page2_Observer.observe(target2);
+  }
+
+
+
+  // --- ページ3の処理 ---
+  const showPage3 = (entries, observer) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        document.querySelectorAll('#page3_copy_head1').forEach(el => el.animate(keyframes, options));
+        document.querySelectorAll('#page3_copy_body1').forEach(el => el.animate({opacity:[0, 1], translate: ['0 30px', 0]}, 2000));
+        document.querySelectorAll('#page3_copy_body2').forEach(el => el.animate({opacity:[0, 1], translate: ['0 30px', 0]}, 2000));
+        document.querySelectorAll('#page3_copy_body3').forEach(el => el.animate({opacity:[0, 1], translate: ['0 30px', 0]}, 3000));
+        console.log('見出しの背景を伸ばす');
+        
+        observer.unobserve(entry.target);
+      }
+    });
+  };
+  const page3_Observer = new IntersectionObserver(showPage3, observerOptions);
+  
+  // 【修正点】監視対象をbody1ではなく、コンテンツ全体を囲む親要素（例: #page3）にする
+  // ※HTML側に id="page3" を持つコンテナがある前提です
+  const target3 = document.querySelector('#page3') || document.querySelector('#page3_copy_body1'); 
+  if (target3) {
+    page3_Observer.observe(target3);
+  }
+
+
+  let tooltipTriggerList = [].slice.call(document.querySelectorAll('{data-bs-toggle="tooltip"}'));
+  let tooltipList = tooltipTriggerList.map(function (tooltipTriggerElem){
+    return new bootstrap.Tooltip(tooltipTriggerElem)
   });
+});
 
 </script>
 

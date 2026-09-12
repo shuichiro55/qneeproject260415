@@ -186,7 +186,10 @@ class ClrStatus(models.IntegerChoices):
   PENDING = 2 # 保留
   DONE = 3    # 清算済み
 
+
 """ パートナーにおける前払い（Qnee立替分）の清算状況を管理 """
+""" 各パートナーにおいて支払年月ごとのデータができる """
+
 class ClearingInfo(models.Model):
 
   buyEntity = models.ForeignKey(LegalEntity,
