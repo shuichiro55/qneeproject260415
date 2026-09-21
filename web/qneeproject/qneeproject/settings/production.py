@@ -5,6 +5,9 @@ from .base import *
 import os
 import environ
 
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = False
+
 env = environ.Env()
 envpath = os.path.join(BASE_DIR, '.env')
 env.read_env(envpath)
@@ -38,7 +41,7 @@ LOGGING = {
     'file': {
       'level': 'DEBUG',
       'class': 'logging.FileHandler',
-      'filename': 'var/log/{}/app.log'.format(PROJECT_NAME),
+      'filename': '/var/log/{}/app.log'.format(PROJECT_NAME),
       'formatter': 'production', # 下記で定義したformatterを使用する
     },
   },

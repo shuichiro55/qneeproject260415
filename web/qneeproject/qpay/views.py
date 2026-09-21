@@ -712,7 +712,10 @@ class TxReapplyView_seller(generic.UpdateView):
     # ★★　申請を取り下げる
     if actionBtn.find('ToDropApply') >= 0:
 
-      tx.txStatus = -1;
+      tx_id = actionBtn.split('_')[1]
+      tx = QpayTx.objects.select_related('buyEntity').get(pk=tx_id)
+      
+      tx.txStatus = -1
       tx.txStatus_char = 'ゲスト取下'
       tx.save()
       return HttpResponseRedirect(reverse_lazy('qpay:txReapply_seller'))

@@ -81,12 +81,9 @@
     {% if IndivOrAggreg == 'indiv' %}
 
       <div class="d-flex justify-content-center mt-2">
-        <h5 class="text-secondary pt-1"><b>取引一覧</b></h5>
-        <span class="ms-2">
-          {% bs_icon 'receipt-cutoff' color='deeppink' size='2.2em' %}
-        </span>
+        <span class="">{% bs_icon 'receipt-cutoff' color='deeppink' size='1.7em' %}</span>
+        <h5 class="text-secondary ms-3"><b>取引一覧</b></h5>
       </div>
-
 
       <div class="row justify-content-center mt-2 mx-2">
 
@@ -420,8 +417,8 @@
     {% elif IndivOrAggreg == 'aggreg'%}
 
       <div class="d-flex justify-content-center mt-2">
-        <h5 class="text-secondary pt-1"><b>月次集計</b></h5>
-        <span class="ms-2">{% bs_icon 'receipt-cutoff' color='deeppink' size='2.2em' %}</span>
+        <span class="">{% bs_icon 'receipt-cutoff' color='deeppink' size='2.2em' %}</span>
+        <h5 class="text-secondary ms-2 pt-1"><b>月次集計</b></h5>
       </div>
 
       <div class="row justify-content-center mt-2 mx-0">

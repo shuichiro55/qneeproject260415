@@ -909,6 +909,7 @@ class EntityCreateView_buyer(generic.CreateView):
     """ 新規のパートナー登録をする処理 """
     if next1 != None:
 
+      context = {}
       if next1.find('ToCreateEntity') >= 0:
 
         user = UserModel.objects.get(pk=next1.split('_')[1]) 

@@ -12,7 +12,7 @@ import unicodedata, re
 from django.core.validators import RegexValidator
 
 UserModel = get_user_model()
-
+  
 name_validator = CustomUnicodeUsernameValidator()
 
 tel_regex = RegexValidator(

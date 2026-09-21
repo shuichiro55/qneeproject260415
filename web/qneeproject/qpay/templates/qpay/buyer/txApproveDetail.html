@@ -53,15 +53,15 @@
 
       {% if tx.txStatus != 4 %}
         <div class="d-flex justify-content-center mt-5">
-          <h5 class="text-secondary pt-1"><b>承認処理</b></h5>
-          <span class="ms-3">{% bs_icon 'person-check' color='deeppink' size='2.2em' %}</span>
+          <span class="">{% bs_icon 'person-check' color='deeppink' size='2.0em' %}</span>
+          <h5 class="text-secondary ms-3 pt-1"><b>承認処理</b></h5>
         </div>
 
       {% else %}
       
         <div class="d-flex justify-content-center mt-5">
-          <h5 class="text-secondary pt-1"><b>承認処理</b></h5>
-          <span class="ms-3">{% bs_icon 'person-check' color='deeppink' size='2.2em' %}</span>
+          <span class="">{% bs_icon 'person-check' color='deeppink' size='2.2em' %}</span>
+          <h5 class="text-secondary ms-3 pt-1"><b>承認処理</b></h5>
         </div>
 
         <div class="row justify-content-center mt-3 px-3 mb-3">
@@ -239,10 +239,8 @@
     {% elif step_process == 2 %}
 
       <div class="d-flex justify-content-center mt-5">
-        <h5 class="text-secondary pt-1"><b>申請の差戻理由</b></h5>
-        <span class="ms-3">
-          {% bs_icon 'inbox-fill' color='deeppink' size='2.2em' %}
-        </span>
+        <span class="">{% bs_icon 'inbox-fill' color='deeppink' size='2.2em' %}</span>
+        <h5 class="text-secondary ms-3 pt-1"><b>申請の差戻理由</b></h5>
       </div>
 
       <div class="row justify-content-center mt-2">

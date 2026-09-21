@@ -1,5 +1,8 @@
 from .base import *
 
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True
+
 ALLOWED_HOSTS = ['*']
 
 SECRET_KEY = 'django-insecure-egglb64b%uak^4quaeg^zmt3e=pxvjb4l9ix(-j1vx$r4y1zrg'
@@ -46,7 +49,7 @@ LOGGING = {
     # データベースクエリやリクエスト処理等、Djangoのフレームワークのログ)
     'django': {
       'handlers': ['console'],
-      'level': 'DEBUG',
+      'level': 'INFO',
       # DEBUG以上の重要度（DEBUG, INFO, WARNING, ERROR, CRITICAL）の情報を出力
       'propagate': True,
     },

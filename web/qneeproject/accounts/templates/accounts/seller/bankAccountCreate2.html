@@ -38,8 +38,8 @@
     {% if flag_step == 1 %}
 
       <div class="d-flex justify-content-center mt-5">
-        <h5 class="text-secondary me-2"><b>銀行口座の登録</b></h5>
-        <span class="ms-2">{% bs_icon 'bank' color='deeppink' size='1.6em' %}</span>
+        <span class="">{% bs_icon 'bank' color='deeppink' size='1.6em' %}</span>
+        <h5 class="text-secondary ms-2 me-2"><b>銀行口座の登録</b></h5>
       </div>
 
       <div class="row justify-content-center mt-3 mx-2">
@@ -177,8 +177,13 @@
     {% if flag_step == 2 %}
 
       <div class="d-flex justify-content-center mt-4">
-        <h5 class="text-secondary"><b>名義・口座情報の入力</b></h5>
-        <i class="bi bi-bank ms-3" style="font-size:1.5rem; color:deeppink;"></i>
+        <i class="bi bi-bank" style="font-size:1.5rem; color:deeppink;"></i>
+        <h5 class="text-secondary ms-3"><b>名義・口座情報の入力</b></h5>
+        <span id="id_addition_text"
+          style="font-size:0.75rem; display:none;"
+          class="text-danger ms-3">
+          ※反社会勢力排除のため、ご登録の法人・ご本人の名義以外の口座にはお支払いいたしません。
+        </span>
       </div>
 
 
