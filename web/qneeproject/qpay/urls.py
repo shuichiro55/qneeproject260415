@@ -54,4 +54,11 @@ urlpatterns = [
   path('<int:tx_id>/txInboxDetail/', views.TxInboxDetailView_admin.as_view(), name='txInboxDetail'),
   path('<int:tx_id>/<int:page_number>/txInboxDetail/', views.TxInboxDetailView_admin.as_view(), name='txInboxDetail'),
   # 「int:page_number」は承認後、txInboxにおいて結果を確認するときに使う
+
+  path('clearingList_admin', views.ClearingListView_admin.as_view(), name='clearingList_admin'),
+  path('<int:page_number>/clearingList_admin', views.ClearingListView_admin.as_view(), name='clearingList_admin'),
+
+  path('clearingListDetail_admin', views.ClearingListDetailView_admin.as_view(), name='clearingListDetail_admin'),
+  path('<int:clrInfo_id><int:page_number>/clearingListDetail_admin', views.ClearingListDetailView_admin.as_view(), name='clearingListDetail_admin'),
+
 ]

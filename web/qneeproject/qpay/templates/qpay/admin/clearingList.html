@@ -1,0 +1,167 @@
+{% extends "admin/index/base_qconnect.html" %}
+
+{% load bootstrap_icons %}
+{% load humanize %}
+
+{% block content %}
+{% csrf_token %}
+
+<div class="authentication-bg align-items-start">
+
+  <div class="container">
+
+    {% if messages %}
+      <div class="messages row justify-content-center mt-2 mx-2">
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} py-1 rounded-1 mb-0" role="alert">
+            <span>{{ message }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <nav class="mt-2 bg-light rounded-3 border-top shadow-sm"
+      aria-label="breadcrumb" role="navigation">
+      <ol class="breadcrumb px-2" style="font-size: 0.85rem !important">
+        <li class="breadcrumb-item">
+          <a href="{% url 'accounts:mypage_admin' %}">
+            <i class="bi bi-house" style="font-size:1.2em; color:cornflowerblue"></i>
+            マイページトップ</a>
+        </li>
+        <li class="breadcrumb-item" aria-current="page">
+          {% bs_icon 'wallet2' color='text-secondary' size='1.1em' %}
+          取引一覧</li>
+      </ol>
+    </nav>
+
+    
+    <div class="d-flex justify-content-center mt-5">
+      <span class="pt-1">
+        {% bs_icon 'wallet2' color='deeppink' size='1.8em' %}
+      </span>
+      <h5 class="text-secondary pt-1 ms-3"><b>パートナー清算情報</b></h5>
+
+    </div>
+
+    <div class="row justify-content-center">
+
+      <form method="GET" action="{% url 'qpay:txList_admin' %}"
+        class="col-11 col-md-8 col-lg-6 col-xl-5 my-0">
+        {% csrf_token %}
+
+        <div class="input-group mt-2 col-md-10 col-lg-8">
+          <input type="text"
+            name="searchInput"
+            class="form-control"
+            value="{{searchInput|default:''}}"
+            placeholder="関係者名に含まれる文字で検索">
+          <button type="submit"
+            class="btn btn-outline-primary py-0 px-3">
+            <span>{% bs_icon 'search' color='cornflowerblue' size='1.2em' %}</span>
+            <span>検索</span>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="row justify-content-center">
+      <div class="col-lg-9">
+ 
+        {% if clrInfo.count >= 1 %}
+
+          <div class="rounded-1 px-2 pt-1 pb-0"
+            style="background-color: transparent !important; border-color:transparent !important;">
+
+            <div class="d-lg-none">
+        
+              <table class="table table-sm bg-light
+                table-bordered border-primary-subtle table-responsive mb-1">
+
+                <tbody style="font-size:0.9rem">
+
+                  <tr class="table-primary" style="text-align:center;">
+                    <th style="vertical-align:top"></th>
+                    <th style="vertical-align:top">前払年月</th>
+                    <th style="vertical-align:top">パートナー</th>
+                    <th style="vertical-align:top">前払金額</th>
+                    <th style="vertical-align:top">処理状況</th>
+                    <th style="vertical-align:top">支払日時</th>
+
+                    <th style="vertical-align:top">詳細</th>
+                  </tr>
+
+                  {% for item in page_obj %}
+
+                    <tr>
+                      <th rowspan="1"
+                        class="table-primary" style="vertical-align:middle; text-align:center">
+                        {{ page_obj.start_index|add:forloop.counter0   }}</th>
+          
+                      <td class="table-primary" style="vertical-align:middle; text-align:center">
+                        {{ item.advancedTerm_YYYYMM }}</td>
+
+                      <td rowspan="1"
+                        style="vertical-align:middle; text-align:center">
+                        {{ item.buyEntity.entityname|intcomma }}</td>
+
+                      <td rowspan="1"
+                        style="vertical-align:middle; text-align:center">
+                        {{ item.amount_toBeCleared |intcomma }}</td>
+
+                      <!-- 清算状況を表示 -->
+                      {% if item.status == 1 %}
+                        <td style="vertical-align:middle; text-align:center">未清算</td>
+                        <td style="vertical-align:middle; text-align:center">-</td>
+                      {% elif item.status == 2 %}
+                        <td style="vertical-align:middle; text-align:center">
+                          清算済</td>
+                        <td style="vertical-align:middle; text-align:center;
+                          font-size:0.75rem">
+                            {{ item.cleared_at|default:'-'|date:"y/n/j H:i" }}</td>
+                      {% endif %}
+                      <td rowspan="1" 
+                        style="width:70px;
+                        vertical-align:middle; text-align:center">
+                        <a href="{% url 'qpay:clearingListDetail_admin' item.id page_number %}"
+                          class="btn btn-outline-primary px-1 w-100">表示</a>
+                      </td>
+                    </tr>
+
+
+                  {% empty %}
+                    <p>前月は前払い取引がありません。</p>
+                  {% endfor %}
+            
+                </tbody>
+              </table>
+
+            </div>
+
+            <div class="d-none d-lg-block">
+        
+
+
+            </div>
+
+            <input type="hidden" name="next" value="{{ next }}" />
+
+            <div class="mt-4">
+              {% include "partials/pagination.html" %}
+            </div>
+            
+          </div>
+
+        {% else %}
+
+          <div class="row justify-content-center mt-5">
+            前月は前払い取引がありません。
+          </div>
+
+        {% endif %}
+
+      </div>
+    </div>    
+  </div>
+</div>
+
+{% endblock %}

@@ -94,7 +94,8 @@ class QpayTx(models.Model):
   #advancePayment_date = models.DateField(_('前払日'), null=True)
   # advanced_atがあるの不要
  
-  rejected_at = models.DateTimeField(_('否認時点'), null=True, blank=True)
+  buyer_declined_at = models.DateTimeField(_('否認時点'), null=True, blank=True)
+  qnee_declined_at = models.DateTimeField(_('謝絶時点'), null=True, blank=True) 
   #updated_at = models.DateTimeField(_('更新時点'), auto_now_add=True)
 
   """ 前払い決済に係る項目 """
@@ -180,11 +181,10 @@ class SendbackInfo(models.Model):
     unique=False, null=True, blank=True,)  
 
 
-class ClrStatus(models.IntegerChoices):
+class ClearingStatus(models.IntegerChoices):
   """ 状態 """
   TBD = 1     # 未清算
-  PENDING = 2 # 保留
-  DONE = 3    # 清算済み
+  DONE = 2    # 清算済
 
 
 """ パートナーにおける前払い（Qnee立替分）の清算状況を管理 """
@@ -200,8 +200,11 @@ class ClearingInfo(models.Model):
   advancedTerm_YYYYMM = models.CharField(
     '前払い年月', max_length=6, unique=False, null=True, blank=True,)
   
-  status = models.IntegerField(
-    '清算状況', choices=TxStatus.choices, default=1,)
+  status = models.IntegerField('清算状況', choices=ClearingStatus.choices, default=1,)
+  status_char = models.CharField('清算状況（文字）', max_length=20,
+    null=False, blank=False, default="未清算")
+  
+
   
   amount_toBeCleared = models.DecimalField(_('清算必要額（円）'), max_digits=8, decimal_places=0, null=True, default=0)
   # 清算必要額を格納する

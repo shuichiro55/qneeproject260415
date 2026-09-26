@@ -21,10 +21,13 @@
 
     <div class="carousel-inner h-100">
 
-
       <!-- スライドする画像１ -->
-      <div class="carousel-item active h-100" data-bs-interval="5000">
-        <img src='static/images/qconnect/bg-productLP-buyer1_6.jpg' class="d-block w-100 h-100"
+      <div class="carousel-item active"
+        style="height:calc(100vh-60px);"
+        data-bs-interval="5000">
+
+        <img src='static/images/qconnect/bg-productLP-buyer1_6.jpg'
+          class="d-block w-100 h-100"
           loading="eager" decoding="sync"
           style="object-fit:cover; object-position: left;"
           alt="スライド1">
@@ -36,7 +39,7 @@
           h-100 bottom-0 start-0 end-0 pt-5">
 
           <!-- 768px未満（スマホ含む） -->
-          <div class="d-block d-md-none">
+          <div class="d-md-none">
 
             <div class="">
               <p class=""
@@ -88,7 +91,7 @@
           </div>
 
           <!-- 768px未満（スマホ含む） -->
-          <div class="d-block d-md-none">        
+          <div class="d-md-none">        
             <div>
               <p class=""
                 id="page1_copy_head2" 
@@ -138,14 +141,14 @@
 
           <!-- 下の方のボタン（下部に余白を持たせる） -->
           <div class="mb-5 w-100">
-            <div class="d-block d-md-none mx-5">
+            <div class="d-md-none mx-5">
               <div class="d-flex flex-column gap-3">
 
                 <a href="#"
                   class="btn btn-primary w-100" style="line-height:13px;" role="button"
                   data-bs-toggle="modal" data-bs-target="#imageModal"
                   data-bs-placement="bottom">
-                  他のサービスと何が違うのか？</a>
+                  他のサービスと何が違うの？</a>
     
                 <a href="{% url 'accounts:login_buyer' %}"
                   class="btn btn-primary w-100" style="line-height:13px;" role="button"
@@ -163,7 +166,7 @@
                       class="btn btn-primary px-5" role="button"
                       data-bs-toggle="modal" data-bs-target="#imageModal"
                       data-bs-placement="bottom">
-                      他のサービスと違うのか？</a>
+                      他のサービスと違うの？</a>
                   
                     <a href="{% url 'accounts:login_buyer' %}"
                       class="btn btn-primary px-5" role="button"
@@ -182,7 +185,10 @@
 
 
       <!-- スライドする画像２ -->
-      <div id="page2" class="carousel-item h-100" data-bs-interval="5000">
+      <div id="page2"
+        class="carousel-item h-100"
+        style="height:calc(100vh-60px);"
+        data-bs-interval="5000">
         
         <video class="d-block w-100 h-100"
            style="object-fit:cover;"
@@ -199,7 +205,7 @@
           h-100 bottom-0 start-0 end-0 pt-5">
 
           <!-- 768px未満（スマホ含む） -->
-          <div class="d-block d-md-none">
+          <div class="d-md-none">
             <div class="justify-content-center">
               <p class=""
                 id="page2_copy_head1" 
@@ -290,7 +296,7 @@
 
           <!-- 下の方のボタン（下部に余白を持たせる） -->
           <div class="mb-5 w-100">
-            <div class="d-block d-md-none mx-5">
+            <div class="d-md-none mx-5">
               <div class="d-flex flex-column gap-3">
 
                 <a href="#"
@@ -333,7 +339,10 @@
 
 
       <!-- スライドする画像３ -->
-      <div id="page3" class="carousel-item h-100" data-bs-interval="5000">
+      <div id="page3"
+        class="carousel-item"
+        style="height:calc(100vh-60px);"
+        data-bs-interval="5000">
         
         <img src='static/images/qconnect/bg-productLP-buyer2_6.jpg' class="d-block w-100 h-100" alt="スライド1"
           style="object-fit:cover; object-position: left;">
@@ -345,7 +354,7 @@
           h-100 bottom-0 start-0 end-0 pt-5">
 
           <!-- 768px未満（スマホ含む） -->
-          <div class="d-block d-md-none w-100">
+          <div class="d-md-none w-100">
 
             <div class="justify-content-center">
               <p class="" id="page3_copy_head1" 
@@ -483,7 +492,7 @@
 
           <!-- 下の方のボタン（下部に余白を持たせる） -->
           <div class="mb-5 w-100">
-            <div class="d-block d-md-none mx-5">
+            <div class="d-md-none mx-5">
               <div class="d-flex flex-column gap-3">
 
                 <a href="#"

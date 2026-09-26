@@ -36,8 +36,8 @@
 
     
     <div class="d-flex justify-content-center mt-5">
-      <h5 class="text-secondary pt-1"><b>QPAY インボックス</b></h5>
-      <span class="ms-3">{% bs_icon 'inbox-fill' color='deeppink' size='2.2em' %}</span>
+      <span class="">{% bs_icon 'inbox-fill' color='deeppink' size='2.2em' %}</span>
+      <h5 class="text-secondary ms-4 pt-1"><b>QPAY インボックス</b></h5>
     </div>
 
     {% if object_list.count >= 1 %}
@@ -77,7 +77,7 @@
                       <td class="table-primary" style="vertical-align:middle; text-align:start">
                         {{ item.sellEntityname }}</td>
 
-                      <td {% if item.txStatus <= 3 %} rowspan="2" {% else %} rowspan="3" {% endif %}
+                      <td {% if item.txStatus <= 3  %} rowspan="2" {% else %} rowspan="3" {% endif %}
                         style="vertical-align:middle; text-align:center">
                         {{ item.requested_amount|intcomma }}</td>
 
@@ -107,6 +107,7 @@
                       {% if item.txStatus == 1 %}
                         <td class="table-danger" style="vertical-align:middle; text-align:center">未了</td>
                       {% endif %}
+
                       {% if item.txStatus == 2 %}
                         <td class="table-danger" style="vertical-align:middle; text-align:center">未了</td>
                       {% endif %}
@@ -139,23 +140,19 @@
 
                     <!-- Qneeが差し戻した場合の表示 -->
                     {% if item.sendbackInfo_admin != None %}
-                      <tr>
-                        <td class="table-primary" style="text-align:start">(株)キユーニー</td>
+                      {% if item.txStatus == 4 %}
+                        <tr>
+                          <!-- Qneeに関する差戻の情報を表示 -->
+                          <td class="table-primary" style="text-align:start">(株)キユーニー</td>
 
-                        <!-- Qneeに関する差戻の情報を表示 -->
-                        {% if item.txStatus == 4 %}
                           <td style="font-size:0.9rem; vertical-align:middle; text-align:center">
                             Qnee差戻</td>
                           <td style="font-size:0.75rem; vertical-align:middle; text-align:center">
                             {{ item.sendbackInfo_admin.created_at|default:'-'|date:"n/j H:i" }}</td>
-
-                        {% else %}
-                          <td style="font-size:0.9rem; vertical-align:middle; text-align:center">-</td>
-                          <td style="font-size:0.75rem; vertical-align:middle; text-align:center">-</td>
-                        {% endif %}
+                        </tr>
                       {% endif %}
+                    {% endif %}
   
-                    </tr>
 
                   {% empty %}
                     <p>承認待ちのデータはありません。</p>

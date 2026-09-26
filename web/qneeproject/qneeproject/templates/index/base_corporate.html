@@ -44,19 +44,16 @@
 
   <body
     class="p-0" 
-    data-bs-spy="scroll" data-bs-target="#navbar-navlist" data-bs-offset="70">
+    data-bs-spy="scroll" data-bs-target="#navbar-navlist" data-bs-offset="60">
   <!-- data-bs-offset="60" スクロールスパイ等を利用しているとき、 
       ナビバーが固定（fixed）されている場合、 コンテンツのスクロール位置がナビバーに
       隠れないよう、見出しの表示位置を60px下（または上）に調整する際に使われます。
   -->
 
-    <!--
-    <div class="position-fixed top-0 start-0"
-      style="position:relative; z-index:1040; width: max-content; margin:10px 148px;">
-      <a href="#">
-        <img src="{% static 'images/lovebird.png' %}" alt="" height="50"></a>  
-    </div>
-    -->
+
+    {% block navbar %}
+      {% include 'partials/navbar.html' %}
+    {% endblock %}
 
     {% block home %}{% endblock home %}
 
@@ -79,10 +76,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
 
-    {% block extrajs %}{% endblock %}
-
-
-    
+    {% block extrajs %}{% endblock %}  
 
     <!-- <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script> -->
     <!-- <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script> -->

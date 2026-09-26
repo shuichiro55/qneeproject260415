@@ -44,16 +44,16 @@
       <a class="navbar-brand mt-1 ms-3" href="/">
         <img src="{% static 'images/logo_text_lovebird.png' %}" alt="" height="60"></a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-        data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false"
+        data-bs-target="#navbarContent2" aria-controls="navbarContent" aria-expanded="false"
         aria-label="Toggle navigation">
         <i class="mdi mdi-menu text-secondary me-4" style="font-size:1.4em;"></i>
       </button>
 
-      <div class="collapse navbar-collapse" id="navbarContent">
+      <div class="collapse navbar-collapse" id="navbarContent2">
 
         <div class="d-none d-lg-block ms-5">
 
-          <ul class="navbar-nav" id="navbar-navlist">
+          <ul class="navbar-nav" class="navbar-navlist">
             <li class="nav-item">
               <a class="nav-link" href="/?#home">HOME</a>
             </li>
@@ -67,7 +67,7 @@
             </li>
 
             <li class="nav-item">
-              <a class="nav-link" href="#overview">会社概要</a>
+              <a class="nav-link" href="#overview">会社情報</a>
             </li>
             
             <li class="nav-item">
@@ -75,16 +75,16 @@
             </li>
 
             <li class="nav-item">
-              <a class="nav-link" href="/#contact">お問い合わせ</a>
+              <a class="nav-link" href="/?#contact">お問い合わせ</a>
             </li>
           </ul> <!--end navbar-nav-->
         </div> <!-- end d-none -->
 
         <div
-          class="d-block d-lg-none ms-2 rounded-2"
+          class="d-lg-none ms-2 rounded-2"
           style="background-color:rgba(241, 236, 236, 0.95) !important;">
 
-          <ul class="navbar-nav" id="navbar-navlist">
+          <ul class="navbar-nav" class="navbar-navlist">
             <div class="row">
               <div class="col-3 ps-3 pe-0">
                 <li class="nav-item"><a class="nav-link" href="/?#home">HOME</a> </li>
@@ -93,7 +93,7 @@
                 <li class="nav-item"><a class="nav-link" href="#mission">ミッション</a></li>
               </div>
               <div class="col-3 px-0">
-                <li class="nav-item"><a class="nav-link" href="#outStory">ストーリー</a></li>
+                <li class="nav-item"><a class="nav-link" href="#ourStory">ストーリー</a></li>
               </div>
               <div class="col-3 px-0">
                 <li class="nav-item"><a class="nav-link" href="#overview">会社情報</a></li>
@@ -381,7 +381,6 @@
 
   </section><!-- /About Section -->
 
-
   {% block overview %}
     {% include 'partials/overview.html' %}
   {% endblock %}
@@ -390,9 +389,6 @@
     {% include 'partials/footer.html' %}
   {% endblock %}
 
-  {% block switcher %}
-    {% include 'partials/switcher.html' %}
-  {% endblock %}
 
 {% endblock home %}
 

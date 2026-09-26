@@ -41,10 +41,10 @@
     </nav>
 
     <div class="d-flex justify-content-center mt-5">
-      <h5 class="text-secondary pt-1"><b>QPAY 取引詳細</b></h5>
-      <span class="ms-2">
-        {% bs_icon 'person-check' color='deeppink' size='2.2em' %}
+      <span class="">
+        {% bs_icon 'person-check' color='deeppink' size='2.0em' %}
       </span>
+      <h5 class="text-secondary ms-3 pt-1"><b>QPAY 取引詳細</b></h5>
     </div>
 
     <div class="row justify-content-center mt-2">
@@ -140,7 +140,8 @@
                 <td width="40%" class="table-primary" >－前払手数料</td>
                 <td style="text-align:right;">{{ tx.advance_fee|default:'-'|intcomma }}</td></tr>
               <tr>
-                <td width="40%" class="table-primary" >－振込手数料</td><td style="text-align:right;">{{ tx.transfer_fee|intcomma }}</td></tr>
+                <td width="40%" class="table-primary" >－振込手数料</td>
+                <td style="text-align:right;">{{ tx.transfer_fee|intcomma }}</td></tr>
             </tbody>
           </table>
         {% endif %}

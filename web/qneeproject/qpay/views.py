@@ -483,8 +483,8 @@ class TxCreateView(generic.CreateView):
 
       messages.add_message(request, messages.SUCCESS, 'パートナー企業に前払いの申請を行いました.')
 
-      return TemplateResponse(request, "accounts/seller/mypage.html", {'entity': tx.sellEntity},)
-          #return reverse_lazy('accounts:bankaccount_create', kwargs={'tx_id': tx_id})
+      return HttpResponseRedirect(reverse_lazy('accounts:mypage_seller'))
+      #return TemplateResponse(request, "accounts/seller/mypage.html", {'entity': tx.sellEntity},)
   
     # self.request.POST.get('next', '')が何にも該当しない場合
     messages.add_message(request, messages.WARNING, 'システムエラーが発生しました。お手数ですがお問い合わせ頂けると有難いです。')
@@ -1008,7 +1008,7 @@ class TxApproveDetailView_buyer(LoginRequiredMixin, generic.UpdateView):
       # 否認された場合の処理（処理状況の更新、受注者への連絡等）を行う
       tx.txStatus = -3
       tx.txStatus_char = "ゲスト申請否認・パートナー否認済"
-      tx.rejected_at = timezone.now()
+      tx.buyer_declined_at = timezone.now()
 
       tx.buyUser = buyUser
       tx.buyUser_personname = buyUser.personname
@@ -1123,7 +1123,8 @@ class TxListDetailView_admin(generic.UpdateView):
       page_number = 1
 
     print(f'page_number={page_number} def get in TxListDetailView_admin')
-    return TemplateResponse(request, "qpay/admin/txListDetail.html", { "tx": tx, 'page_number': page_number }) 
+    return TemplateResponse(request, "qpay/admin/txListDetail.html",
+      { "tx": tx, 'page_number': page_number }) 
 
   def post(self, request, *args, **kwargs):
     tx =QpayTx.objects.get(pk=self.kwargs['tx_id'])
@@ -1219,9 +1220,10 @@ class TxInboxDetailView_admin(LoginRequiredMixin, generic.UpdateView):
 
     if BankAccount.objects.filter(pk=sellEntity.bankAccount_id).exists():
 
-      bankAccount = BankAccount.objects.get(pk=sellEntity.bankAccount_id)
+      ba = BankAccount.objects.get(pk=sellEntity.bankAccount_id)
       return TemplateResponse(request,
-        "qpay/admin/txInboxDetail.html", {'step_process': 1, 'tx': tx, 'ba': bankAccount,}) 
+        "qpay/admin/txInboxDetail.html",
+        {'step_process': 1, 'tx': tx, 'ba': ba,}) 
 
     else:
       messages.add_message(request, messages.WARNING, "ゲストの受取口座が未設定です。「口座設定依頼」をお願いします。") 
@@ -1237,7 +1239,7 @@ class TxInboxDetailView_admin(LoginRequiredMixin, generic.UpdateView):
     # 口座設定がある場合とない場合に分けて処理をする
     ba = None
     if BankAccount.objects.filter(entity=tx.sellEntity).exists():
-        ba = BankAccount.objects.get(entity=tx.sellEntity).exists()
+        ba = BankAccount.objects.get(entity=tx.sellEntity)
 
     actionBtn = self.request.POST.get('actionBtn', None) 
     if actionBtn.find('ToTransferMoney') >= 0:
@@ -1256,25 +1258,35 @@ class TxInboxDetailView_admin(LoginRequiredMixin, generic.UpdateView):
 
         advancedTerm_YYYYMM = timezone.now().strftime('%Y%m')
 
-        clrdInfo, created = ClearingInfo.objects.get_or_create(
+        clrInfo, created = ClearingInfo.objects.get_or_create(
           buyEntity=tx.buyEntity, advancedTerm_YYYYMM=advancedTerm_YYYYMM)
       
-        if not created:
-          amount_toBeCleared = QpayTx.objects.filter(
-            buyEntity=tx.buyEntity, advancedTerm_YYYYMM=advancedTerm_YYYYMM).aggregate(sum('requested_amount'))
-        
-          clrdInfo.amount_toBeCleared = amount_toBeCleared
+        result = QpayTx.objects.select_related('clearingInfo').filter(
+          buyEntity=tx.buyEntity,
+          clearingInfo__advancedTerm_YYYYMM=advancedTerm_YYYYMM
+          ).aggregate(total_amount=Sum('requested_amount'))
 
-        clrdInfo.updated_at = timezone.now()
-        tx.ClearingInfo = clrdInfo
+        clrInfo.amount_toBeCleared = result['total_amount'] or 0
+        clrInfo.updated_at = timezone.now()
+        tx.clearingInfo = clrInfo
 
-        tx.save(); clrdInfo.save()
+        tx.save(); clrInfo.save()
 
 
-        ## buyer承諾後に、sellerに承諾したことをメールで伝える
+        ## 要工事 20260923 振込処理をした後、buyerとsellerにその旨を伝える
 
-        """ 251103 「canApproveAll=True」「canApproveQpay=True」のユーザーに
-            承認されたことを伝える """
+        """ 要工事 20260923 Qneeが振込処理をした後、
+            ゲスト（canApproveAll=True & canApproveQpay=True）及び、
+            パートナー（canApproveAll=True & canApproveQpay=True）に
+            振込処理がなされたことを伝える """
+
+        buyEntityUsers = UserModel.objects.select_related('entity').filter(
+          Q(entity=tx.buyEntity)
+          & (Q(canApproveAll=True) | Q(canApproveQpay=True))).values('personname','email','entity__entityname')
+        # valuesは辞書型、value_listはタプルで戻る
+        # （ご参考）https://se-memorandum.com/django-values-values_list/
+
+
         sellEntityUsers = UserModel.objects.select_related('entity').filter(
           Q(entity=tx.sellEntity)
           & (Q(canApproveAll=True) | Q(canApproveQpay=True))).values('personname','email','entity__entityname')
@@ -1291,10 +1303,11 @@ class TxInboxDetailView_admin(LoginRequiredMixin, generic.UpdateView):
               'ba': ba,
               'token': dumps(tx.pk),
               'sellUser': sellUser, }
-            utils.sendEmail_common('qpay/admin/mail/adminPayed', '', [sellUser.email], context1)
+            utils.sendEmail_common('qpay/admin/mail/adminPayed', '', [sellUser['email']], context1)
     
           return TemplateResponse(request,
-            "qpay/admin/txInboxDetail.html", {'step_process': 1,  'tx': tx, })
+            "qpay/admin/txInboxDetail.html", 
+            {'step_process': 1,  'tx': tx, 'ba': ba})
           #return HttpResponseRedirect(self.get_success_url())
       
       else:
@@ -1303,7 +1316,8 @@ class TxInboxDetailView_admin(LoginRequiredMixin, generic.UpdateView):
           '口座未設定のため振込ができません。「設定依頼」のボタンを押下してください。')
 
         return TemplateResponse(request,
-          "qpay/admin/txInboxDetail.html", {'step_process': 1,  'tx': tx, })
+          "qpay/admin/txInboxDetail.html",
+          {'step_process': 1,  'tx': tx, 'ba': ba})
 
 
     elif actionBtn.find('ToRejectTransfer') >= 0:
@@ -1313,7 +1327,7 @@ class TxInboxDetailView_admin(LoginRequiredMixin, generic.UpdateView):
       tx.txStatus_char = "Qnee前払謝絶"
       tx.sendbackInfo_admin = None
       tx.sendbackInfo_buyer = None 
-      tx.rejected_at = timezone.now()
+      tx.qnee_declined_at = timezone.now()
       tx.save()
 
       context = {
@@ -1431,54 +1445,118 @@ class TxInboxDetailView_admin(LoginRequiredMixin, generic.UpdateView):
     return HttpResponseBadRequest()
 
 
-# ★★　開発開始 20260624 パートナーの支払状況を更新するクラス
+# ★★　開発開始 20260624-
+""" Qneeがパートナーの清算情報を閲覧・編集するクラス """
+
+class ClearingListView_admin(LoginRequiredMixin, generic.UpdateView):
+
+  login_url = '/accounts/login_buyer/'
+  #template_name = "qpay/admin/txInboxDetail.html"
+  paginate_by = 15 # 15で仮置き
+
+  def get(self, request, *args, **kwargs):
+
+    today = datetime.date.today()
+
+    # 当月の清算情報を、清算必要額の大きい順に抽出
+    # テスト用に「months=-2」としている（通常は「months=-1」）
+    OneMonthAgo = today + relativedelta(months=0)
+    advancedTerm_YYYYMM = OneMonthAgo.strftime('%Y%m')
+
+    print(f'advancedTerm_YYYYMM={advancedTerm_YYYYMM} in ClearingListView_admin'  )
+    clrInfo = ClearingInfo.objects.select_related('buyEntity').filter(
+      advancedTerm_YYYYMM=advancedTerm_YYYYMM).order_by('amount_toBeCleared')
+    print(f'clrInfo.count()={clrInfo.count()} in ClearingListView_admin')
+
+    paginator = Paginator(clrInfo, self.paginate_by)
+
+    # URLからページネーション経由でページ番号を取得する場合
+    page_number = self.request.GET.get('page_number', None)
+
+    if page_number is None:
+      # viewを呼ぶときにページ番号が指定されている場合  
+      page_number = self.kwargs.get('page_number', 1)
+    print(f'pass1 page_number={page_number} in TxListView_seller')
+
+    page_obj = paginator.page(page_number)
+
+    # 前月以前で未清算情報を、決算年月順に抽出
+    clrInfo_yet = ClearingInfo.objects.select_related('buyEntity').filter(
+      advancedTerm_YYYYMM__lt=advancedTerm_YYYYMM, cleared_at__isnull=True).order_by('amount_toBeCleared')
+
+    context = {
+      'clrInfo': clrInfo,
+      'page_obj': page_obj,
+      'page_number': page_number,
+    }
+    return render(request, 'qpay/admin/clearingList.html', context)
 
 
+class ClearingListDetailView_admin(LoginRequiredMixin, generic.UpdateView):
+
+  model = QpayTx
+  template_name = "qpay/admin/ClearingListDetail.html"
+
+  def get(self, request, *args, **kwargs):
+
+    clrInfo = ClearingInfo.objects.get(pk=self.kwargs['clrInfo_id'])
+
+    #le = LegalEntity.objects.get(entityname=tx.buyEntityname)
+
+    try:
+      page_number = int(self.kwargs['page_number'])
+      print(f'page_number={page_number} in ClearingListDetailView_admin, get')
+    except:
+      page_number = 1
+
+    print(f'page_number={page_number} def get in ClearingListDetailView_admin')
+    return TemplateResponse(request, "qpay/admin/clearingListDetail.html",
+      { "clrInfo": clrInfo, 'page_number': page_number }) 
+
+
+  def post(self, request, *args, **kwargs):
+    tx =QpayTx.objects.get(pk=self.kwargs['tx_id'])
+    return TemplateResponse(request,
+      "qpay/admin/txListDetail.html",{ "tx":tx, })
+      
+
+
+
+# ★★　工事前260922　パートナーが自分の清算情報を見るためのクラス
 class ClearingListView_buyer(LoginRequiredMixin, generic.UpdateView):
 
   login_url = '/accounts/login_buyer/'
   model = QpayTx
   #template_name = "qpay/admin/txInboxDetail.html"
+  paginate_by = 6 # 6で仮置き
 
   def get(self, request, *args, **kwargs):
 
-    # ★★　全てのbuyerに対して処理する
-    tx = QpayTx.objects.get(pk=self.kwargs['tx_id'])
-    buyEntity = LegalEntity.objects.get(pk=tx.buyEntity_id)
-    sellEntity = LegalEntity.objects.get(pk=tx.sellEntity_id)
+    sellUser = UserModel.objects.get(email=self.request.user)
+    object_list = QpayTx.objects.filter(
+      sellEntity = sellUser.entity).order_by('-requested_at')
 
-    if BankAccount.objects.filter(pk=sellEntity.bankAccount_id).exists():
+    if sellUser.type1 == 1:
+    # 次のメッセージは確認できなかったので、要調整（トップページで出るようにする？）
+      messages.add_message(request, messages.WARNING, "受注者としてログインして下さい") 
+      return HttpResponseRedirect(reverse('accounts:logout'))
 
-      bankAccount = BankAccount.objects.get(pk=sellEntity.bankAccount_id)
-      return TemplateResponse(request,
-        "qpay/admin/txInboxDetail.html", {'tx': tx, 'ba': bankAccount,}) 
+    paginator = Paginator(object_list, self.paginate_by)
 
-    else:
-      messages.add_message(request, messages.WARNING, "ゲスト側で受取口座が未設定です。メールにて設定依頼をしました") 
+    # URLからページネーション経由でページ番号を取得する場合
+    page_number = self.request.GET.get('page_number', None)
+    if page_number is None:
+      # viewを呼ぶときにページ番号が指定されている場合  
+      page_number = self.kwargs.get('page_number', 1)
+    print(f'pass1 page_number={page_number} in TxListView_seller')
 
-      sellUser = UserModel.objects.get(pk=tx.sellUser_id)
-      sellEntity = LegalEntity.objects.get(pk=tx.sellEntity_id)
+    page_obj = paginator.page(page_number)
 
-      current_site = get_current_site(self.request)
-      domain = current_site.domain
-      context = {
-        'protocol': self.request.scheme,
-        'domain': domain,
-        'type1': 2,  # 承認された後、sellerがログインする場合の種別
-        'token': dumps(tx.pk), # tx.pkを維持する必要ないので不要か
-        'tx': tx,}
-
-      subject = render_to_string('qpay/admin/mail/bankAccountUnset_subject.txt', context)
-      message = render_to_string('qpay/admin/mail/bankAccountUnset_message.txt', context)
-
-      from_email = 'shuichiro.tomihari.201604@gmail.com'
-      recipient_list =[sellUser.email]
-      #bcc =  ["toritoritorina@gmail.com"]  # BCCリスト
-      email = EmailMessage(subject, message, from_email, recipient_list)
-      email.send()
-      
-      return TemplateResponse(request,
-        "qpay/admin/txInboxDetail.html",  {'tx': tx }) 
+    context = {
+      'object_list': object_list,
+      'page_obj': page_obj,
+    }
+    return render(request, 'qpay/buyer/clrList.html', context)
 
 
   def post(self, request, *args, **kwargs):

@@ -216,6 +216,13 @@
                           font-size:0.75rem">
                           {{ item.approved_at|default:'-'|date:"y/n/j H:i" }}</td>
 
+                      {% elif item.txStatus == -3 %}
+                        <td style="vertical-align:middle; text-align:center">
+                          否認済</td>
+                        <td style="vertical-align:middle; text-align:center;
+                          font-size:0.75rem">
+                          {{ item.buyer_declined_at|default:'-'|date:"y/n/j H:i" }}</td>
+
                       {% else %}
                         <td style="vertical-align:middle; text-align:center">-</td>
                         <td style="vertical-align:middle; text-align:center">-</td>
@@ -238,6 +245,12 @@
                           Qnee前払済み</td>
                         <td style="font-size:0.75rem; vertical-align:middle; text-align:center">
                           {{ item.advanced_at|default:'-'|date:"n/j H:i" }}</td>
+
+                      {% elif item.txStatus == -5 %}
+                        <td style="vertical-align:middle; text-align:center">
+                          前払い謝絶</td>
+                        <td style="font-size:0.75rem; vertical-align:middle; text-align:center">
+                          {{ item.qnee_declined_at|default:'-'|date:"n/j H:i" }}</td>
 
                       {% else %}
                         <td style="font-size:0.9rem; vertical-align:middle; text-align:center">
@@ -356,6 +369,14 @@
                           font-size:0.75rem">
                           {{ item.approved_at|default:'-'|date:"y/n/j H:i" }}</td>
 
+                      {% elif item.txStatus == -3 %}
+
+                      <td style="vertical-align:middle; text-align:center">
+                          否認済</td>
+                        <td style="vertical-align:middle; text-align:center;
+                          font-size:0.75rem">
+                          {{ item.buyer_declined_at|default:'-'|date:"y/n/j H:i" }}</td>
+
                       {% else %}
                         <td style="vertical-align:middle; text-align:center">-</td>
                         <td style="vertical-align:middle; text-align:center">-</td>
@@ -378,6 +399,13 @@
                           Qnee前払済み</td>
                         <td style="font-size:0.75rem; vertical-align:middle; text-align:center">
                           {{ item.advanced_at|default:'-'|date:"n/j H:i" }}</td>
+
+                      {% elif item.txStatus == -5 %}
+                        <td style="vertical-align:middle; text-align:center">
+                          前払い謝絶</td>
+                        <td style="vertical-align:middle; text-align:center;
+                          font-size:0.75rem">
+                          {{ item.qnee_declined_at|default:'-'|date:"y/n/j H:i" }}</td>
 
                       {% else %}
                         <td style="font-size:0.9rem; vertical-align:middle; text-align:center">

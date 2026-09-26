@@ -53,10 +53,10 @@
     {% if step_process == 1 %}
 
       <div class="d-flex justify-content-center mt-4">
-        <h5 class="text-secondary pt-1"><b>QPAY 送金処理</b></h5>
-        <span class="ms-2">
-          {% bs_icon 'person-check' color='deeppink' size='2.2em' %}
+        <span class="">
+          {% bs_icon 'person-check' color='deeppink' size='1.8em' %}
         </span>
+        <h5 class="text-secondary ms-3 pt-1"><b>QPAY 送金処理</b></h5>
       </div>
 
       <div class="row justify-content-center">
@@ -208,6 +208,7 @@
                 action="{% url 'qpay:txInbox' %}"
                 style="background-color: transparent !important; border-color:transparent !important;"
                 id="id_PostForm">
+
                 {% csrf_token %}
                 {{ tx.id.as_hide }}
                 <button type="submit" class="btn btn-outline-primary w-100 p-1">
@@ -376,13 +377,15 @@
 {% endblock %}
 
 
+
+
 {% block extrajs %}
 
 <script>
 
 document.addEventListener('DOMContentLoaded', function() {
 
-  console.log('setTimeoutが認識前');
+  console.log('setTimeoutの認識前');
 
   // 3秒後にメッセージを消す
   setTimeout(function() {
@@ -394,36 +397,17 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }, 3000); // 3000ミリ秒 = 3秒
 
-
   // Submitボタンを押下後「しばらくお待ちください。」を表示する
   const postForm = document.getElementById('id_PostForm');
   if (postForm) {
     postForm.addEventListener('submit', function() {
       const loadingEl = document.getElementById('loading');
       if (loadingEl) {
+        console.log('loading認識！');
         loadingEl.style.display = 'block';
       }
     });
   }
-
-  var Radio0 = document.getElementById('id_reason_radio_0');
-  var Radio1 = document.getElementById('id_reason_radio_1');
-  var Radio2 = document.getElementById('id_reason_radio_2');
-  var Radio3 = document.getElementById('id_reason_radio_3');
-  var Radio4 = document.getElementById('id_reason_radio_4');
-  var addition_otherReason = document.getElementById('id_addition_otherReason');
-
-  // 修正後（すべてのラジオボタンを監視する）
-  document.querySelectorAll('input[name="reason_radio"]').forEach(function(radio) {
-    radio.addEventListener('change', function() {
-      addition_otherReason.style.display = "none";
-      console.log('radioが変わったことを認識しています。');
-      if (Radio4.checked) {
-          addition_otherReason.style.display = "block";
-      }
-    });
-  });
-
 });
 
 </script>
