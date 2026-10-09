@@ -18,6 +18,8 @@ from django.contrib import messages
 from django.conf.global_settings import DATETIME_INPUT_FORMATS, DATE_INPUT_FORMATS
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+# qneeprojectがベースディレクトリとして定義する
+# 【補足】settings.pyをフォルダにして階層を増やしたため、parent×3に変更
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 PROJECT_NAME = os.path.basename(BASE_DIR)

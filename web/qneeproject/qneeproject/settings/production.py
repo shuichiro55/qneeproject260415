@@ -9,8 +9,13 @@ import environ
 DEBUG = False
 
 env = environ.Env()
-envpath = os.path.join(BASE_DIR, '.env')
+envpath = '/var/www/app1/web/qneeproject/.env'
 env.read_env(envpath)
+
+#envpath = os.path.join(BASE_DIR, '.env')
+#上記の場合、一番上のqneeprojectフォルダではなくその下のqneeprojectを見に行く
+
+
 
 SECRET_KEY =env('SECRET_KEY')
 ALLOWED_HOSTS =env.list('ALLOWED_HOSTS')

@@ -1,12 +1,16 @@
 from .base import *
+import environ
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+env = environ.Env()
+envpath = '/var/www/app1/web/qneeproject/.env'
+env.read_env(envpath)
 
-SECRET_KEY = 'django-insecure-egglb64b%uak^4quaeg^zmt3e=pxvjb4l9ix(-j1vx$r4y1zrg'
-#SECRET_KEY = '_kl%xsko4i=-l=23j-b8#tve+wy1^t2-ut((pv*w*0vbge$1y_'
+# --- ここを追加・修正 --- 20260927
+# .env から SECRET_KEY を読み込む（見つからない場合のデフォルト値も設定可能）
+SECRET_KEY = env('SECRET_KEY', default='django-insecure-fallback-dev-key')
 
 # 開発環境では「http」しか対応していない
 PROTOCOL = os.environ.get('SITE_PROTOCOL', 'http')

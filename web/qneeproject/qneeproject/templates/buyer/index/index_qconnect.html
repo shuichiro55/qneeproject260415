@@ -9,7 +9,7 @@
   <div id="qneeCarousel" class="carousel slide h-100" data-bs-ride="carousel">
   
     <!-- インジケーター（ページネーション） -->
-    <div class="carousel-indicators" style="bottom: 7px;">
+    <div class="carousel-indicators" style="bottom: 2px;">
       <button type="button" data-bs-target="#qneeCarousel" data-bs-slide-to="0"
         class="active" aria-current="true"
         aria-label="Slide 1"></button>
@@ -23,14 +23,20 @@
 
       <!-- スライドする画像１ -->
       <div class="carousel-item active"
-        style="height:calc(100vh-60px);"
-        data-bs-interval="5000">
+        style="height:calc(100vh - 60px);
+        background-image: url('static/images/qconnect/bg-productLP-buyer1_6.jpg'); 
+        background-size: cover; 
+        background-position: left center; 
+        background-repeat: no-repeat;"
+        data-bs-interval="6000">
 
+        <!--
         <img src='static/images/qconnect/bg-productLP-buyer1_6.jpg'
-          class="d-block w-100 h-100"
+          class="d-block h-100"
           loading="eager" decoding="sync"
           style="object-fit:cover; object-position: left;"
           alt="スライド1">
+        -->
 
         <div class="bg-overlay2"></div>
 
@@ -38,25 +44,24 @@
         <div id="page1" class="carousel-caption d-flex flex-column justify-content-between align-items-center
           h-100 bottom-0 start-0 end-0 pt-5">
 
-          <!-- 768px未満（スマホ含む） -->
-          <div class="d-md-none">
+          <!-- 576px未満（スマホ含む） -->
+          <div class="d-sm-none">
 
             <div class="">
               <p class=""
                 id="page1_copy_head1" 
                 style="color: #fff;
-                font-size:1.2rem;
+                font-size:1.1rem;
                 display:inline-block;
                 background-image: linear-gradient(90deg, rgb(150, 127, 195), rgb(147, 171, 226) 50%, #fff 50%, #fff);
                 background-size:200% 100%;
-                padding:0.5rem 1.5em;">
+                padding:0.3rem 1.5rem;">
                 キユーニーによる前払い
               </p>
-              <p class="mt-4"
-                style="color:#fff; font-size:1.0rem;"
+              <p class="mt-3"
+                style="color:#fff; font-size:0.9rem;"
                 id="page1_copy_body1">
-                報酬を早くもらいたい？ <br><br>
-                委託先からそんな相談ありませんか<br><br>
+                報酬を早くもらいたい？ そんな相談ありませんか<br><br>
 
                 カードや銀行の審査が厳しかったり、<br><br>
                 他の手段は手数料負担が大きかったり。<br><br>
@@ -64,47 +69,47 @@
             </div>
           </div>
 
-          <!-- 768px以上（PC含む） -->
-          <div class="d-none d-md-block">
+          <!-- 576px以上（PC含む） -->
+          <div class="d-none d-sm-block">
 
             <div class="">
               <p class=""
                 id="page1_copy_head1" 
                 style="color: #fff;
-                font-size: 1.3rem;
+                font-size: 1.1rem;
                 display:inline-block;
                 background-image: linear-gradient(90deg, rgb(150, 127, 195), rgb(147, 171, 226) 50%, #fff 50%, #fff);
                 background-size:200% 100%;
-                padding:0.4rem 1.5em;">
+                padding:0.3rem 1.5rem;">
                 キユーニーによる前払い
               </p>
               <p class="mt-3"
-                style="color:#fff; font-size:1.0rem;"
+                style="color:#fff; font-size:0.85rem;"
                 id="page1_copy_body1">
                 報酬をもう少し早くもらいたい！ <br><br>
-                委託先からそんな相談あったことはないでしょうか。<br><br>
-                定期収入がないとカードや銀行の審査が厳しい、<br><br>
-                他の手段は手数料負担が大きかったりします。<br><br>
+                これまでそんな相談あったことはないでしょうか。<br><br>
+                フリーランスは定期収入がないためカードや銀行の審査が厳しいし、<br><br>
+                他の手段はご利用の負担が大きかったりします。<br><br>
               </p>
             </div>
           </div>
 
-          <!-- 768px未満（スマホ含む） -->
-          <div class="d-md-none">        
+          <!-- 576px未満（スマホ含む） -->
+          <div class="d-sm-none">        
             <div>
               <p class=""
                 id="page1_copy_head2" 
                 style="color: #fff;
-                  font-size:1.2rem;                
+                  font-size:1.1rem;                
                   display:inline-block;
                   background-image: linear-gradient(90deg, rgb(150, 127, 195), rgb(147, 171, 226) 50%, #fff 50%, #fff);
                   background-size:200% 100%;
-                  padding:0.5em 1.5em;">
+                  padding:0.3rem 1.5rem;">
                 委託先とよい関係をきずく
               </p>
               
               <p class="mt-4"
-                style="color: #fff; font-size:1.0rem"
+                style="color: #fff; font-size:0.9rem"
                 id="page1_copy_body2" >
                 フリーランスの環境を支援し、<br><br>
                 よりよい関係を築きませんか？<br><br>
@@ -114,32 +119,32 @@
             </div>
           </div>
 
-          <!-- 768px以上（PC含む） -->
-          <div class="d-none d-md-block">        
+          <!-- 576px以上（PC含む） -->
+          <div class="d-none d-sm-block">        
             <div>
               <p class=""
                 id="page1_copy_head2" 
                 style="color: #fff;
-                  font-size: 1.3rem;
+                  font-size: 1.1rem;
                   display:inline-block;
                   background-image: linear-gradient(90deg, rgb(150, 127, 195), rgb(147, 171, 226) 50%, #fff 50%, #fff);
                   background-size:200% 100%;
-                  padding:0.4rem 1.5em;">
+                  padding:0.3rem 1.5rem;">
                 委託先とよい関係をきずく
               </p>
               <p class="mt-3"
                 id="page1_copy_body2" 
-                style="font-size:1.0rem;">
-                フリーランスなどの委託先の働く環境を支援することで、<br><br>
-                取引先とよりよい関係を築いていきませんか？<br><br><br>
-                キユーニーがサポートいたします。
+                style="font-size:0.85rem;">
+                キユーニーとともに委託先の働く環境を支援することで、<br><br>
+                取引先とよりよい関係を築いていきませんか？<br><br>
+                キユーニーがあなたの会社をサポートいたします。
               </p>
             </div>
           </div>
 
           <!-- 下の方のボタン（下部に余白を持たせる） -->
           <div class="mb-5 w-100">
-            <div class="d-md-none mx-5">
+            <div class="d-sm-none mx-5">
               <div class="d-flex flex-column gap-3">
 
                 <a href="#"
@@ -155,19 +160,21 @@
               </div>
             </div>
 
-            <div class="d-none d-md-block">
+            <div class="d-none d-sm-block">
               <div class="row justify-content-center">
                 <div class="col-md-11 col-lg-8 col-xl-7">
 
                   <div class="d-flex justify-content-center mx-4 text-center gap-5">
                     <a href="#"
-                      class="btn btn-primary px-5" role="button"
+                      class="btn btn-primary px-4" role="button"
+                      style="line-height:17px;"
                       data-bs-toggle="modal" data-bs-target="#imageModal"
                       data-bs-placement="bottom">
                       他のサービスと違うの？</a>
                   
                     <a href="{% url 'accounts:login_buyer' %}"
-                      class="btn btn-primary px-5" role="button"
+                      class="btn btn-primary px-4" role="button"
+                      style="line-height:17px;"
                       data-bs-toggle="tooltip" data-bs-placement="bottom" title="発注者向けWebアプリ準備中">
                       キユーニーを利用してみる</a>
                   </div> <!-- end d-flex -->
@@ -181,15 +188,14 @@
       </div> <!-- end carousel item -->
 
 
-
       <!-- スライドする画像２ -->
       <div id="page2"
-        class="carousel-item h-100"
-        style="height:calc(100vh-60px);"
-        data-bs-interval="5000">
+        class="carousel-item"
+        style="height:calc(100vh - 60px);"
+        data-bs-interval="6000">
         
-        <video class="d-block w-100 h-100"
-           style="object-fit:cover;"
+        <video class="d-block"
+           style="width: 100%; height: 100%; object-fit:cover;"
            id="paravideo" autoplay muted loop>
           <source 
             src="static/images/qconnect/bg-productLP-buyer2_2.mp4"
@@ -202,22 +208,22 @@
         <div class="carousel-caption d-flex flex-column justify-content-between align-items-center
           h-100 bottom-0 start-0 end-0 pt-5">
 
-          <!-- 768px未満（スマホ含む） -->
-          <div class="d-md-none">
+          <!-- 576px未満（スマホ含む） -->
+          <div class="d-sm-none">
             <div class="justify-content-center">
               <p class=""
                 id="page2_copy_head1" 
                 style="color: #fff;
-                  font-size: 1.2rem;
+                  font-size: 1.1rem;
                   display:inline-block;
                   background-image: linear-gradient(90deg, rgb(150, 127, 195), rgb(147, 171, 226) 50%, #fff 50%, #fff);
                   background-size:200% 100%;
-                  padding:0.5em 1.5em;">
+                  padding:0.3rem 1.5rem;">
                 皆さまへのお願い
               </p>
-              <p class="mt-4"
+              <p class="mt-3"
                 id="page2_copy_body1"
-                style="font-size:1rem">
+                style="font-size:0.9rem">
                 キユーニーのパートナーとなって、<br><br>
                 フリーランスをご紹介いただけませんか？<br><br>
               </p>
@@ -226,16 +232,17 @@
                 id="page2_copy_head2" 
                 style="margin-top: 60px;
                   color: #fff;
-                  font-size: 1.2rem;        
+                  font-size: 1.1rem;        
                   display:inline-block;
                   background-image: linear-gradient(90deg, rgb(150, 127, 195), rgb(147, 171, 226) 50%, #fff 50%, #fff);
                   background-size:200% 100%;
-                  padding:0.5em 1.5em;">
+                  padding:0.3rem 1.5rem;">
                 貴社にとってのメリット
               </p>
 
               <p class=""
-                id="page2_copy_body2">
+                id="page2_copy_body2"
+                style="font-size:0.9rem">
                 <br>
                 フリーランスはすぐに報酬を手にし、<br><br>
                 あなたの会社は、①フリーランスとの良い関係と<br><br>
@@ -246,46 +253,45 @@
 
           </div>
 
-          <!-- 768px以上（PC含む） -->
-          <div class="d-none d-md-block">
+          <!-- 576px以上（PC含む） -->
+          <div class="d-none d-sm-block">
             <div>
               <p class=""
                 id="page2_copy_head1" 
                 style="color: #fff;
-                font-size: 1.3rem;
+                font-size: 1.1rem;
                   display:inline-block;
                   background-image: linear-gradient(90deg, rgb(150, 127, 195), rgb(147, 171, 226) 50%, #fff 50%, #fff);
                   background-size:200% 100%;
-                  padding:0.5em 1.5em;">
+                  padding:0.3rem 1.5rem;">
                 皆さまへのお願い
               </p>
-              <p class="mt-4"
+              <p class="mt-3"
                 id="page2_copy_body1"
-                style="font-size:1.0rem">
-                キユーニーのパートナーとなって、<br><br>
-                フリーランスをご紹介いただけませんか？<br><br>
+                style="font-size:0.85rem">
+                あなたの会社のお役に立つきっかけをいただけませんか<br><br>
+                キユーニーのパートナーとなっていただき、<br><br>
+                そして貴社の委託先をご紹介いただけませんか？<br><br>
               </p> 
-            </div>
 
-            <div>
               <p class=""
                 id="page2_copy_head2" 
                 style="margin-top:50px;
                   color: #fff;
-                  font-size:1.3rem;
+                  font-size:1.1rem;
                   display:inline-block;
                   background-image: linear-gradient(90deg, rgb(150, 127, 195), rgb(147, 171, 226) 50%, #fff 50%, #fff);
                   background-size:200% 100%;
-                  padding:0.5em 1.5em;">
+                  padding:0.3rem 1.5rem;">
                 貴社にとってのメリット
               </p>
 
-              <p class="" style="font-size:1.0rem"
+              <p class="" style="font-size:0.85rem"
                 id="page2_copy_body2">
                 <br>
-                フリーランスはすぐに報酬を手にし、<br><br>
-                あなたの会社は、 ①フリーランスとの良い関係と<br><br>
-                ②キユーニーからのご確認の謝礼金を手にします
+                あなたの会社は、委託先にすぐに報酬を払うことができ、<br><br>
+                ②委託先とのより良い関係と、②キユーニーからのご確認の謝礼金を手にします<br><br>
+                またキユーニーを導入した会社としてアピールにもなります。
               </p>
             </div>
 
@@ -294,7 +300,7 @@
 
           <!-- 下の方のボタン（下部に余白を持たせる） -->
           <div class="mb-5 w-100">
-            <div class="d-md-none mx-5">
+            <div class="d-sm-none mx-5">
               <div class="d-flex flex-column gap-3">
 
                 <a href="#"
@@ -310,20 +316,21 @@
               </div>
             </div>
 
-            <div class="d-none d-md-block">
+            <div class="d-none d-sm-block">
               <div class="row justify-content-center">
                 <div class="col-md-11 col-lg-8 col-xl-7">
 
                   <div class="d-flex justify-content-center mx-4 text-center gap-5">
                     <a href="#"
-                      class="btn btn-primary px-5" role="button"
+                      class="btn btn-primary px-4" role="button"
+                      style="line-height:17px;"
                       data-bs-toggle="modal" data-bs-target="#imageModal"
                       data-bs-placement="bottom">
                       他のサービスと違うのか？</a>
                   
                     <a href="{% url 'accounts:login_buyer' %}"
-                      class="btn btn-primary px-5" role="button"
-                      data-bs-toggle="tooltip" data-bs-placement="bottom" title="発注者向けWebアプリ準備中">
+                      class="btn btn-primary px-4" role="button"
+                      style="line-height:17px;"data-bs-toggle="tooltip" data-bs-placement="bottom" title="発注者向けWebアプリ準備中">
                       キユーニーを利用してみる</a>
                   </div> <!-- end d-flex -->
                 </div> <!-- end col -->
@@ -339,11 +346,17 @@
       <!-- スライドする画像３ -->
       <div id="page3"
         class="carousel-item"
-        style="height:calc(100vh-60px);"
-        data-bs-interval="5000">
+        style="height:calc(100vh - 60px);
+        background-image: url('static/images/qconnect/bg-productLP-buyer2_6.jpg'); 
+        background-size: cover; 
+        background-position: left center; 
+        background-repeat: no-repeat;"
+        data-bs-interval="6000">
         
+        <!--
         <img src='static/images/qconnect/bg-productLP-buyer2_6.jpg' class="d-block w-100 h-100" alt="スライド1"
           style="object-fit:cover; object-position: left;">
+        -->
 
         <div class="bg-overlay2"></div>
 
@@ -351,24 +364,26 @@
         <div class="carousel-caption d-flex flex-column justify-content-between align-items-center
           h-100 bottom-0 start-0 end-0 pt-5">
 
-          <!-- 768px未満（スマホ含む） -->
-          <div class="d-md-none w-100">
+          <!-- 576px未満（スマホ含む） -->
+          <div class="d-sm-none w-100">
 
             <div class="justify-content-center">
               <p class="" id="page3_copy_head1" 
                 style="color: #fff;
-                  font-size: 1.2rem;
+                  font-size: 1.1rem;
                   display:inline-block;
                   background-image: linear-gradient(90deg, rgb(150, 127, 195), rgb(147, 171, 226) 50%, #fff 50%, #fff);
                   background-size:200% 100%;
-                  padding:0.5em 1.5em;">
+                  padding:0.3rem 1.5rem;">
                 謝礼金と基本料金
               </p>
-              <p class="mt-4" id="page3_copy_body1">
+              <p class="mt-3" id="page3_copy_body1"
+                style="font-size:0.9rem">
                 皆さまのご利用を「サービス向上の機会」、<br><br>
                 「サービスの普及」の機会として考えています。<br><br> 
               </p>
-              <p class="" id="page3_copy_body2">
+              <p class="" id="page3_copy_body2"
+              style="font-size:0.85rem">
                 委託先からの申請内容をご確認には、<br><br>
                 キユーニーが感謝として謝礼をお支払い。<br><br>
               </p>
@@ -418,37 +433,37 @@
 
           </div> <!-- end d-block -->
 
-          <!-- 768px以上（PC含む） -->
-          <div class="d-none d-md-block w-100">
+          <!-- 576px以上（PC含む） -->
+          <div class="d-none d-sm-block w-100">
 
             <div class="justify-content-center">
               <p class=""
                 id="page3_copy_head1" 
                 style="color: #fff;
-                  font-size: 1.3rem;
+                  font-size: 1.1rem;
                   display:inline-block;
                   background-image: linear-gradient(90deg, rgb(150, 127, 195), rgb(147, 171, 226) 50%, #fff 50%, #fff);
                   background-size:200% 100%;
-                  padding:0.5em 1.5em;">
+                  padding:0.3rem 1.5rem;">
                 謝礼金と基本料金
               </p>
-              <p class="mt-4" id="page3_copy_body1">
-                皆さまのご利用を「サービス向上の機会」、<br><br>
-                「サービスの普及」の機会として考えています。<br><br> 
+              <p class="mt-2" id="page3_copy_body1" style="font-size:0.8rem">
+                皆さまのご利用は、キユーニーにとっての<br><br>
+                「サービス向上の機会」「サービスの普及」の貴重な機会となります。<br><br> 
               </p>
-              <p class="" id="page3_copy_body2">
-                委託先からの申請内容をご確認には、<br><br>
-                キユーニーが感謝として謝礼をお支払い。<br><br>
+              <p class="" id="page3_copy_body2" style="font-size:0.8rem">
+                委託先からの申請内容をご確認いただく感謝として、<br><br>
+                キユーニーが謝礼をお支払いします。<br><br>
               </p>
 
-              <p class="" id="page3_copy_body3" style="text-decoration: underline;">
-                優待特典として、β版運用期間は、<br><br>
-                ①ご確認の謝礼金2倍、②基本料金ゼロ<br><br>
+              <p class="" id="page3_copy_body3"
+              style="text-decoration: underline; font-size:0.8rem; ">
+                β版運用期間は、①謝礼金2倍、②基本料金ゼロ<br><br>
               </p>
             </div>
 
-            <div class="row justify-content-center mt-4">
-              <div class="col-10 col-md-8 col-lg-6 col-xl-4">
+            <div class="row justify-content-center mt-2">
+              <div class="col-10 col-9 col-md-7 col-lg-6 col-xl-4">
 
                 <table class="table table-sm table-striped
                   table-bordered w-100 bg-light m-0 px-0">
@@ -490,7 +505,7 @@
 
           <!-- 下の方のボタン（下部に余白を持たせる） -->
           <div class="mb-5 w-100">
-            <div class="d-md-none mx-5">
+            <div class="d-sm-none mx-5">
               <div class="d-flex flex-column gap-3">
 
                 <a href="#"
@@ -506,19 +521,21 @@
               </div>
             </div>
 
-            <div class="d-none d-md-block">
+            <div class="d-none d-sm-block">
               <div class="row justify-content-center">
                 <div class="col-md-11 col-lg-8 col-xl-7">
 
                   <div class="d-flex justify-content-center mx-4 text-center gap-5">
                     <a href="#"
-                      class="btn btn-primary px-5" role="button"
+                      class="btn btn-primary px-4" role="button"
+                      style="line-height:17px;"
                       data-bs-toggle="modal" data-bs-target="#imageModal"
                       data-bs-placement="bottom">
                       他のサービスと違うのか？</a>
                   
                     <a href="{% url 'accounts:login_buyer' %}"
-                      class="btn btn-primary px-5" role="button"
+                      class="btn btn-primary px-3" role="button"
+                      style="line-height:17px;"
                       data-bs-toggle="tooltip" data-bs-placement="bottom" title="発注者向けWebアプリ準備中">
                       キユーニーを利用してみる</a>
                   </div> <!-- end d-flex -->
@@ -582,7 +599,7 @@
 
 </section>
 
-<!-- clamp(1.2rem, 0.9em + 0.7vh, 2.0rem);を利用していた -->
+<!-- clamp(1.1rem, 0.9em + 0.7vh, 2.0rem);を利用していた -->
 
 {% endblock %}
 
@@ -614,7 +631,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('#page1_copy_head1').forEach(el => el.animate(keyframes, options));
         document.querySelectorAll('#page1_copy_head2').forEach(el => el.animate(keyframes, options2));
         document.querySelectorAll('#page1_copy_body1').forEach(el => el.animate({opacity:[0, 1], translate: ['0 30px', 0]}, 2000));
-        document.querySelectorAll('#page1_copy_body2').forEach(el => el.animate({opacity:[0, 1], translate: ['0 25px', 0]}, 2000));
+        document.querySelectorAll('#page1_copy_body2').forEach(el => el.animate({opacity:[0, 1], translate: ['0 25px', 0]}, 4000));
         
         // 一度実行したら監視を解除（重複防止）
         observer.unobserve(entry.target);
@@ -688,4 +705,3 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 {% endblock %}
-
